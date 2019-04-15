@@ -1,11 +1,13 @@
 open Instascan;
 open Webapi.Dom;
 
-let videoEl = document |> Document.querySelector("video");
+let videoEl = document |> Document.querySelector(".preview");
 
 let instascanOpts = Scanner.options(~video=Js.Nullable.fromOption(videoEl));
 
 let scanner = Scanner.newScanner(instascanOpts);
+
+Scanner.addListener(scanner, Js.log);
 
 Camera.getCameras()
 |> Js.Promise.then_(cameras => {

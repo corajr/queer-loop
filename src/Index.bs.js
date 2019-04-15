@@ -8,7 +8,7 @@ var Caml_option = require("bs-platform/lib/js/caml_option.js");
 var Js_null_undefined = require("bs-platform/lib/js/js_null_undefined.js");
 var Instascan$QueerLoop = require("./Instascan.bs.js");
 
-var videoEl = document.querySelector("video");
+var videoEl = document.querySelector(".preview");
 
 var videoEl$1 = (videoEl == null) ? undefined : Caml_option.some(videoEl);
 
@@ -17,6 +17,11 @@ var instascanOpts = {
 };
 
 var scanner = new Instascan.Scanner(instascanOpts);
+
+scanner.addListener("scan", (function (prim) {
+        console.log(prim);
+        return /* () */0;
+      }));
 
 Curry._1(Instascan$QueerLoop.Camera[/* getCameras */0], /* () */0).then((function (cameras) {
           if (cameras.length !== 0) {

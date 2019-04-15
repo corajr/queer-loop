@@ -17,6 +17,6 @@
   },
   "dependencies": {
     "bs-webapi": "^0.13.6",
-    "instascan": "^1.0.0"
+    "instascan": "https://github.com/schmich/instascan"
   }
 }
