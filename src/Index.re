@@ -12,6 +12,16 @@ let maybeSetCode: (option(Dom.element), string) => unit =
 
 let domain = "qqq.lu";
 
+let camerasRef = ref([||]);
+let cameraIndex = ref(0);
+
+let cycle = scanner => {
+  let n = Array.length(camerasRef^);
+  cameraIndex := (cameraIndex^ + 1) mod n;
+  let nextCamera = camerasRef^[cameraIndex^];
+  Scanner.start(scanner, nextCamera);
+};
+
 let codeRegex = Js.Re.fromString("https:\/\/" ++ domain ++ "\/#(.+)");
 
 let init: unit => unit =
@@ -60,8 +70,12 @@ let init: unit => unit =
 
     Scanner.addListener(scanner, response);
 
+    WindowRe.addEventListener("click", _ => cycle(scanner), window);
+
     Camera.getCameras()
     |> Js.Promise.then_(cameras => {
+         camerasRef := cameras;
+
          if (Array.length(cameras) > 0) {
            Scanner.start(scanner, cameras[0]);
          } else {

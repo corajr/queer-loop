@@ -4,6 +4,7 @@
 var Curry = require("bs-platform/lib/js/curry.js");
 var Instascan = require("instascan");
 var Caml_array = require("bs-platform/lib/js/caml_array.js");
+var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_format = require("bs-platform/lib/js/caml_format.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
@@ -19,6 +20,18 @@ function maybeSetCode(maybeEl, text) {
 }
 
 var domain = "qqq.lu";
+
+var camerasRef = /* record */[/* contents : array */[]];
+
+var cameraIndex = /* record */[/* contents */0];
+
+function cycle(scanner) {
+  var n = camerasRef[0].length;
+  cameraIndex[0] = Caml_int32.mod_(cameraIndex[0] + 1 | 0, n);
+  var nextCamera = Caml_array.caml_array_get(camerasRef[0], cameraIndex[0]);
+  scanner.start(nextCamera);
+  return /* () */0;
+}
 
 var codeRegex = new RegExp("https:\\/\\/qqq.lu\\/#(.+)");
 
@@ -57,7 +70,11 @@ function init(param) {
     }
   };
   scanner.addListener("scan", response);
+  window.addEventListener("click", (function (param) {
+          return cycle(scanner);
+        }));
   Curry._1(Instascan$QueerLoop.Camera[/* getCameras */0], /* () */0).then((function (cameras) {
+            camerasRef[0] = cameras;
             if (cameras.length !== 0) {
               scanner.start(Caml_array.caml_array_get(cameras, 0));
             } else {
@@ -77,6 +94,9 @@ window.addEventListener("load", (function (param) {
 
 exports.maybeSetCode = maybeSetCode;
 exports.domain = domain;
+exports.camerasRef = camerasRef;
+exports.cameraIndex = cameraIndex;
+exports.cycle = cycle;
 exports.codeRegex = codeRegex;
 exports.init = init;
 /* codeRegex Not a pure module */
