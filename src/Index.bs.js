@@ -5,6 +5,7 @@ var Curry = require("bs-platform/lib/js/curry.js");
 var Instascan = require("instascan");
 var Caml_array = require("bs-platform/lib/js/caml_array.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
+var Caml_format = require("bs-platform/lib/js/caml_format.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 var Js_null_undefined = require("bs-platform/lib/js/js_null_undefined.js");
 var Instascan$QueerLoop = require("./Instascan.bs.js");
@@ -17,21 +18,50 @@ function maybeSetCode(maybeEl, text) {
   return /* () */0;
 }
 
+var domain = "qqq.lu";
+
+var codeRegex = new RegExp("https:\\/\\/qqq.lu\\/#(.+)");
+
 function init(param) {
   var videoEl = document.querySelector("#preview");
   var qrcodeEl = document.querySelector("#code");
   var qrcodeEl$1 = (qrcodeEl == null) ? undefined : Caml_option.some(qrcodeEl);
-  maybeSetCode(qrcodeEl$1, "hello");
+  var initialHash = window.location.hash;
+  var hash = initialHash === "" ? (window.location.hash = "0", "#0") : initialHash;
+  maybeSetCode(qrcodeEl$1, "https://" + (domain + ("/" + hash)));
   var instascanOpts = {
     video: Js_null_undefined.fromOption((videoEl == null) ? undefined : Caml_option.some(videoEl))
   };
   var scanner = new Instascan.Scanner(instascanOpts);
   var response = function (input) {
-    return maybeSetCode(qrcodeEl$1, input + "1");
+    var match = codeRegex.exec(input);
+    if (match !== null) {
+      var match$1 = Caml_array.caml_array_get(match, 1);
+      if (match$1 == null) {
+        return /* () */0;
+      } else {
+        var i;
+        try {
+          i = Caml_format.caml_int_of_string(match$1);
+        }
+        catch (exn){
+          console.log("Error: " + (match$1 + " is invalid."));
+          i = 0;
+        }
+        var nextHash = String(i + 1 | 0);
+        window.location.hash = nextHash;
+        return maybeSetCode(qrcodeEl$1, "https://" + (domain + ("/#" + nextHash)));
+      }
+    } else {
+      return /* () */0;
+    }
   };
   scanner.addListener("scan", response);
   Curry._1(Instascan$QueerLoop.Camera[/* getCameras */0], /* () */0).then((function (cameras) {
-            if (cameras.length !== 0) {
+            var n = cameras.length;
+            if (n > 1) {
+              scanner.start(Caml_array.caml_array_get(cameras, 1));
+            } else if (n === 1) {
               scanner.start(Caml_array.caml_array_get(cameras, 0));
             } else {
               console.error("No cameras found!");
@@ -49,5 +79,7 @@ window.addEventListener("load", (function (param) {
       }));
 
 exports.maybeSetCode = maybeSetCode;
+exports.domain = domain;
+exports.codeRegex = codeRegex;
 exports.init = init;
-/*  Not a pure module */
+/* codeRegex Not a pure module */
