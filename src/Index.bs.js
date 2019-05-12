@@ -12,7 +12,7 @@ var QrCodeGen$QueerLoop = require("./QrCodeGen.bs.js");
 
 function maybeSetCode(maybeEl, text) {
   Belt_Option.map(maybeEl, (function (el) {
-          return QrCodeGen$QueerLoop.setSvg(qrcodegen.QrCode.encodeText(text, qrcodegen.QrCode.Ecc.LOW), el);
+          return QrCodeGen$QueerLoop.setSvg(qrcodegen.QrCode.encodeText(text, qrcodegen.QrCode.Ecc.MEDIUM), el);
         }));
   return /* () */0;
 }

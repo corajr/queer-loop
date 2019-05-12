@@ -9,7 +9,7 @@ function _setSvg (t,el){
      };
 
 function setSvg(t, el) {
-  return _setSvg(t.toSvgString(1), el);
+  return _setSvg(t.toSvgString(2), el);
 }
 
 exports.Ecc = Ecc;

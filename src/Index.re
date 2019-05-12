@@ -5,7 +5,9 @@ open Webapi.Dom;
 let maybeSetCode: (option(Dom.element), string) => unit =
   (maybeEl, text) =>
     ignore(
-      Belt.Option.map(maybeEl, el => setSvg(encodeText(text, Ecc.low), el)),
+      Belt.Option.map(maybeEl, el =>
+        setSvg(encodeText(text, Ecc.medium), el)
+      ),
     );
 
 let init: unit => unit =
@@ -37,7 +39,8 @@ let init: unit => unit =
     |> Js.Promise.catch(err => {
          Js.Console.error2("getCameras failed", err);
          Js.Promise.resolve();
-       });
+       })
+    |> ignore;
 
     ();
   };
