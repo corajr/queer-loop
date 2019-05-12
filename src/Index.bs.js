@@ -4,38 +4,50 @@
 var Curry = require("bs-platform/lib/js/curry.js");
 var Instascan = require("instascan");
 var Caml_array = require("bs-platform/lib/js/caml_array.js");
+var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 var Js_null_undefined = require("bs-platform/lib/js/js_null_undefined.js");
 var Instascan$QueerLoop = require("./Instascan.bs.js");
+var QrCodeGen$QueerLoop = require("./QrCodeGen.bs.js");
 
-var videoEl = document.querySelector(".preview");
+function maybeSetCode(maybeEl, text) {
+  Belt_Option.map(maybeEl, (function (el) {
+          return QrCodeGen$QueerLoop.setSvg(qrcodegen.QrCode.encodeText(text, qrcodegen.QrCode.Ecc.LOW), el);
+        }));
+  return /* () */0;
+}
 
-var videoEl$1 = (videoEl == null) ? undefined : Caml_option.some(videoEl);
-
-var instascanOpts = {
-  video: Js_null_undefined.fromOption(videoEl$1)
-};
-
-var scanner = new Instascan.Scanner(instascanOpts);
-
-scanner.addListener("scan", (function (prim) {
-        console.log(prim);
-        return /* () */0;
-      }));
-
-Curry._1(Instascan$QueerLoop.Camera[/* getCameras */0], /* () */0).then((function (cameras) {
-          if (cameras.length !== 0) {
-            scanner.start(Caml_array.caml_array_get(cameras, 0));
-          } else {
-            console.error("No cameras found!");
-          }
+function init(param) {
+  var videoEl = document.querySelector("#preview");
+  var qrcodeEl = document.querySelector("#code");
+  var qrcodeEl$1 = (qrcodeEl == null) ? undefined : Caml_option.some(qrcodeEl);
+  maybeSetCode(qrcodeEl$1, "hello");
+  var instascanOpts = {
+    video: Js_null_undefined.fromOption((videoEl == null) ? undefined : Caml_option.some(videoEl))
+  };
+  var scanner = new Instascan.Scanner(instascanOpts);
+  var response = function (input) {
+    return maybeSetCode(qrcodeEl$1, input + "1");
+  };
+  scanner.addListener("scan", response);
+  Curry._1(Instascan$QueerLoop.Camera[/* getCameras */0], /* () */0).then((function (cameras) {
+            if (cameras.length !== 0) {
+              scanner.start(Caml_array.caml_array_get(cameras, 0));
+            } else {
+              console.error("No cameras found!");
+            }
+            return Promise.resolve(/* () */0);
+          })).catch((function (err) {
+          console.error("getCameras failed", err);
           return Promise.resolve(/* () */0);
-        })).catch((function (err) {
-        console.error("getCameras failed", err);
-        return Promise.resolve(/* () */0);
+        }));
+  return /* () */0;
+}
+
+window.addEventListener("load", (function (param) {
+        return init(/* () */0);
       }));
 
-exports.videoEl = videoEl$1;
-exports.instascanOpts = instascanOpts;
-exports.scanner = scanner;
-/* videoEl Not a pure module */
+exports.maybeSetCode = maybeSetCode;
+exports.init = init;
+/*  Not a pure module */
