@@ -62,10 +62,7 @@ let init: unit => unit =
 
     Camera.getCameras()
     |> Js.Promise.then_(cameras => {
-         let n = Array.length(cameras);
-         if (n > 1) {
-           Scanner.start(scanner, cameras[1]);
-         } else if (n == 1) {
+         if (Array.length(cameras) > 0) {
            Scanner.start(scanner, cameras[0]);
          } else {
            Js.Console.error("No cameras found!");

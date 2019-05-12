@@ -58,10 +58,7 @@ function init(param) {
   };
   scanner.addListener("scan", response);
   Curry._1(Instascan$QueerLoop.Camera[/* getCameras */0], /* () */0).then((function (cameras) {
-            var n = cameras.length;
-            if (n > 1) {
-              scanner.start(Caml_array.caml_array_get(cameras, 1));
-            } else if (n === 1) {
+            if (cameras.length !== 0) {
               scanner.start(Caml_array.caml_array_get(cameras, 0));
             } else {
               console.error("No cameras found!");
