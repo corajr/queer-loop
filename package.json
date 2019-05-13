@@ -7,10 +7,13 @@
     "clean": "bsb -clean-world"
   },
   "keywords": [
-    "BuckleScript"
+    "BuckleScript",
+    "queer",
+    "qr",
+    "strange-loops"
   ],
-  "author": "",
-  "license": "MIT",
+  "author": "Cora Johnson-Roberson <corajr@pm.me>",
+  "license": "GPL-3.0",
   "devDependencies": {
     "bs-platform": "^5.0.2",
     "webpack": "^4.30.0",
