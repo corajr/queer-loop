@@ -1,11 +1,16 @@
 # queer-loop (WIP)
 
 [queer-loop](https://qqq.lu) is a simple [ReasonML](https://reasonml.github.io/)
-app that generates and reads QR codes. The QR codes follow a color sequence that
-will only progress when the app recognizes another instance of itself. (The name
-is a playful reference to the notion of a [strange
-loop](https://en.wikipedia.org/wiki/Strange_loop) elaborated by Douglas
+app that generates and reads Q(uee)R codes. Q(uee)R codes are QR codes that
+follow a sequence, which will progress only when the app recognizes another
+instance of itself. (The name is a playful reference to the notion of a [strange
+loop](https://en.wikipedia.org/wiki/Strange_loop) as elaborated by Douglas
 Hofstadter.)
+
+Only tested in Chrome (on desktop web and Android mobile).
+
+**NOTE: this does not yet work in iOS. Switching to a different QR scanning
+library may be needed... stay tuned.**
 
 ## Usage
 
@@ -14,15 +19,34 @@ device.
 
 Here are a few ways I've found so far to play with queer-loop:
 
-- open two copies of it on different devices and point their screens at each other
+- open two copies of it on different devices and point their screens/cameras at
+  each other
 - hook up a capture card (I use the ClonerAlliance Flint LXT) to a Chromecast,
-  and cast the tab to itself
+  and cast...:
+    - a phone camera to it
+    - the tab to itself
 
 So far, I've not been able to get queer-loop to work by pointing a phone's
 front-facing camera at a mirror, though I figure it ought to be possible. I
-suspect it's due to the difficulty in recognizing the barcode at an angle (at
-least using the current library). I'd love to get that working -- suggestions
-welcome!
+suspect it's due to the difficulty in recognizing the barcode at even a slight
+angle (at least using the current library). I'd **love** to get that working --
+suggestions welcome!
+
+## TODOs
+
+Currently, the sequence is simply counting through 4096 RGB colors in
+lexicographic order, but there are innumerable possibilities here. Possible
+directions include:
+
+- cycling in some kind of HSV/rainbow order instead (Pride edition!)
+- encoding more than just color (using Base64[^1])
+
+[^1]: Encoding binary directly in the QR code is possible, but I prefer to
+retain a one-to-one relationship between QueeR codes and URLs.
+
+By adopting a Base64 format, a whole range of things could be stored in QueeR
+code. For instance, the state of a [reversible cellular
+automaton](https://en.wikipedia.org/wiki/Reversible_cellular_automaton)... :)
 
 ## Development
 
@@ -34,7 +58,6 @@ present. License is GPL v3.
 - [yarn](https://yarnpkg.com/)
 
 Only tested on Ubuntu 18.10, but should work anywhere.
-
 
 ### Build + Watch
 

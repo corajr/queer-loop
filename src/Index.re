@@ -58,7 +58,8 @@ let init: unit => unit =
   _ => {
     let videoEl = document |> Document.querySelector("#preview");
 
-    let qrcodeEl = document |> Document.querySelector("#code");
+    let previousQrEl = document |> Document.querySelector("#previous");
+    let currentQrEl = document |> Document.querySelector("#current");
 
     let initialHash = DomRe.Location.hash(WindowRe.location(window));
     let hash =
@@ -70,7 +71,7 @@ let init: unit => unit =
       };
 
     setBgColor(hash);
-    maybeSetCode(qrcodeEl, "https://" ++ domain ++ "/" ++ hash);
+    maybeSetCode(currentQrEl, "https://" ++ domain ++ "/" ++ hash);
 
     let instascanOpts =
       Scanner.options(
@@ -88,15 +89,16 @@ let init: unit => unit =
       | Some(result) =>
         switch (Js.Nullable.toOption(Js.Re.captures(result)[1])) {
         | Some(hash) =>
-          Js.log(hash);
+          maybeSetCode(previousQrEl, "https://" ++ domain ++ "/" ++ hash);
           let nextHash = getNextHash(hash);
           DomRe.Location.setHash(WindowRe.location(window), nextHash);
           setBgColor(nextHash);
 
-          maybeSetCode(qrcodeEl, "https://" ++ domain ++ "/" ++ nextHash);
+          maybeSetCode(currentQrEl, "https://" ++ domain ++ "/" ++ nextHash);
         | None => ()
         }
-      | None => Js.log("Ignoring QR: " ++ input)
+      | None => Js.log("Ignoring (external barcode): " ++ input)
+      /* TODO: maybe hash such barcodes as alternative entrances to loop? */
       };
 
     Scanner.addListener(scanner, response);

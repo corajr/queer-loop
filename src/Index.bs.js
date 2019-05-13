@@ -78,12 +78,14 @@ function setBgColor(color) {
 
 function init(param) {
   var videoEl = document.querySelector("#preview");
-  var qrcodeEl = document.querySelector("#code");
-  var qrcodeEl$1 = (qrcodeEl == null) ? undefined : Caml_option.some(qrcodeEl);
+  var previousQrEl = document.querySelector("#previous");
+  var previousQrEl$1 = (previousQrEl == null) ? undefined : Caml_option.some(previousQrEl);
+  var currentQrEl = document.querySelector("#current");
+  var currentQrEl$1 = (currentQrEl == null) ? undefined : Caml_option.some(currentQrEl);
   var initialHash = window.location.hash;
   var hash = initialHash === "" ? (window.location.hash = defaultHash, defaultHash) : initialHash;
   setBgColor(hash);
-  maybeSetCode(qrcodeEl$1, "https://" + (domain + ("/" + hash)));
+  maybeSetCode(currentQrEl$1, "https://" + (domain + ("/" + hash)));
   var instascanOpts = {
     video: Js_null_undefined.fromOption((videoEl == null) ? undefined : Caml_option.some(videoEl)),
     mirror: false,
@@ -98,14 +100,14 @@ function init(param) {
       if (match$1 == null) {
         return /* () */0;
       } else {
-        console.log(match$1);
+        maybeSetCode(previousQrEl$1, "https://" + (domain + ("/" + match$1)));
         var nextHash = getNextHash(match$1);
         window.location.hash = nextHash;
         setBgColor(nextHash);
-        return maybeSetCode(qrcodeEl$1, "https://" + (domain + ("/" + nextHash)));
+        return maybeSetCode(currentQrEl$1, "https://" + (domain + ("/" + nextHash)));
       }
     } else {
-      console.log("Ignoring QR: " + input);
+      console.log("Ignoring (external barcode): " + input);
       return /* () */0;
     }
   };

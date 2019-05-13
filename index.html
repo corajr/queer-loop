@@ -6,7 +6,7 @@
         <script type="text/javascript" src="bundle.js"></script>
         <style type="text/css">
          body { margin: 0; }
-         #preview, #code {
+         #preview, #current {
              position: fixed;
              width: auto;
              height: auto;
@@ -20,16 +20,24 @@
              min-height: 100%;
              opacity: 0.5;
          }
-         #code {
+         #current {
              max-width: 100%;
              max-height: 100%;
              mix-blend-mode: hard-light;
              opacity: 0.8;
          }
+         #previous {
+             position: fixed;
+             width: 12.5vw;
+             height: auto;
+             left: 0;
+             bottom: 0;
+         }
         </style>
     </head>
     <body>
         <video id="preview"></video>
-        <img id="code"></img>
+        <img id="previous"></img>
+        <img id="current"></img>
     </body>
 </html>
