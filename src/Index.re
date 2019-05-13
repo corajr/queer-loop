@@ -12,17 +12,47 @@ let maybeSetCode: (option(Dom.element), string) => unit =
 
 let domain = "qqq.lu";
 
+let codeRegex = Js.Re.fromString("https:\/\/" ++ domain ++ "\/#([0-f]{3})");
+let defaultHash = "fff";
+
+let getNextHash = current => {
+  let i =
+    switch (int_of_string("0x" ++ current)) {
+    | i => i
+    | exception _ =>
+      Js.log("Error: " ++ current ++ " is invalid.");
+      0;
+    };
+
+  let nextI = (i + 1) mod 4096;
+
+  Printf.sprintf("#%03x", nextI);
+};
+
 let camerasRef = ref([||]);
 let cameraIndex = ref(0);
 
-let cycle = scanner => {
+let cycleCameras = scanner => {
   let n = Array.length(camerasRef^);
   cameraIndex := (cameraIndex^ + 1) mod n;
   let nextCamera = camerasRef^[cameraIndex^];
   Scanner.start(scanner, nextCamera);
 };
 
-let codeRegex = Js.Re.fromString("https:\/\/" ++ domain ++ "\/#(.+)");
+let setBgColor = color =>
+  Belt.Option.(
+    DocumentRe.asHtmlDocument(document)
+    |. flatMap(HtmlDocumentRe.body)
+    |. flatMap(DomRe.Element.asHtmlElement)
+    |. map(body =>
+         DomRe.CssStyleDeclaration.setProperty(
+           "background-color",
+           color,
+           "",
+           HtmlElementRe.style(body),
+         )
+       )
+  );
 
 let init: unit => unit =
   _ => {
@@ -33,12 +63,13 @@ let init: unit => unit =
     let initialHash = DomRe.Location.hash(WindowRe.location(window));
     let hash =
       if (initialHash == "") {
-        DomRe.Location.setHash(WindowRe.location(window), "0");
-        "#0";
+        DomRe.Location.setHash(WindowRe.location(window), defaultHash);
+        defaultHash;
       } else {
         initialHash;
       };
 
+    setBgColor(hash);
     maybeSetCode(qrcodeEl, "https://" ++ domain ++ "/" ++ hash);
 
     let instascanOpts =
@@ -51,26 +82,20 @@ let init: unit => unit =
       | Some(result) =>
         switch (Js.Nullable.toOption(Js.Re.captures(result)[1])) {
         | Some(hash) =>
-          let i =
-            switch (int_of_string(hash)) {
-            | i => i
-            | exception _ =>
-              Js.log("Error: " ++ hash ++ " is invalid.");
-              0;
-            };
-
-          let nextHash = string_of_int(i + 1);
+          Js.log(hash);
+          let nextHash = getNextHash(hash);
           DomRe.Location.setHash(WindowRe.location(window), nextHash);
+          setBgColor(nextHash);
 
-          maybeSetCode(qrcodeEl, "https://" ++ domain ++ "/#" ++ nextHash);
+          maybeSetCode(qrcodeEl, "https://" ++ domain ++ "/" ++ nextHash);
         | None => ()
         }
-      | None => ()
+      | None => Js.log("Ignoring QR: " ++ input)
       };
 
     Scanner.addListener(scanner, response);
 
-    WindowRe.addEventListener("click", _ => cycle(scanner), window);
+    WindowRe.addEventListener("click", _ => cycleCameras(scanner), window);
 
     Camera.getCameras()
     |> Js.Promise.then_(cameras => {
