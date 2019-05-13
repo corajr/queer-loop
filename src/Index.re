@@ -1,3 +1,4 @@
+open Color;
 open Instascan;
 open QrCodeGen;
 open Webapi.Dom;
@@ -17,16 +18,12 @@ let defaultHash = "fff";
 
 let getNextHash = current => {
   let i =
-    switch (int_of_string("0x" ++ current)) {
+    switch (int_of_string("0x" ++ Js.String.sliceToEnd(~from=1, current))) {
     | i => i
-    | exception _ =>
-      Js.log("Error: " ++ current ++ " is invalid.");
-      0;
+    | exception _ => 0
     };
 
-  let nextI = (i + 1) mod 4096;
-
-  Printf.sprintf("#%03x", nextI);
+  Printf.sprintf("#%03x", (i + 1) mod 4096);
 };
 
 let camerasRef = ref([||]);
@@ -67,7 +64,6 @@ let init: unit => unit =
     let videoEl = document |> Document.querySelector("#preview");
 
     let previousQrEl = document |> Document.querySelector("#previous");
-    let currentQrEl = document |> Document.querySelector("#current");
 
     let initialHash = DomRe.Location.hash(WindowRe.location(window));
     let hash =

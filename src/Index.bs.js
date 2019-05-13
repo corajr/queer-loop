@@ -32,10 +32,9 @@ var defaultHash = "fff";
 function getNextHash(current) {
   var i;
   try {
-    i = Caml_format.caml_int_of_string("0x" + current);
+    i = Caml_format.caml_int_of_string("0x" + current.slice(1));
   }
   catch (exn){
-    console.log("Error: " + (current + " is invalid."));
     i = 0;
   }
   return Curry._1(Printf.sprintf(/* Format */[
@@ -88,7 +87,6 @@ function init(param) {
   var videoEl = document.querySelector("#preview");
   var previousQrEl = document.querySelector("#previous");
   var previousQrEl$1 = (previousQrEl == null) ? undefined : Caml_option.some(previousQrEl);
-  document.querySelector("#current");
   var initialHash = window.location.hash;
   if (initialHash === "") {
     window.location.hash = defaultHash;

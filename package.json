@@ -15,6 +15,7 @@
   "author": "Cora Johnson-Roberson <corajr@pm.me>",
   "license": "GPL-3.0",
   "devDependencies": {
+    "@glennsl/bs-jest": "^0.4.8",
     "bs-platform": "^5.0.2",
     "webpack": "^4.30.0",
     "webpack-cli": "^3.3.2"

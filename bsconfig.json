@@ -1,10 +1,15 @@
 {
   "name": "queer-loop",
   "version": "0.1.0",
-  "sources": {
-    "dir" : "src",
-    "subdirs" : true
+  "sources": [{
+    "dir": "src",
+    "subdirs": true
   },
+  {
+    "dir": "__tests__",
+    "subdirs": true,
+    "type": "dev"
+  }],
   "package-specs": {
     "module": "commonjs",
     "in-source": true
@@ -13,6 +18,7 @@
   "bs-dependencies": [
       "bs-webapi"
   ],
+  "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "warnings": {
     "error" : "+101"
   },
