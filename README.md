@@ -1,6 +1,4 @@
-# queer-loop (WIP)
-
-[![A QR code for queer-loop](queer-loop.svg)](https://qqq.lu)
+# [![A QR code for queer-loop](queer-loop.png)](https://qqq.lu) queer-loop
 
 [queer-loop](https://qqq.lu) is a simple [ReasonML](https://reasonml.github.io/)
 app that generates and reads Q(uee)R codes. Q(uee)R codes are QR codes that
