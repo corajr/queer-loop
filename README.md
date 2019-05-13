@@ -1,5 +1,7 @@
 # queer-loop (WIP)
 
+[!(A QR code over a pride flag)[queer-loop.png]](https://qqq.lu)
+
 [queer-loop](https://qqq.lu) is a simple [ReasonML](https://reasonml.github.io/)
 app that generates and reads Q(uee)R codes. Q(uee)R codes are QR codes that
 follow a sequence, which will progress only when the app recognizes another
@@ -49,6 +51,8 @@ code. For instance, the state of a [reversible cellular
 automaton](https://en.wikipedia.org/wiki/Reversible_cellular_automaton)... :)
 
 ## Development
+
+!(a version of queer-loop pointed to localhost)[hidden-loopback.png]
 
 This is very much a WIP, so the ergonomics of working with the code are poor at
 present. License is GPL v3.
