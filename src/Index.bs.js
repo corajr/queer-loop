@@ -108,7 +108,7 @@ function init(param) {
       if (match$1 == null) {
         return /* () */0;
       } else {
-        maybeSetCode(previousQrEl$1, "https://" + (domain + ("/" + match$1)));
+        maybeSetCode(previousQrEl$1, "https://" + (domain + ("/#" + match$1)));
         var nextHash = getNextHash(match$1);
         window.location.hash = nextHash;
         return /* () */0;

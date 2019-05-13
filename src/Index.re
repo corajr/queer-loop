@@ -96,7 +96,7 @@ let init: unit => unit =
       | Some(result) =>
         switch (Js.Nullable.toOption(Js.Re.captures(result)[1])) {
         | Some(hash) =>
-          maybeSetCode(previousQrEl, "https://" ++ domain ++ "/" ++ hash);
+          maybeSetCode(previousQrEl, "https://" ++ domain ++ "/#" ++ hash);
           let nextHash = getNextHash(hash);
           DomRe.Location.setHash(WindowRe.location(window), nextHash);
         | None => ()
