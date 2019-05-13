@@ -17,7 +17,16 @@ module Scanner = {
   type t;
 
   [@bs.deriving abstract]
-  type options = {video: Js.Nullable.t(Dom.element)};
+  type options = {
+    [@bs.optional]
+    video: Js.Nullable.t(Dom.element),
+    [@bs.optional]
+    mirror: bool,
+    [@bs.optional]
+    backgroundScan: bool,
+    [@bs.optional]
+    scanPeriod: int,
+  };
 
   [@bs.module "instascan"] [@bs.new]
   external newScanner : options => t = "Scanner";

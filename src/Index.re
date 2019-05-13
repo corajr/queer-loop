@@ -73,7 +73,13 @@ let init: unit => unit =
     maybeSetCode(qrcodeEl, "https://" ++ domain ++ "/" ++ hash);
 
     let instascanOpts =
-      Scanner.options(~video=Js.Nullable.fromOption(videoEl));
+      Scanner.options(
+        ~video=Js.Nullable.fromOption(videoEl),
+        ~mirror=false,
+        ~backgroundScan=false,
+        ~scanPeriod=5,
+        (),
+      );
 
     let scanner = Scanner.newScanner(instascanOpts);
 

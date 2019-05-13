@@ -85,7 +85,10 @@ function init(param) {
   setBgColor(hash);
   maybeSetCode(qrcodeEl$1, "https://" + (domain + ("/" + hash)));
   var instascanOpts = {
-    video: Js_null_undefined.fromOption((videoEl == null) ? undefined : Caml_option.some(videoEl))
+    video: Js_null_undefined.fromOption((videoEl == null) ? undefined : Caml_option.some(videoEl)),
+    mirror: false,
+    backgroundScan: false,
+    scanPeriod: 5
   };
   var scanner = new Instascan.Scanner(instascanOpts);
   var response = function (input) {
