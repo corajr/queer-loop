@@ -27,4 +27,4 @@ let _setSvg: (string, Dom.element) => unit = [%bs.raw
 ];
 
 let setSvg: (t, Dom.element) => unit =
-  (t, el) => _setSvg(toSvgString(t, 2), el);
+  (t, el) => _setSvg(toSvgString(t, 4), el);

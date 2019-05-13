@@ -76,16 +76,24 @@ function setBgColor(color) {
               }));
 }
 
+function onHashChange(param) {
+  var hash = window.location.hash;
+  setBgColor(hash);
+  var currentQrEl = document.querySelector("#current");
+  maybeSetCode((currentQrEl == null) ? undefined : Caml_option.some(currentQrEl), "https://" + (domain + ("/" + hash)));
+  return /* () */0;
+}
+
 function init(param) {
   var videoEl = document.querySelector("#preview");
   var previousQrEl = document.querySelector("#previous");
   var previousQrEl$1 = (previousQrEl == null) ? undefined : Caml_option.some(previousQrEl);
-  var currentQrEl = document.querySelector("#current");
-  var currentQrEl$1 = (currentQrEl == null) ? undefined : Caml_option.some(currentQrEl);
+  document.querySelector("#current");
   var initialHash = window.location.hash;
-  var hash = initialHash === "" ? (window.location.hash = defaultHash, defaultHash) : initialHash;
-  setBgColor(hash);
-  maybeSetCode(currentQrEl$1, "https://" + (domain + ("/" + hash)));
+  if (initialHash === "") {
+    window.location.hash = defaultHash;
+  }
+  onHashChange(/* () */0);
   var instascanOpts = {
     video: Js_null_undefined.fromOption((videoEl == null) ? undefined : Caml_option.some(videoEl)),
     mirror: false,
@@ -103,8 +111,7 @@ function init(param) {
         maybeSetCode(previousQrEl$1, "https://" + (domain + ("/" + match$1)));
         var nextHash = getNextHash(match$1);
         window.location.hash = nextHash;
-        setBgColor(nextHash);
-        return maybeSetCode(currentQrEl$1, "https://" + (domain + ("/" + nextHash)));
+        return /* () */0;
       }
     } else {
       console.log("Ignoring (external barcode): " + input);
@@ -134,6 +141,10 @@ window.addEventListener("load", (function (param) {
         return init(/* () */0);
       }));
 
+window.addEventListener("hashchange", (function (param) {
+        return onHashChange(/* () */0);
+      }));
+
 exports.maybeSetCode = maybeSetCode;
 exports.domain = domain;
 exports.codeRegex = codeRegex;
@@ -143,5 +154,6 @@ exports.camerasRef = camerasRef;
 exports.cameraIndex = cameraIndex;
 exports.cycleCameras = cycleCameras;
 exports.setBgColor = setBgColor;
+exports.onHashChange = onHashChange;
 exports.init = init;
 /* codeRegex Not a pure module */

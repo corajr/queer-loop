@@ -54,6 +54,14 @@ let setBgColor = color =>
        )
   );
 
+let onHashChange = _ => {
+  let hash = DomRe.Location.hash(WindowRe.location(window));
+  setBgColor(hash);
+  let currentQrEl = document |> Document.querySelector("#current");
+  maybeSetCode(currentQrEl, "https://" ++ domain ++ "/" ++ hash);
+  ();
+};
+
 let init: unit => unit =
   _ => {
     let videoEl = document |> Document.querySelector("#preview");
@@ -70,8 +78,7 @@ let init: unit => unit =
         initialHash;
       };
 
-    setBgColor(hash);
-    maybeSetCode(currentQrEl, "https://" ++ domain ++ "/" ++ hash);
+    onHashChange();
 
     let instascanOpts =
       Scanner.options(
@@ -92,9 +99,6 @@ let init: unit => unit =
           maybeSetCode(previousQrEl, "https://" ++ domain ++ "/" ++ hash);
           let nextHash = getNextHash(hash);
           DomRe.Location.setHash(WindowRe.location(window), nextHash);
-          setBgColor(nextHash);
-
-          maybeSetCode(currentQrEl, "https://" ++ domain ++ "/" ++ nextHash);
         | None => ()
         }
       | None => Js.log("Ignoring (external barcode): " ++ input)
@@ -126,3 +130,5 @@ let init: unit => unit =
   };
 
 WindowRe.addEventListener("load", _ => init(), window);
+
+WindowRe.addEventListener("hashchange", _ => onHashChange(), window);
