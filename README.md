@@ -3,7 +3,7 @@
 [queer-loop](https://qqq.lu) is a simple [ReasonML](https://reasonml.github.io/)
 app that generates and reads Q(uee)R codes. Q(uee)R codes are QR codes that
 follow a sequence, which will progress only when the app recognizes another
-instance of itself. (The name is a playful reference to the notion of a [strange
+Q(uee)R code. (The name is a playful reference to the notion of a [strange
 loop](https://en.wikipedia.org/wiki/Strange_loop) as elaborated by Douglas
 Hofstadter.)
 
@@ -32,11 +32,11 @@ suspect it's due to the difficulty in recognizing the barcode at even a slight
 angle (at least using the current library). I'd **love** to get that working --
 suggestions welcome!
 
-## TODOs
+## Future Work
 
 Currently, the sequence is simply counting through 4096 RGB colors in
 lexicographic order, but there are innumerable possibilities here. Possible
-directions include:
+directions I hope to explore include:
 
 - cycling in some kind of HSV/rainbow order instead (Pride edition!)
 - encoding more than just color (using Base64[^1])
@@ -76,4 +76,6 @@ webpack -w
 http-server
 ```
 
-(Alternatively, you could run all three in a subshell, viz.:. `( yarn start &; webpack -w &; http-server &; )`
+Alternatively, you could run all three in a subshell, e.g.:
+
+```( yarn start &; webpack -w &; http-server &; )```
