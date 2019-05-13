@@ -1,9 +1,9 @@
 # queer-loop (WIP)
 
 [queer-loop](https://qqq.lu) is a simple [ReasonML](https://reasonml.github.io/)
-app that generates QR codes in a sequence as well as reading them through a
-webcam. The sequence will only progress when the app recognizes another instance
-of itself. (The name is a playful reference to the notion of a [strange
+app that generates and reads QR codes. The QR codes follow a color sequence that
+will only progress when the app recognizes another instance of itself. (The name
+is a playful reference to the notion of a [strange
 loop](https://en.wikipedia.org/wiki/Strange_loop) elaborated by Douglas
 Hofstadter.)
 
@@ -18,7 +18,7 @@ Here are a few ways I've found so far to play with queer-loop:
 - hook up a capture card (I use the ClonerAlliance Flint LXT) to a Chromecast,
   and cast the tab to itself
 
-So far, I've not been able to get queer-loop to work by pointing the
+So far, I've not been able to get queer-loop to work by pointing a phone's
 front-facing camera at a mirror, though I figure it ought to be possible. I
 suspect it's due to the difficulty in recognizing the barcode at an angle (at
 least using the current library). I'd love to get that working -- suggestions
