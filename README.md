@@ -1,6 +1,6 @@
 # queer-loop (WIP)
 
-[!(A QR code over a pride flag)[queer-loop.png]](https://qqq.lu)
+[![A QR code over a pride flag](queer-loop.png)](https://qqq.lu)
 
 [queer-loop](https://qqq.lu) is a simple [ReasonML](https://reasonml.github.io/)
 app that generates and reads Q(uee)R codes. Q(uee)R codes are QR codes that
@@ -41,10 +41,7 @@ lexicographic order, but there are innumerable possibilities here. Possible
 directions I hope to explore include:
 
 - cycling in some kind of HSV/rainbow order instead (Pride edition!)
-- encoding more than just color (using Base64[^1])
-
-[^1]: Encoding binary directly in the QR code is possible, but I prefer to
-retain a one-to-one relationship between QueeR codes and URLs.
+- encoding more than just color (using Base64)
 
 By adopting a Base64 format, a whole range of things could be stored in QueeR
 code. For instance, the state of a [reversible cellular
@@ -52,7 +49,7 @@ automaton](https://en.wikipedia.org/wiki/Reversible_cellular_automaton)... :)
 
 ## Development
 
-!(a version of queer-loop pointed to localhost)[hidden-loopback.png]
+![a version of queer-loop pointed to localhost](hidden-loopback.png)
 
 This is very much a WIP, so the ergonomics of working with the code are poor at
 present. License is GPL v3.
