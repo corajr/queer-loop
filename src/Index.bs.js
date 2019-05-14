@@ -81,7 +81,7 @@ function onHashChange(param) {
   var hash = window.location.hash;
   setBgColor(hash);
   var currentQrEl = document.querySelector("#current");
-  maybeSetCode((currentQrEl == null) ? undefined : Caml_option.some(currentQrEl), "https://qqq.lu");
+  maybeSetCode((currentQrEl == null) ? undefined : Caml_option.some(currentQrEl), "https://" + (domain + ("/" + hash)));
   return /* () */0;
 }
 

@@ -55,8 +55,7 @@ let onHashChange = _ => {
   let hash = DomRe.Location.hash(WindowRe.location(window));
   setBgColor(hash);
   let currentQrEl = document |> Document.querySelector("#current");
-  maybeSetCode(currentQrEl, "https://" ++ domain);
-  /* maybeSetCode(currentQrEl, "https://" ++ domain ++ "/" ++ hash); */
+  maybeSetCode(currentQrEl, "https://" ++ domain ++ "/" ++ hash);
   ();
 };
 
