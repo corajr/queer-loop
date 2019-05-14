@@ -20,7 +20,7 @@ var QueerCode$QueerLoop = require("./QueerCode.bs.js");
 
 function maybeSetCode(maybeEl, text) {
   Belt_Option.map(maybeEl, (function (el) {
-          return QueerCode$QueerLoop.setSvg(QrCodeGen$QueerLoop.QrCode[/* encodeText */0](text, QrCodeGen$QueerLoop.Ecc[/* high */3]), el);
+          return QueerCode$QueerLoop.setSvg(QrCodeGen$QueerLoop.QrCode[/* encodeText */0](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), el);
         }));
   return /* () */0;
 }
@@ -81,7 +81,7 @@ function onHashChange(param) {
   var hash = window.location.hash;
   setBgColor(hash);
   var currentQrEl = document.querySelector("#current");
-  maybeSetCode((currentQrEl == null) ? undefined : Caml_option.some(currentQrEl), "https://" + (domain + ("/" + hash)));
+  maybeSetCode((currentQrEl == null) ? undefined : Caml_option.some(currentQrEl), "https://qqq.lu");
   return /* () */0;
 }
 

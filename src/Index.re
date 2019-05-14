@@ -7,7 +7,7 @@ let maybeSetCode: (option(Dom.element), string) => unit =
   (maybeEl, text) =>
     ignore(
       Belt.Option.map(maybeEl, el =>
-        QueerCode.setSvg(QrCode.encodeText(text, Ecc.high), el)
+        QueerCode.setSvg(QrCode.encodeText(text, Ecc.medium), el)
       ),
     );
 
@@ -55,7 +55,8 @@ let onHashChange = _ => {
   let hash = DomRe.Location.hash(WindowRe.location(window));
   setBgColor(hash);
   let currentQrEl = document |> Document.querySelector("#current");
-  maybeSetCode(currentQrEl, "https://" ++ domain ++ "/" ++ hash);
+  maybeSetCode(currentQrEl, "https://" ++ domain);
+  /* maybeSetCode(currentQrEl, "https://" ++ domain ++ "/" ++ hash); */
   ();
 };
 
