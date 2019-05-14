@@ -89,6 +89,10 @@ function modulesToSvgString (modules){
 		 '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ' +
 		 (size + border * 2) + ' ' + (size + border * 2) + '" stroke="none">' +
      '<defs>' +
+     '<mask id="mask">' +
+     '<rect width="100%" height="100%" fill="#FFFFFF" />\n' +
+     '<path d="' + parts.join(" ") + '" fill="#000000" />' +
+     '</mask>' +
      '<linearGradient id="rainbow">' +
      '<stop offset="0%" stop-color="hsl(300deg,100%,28%)" />' +
      '<stop offset="14.285%" stop-color="hsl(265deg,100%,30%)" />' +
@@ -99,9 +103,9 @@ function modulesToSvgString (modules){
      '<stop offset="85.712%" stop-color="hsl(0deg,100%,50%)" />' +
      '<stop offset="100%" stop-color="hsl(330deg,100%,71%)" />' +
      '</linearGradient></defs>' +
-     '<rect width="100%" height="100%" fill="#FFFFFF" fill-opacity="0.99" />\n' +
-     '<rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.2" />\n' +
-     '<path d="' + parts.join(" ") + '" fill="#FFFFFF" style="mix-blend-mode: difference;" />' +
+     '<path d="' + parts.join(" ") + '" fill="#000000" fill-opacity="0.5" />' +
+     '<rect width="100%" height="100%" fill="#FFFFFF" mask="url(#mask)" fill-opacity="0.99" />\n' +
+     '<rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.3" />\n' +
 		 '</svg>';
      };
 

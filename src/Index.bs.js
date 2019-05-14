@@ -77,25 +77,6 @@ function setBgColor(color) {
               }));
 }
 
-function moveCode(x, y) {
-  var currentQrEl = document.querySelector("#current");
-  Belt_Option.map(Belt_Option.flatMap((currentQrEl == null) ? undefined : Caml_option.some(currentQrEl), ElementRe.asHtmlElement), (function (current) {
-          current.style.setProperty("top", Pervasives.string_of_float(y * 100.0) + "%", "");
-          current.style.setProperty("left", Pervasives.string_of_float(x * 100.0) + "%", "");
-          return /* () */0;
-        }));
-  return /* () */0;
-}
-
-function onTick(ts) {
-  var scaled = ts * 0.0005;
-  var newX = 0.5 + Math.cos(scaled) * 0.25;
-  var newY = 0.5 + Math.sin(scaled * 2.0) * 0.25;
-  moveCode(newX, newY);
-  requestAnimationFrame(onTick);
-  return /* () */0;
-}
-
 function onHashChange(param) {
   var hash = window.location.hash;
   setBgColor(hash);
@@ -104,8 +85,18 @@ function onHashChange(param) {
   return /* () */0;
 }
 
-function init(param) {
+function onTick(ts) {
+  var scaled = ts * 0.0005;
+  var opacity = Math.pow(Math.sin(scaled), 2.0);
+  Belt_Option.map(Belt_Option.flatMap(Caml_option.nullable_to_opt(document.querySelector("#current")), ElementRe.asHtmlElement), (function (body) {
+          body.style.setProperty("opacity", Pervasives.string_of_float(opacity), "");
+          return /* () */0;
+        }));
   requestAnimationFrame(onTick);
+  return /* () */0;
+}
+
+function init(param) {
   var videoEl = document.querySelector("#preview");
   var previousQrEl = document.querySelector("#previous");
   var previousQrEl$1 = (previousQrEl == null) ? undefined : Caml_option.some(previousQrEl);
@@ -114,6 +105,7 @@ function init(param) {
     window.location.hash = defaultHash;
   }
   onHashChange(/* () */0);
+  requestAnimationFrame(onTick);
   var instascanOpts = {
     video: Js_null_undefined.fromOption((videoEl == null) ? undefined : Caml_option.some(videoEl)),
     mirror: false,
@@ -174,8 +166,7 @@ exports.camerasRef = camerasRef;
 exports.cameraIndex = cameraIndex;
 exports.cycleCameras = cycleCameras;
 exports.setBgColor = setBgColor;
-exports.moveCode = moveCode;
-exports.onTick = onTick;
 exports.onHashChange = onHashChange;
+exports.onTick = onTick;
 exports.init = init;
 /* codeRegex Not a pure module */

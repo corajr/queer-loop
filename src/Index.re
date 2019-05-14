@@ -51,38 +51,6 @@ let setBgColor = color =>
        )
   );
 
-let moveCode = (x, y) => {
-  let currentQrEl = document |> Document.querySelector("#current");
-  Belt.Option.(
-    currentQrEl
-    |. flatMap(DomRe.Element.asHtmlElement)
-    |. map(current => {
-         DomRe.CssStyleDeclaration.setProperty(
-           "top",
-           string_of_float(y *. 100.0) ++ "%",
-           "",
-           HtmlElementRe.style(current),
-         );
-         DomRe.CssStyleDeclaration.setProperty(
-           "left",
-           string_of_float(x *. 100.0) ++ "%",
-           "",
-           HtmlElementRe.style(current),
-         );
-       })
-  );
-  ();
-};
-
-let rec onTick = ts => {
-  let scaled = ts *. 0.0005;
-  let newX = 0.5 +. cos(scaled) *. 0.25;
-  let newY = 0.5 +. sin(scaled *. 2.0) *. 0.25;
-  moveCode(newX, newY);
-
-  Webapi.requestAnimationFrame(onTick);
-};
-
 let onHashChange = _ => {
   let hash = DomRe.Location.hash(WindowRe.location(window));
   setBgColor(hash);
@@ -91,9 +59,27 @@ let onHashChange = _ => {
   ();
 };
 
+let rec onTick = ts => {
+  let scaled = ts *. 0.0005;
+  let opacity = sin(scaled) ** 2.0;
+  Belt.Option.(
+    document
+    |> Document.querySelector("#current")
+    |. flatMap(DomRe.Element.asHtmlElement)
+    |. map(body =>
+         DomRe.CssStyleDeclaration.setProperty(
+           "opacity",
+           string_of_float(opacity),
+           "",
+           HtmlElementRe.style(body),
+         )
+       )
+  );
+  Webapi.requestAnimationFrame(onTick);
+};
+
 let init: unit => unit =
   _ => {
-    Webapi.requestAnimationFrame(onTick);
     let videoEl = document |> Document.querySelector("#preview");
 
     let previousQrEl = document |> Document.querySelector("#previous");
@@ -108,6 +94,8 @@ let init: unit => unit =
       };
 
     onHashChange();
+
+    Webapi.requestAnimationFrame(onTick);
 
     let instascanOpts =
       Scanner.options(
