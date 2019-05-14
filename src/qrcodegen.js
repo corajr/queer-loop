@@ -1,4 +1,20 @@
-/* 
+"use strict";
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['exports'], factory);
+    } else if (typeof exports === 'object' && typeof exports.nodeName !== 'string') {
+        // CommonJS
+        factory(exports);
+    } else {
+        // Browser globals
+        factory((root.commonJsStrict = {}));
+    }
+}(typeof self !== 'undefined' ? self : this, function (exports) {
+
+
+/*
  * QR Code generator library (JavaScript)
  * 
  * Copyright (c) Project Nayuki. (MIT License)
@@ -21,7 +37,6 @@
  *   Software.
  */
 
-"use strict";
 
 
 /* 
@@ -158,6 +173,8 @@ var qrcodegen = new function() {
 		this.getModule = function(x, y) {
 			return 0 <= x && x < size && 0 <= y && y < size && modules[y][x];
 		};
+
+    this.getModules = function () { return modules; }
 		
 		
 		/*---- Public instance methods ----*/
@@ -1035,7 +1052,7 @@ var qrcodegen = new function() {
 		this.appendBits = function(val, len) {
 			if (len < 0 || len > 31 || val >>> len != 0)
 				throw "Value out of range";
-			for (var i = len - 1; i >= 0; i--)  // Append bit by bit
+		for (var i = len - 1; i >= 0; i--)  // Append bit by bit
 				this.push((val >>> i) & 1);
 		};
 	}
@@ -1044,3 +1061,12 @@ var qrcodegen = new function() {
 	BitBuffer.prototype.constructor = BitBuffer;
 	
 };
+
+    exports.QrCode = qrcodegen.QrCode;
+    exports.encodeSegments = function() {
+        return qrcodegen.QrCode.encodeSegments.apply(qrcodegen.QrCode, arguments);
+    };
+    exports.encodeText = qrcodegen.QrCode.encodeText;
+    exports.Ecc = qrcodegen.QrCode.Ecc;
+    exports.QrSegment = qrcodegen.QrSegment;
+}));

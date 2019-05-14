@@ -1,24 +1,40 @@
 module Ecc = {
   type t;
 
-  [@bs.scope ("qrcodegen", "QrCode", "Ecc")] [@bs.val]
-  external low : t = "LOW";
-  [@bs.scope ("qrcodegen", "QrCode", "Ecc")] [@bs.val]
-  external medium : t = "MEDIUM";
-  [@bs.scope ("qrcodegen", "QrCode", "Ecc")] [@bs.val]
-  external quartile : t = "QUARTILE";
-  [@bs.scope ("qrcodegen", "QrCode", "Ecc")] [@bs.val]
-  external high : t = "HIGH";
+  [@bs.deriving abstract]
+  type ecc = {
+    [@bs.as "LOW"]
+    low: t,
+    [@bs.as "MEDIUM"]
+    medium: t,
+    [@bs.as "QUARTILE"]
+    quartile: t,
+    [@bs.as "HIGH"]
+    high: t,
+  };
+
+  [@bs.module "./qrcodegen"] [@bs.val] external ecc : ecc = "Ecc";
+
+  let low: t = lowGet(ecc);
+  let medium: t = mediumGet(ecc);
+  let quartile: t = quartileGet(ecc);
+  let high: t = highGet(ecc);
 };
 
-type t;
+module QrCode = {
+  type t;
 
-[@bs.scope ("qrcodegen", "QrCode")] [@bs.val]
-external encodeText : (string, Ecc.t) => t = "encodeText";
+  [@bs.module "./qrcodegen"] external encodeText : (string, Ecc.t) => t = "";
 
-[@bs.send] external drawCanvas : (t, int, int, Dom.element) => unit = "";
+  [@bs.send] external drawCanvas : (t, int, int, Dom.element) => unit = "";
 
-[@bs.send] external toSvgString : (t, int) => string = "";
+  [@bs.get] external size : t => string = "";
+
+  [@bs.send] external getModule : (t, int, int) => bool = "";
+  [@bs.send] external getModules : t => array(array(bool)) = "";
+
+  [@bs.send] external toSvgString : (t, int) => string = "";
+};
 
 let _setSvg: (string, Dom.element) => unit = [%bs.raw
   (t, el) => {|
@@ -26,5 +42,5 @@ let _setSvg: (string, Dom.element) => unit = [%bs.raw
      |}
 ];
 
-let setSvg: (t, Dom.element) => unit =
-  (t, el) => _setSvg(toSvgString(t, 4), el);
+let setSvg: (QrCode.t, Dom.element) => unit =
+  (t, el) => _setSvg(QrCode.toSvgString(t, 4), el);

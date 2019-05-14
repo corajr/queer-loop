@@ -7,7 +7,7 @@ let maybeSetCode: (option(Dom.element), string) => unit =
   (maybeEl, text) =>
     ignore(
       Belt.Option.map(maybeEl, el =>
-        setSvg(encodeText(text, Ecc.medium), el)
+        setSvg(QrCode.encodeText(text, Ecc.medium), el)
       ),
     );
 
