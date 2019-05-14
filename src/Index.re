@@ -7,7 +7,7 @@ let maybeSetCode: (option(Dom.element), string) => unit =
   (maybeEl, text) =>
     ignore(
       Belt.Option.map(maybeEl, el =>
-        setSvg(QrCode.encodeText(text, Ecc.medium), el)
+        QueerCode.setSvg(QrCode.encodeText(text, Ecc.high), el)
       ),
     );
 
@@ -51,6 +51,38 @@ let setBgColor = color =>
        )
   );
 
+let moveCode = (x, y) => {
+  let currentQrEl = document |> Document.querySelector("#current");
+  Belt.Option.(
+    currentQrEl
+    |. flatMap(DomRe.Element.asHtmlElement)
+    |. map(current => {
+         DomRe.CssStyleDeclaration.setProperty(
+           "top",
+           string_of_float(y *. 100.0) ++ "%",
+           "",
+           HtmlElementRe.style(current),
+         );
+         DomRe.CssStyleDeclaration.setProperty(
+           "left",
+           string_of_float(x *. 100.0) ++ "%",
+           "",
+           HtmlElementRe.style(current),
+         );
+       })
+  );
+  ();
+};
+
+let rec onTick = ts => {
+  let scaled = ts *. 0.0005;
+  let newX = 0.5 +. cos(scaled) *. 0.25;
+  let newY = 0.5 +. sin(scaled *. 2.0) *. 0.25;
+  moveCode(newX, newY);
+
+  Webapi.requestAnimationFrame(onTick);
+};
+
 let onHashChange = _ => {
   let hash = DomRe.Location.hash(WindowRe.location(window));
   setBgColor(hash);
@@ -61,6 +93,7 @@ let onHashChange = _ => {
 
 let init: unit => unit =
   _ => {
+    Webapi.requestAnimationFrame(onTick);
     let videoEl = document |> Document.querySelector("#preview");
 
     let previousQrEl = document |> Document.querySelector("#previous");

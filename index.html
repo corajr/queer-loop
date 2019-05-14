@@ -10,32 +10,26 @@
              position: fixed;
              width: auto;
              height: auto;
+         }
+         #preview {
              top: 0;
              left: 0;
              bottom: 0;
              right: 0;
-         }
-         #preview {
              min-width: 100%;
              min-height: 100%;
              opacity: 0.5;
          }
-         #previous {
-             position: fixed;
-             width: 12.5vw;
-             left: 0;
-             bottom: 0;
-         }
          #current {
-             max-width: 100%;
-             max-height: 100%;
-             opacity: 0.95;
+             height: 50%;
+             top: 50%;
+             left: 50%;
+             transform: translate(-50%,-50%);
          }
         </style>
     </head>
     <body>
         <video id="preview"></video>
-        <img id="previous"></img>
         <img id="current"></img>
     </body>
 </html>

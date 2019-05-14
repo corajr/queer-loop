@@ -9,16 +9,18 @@ var Instascan = require("instascan");
 var Caml_array = require("bs-platform/lib/js/caml_array.js");
 var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
 var DocumentRe = require("bs-webapi/src/dom/nodes/DocumentRe.js");
+var Pervasives = require("bs-platform/lib/js/pervasives.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_format = require("bs-platform/lib/js/caml_format.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 var Js_null_undefined = require("bs-platform/lib/js/js_null_undefined.js");
 var Instascan$QueerLoop = require("./Instascan.bs.js");
 var QrCodeGen$QueerLoop = require("./QrCodeGen.bs.js");
+var QueerCode$QueerLoop = require("./QueerCode.bs.js");
 
 function maybeSetCode(maybeEl, text) {
   Belt_Option.map(maybeEl, (function (el) {
-          return QrCodeGen$QueerLoop.setSvg(QrCodeGen$QueerLoop.QrCode[/* encodeText */0](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), el);
+          return QueerCode$QueerLoop.setSvg(QrCodeGen$QueerLoop.QrCode[/* encodeText */0](text, QrCodeGen$QueerLoop.Ecc[/* high */3]), el);
         }));
   return /* () */0;
 }
@@ -75,6 +77,25 @@ function setBgColor(color) {
               }));
 }
 
+function moveCode(x, y) {
+  var currentQrEl = document.querySelector("#current");
+  Belt_Option.map(Belt_Option.flatMap((currentQrEl == null) ? undefined : Caml_option.some(currentQrEl), ElementRe.asHtmlElement), (function (current) {
+          current.style.setProperty("top", Pervasives.string_of_float(y * 100.0) + "%", "");
+          current.style.setProperty("left", Pervasives.string_of_float(x * 100.0) + "%", "");
+          return /* () */0;
+        }));
+  return /* () */0;
+}
+
+function onTick(ts) {
+  var scaled = ts * 0.0005;
+  var newX = 0.5 + Math.cos(scaled) * 0.25;
+  var newY = 0.5 + Math.sin(scaled * 2.0) * 0.25;
+  moveCode(newX, newY);
+  requestAnimationFrame(onTick);
+  return /* () */0;
+}
+
 function onHashChange(param) {
   var hash = window.location.hash;
   setBgColor(hash);
@@ -84,6 +105,7 @@ function onHashChange(param) {
 }
 
 function init(param) {
+  requestAnimationFrame(onTick);
   var videoEl = document.querySelector("#preview");
   var previousQrEl = document.querySelector("#previous");
   var previousQrEl$1 = (previousQrEl == null) ? undefined : Caml_option.some(previousQrEl);
@@ -152,6 +174,8 @@ exports.camerasRef = camerasRef;
 exports.cameraIndex = cameraIndex;
 exports.cycleCameras = cycleCameras;
 exports.setBgColor = setBgColor;
+exports.moveCode = moveCode;
+exports.onTick = onTick;
 exports.onHashChange = onHashChange;
 exports.init = init;
 /* codeRegex Not a pure module */

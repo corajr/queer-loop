@@ -67,7 +67,7 @@ let modulesToSvgString: array(array(bool)) => string = [%bs.raw
 		 var parts = [];
 		 for (var y = 0; y < size; y++) {
 		 for (var x = 0; x < size; x++) {
-     if (!modules[y][x])
+     if (modules[y][x])
 		 parts.push("M" + (x + border) + "," + (y + border) + "h1v1h-1z");
 		 }
 		 }
@@ -75,10 +75,20 @@ let modulesToSvgString: array(array(bool)) => string = [%bs.raw
 		 '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n' +
 		 '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ' +
 		 (size + border * 2) + ' ' + (size + border * 2) + '" stroke="none">' +
-     '<defs><clipPath id="code"><path d="' + parts.join(" ") + '" fill="#FFFFFF"/></clipPath>' +
-     '</defs>' +
-     '<rect width="100%" height="100%" stroke-width="' + border * 2 + '" stroke="#FFFFFF"/>' +
-     '<rect width="100%" height="100%" fill="#FFFFFF" clip-path="url(#code)"/>\n' +
+     '<defs>' +
+     '<linearGradient id="rainbow">' +
+     '<stop offset="0%" stop-color="hsl(300deg,100%,28%)" />' +
+     '<stop offset="14.285%" stop-color="hsl(265deg,100%,30%)" />' +
+     '<stop offset="28.571%" stop-color="hsl(180deg,100%,38%)" />' +
+     '<stop offset="42.857%" stop-color="hsl(120deg,100%,28%)" />' +
+     '<stop offset="57.142%" stop-color="hsl(60deg,100%,50%)" />' +
+     '<stop offset="71.428%" stop-color="hsl(33deg,100%,50%)" />' +
+     '<stop offset="85.712%" stop-color="hsl(0deg,100%,50%)" />' +
+     '<stop offset="100%" stop-color="hsl(330deg,100%,71%)" />' +
+     '</linearGradient></defs>' +
+     '<rect width="100%" height="100%" fill="#FFFFFF" fill-opacity="0.99" />\n' +
+     '<rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.05" />\n' +
+     '<path d="' + parts.join(" ") + '" fill="#FFFFFF" style="mix-blend-mode: difference;" />' +
 		 '</svg>';
      |}
 ];
