@@ -87,7 +87,7 @@ let modulesToSvgString: array(array(bool)) => string = [%bs.raw
      '<stop offset="100%" stop-color="hsl(330deg,100%,71%)" />' +
      '</linearGradient></defs>' +
      '<rect width="100%" height="100%" fill="#FFFFFF" fill-opacity="0.99" />\n' +
-     '<rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.05" />\n' +
+     '<rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.2" />\n' +
      '<path d="' + parts.join(" ") + '" fill="#FFFFFF" style="mix-blend-mode: difference;" />' +
 		 '</svg>';
      |}
