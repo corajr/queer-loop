@@ -94,18 +94,17 @@ function modulesToSvgString (modules){
      '<path d="' + parts.join(" ") + '" fill="#000000" />' +
      '</mask>' +
      '<linearGradient id="rainbow">' +
-     '<stop offset="0%" stop-color="hsl(300deg,100%,28%)" />' +
-     '<stop offset="14.285%" stop-color="hsl(265deg,100%,30%)" />' +
-     '<stop offset="28.571%" stop-color="hsl(180deg,100%,38%)" />' +
-     '<stop offset="42.857%" stop-color="hsl(120deg,100%,28%)" />' +
-     '<stop offset="57.142%" stop-color="hsl(60deg,100%,50%)" />' +
-     '<stop offset="71.428%" stop-color="hsl(33deg,100%,50%)" />' +
-     '<stop offset="85.712%" stop-color="hsl(0deg,100%,50%)" />' +
-     '<stop offset="100%" stop-color="hsl(330deg,100%,71%)" />' +
+     '<stop offset="0.000%" stop-color="#ffb5b5" />' +
+     '<stop offset="14.286%" stop-color="#fcdc85" />' +
+     '<stop offset="28.571%" stop-color="#caf79c" />' +
+     '<stop offset="42.857%" stop-color="#a8fdbf" />' +
+     '<stop offset="57.143%" stop-color="#70feff" />' +
+     '<stop offset="71.429%" stop-color="#a8bffd" />' +
+     '<stop offset="85.714%" stop-color="#ca9cf7" />' +
+     '<stop offset="100.000%" stop-color="#fc85dc" />' +
      '</linearGradient></defs>' +
-     '<path d="' + parts.join(" ") + '" fill="#000000" fill-opacity="0.5" />' +
-     '<rect width="100%" height="100%" fill="#FFFFFF" mask="url(#mask)" fill-opacity="0.99" />\n' +
-     '<rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.3" />\n' +
+     '<path d="' + parts.join(" ") + '" fill="#000000" />' +
+     '<rect width="100%" height="100%" fill="url(#rainbow)" mask="url(#mask)" />\n' +
 		 '</svg>';
      };
 

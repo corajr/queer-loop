@@ -85,13 +85,19 @@ function onHashChange(param) {
   return /* () */0;
 }
 
+function setOpacity(elQuery, opacity) {
+  return Belt_Option.map(Belt_Option.flatMap(Caml_option.nullable_to_opt(document.querySelector(elQuery)), ElementRe.asHtmlElement), (function (body) {
+                body.style.setProperty("opacity", Pervasives.string_of_float(opacity), "");
+                return /* () */0;
+              }));
+}
+
 function onTick(ts) {
   var scaled = ts * 0.0005;
-  var opacity = Math.pow(Math.sin(scaled), 2.0);
-  Belt_Option.map(Belt_Option.flatMap(Caml_option.nullable_to_opt(document.querySelector("#current")), ElementRe.asHtmlElement), (function (body) {
-          body.style.setProperty("opacity", Pervasives.string_of_float(opacity), "");
-          return /* () */0;
-        }));
+  var videoOpacity = Math.pow(Math.cos(scaled), 2.0);
+  var codeOpacity = Math.pow(Math.sin(scaled), 2.0);
+  setOpacity("#preview", videoOpacity);
+  setOpacity("#current", codeOpacity);
   requestAnimationFrame(onTick);
   return /* () */0;
 }
@@ -105,7 +111,6 @@ function init(param) {
     window.location.hash = defaultHash;
   }
   onHashChange(/* () */0);
-  requestAnimationFrame(onTick);
   var instascanOpts = {
     video: Js_null_undefined.fromOption((videoEl == null) ? undefined : Caml_option.some(videoEl)),
     mirror: false,
@@ -167,6 +172,7 @@ exports.cameraIndex = cameraIndex;
 exports.cycleCameras = cycleCameras;
 exports.setBgColor = setBgColor;
 exports.onHashChange = onHashChange;
+exports.setOpacity = setOpacity;
 exports.onTick = onTick;
 exports.init = init;
 /* codeRegex Not a pure module */

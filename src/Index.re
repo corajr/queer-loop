@@ -59,12 +59,10 @@ let onHashChange = _ => {
   ();
 };
 
-let rec onTick = ts => {
-  let scaled = ts *. 0.0005;
-  let opacity = sin(scaled) ** 2.0;
+let setOpacity = (elQuery, opacity) =>
   Belt.Option.(
     document
-    |> Document.querySelector("#current")
+    |> Document.querySelector(elQuery)
     |. flatMap(DomRe.Element.asHtmlElement)
     |. map(body =>
          DomRe.CssStyleDeclaration.setProperty(
@@ -75,6 +73,13 @@ let rec onTick = ts => {
          )
        )
   );
+
+let rec onTick = ts => {
+  let scaled = ts *. 0.0005;
+  let videoOpacity = cos(scaled) ** 2.0;
+  let codeOpacity = sin(scaled) ** 2.0;
+  setOpacity("#preview", videoOpacity);
+  setOpacity("#current", codeOpacity);
   Webapi.requestAnimationFrame(onTick);
 };
 
@@ -95,7 +100,7 @@ let init: unit => unit =
 
     onHashChange();
 
-    Webapi.requestAnimationFrame(onTick);
+    /* Webapi.requestAnimationFrame(onTick); */
 
     let instascanOpts =
       Scanner.options(
