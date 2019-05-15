@@ -5,7 +5,6 @@ var Block = require("bs-platform/lib/js/block.js");
 var Curry = require("bs-platform/lib/js/curry.js");
 var Printf = require("bs-platform/lib/js/printf.js");
 var ElementRe = require("bs-webapi/src/dom/nodes/ElementRe.js");
-var Instascan = require("instascan");
 var Caml_array = require("bs-platform/lib/js/caml_array.js");
 var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
 var DocumentRe = require("bs-webapi/src/dom/nodes/DocumentRe.js");
@@ -13,10 +12,10 @@ var Pervasives = require("bs-platform/lib/js/pervasives.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_format = require("bs-platform/lib/js/caml_format.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
-var Js_null_undefined = require("bs-platform/lib/js/js_null_undefined.js");
-var Instascan$QueerLoop = require("./Instascan.bs.js");
+var Scanner$QueerLoop = require("./Scanner.bs.js");
 var QrCodeGen$QueerLoop = require("./QrCodeGen.bs.js");
 var QueerCode$QueerLoop = require("./QueerCode.bs.js");
+var UserMedia$QueerLoop = require("./UserMedia.bs.js");
 
 function maybeSetCode(maybeEl, text) {
   Belt_Option.map(maybeEl, (function (el) {
@@ -63,8 +62,6 @@ var cameraIndex = /* record */[/* contents */0];
 function cycleCameras(scanner) {
   var n = camerasRef[0].length;
   cameraIndex[0] = Caml_int32.mod_(cameraIndex[0] + 1 | 0, n);
-  var nextCamera = Caml_array.caml_array_get(camerasRef[0], cameraIndex[0]);
-  scanner.start(nextCamera);
   return /* () */0;
 }
 
@@ -94,9 +91,8 @@ function setOpacity(elQuery, opacity) {
 
 function onTick(ts) {
   var scaled = ts * 0.0005;
-  var videoOpacity = Math.pow(Math.cos(scaled), 2.0);
+  Math.pow(Math.cos(scaled), 2.0);
   var codeOpacity = Math.pow(Math.sin(scaled), 2.0);
-  setOpacity("#preview", videoOpacity);
   setOpacity("#current", codeOpacity);
   requestAnimationFrame(onTick);
   return /* () */0;
@@ -111,13 +107,6 @@ function init(param) {
     window.location.hash = defaultHash;
   }
   onHashChange(/* () */0);
-  var instascanOpts = {
-    video: Js_null_undefined.fromOption((videoEl == null) ? undefined : Caml_option.some(videoEl)),
-    mirror: false,
-    backgroundScan: false,
-    scanPeriod: 5
-  };
-  var scanner = new Instascan.Scanner(instascanOpts);
   var response = function (input) {
     var match = codeRegex.exec(input);
     if (match !== null) {
@@ -135,18 +124,13 @@ function init(param) {
       return /* () */0;
     }
   };
-  scanner.addListener("scan", response);
-  window.addEventListener("click", (function (param) {
-          return cycleCameras(scanner);
-        }));
-  Curry._1(Instascan$QueerLoop.Camera[/* getCameras */0], /* () */0).then((function (cameras) {
+  UserMedia$QueerLoop.getCameras(/* () */0).then((function (cameras) {
             camerasRef[0] = cameras;
-            if (cameras.length !== 0) {
-              scanner.start(Caml_array.caml_array_get(cameras, 0));
+            if (videoEl == null) {
+              return Promise.resolve(/* () */0);
             } else {
-              console.error("No cameras found!");
+              return Scanner$QueerLoop.scanUsingDeviceId(videoEl, Caml_array.caml_array_get(cameras, 0).deviceId, response);
             }
-            return Promise.resolve(/* () */0);
           })).catch((function (err) {
           console.error("getCameras failed", err);
           return Promise.resolve(/* () */0);

@@ -22,6 +22,6 @@
   },
   "dependencies": {
     "bs-webapi": "^0.13.6",
-    "instascan": "https://github.com/schmich/instascan"
+    "jsqr": "^1.2.0"
   }
 }

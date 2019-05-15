@@ -1,5 +1,4 @@
 open Color;
-open Instascan;
 open QrCodeGen;
 open Webapi.Dom;
 
@@ -26,14 +25,14 @@ let getNextHash = current => {
   Printf.sprintf("#%03x", (i + 1) mod 4096);
 };
 
-let camerasRef = ref([||]);
+let camerasRef: ref(array(UserMedia.mediaDeviceInfo)) = ref([||]);
 let cameraIndex = ref(0);
 
 let cycleCameras = scanner => {
   let n = Array.length(camerasRef^);
   cameraIndex := (cameraIndex^ + 1) mod n;
   let nextCamera = camerasRef^[cameraIndex^];
-  Scanner.start(scanner, nextCamera);
+  ();
 };
 
 let setBgColor = color =>
@@ -78,7 +77,7 @@ let rec onTick = ts => {
   let scaled = ts *. 0.0005;
   let videoOpacity = cos(scaled) ** 2.0;
   let codeOpacity = sin(scaled) ** 2.0;
-  setOpacity("#preview", videoOpacity);
+  /* setOpacity("#border", videoOpacity); */
   setOpacity("#current", codeOpacity);
   Webapi.requestAnimationFrame(onTick);
 };
@@ -100,19 +99,6 @@ let init: unit => unit =
 
     onHashChange();
 
-    /* Webapi.requestAnimationFrame(onTick); */
-
-    let instascanOpts =
-      Scanner.options(
-        ~video=Js.Nullable.fromOption(videoEl),
-        ~mirror=false,
-        ~backgroundScan=false,
-        ~scanPeriod=5,
-        (),
-      );
-
-    let scanner = Scanner.newScanner(instascanOpts);
-
     let response = input =>
       switch (Js.Re.exec_(codeRegex, input)) {
       | Some(result) =>
@@ -127,20 +113,21 @@ let init: unit => unit =
       /* TODO: maybe hash such barcodes as alternative entrances to loop? */
       };
 
-    Scanner.addListener(scanner, response);
+    /* WindowRe.addEventListener("click", _ => cycleCameras(scanner), window); */
 
-    WindowRe.addEventListener("click", _ => cycleCameras(scanner), window);
-
-    Camera.getCameras()
+    UserMedia.getCameras()
     |> Js.Promise.then_(cameras => {
          camerasRef := cameras;
 
-         if (Array.length(cameras) > 0) {
-           Scanner.start(scanner, cameras[0]);
-         } else {
-           Js.Console.error("No cameras found!");
+         switch (videoEl) {
+         | Some(videoEl) =>
+           Scanner.scanUsingDeviceId(
+             videoEl,
+             UserMedia.deviceIdGet(cameras[0]),
+             response,
+           )
+         | None => Js.Promise.resolve()
          };
-         Js.Promise.resolve();
        })
     |> Js.Promise.catch(err => {
          Js.Console.error2("getCameras failed", err);
