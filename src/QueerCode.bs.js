@@ -104,7 +104,7 @@ function modulesToSvgString (modules){
      '<stop offset="100.000%" stop-color="#fda1e4" />' +
      '</linearGradient></defs>' +
      '<path d="' + parts.join(" ") + '" fill="#000000" fill-opacity="0.8" />' +
-     '<rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.5" mask="url(#mask)" />\n' +
+     '<rect width="100%" height="100%" fill="url(#rainbow)" mask="url(#mask)" />\n' +
 		 '</svg>';
      };
 
