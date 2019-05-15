@@ -4,9 +4,27 @@
 var Jsqr = require("jsqr");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 
-function jsQR(d, w, h) {
-  return Caml_option.nullable_to_opt(Jsqr(d, w, h));
+function string_of_invertOptions(param) {
+  switch (param) {
+    case 0 : 
+        return "attemptBoth";
+    case 1 : 
+        return "dontInvert";
+    case 2 : 
+        return "onlyInvert";
+    case 3 : 
+        return "invertFirst";
+    
+  }
 }
 
+function jsQR(d, w, h, invertOptions) {
+  var optString = string_of_invertOptions(invertOptions);
+  return Caml_option.nullable_to_opt(Jsqr(d, w, h, {
+                  inversionAttempts: optString
+                }));
+}
+
+exports.string_of_invertOptions = string_of_invertOptions;
 exports.jsQR = jsQR;
 /* jsqr Not a pure module */

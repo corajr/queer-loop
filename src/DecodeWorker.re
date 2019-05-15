@@ -5,7 +5,7 @@ WebWorkers.setWorkerOnMessage(
   (e: WebWorkers.MessageEvent.t) => {
     let (data, width, height) = WebWorkers.MessageEvent.data(e);
 
-    let maybeCode = jsQR(data, width, height);
+    let maybeCode = jsQR(data, width, height, DontInvert);
     WebWorkers.postMessageFromWorker(maybeCode);
   },
 );

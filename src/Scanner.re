@@ -15,7 +15,7 @@ let scanUsingDeviceId:
            e => {
              let maybeCode: option(code) = WebWorkers.MessageEvent.data(e);
              switch (maybeCode) {
-             | Some(qrCode) => scanCallback(contentGet(qrCode))
+             | Some(qrCode) => scanCallback(textDataGet(qrCode))
              | None => ()
              };
              ();
