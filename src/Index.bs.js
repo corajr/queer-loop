@@ -91,8 +91,7 @@ function setOpacity(elQuery, opacity) {
 
 function onTick(ts) {
   var scaled = ts * 0.0005;
-  Math.pow(Math.cos(scaled), 2.0);
-  var codeOpacity = Math.pow(Math.sin(scaled), 2.0);
+  var codeOpacity = 0.5 + Math.pow(Math.sin(scaled), 2.0) * 0.5;
   setOpacity("#current", codeOpacity);
   requestAnimationFrame(onTick);
   return /* () */0;
@@ -107,6 +106,7 @@ function init(param) {
     window.location.hash = defaultHash;
   }
   onHashChange(/* () */0);
+  requestAnimationFrame(onTick);
   var response = function (input) {
     var match = codeRegex.exec(input);
     if (match !== null) {

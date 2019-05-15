@@ -75,9 +75,9 @@ let setOpacity = (elQuery, opacity) =>
 
 let rec onTick = ts => {
   let scaled = ts *. 0.0005;
-  let videoOpacity = cos(scaled) ** 2.0;
-  let codeOpacity = sin(scaled) ** 2.0;
-  /* setOpacity("#border", videoOpacity); */
+  let codeOpacity = 0.5 +. sin(scaled) ** 2.0 *. 0.5;
+  /* let videoOpacity = 0.5 +. cos(scaled) ** 2.0 *. 0.5; */
+  /* setOpacity("#preview", videoOpacity); */
   setOpacity("#current", codeOpacity);
   Webapi.requestAnimationFrame(onTick);
 };
@@ -98,6 +98,7 @@ let init: unit => unit =
       };
 
     onHashChange();
+    Webapi.requestAnimationFrame(onTick);
 
     let response = input =>
       switch (Js.Re.exec_(codeRegex, input)) {
