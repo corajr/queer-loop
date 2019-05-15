@@ -1,9 +1,13 @@
 module.exports = {
-    entry: './src/Index.bs.js',
+    entry: {
+        index: './src/Index.bs.js',
+        worker: './src/DecodeWorker.bs.js'
+    },
     mode: 'development',
     output: {
         path: __dirname,
-        filename: 'bundle.js',
+        filename: '[name].js',
+        publicPath: "/"
     },
     node: {
         fs: 'empty'

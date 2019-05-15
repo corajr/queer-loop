@@ -3,14 +3,23 @@
 
 var Curry = require("bs-platform/lib/js/curry.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
-var JsQr$QueerLoop = require("./JsQr.bs.js");
 var UserMedia$QueerLoop = require("./UserMedia.bs.js");
 
 function scanUsingDeviceId(videoEl, deviceId, scanCallback) {
   return UserMedia$QueerLoop.initStreamByDeviceId(videoEl, deviceId).then((function (video) {
                 var canvas = document.createElement("canvas");
+                var worker = new Worker("worker.js");
+                var msgBackHandler = function (e) {
+                  var maybeCode = e.data;
+                  if (maybeCode !== undefined) {
+                    Curry._1(scanCallback, Caml_option.valFromOption(maybeCode).data);
+                  }
+                  return /* () */0;
+                };
+                worker.onmessage = msgBackHandler;
+                var frameCount = /* record */[/* contents */0];
                 var onTick = function (param) {
-                  if (video.readyState === 4) {
+                  if (frameCount[0] % 5 === 0 && video.readyState === 4) {
                     var width = video.videoWidth;
                     var height = video.videoHeight;
                     canvas.width = width;
@@ -18,12 +27,13 @@ function scanUsingDeviceId(videoEl, deviceId, scanCallback) {
                     var ctx = canvas.getContext("2d");
                     ctx.drawImage(video, 0, 0);
                     var imageData = ctx.getImageData(0, 0, width, height);
-                    var maybeCode = JsQr$QueerLoop.jsQR(imageData.data, width, height);
-                    if (maybeCode !== undefined) {
-                      Curry._1(scanCallback, Caml_option.valFromOption(maybeCode).data);
-                    }
-                    
+                    worker.postMessage(/* tuple */[
+                          imageData.data,
+                          width,
+                          height
+                        ]);
                   }
+                  frameCount[0] = frameCount[0] + 1 | 0;
                   requestAnimationFrame(onTick);
                   return /* () */0;
                 };
@@ -33,4 +43,4 @@ function scanUsingDeviceId(videoEl, deviceId, scanCallback) {
 }
 
 exports.scanUsingDeviceId = scanUsingDeviceId;
-/* JsQr-QueerLoop Not a pure module */
+/* UserMedia-QueerLoop Not a pure module */

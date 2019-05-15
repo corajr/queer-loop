@@ -10,8 +10,22 @@ let scanUsingDeviceId:
     |> Js.Promise.then_(video => {
          let canvas = DocumentRe.createElement("canvas", document);
 
+         let worker = WebWorkers.create_webworker("worker.js");
+         let msgBackHandler: WebWorkers.MessageEvent.t => unit =
+           e => {
+             let maybeCode: option(code) = WebWorkers.MessageEvent.data(e);
+             switch (maybeCode) {
+             | Some(qrCode) => scanCallback(contentGet(qrCode))
+             | None => ()
+             };
+             ();
+           };
+         WebWorkers.onMessage(worker, msgBackHandler);
+
+         let frameCount = ref(0);
+
          let rec onTick = _ => {
-           if (readyState(video) == 4) {
+           if (frameCount^ mod 5 == 0 && readyState(video) == 4) {
              let width = videoWidth(video);
              let height = videoHeight(video);
              setWidth(canvas, width);
@@ -20,13 +34,13 @@ let scanUsingDeviceId:
              Ctx.drawImage(ctx, ~image=video, ~dx=0, ~dy=0);
              let imageData =
                Ctx.getImageData(ctx, ~sx=0, ~sy=0, ~sw=width, ~sh=height);
-             let maybeCode = jsQR(dataGet(imageData), width, height);
-             switch (maybeCode) {
-             | Some(code) => scanCallback(contentGet(code))
-             | None => ()
-             };
+             WebWorkers.postMessage(
+               worker,
+               (dataGet(imageData), width, height),
+             );
            };
 
+           frameCount := frameCount^ + 1;
            Webapi.requestAnimationFrame(onTick);
          };
          Webapi.requestAnimationFrame(onTick);

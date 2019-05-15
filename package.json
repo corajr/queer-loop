@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "bs-webapi": "^0.13.6",
+    "bs-webworkers": "^0.2.4",
     "jsqr": "^1.2.0"
   }
 }
