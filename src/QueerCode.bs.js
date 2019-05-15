@@ -94,14 +94,14 @@ function modulesToSvgString (modules){
      '<path d="' + parts.join(" ") + '" fill="#000000" />' +
      '</mask>' +
      '<linearGradient id="rainbow">' +
-     '<stop offset="0.000%" stop-color="#fec6c6" />' +
-     '<stop offset="14.286%" stop-color="#fde4a1" />' +
-     '<stop offset="28.571%" stop-color="#d6f9b3" />' +
-     '<stop offset="42.857%" stop-color="#bcfdcd" />' +
-     '<stop offset="57.143%" stop-color="#90feff" />' +
-     '<stop offset="71.429%" stop-color="#bccdfd" />' +
-     '<stop offset="85.714%" stop-color="#d6b3f9" />' +
-     '<stop offset="100.000%" stop-color="#fda1e4" />' +
+     '<stop offset="0.000%" stop-color="#ffb5b5" />' +
+     '<stop offset="14.286%" stop-color="#fcdc85" />' +
+     '<stop offset="28.571%" stop-color="#caf79c" />' +
+     '<stop offset="42.857%" stop-color="#a8fdbf" />' +
+     '<stop offset="57.143%" stop-color="#70feff" />' +
+     '<stop offset="71.429%" stop-color="#a8bffd" />' +
+     '<stop offset="85.714%" stop-color="#ca9cf7" />' +
+     '<stop offset="100.000%" stop-color="#fc85dc" />' +
      '</linearGradient></defs>' +
      '<path d="' + parts.join(" ") + '" fill="#000000" fill-opacity="0.8" />' +
      '<rect width="100%" height="100%" fill="url(#rainbow)" mask="url(#mask)" />\n' +
