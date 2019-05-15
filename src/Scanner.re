@@ -10,18 +10,6 @@ let scanUsingDeviceId:
     |> Js.Promise.then_(video => {
          let canvas = DocumentRe.createElement("canvas", document);
 
-         let worker = WebWorkers.create_webworker("worker.js");
-         let msgBackHandler: WebWorkers.MessageEvent.t => unit =
-           e => {
-             let maybeCode: option(code) = WebWorkers.MessageEvent.data(e);
-             switch (maybeCode) {
-             | Some(qrCode) => scanCallback(contentGet(qrCode))
-             | None => ()
-             };
-             ();
-           };
-         WebWorkers.onMessage(worker, msgBackHandler);
-
          let frameCount = ref(0);
 
          let rec onTick = _ => {
@@ -34,10 +22,12 @@ let scanUsingDeviceId:
              Ctx.drawImage(ctx, ~image=video, ~dx=0, ~dy=0);
              let imageData =
                Ctx.getImageData(ctx, ~sx=0, ~sy=0, ~sw=width, ~sh=height);
-             WebWorkers.postMessage(
-               worker,
-               (dataGet(imageData), width, height),
-             );
+             let maybeCode = jsQR(data, width, height);
+             switch (maybeCode) {
+             | Some(qrCode) => scanCallback(contentGet(qrCode))
+             | None => ()
+             };
+             ();
            };
 
            frameCount := frameCount^ + 1;
