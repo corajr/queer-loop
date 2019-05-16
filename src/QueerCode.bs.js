@@ -69,28 +69,36 @@ function rgbModulesToSvgString (modules){
 		 '</svg>\n';
      };
 
-function modulesToSvgString (modules){
-
+function modulesToSvgString (modules,foreignCodes){
      var border = 4;
      var size = modules.length;
 
 		 if (border < 0)
 		 throw "Border must be non-negative";
 		 var parts = [];
+     var n = size + (border * 2);
+     var meta = foreignCodes.map((code, i) => {
+       var x = i % n;
+       var y = ~~(i / n);
+       return '<image href="' + code + '" x="' + x + '" y="' + y + '" width="1" height="1" />'
+     });
 		 for (var y = 0; y < size; y++) {
 		 for (var x = 0; x < size; x++) {
-     if (modules[y][x])
+
+     if (modules[y][x]) {
 		 parts.push("M" + (x + border) + "," + (y + border) + "h1v1h-1z");
+     }
 		 }
 		 }
 		 return '<?xml version="1.0" encoding="UTF-8"?>\n' +
 		 '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n' +
 		 '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ' +
 		 (size + border * 2) + ' ' + (size + border * 2) + '" stroke="none">' +
+     '<symbol id="code"><path d="' + parts.join(" ") + '" fill="#000000" /></symbol>' +
      '<defs>' +
      '<mask id="mask">' +
      '<rect width="100%" height="100%" fill="#FFFFFF" />\n' +
-     '<path d="' + parts.join(" ") + '" fill="#000000" />' +
+     '<use href="#code" />' +
      '</mask>' +
      '<linearGradient id="rainbow">' +
      '<stop offset="0.000%" stop-color="#ffb5b5" />' +
@@ -103,13 +111,14 @@ function modulesToSvgString (modules){
      '<stop offset="100.000%" stop-color="#fc85dc" />' +
      '</linearGradient></defs>' +
      '<rect width="100%" height="100%" fill="url(#rainbow)" mask="url(#mask)" />\n' +
-     '<path d="' + parts.join(" ") + '" fill="#000000" fill-opacity="0.5" />' +
+     '<use href="#code" />' +
+     '<g style="mix-blend-mode: overlay">' + meta.join("") + '</g>' +
 		 '</svg>';
      };
 
-function getSvgDataUri(code) {
+function getSvgDataUri(code, foreignCodes) {
   var moduleArray = code.getModules();
-  var svg = modulesToSvgString(moduleArray);
+  var svg = modulesToSvgString(moduleArray, foreignCodes);
   return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
 }
 

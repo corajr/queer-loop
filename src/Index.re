@@ -48,6 +48,8 @@ let cycleCameras = scanner => {
 let setSrc = [%bs.raw (img, src) => {|
      img.src = src;|}];
 
+let previousCodes: ref(list(string)) = ref([]);
+
 let onHashChange = _ => {
   let hash = DomRe.Location.hash(WindowRe.location(window));
   (
@@ -72,18 +74,22 @@ let onHashChange = _ => {
       defaultCode,
     );
 
-  let codeAsImage =
-    document
-    |> Document.querySelector("#codeCanvas")
-    |. Belt.Option.map(canvas => {
-         QueerCode.drawCanvas(canvas, code);
-         let url = toDataURL(canvas);
-         setBackground("#overlay", "url(" ++ url ++ ")");
-         ();
-       });
+  document
+  |> Document.querySelector("#codeCanvas")
+  |. Belt.Option.map(canvas => {
+       QueerCode.drawCanvas(canvas, code);
+       let url = toDataURL(canvas);
+       previousCodes := [url, ...previousCodes^];
+       ();
+     })
+  |> ignore;
 
   withQuerySelector("#current", img => {
-    let url = QueerCode.getSvgDataUri(code);
+    let url =
+      QueerCode.getSvgDataUri(
+        code,
+        Array.of_list(List.rev(previousCodes^)),
+      );
     setSrc(img, url);
   });
   ();
