@@ -4,6 +4,15 @@ let abToStr: Js.Typed_array.ArrayBuffer.t => string = [%bs.raw
      |}
 ];
 
+let abToHexAndBase64Str: Js.Typed_array.ArrayBuffer.t => (string, string) = [%bs.raw
+  buf => {|
+     var uint8 = new Uint8Array(buf);
+     var b64 = window.btoa(String.fromCharCode.apply(null, uint8));
+     var hex = Array.prototype.map.call(uint8, x => ('00' + x.toString(16)).slice(-2)).join('');
+     return [hex, b64];
+     |}
+];
+
 let abToHexStr: Js.Typed_array.ArrayBuffer.t => string = [%bs.raw
   buf => {|
      return Array.prototype.map.call(new Uint8Array(buf), x => ('00' + x.toString(16)).slice(-2)).join('');
@@ -36,3 +45,10 @@ let hexDigest: (string, string) => Js.Promise.t(string) =
   (algorithm, input) =>
     _digest(algorithm, str2ab(input))
     |> Js.Promise.then_(output => Js.Promise.resolve(abToHexStr(output)));
+
+let hexAndBase64Digest: (string, string) => Js.Promise.t((string, string)) =
+  (algorithm, input) =>
+    _digest(algorithm, str2ab(input))
+    |> Js.Promise.then_(output =>
+         Js.Promise.resolve(abToHexAndBase64Str(output))
+       );

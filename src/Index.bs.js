@@ -58,10 +58,6 @@ function getNextHashInc(current) {
                     ]), (i + 1 | 0) % 4096));
 }
 
-function getNextHash(input) {
-  return Hash$QueerLoop.hexDigest("SHA-256", input);
-}
-
 var camerasRef = /* record */[/* contents : array */[]];
 
 var cameraIndex = /* record */[/* contents */0];
@@ -77,9 +73,14 @@ function setSrc (img,src){
 
 function onHashChange(param) {
   var hash = window.location.hash;
-  if ((/[0-f]+/).test(hash)) {
-    setBackground("body", hash.slice(0, 7));
-  }
+  var match = (/^#[0-9a-f]+$/).test(hash);
+  (
+      match ? Promise.resolve(hash.slice(1)) : Hash$QueerLoop.hexDigest("SHA-256", hash)
+    ).then((function (hexHash) {
+          console.log(hexHash);
+          setBackground("body", "#" + hexHash.slice(0, 6));
+          return Promise.resolve(/* () */0);
+        }));
   Util$QueerLoop.withQuerySelector("#codeContents", (function (contents) {
           contents.innerText = decodeURIComponent(hash);
           return /* () */0;
@@ -123,8 +124,8 @@ function init(param) {
   var hash = initialHash === "" ? (window.location.hash = defaultColor, defaultColor) : initialHash;
   onHashChange(/* () */0);
   var response = function (input) {
-    Hash$QueerLoop.hexDigest("SHA-256", hash + input).then((function (nextHash) {
-            window.location.hash = nextHash;
+    Hash$QueerLoop.hexDigest("SHA-256", hash + input).then((function (hexHash) {
+            window.location.hash = hexHash;
             return Promise.resolve(/* () */0);
           }));
     return /* () */0;
@@ -164,7 +165,6 @@ exports.defaultCode = defaultCode;
 exports.defaultColor = defaultColor;
 exports.defaultHash = defaultHash;
 exports.getNextHashInc = getNextHashInc;
-exports.getNextHash = getNextHash;
 exports.camerasRef = camerasRef;
 exports.cameraIndex = cameraIndex;
 exports.cycleCameras = cycleCameras;

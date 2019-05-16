@@ -35,9 +35,6 @@ let getNextHashInc: string => Js.Promise.t(string) =
     Js.Promise.resolve(Printf.sprintf("#%03x", (i + 1) mod 4096));
   };
 
-let getNextHash: string => Js.Promise.t(string) =
-  input => Hash.hexDigest("SHA-256", input);
-
 let camerasRef: ref(array(UserMedia.mediaDeviceInfo)) = ref([||]);
 let cameraIndex = ref(0);
 
@@ -53,9 +50,20 @@ let setSrc = [%bs.raw (img, src) => {|
 
 let onHashChange = _ => {
   let hash = DomRe.Location.hash(WindowRe.location(window));
-  if (Js.Re.test_([%bs.re "/[0-f]+/"], hash)) {
-    setBackground("body", Js.String.slice(~from=0, ~to_=7, hash)) |> ignore;
-  };
+  (
+    Js.Re.test_([%bs.re "/^#[0-9a-f]+$/"], hash) ?
+      Js.Promise.resolve(Js.String.sliceToEnd(~from=1, hash)) :
+      Hash.hexDigest("SHA-256", hash)
+  )
+  |> Js.Promise.then_(hexHash => {
+       Js.log(hexHash);
+       setBackground(
+         "body",
+         "#" ++ Js.String.slice(~from=0, ~to_=6, hexHash),
+       );
+       Js.Promise.resolve();
+     });
+
   withQuerySelector("#codeContents", contents =>
     HtmlElementRe.setInnerText(contents, QueerCode.decodeURIComponent(hash))
   );
@@ -129,8 +137,8 @@ let init: unit => unit =
 
     let response = input =>
       Hash.hexDigest("SHA-256", hash ++ input)
-      |> Js.Promise.then_(nextHash => {
-           DomRe.Location.setHash(WindowRe.location(window), nextHash);
+      |> Js.Promise.then_(hexHash => {
+           DomRe.Location.setHash(WindowRe.location(window), hexHash);
            Js.Promise.resolve();
          })
       |> ignore;
