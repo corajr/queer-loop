@@ -6,7 +6,6 @@ var $$Array = require("bs-platform/lib/js/array.js");
 var $$String = require("bs-platform/lib/js/string.js");
 var Caml_array = require("bs-platform/lib/js/caml_array.js");
 var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
-var QrCodeGen$QueerLoop = require("./QrCodeGen.bs.js");
 
 function boolToHex(b) {
   if (b) {
@@ -103,20 +102,26 @@ function modulesToSvgString (modules){
      '<stop offset="85.714%" stop-color="#ca9cf7" />' +
      '<stop offset="100.000%" stop-color="#fc85dc" />' +
      '</linearGradient></defs>' +
-     '<path d="' + parts.join(" ") + '" fill="#000000" fill-opacity="0.8" />' +
      '<rect width="100%" height="100%" fill="url(#rainbow)" mask="url(#mask)" />\n' +
+     '<path d="' + parts.join(" ") + '" fill="#000000" fill-opacity="0.5" />' +
 		 '</svg>';
      };
 
-function setSvg(t, el) {
-  var moduleArray = t.getModules();
-  var queerSvg = modulesToSvgString(moduleArray);
-  return QrCodeGen$QueerLoop._setSvg(queerSvg, el);
+function getSvgDataUri(code) {
+  var moduleArray = code.getModules();
+  var svg = modulesToSvgString(moduleArray);
+  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+}
+
+function drawCanvas(el, code) {
+  code.drawCanvas(1, 4, el);
+  return /* () */0;
 }
 
 exports.boolToHex = boolToHex;
 exports.moduleArrayToRgbHex = moduleArrayToRgbHex;
 exports.rgbModulesToSvgString = rgbModulesToSvgString;
 exports.modulesToSvgString = modulesToSvgString;
-exports.setSvg = setSvg;
-/* QrCodeGen-QueerLoop Not a pure module */
+exports.getSvgDataUri = getSvgDataUri;
+exports.drawCanvas = drawCanvas;
+/* No side effect */

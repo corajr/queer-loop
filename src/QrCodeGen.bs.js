@@ -2,6 +2,7 @@
 'use strict';
 
 var Qrcodegen = require("./qrcodegen");
+var Caml_option = require("bs-platform/lib/js/caml_option.js");
 
 var low = Qrcodegen.Ecc.LOW;
 
@@ -18,11 +19,30 @@ var Ecc = /* module */[
   /* high */high
 ];
 
-function encodeText(prim, prim$1) {
+function _encodeText(prim, prim$1) {
   return Qrcodegen.encodeText(prim, prim$1);
 }
 
-var QrCode = /* module */[/* encodeText */encodeText];
+function encodeText(text, ecc) {
+  var exit = 0;
+  var code;
+  try {
+    code = Qrcodegen.encodeText(text, ecc);
+    exit = 1;
+  }
+  catch (exn){
+    return undefined;
+  }
+  if (exit === 1) {
+    return Caml_option.some(code);
+  }
+  
+}
+
+var QrCode = /* module */[
+  /* _encodeText */_encodeText,
+  /* encodeText */encodeText
+];
 
 function _setSvg (t,el){
      el.src = "data:image/svg+xml;utf8," + encodeURIComponent(t);

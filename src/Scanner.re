@@ -1,6 +1,7 @@
 open Canvas;
 open JsQr;
 open UserMedia;
+open Util;
 open Webapi.Dom;
 
 let scanUsingDeviceId:
@@ -9,6 +10,9 @@ let scanUsingDeviceId:
     initStreamByDeviceId(videoEl, deviceId)
     |> Js.Promise.then_(video => {
          let canvas = DocumentRe.createElement("canvas", document);
+         withQuerySelector("body", body =>
+           HtmlElementRe.appendChild(canvas, body)
+         );
 
          let worker = WebWorkers.create_webworker("worker.js");
          let msgBackHandler: WebWorkers.MessageEvent.t => unit =
@@ -25,19 +29,22 @@ let scanUsingDeviceId:
          let frameCount = ref(0);
 
          let rec onTick = _ => {
-           if (frameCount^ mod 5 == 0 && readyState(video) == 4) {
+           if (readyState(video) == 4) {
              let width = videoWidth(video);
              let height = videoHeight(video);
              setWidth(canvas, width);
              setHeight(canvas, height);
              let ctx = getContext(canvas);
              Ctx.drawImage(ctx, ~image=video, ~dx=0, ~dy=0);
-             let imageData =
-               Ctx.getImageData(ctx, ~sx=0, ~sy=0, ~sw=width, ~sh=height);
-             WebWorkers.postMessage(
-               worker,
-               (dataGet(imageData), width, height),
-             );
+
+             if (frameCount^ mod 5 == 0) {
+               let imageData =
+                 Ctx.getImageData(ctx, ~sx=0, ~sy=0, ~sw=width, ~sh=height);
+               WebWorkers.postMessage(
+                 worker,
+                 (dataGet(imageData), width, height),
+               );
+             };
            };
 
            frameCount := frameCount^ + 1;

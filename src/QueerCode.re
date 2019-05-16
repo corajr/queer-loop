@@ -90,15 +90,21 @@ let modulesToSvgString: array(array(bool)) => string = [%bs.raw
      '<stop offset="85.714%" stop-color="#ca9cf7" />' +
      '<stop offset="100.000%" stop-color="#fc85dc" />' +
      '</linearGradient></defs>' +
-     '<path d="' + parts.join(" ") + '" fill="#000000" fill-opacity="0.8" />' +
      '<rect width="100%" height="100%" fill="url(#rainbow)" mask="url(#mask)" />\n' +
+     '<path d="' + parts.join(" ") + '" fill="#000000" fill-opacity="0.5" />' +
 		 '</svg>';
      |}
 ];
 
-let setSvg: (QrCode.t, Dom.element) => unit =
-  (t, el) => {
-    let moduleArray = QrCode.getModules(t);
-    let queerSvg = modulesToSvgString(moduleArray);
-    _setSvg(queerSvg, el);
+[@bs.val]
+external encodeURIComponent : string => string = "encodeURIComponent";
+
+let getSvgDataUri: QrCode.t => string =
+  code => {
+    let moduleArray = QrCode.getModules(code);
+    let svg = modulesToSvgString(moduleArray);
+    "data:image/svg+xml;utf8," ++ encodeURIComponent(svg);
   };
+
+let drawCanvas: (Dom.element, QrCode.t) => unit =
+  (el, code) => QrCode.drawCanvas(code, 1, 4, el);

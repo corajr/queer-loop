@@ -187,8 +187,10 @@ var qrcodegen = new function() {
 			if (scale <= 0 || border < 0)
 				throw "Value out of range";
 			var width = (size + border * 2) * scale;
+      if (canvas.width != width) {
 			canvas.width = width;
-			canvas.height = width;
+			      canvas.height = width;
+        };
 			var ctx = canvas.getContext("2d");
 			for (var y = -border; y < size + border; y++) {
 				for (var x = -border; x < size + border; x++) {

@@ -24,7 +24,14 @@ module Ecc = {
 module QrCode = {
   type t;
 
-  [@bs.module "./qrcodegen"] external encodeText : (string, Ecc.t) => t = "";
+  [@bs.module "./qrcodegen"]
+  external _encodeText : (string, Ecc.t) => t = "encodeText";
+  let encodeText: (string, Ecc.t) => option(t) =
+    (text, ecc) =>
+      switch (_encodeText(text, ecc)) {
+      | code => Some(code)
+      | exception _ => None
+      };
 
   [@bs.send] external drawCanvas : (t, int, int, Dom.element) => unit = "";
 

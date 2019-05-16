@@ -3,11 +3,16 @@
 
 var Curry = require("bs-platform/lib/js/curry.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
+var Util$QueerLoop = require("./Util.bs.js");
 var UserMedia$QueerLoop = require("./UserMedia.bs.js");
 
 function scanUsingDeviceId(videoEl, deviceId, scanCallback) {
   return UserMedia$QueerLoop.initStreamByDeviceId(videoEl, deviceId).then((function (video) {
                 var canvas = document.createElement("canvas");
+                Util$QueerLoop.withQuerySelector("body", (function (body) {
+                        body.appendChild(canvas);
+                        return /* () */0;
+                      }));
                 var worker = new Worker("worker.js");
                 var msgBackHandler = function (e) {
                   var maybeCode = e.data;
@@ -19,19 +24,22 @@ function scanUsingDeviceId(videoEl, deviceId, scanCallback) {
                 worker.onmessage = msgBackHandler;
                 var frameCount = /* record */[/* contents */0];
                 var onTick = function (param) {
-                  if (frameCount[0] % 5 === 0 && video.readyState === 4) {
+                  if (video.readyState === 4) {
                     var width = video.videoWidth;
                     var height = video.videoHeight;
                     canvas.width = width;
                     canvas.height = height;
                     var ctx = canvas.getContext("2d");
                     ctx.drawImage(video, 0, 0);
-                    var imageData = ctx.getImageData(0, 0, width, height);
-                    worker.postMessage(/* tuple */[
-                          imageData.data,
-                          width,
-                          height
-                        ]);
+                    if (frameCount[0] % 5 === 0) {
+                      var imageData = ctx.getImageData(0, 0, width, height);
+                      worker.postMessage(/* tuple */[
+                            imageData.data,
+                            width,
+                            height
+                          ]);
+                    }
+                    
                   }
                   frameCount[0] = frameCount[0] + 1 | 0;
                   requestAnimationFrame(onTick);
@@ -43,4 +51,4 @@ function scanUsingDeviceId(videoEl, deviceId, scanCallback) {
 }
 
 exports.scanUsingDeviceId = scanUsingDeviceId;
-/* UserMedia-QueerLoop Not a pure module */
+/* Util-QueerLoop Not a pure module */

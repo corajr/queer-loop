@@ -1,19 +1,28 @@
+open Canvas;
 open Color;
 open QrCodeGen;
+open Util;
 open Webapi.Dom;
-
-let maybeSetCode: (option(Dom.element), string) => unit =
-  (maybeEl, text) =>
-    ignore(
-      Belt.Option.map(maybeEl, el =>
-        QueerCode.setSvg(QrCode.encodeText(text, Ecc.medium), el)
-      ),
-    );
 
 let domain = "qqq.lu";
 
-let codeRegex = Js.Re.fromString("https:\/\/" ++ domain ++ "\/#([0-f]{3})");
-let defaultHash = "fff";
+let setBackground = (selector, bgCss) =>
+  withQuerySelector(selector, el =>
+    DomRe.CssStyleDeclaration.setProperty(
+      "background",
+      bgCss,
+      "",
+      HtmlElementRe.style(el),
+    )
+  );
+
+let codeRegex = Js.Re.fromString("https:\/\/" ++ domain ++ "\/#(.+)");
+
+let defaultCode = QrCode._encodeText("https://" ++ domain, Ecc.low);
+
+let defaultColor = "fff";
+
+let defaultHash = defaultColor;
 
 let getNextHash = current => {
   let i =
@@ -35,26 +44,35 @@ let cycleCameras = scanner => {
   ();
 };
 
-let setBgColor = color =>
-  Belt.Option.(
-    DocumentRe.asHtmlDocument(document)
-    |. flatMap(HtmlDocumentRe.body)
-    |. flatMap(DomRe.Element.asHtmlElement)
-    |. map(body =>
-         DomRe.CssStyleDeclaration.setProperty(
-           "background-color",
-           color,
-           "",
-           HtmlElementRe.style(body),
-         )
-       )
-  );
+let setSrc = [%bs.raw (img, src) => {|
+     img.src = src;|}];
 
 let onHashChange = _ => {
   let hash = DomRe.Location.hash(WindowRe.location(window));
-  setBgColor(hash);
-  let currentQrEl = document |> Document.querySelector("#current");
-  maybeSetCode(currentQrEl, "https://" ++ domain ++ "/" ++ hash);
+  setBackground("#backdrop", hash);
+  withQuerySelector("#codeContents", contents =>
+    HtmlElementRe.setInnerText(contents, hash)
+  );
+  let code =
+    Belt.Option.getWithDefault(
+      QrCode.encodeText("https://" ++ domain ++ "/" ++ hash, Ecc.medium),
+      defaultCode,
+    );
+
+  let codeAsImage =
+    document
+    |> Document.querySelector("#codeCanvas")
+    |. Belt.Option.map(canvas => {
+         QueerCode.drawCanvas(canvas, code);
+         let url = toDataURL(canvas);
+         setBackground("body", "url(" ++ url ++ ") 400px");
+         ();
+       });
+
+  withQuerySelector("#current", img => {
+    let url = QueerCode.getSvgDataUri(code);
+    setSrc(img, url);
+  });
   ();
 };
 
@@ -76,16 +94,19 @@ let setOpacity = (elQuery, opacity) =>
 let rec onTick = ts => {
   let scaled = ts *. 0.0005;
   let codeOpacity = 0.5 +. sin(scaled) ** 2.0 *. 0.5;
-  /* let videoOpacity = 0.5 +. cos(scaled) ** 2.0 *. 0.5; */
-  /* setOpacity("#preview", videoOpacity); */
-  setOpacity("#current", codeOpacity);
+
+  let maybeCanvas = document |> Document.querySelector("#codeCanvas");
+  switch (maybeCanvas) {
+  | Some(canvas) =>
+    let ctx = getContext(canvas);
+    Ctx.setGlobalAlpha(ctx, codeOpacity);
+  | None => ()
+  };
   Webapi.requestAnimationFrame(onTick);
 };
 
 let init: unit => unit =
   _ => {
-    let videoEl = document |> Document.querySelector("#preview");
-
     let previousQrEl = document |> Document.querySelector("#previous");
 
     let initialHash = DomRe.Location.hash(WindowRe.location(window));
@@ -98,14 +119,13 @@ let init: unit => unit =
       };
 
     onHashChange();
-    Webapi.requestAnimationFrame(onTick);
+    /* Webapi.requestAnimationFrame(onTick); */
 
     let response = input =>
       switch (Js.Re.exec_(codeRegex, input)) {
       | Some(result) =>
         switch (Js.Nullable.toOption(Js.Re.captures(result)[1])) {
         | Some(hash) =>
-          maybeSetCode(previousQrEl, "https://" ++ domain ++ "/#" ++ hash);
           let nextHash = getNextHash(hash);
           DomRe.Location.setHash(WindowRe.location(window), nextHash);
         | None => ()
@@ -120,19 +140,29 @@ let init: unit => unit =
     |> Js.Promise.then_(cameras => {
          camerasRef := cameras;
 
-         switch (videoEl) {
-         | Some(videoEl) =>
-           Scanner.scanUsingDeviceId(
-             videoEl,
-             UserMedia.deviceIdGet(cameras[0]),
-             response,
-           )
-         | None => Js.Promise.resolve()
-         };
+         Js.Promise.all(
+           Array.map(
+             camera => {
+               let videoEl = DocumentRe.createElement("video", document);
+               withQuerySelector("body", body =>
+                 HtmlElementRe.appendChild(videoEl, body)
+               );
+
+               Scanner.scanUsingDeviceId(
+                 videoEl,
+                 UserMedia.deviceIdGet(camera),
+                 response,
+               );
+
+               Js.Promise.resolve();
+             },
+             cameras,
+           ),
+         );
        })
     |> Js.Promise.catch(err => {
          Js.Console.error2("getCameras failed", err);
-         Js.Promise.resolve();
+         Js.Promise.resolve([||]);
        })
     |> ignore;
 
