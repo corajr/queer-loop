@@ -49,7 +49,7 @@ let setSrc = [%bs.raw (img, src) => {|
 
 let onHashChange = _ => {
   let hash = DomRe.Location.hash(WindowRe.location(window));
-  setBackground("#backdrop", hash);
+  setBackground("body", hash);
   withQuerySelector("#codeContents", contents =>
     HtmlElementRe.setInnerText(contents, hash)
   );
@@ -65,7 +65,7 @@ let onHashChange = _ => {
     |. Belt.Option.map(canvas => {
          QueerCode.drawCanvas(canvas, code);
          let url = toDataURL(canvas);
-         setBackground("body", "url(" ++ url ++ ") 400px");
+         setBackground("#overlay", "url(" ++ url ++ ")");
          ();
        });
 

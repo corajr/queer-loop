@@ -73,7 +73,7 @@ function setSrc (img,src){
 
 function onHashChange(param) {
   var hash = window.location.hash;
-  setBackground("#backdrop", hash);
+  setBackground("body", hash);
   Util$QueerLoop.withQuerySelector("#codeContents", (function (contents) {
           contents.innerText = hash;
           return /* () */0;
@@ -82,7 +82,7 @@ function onHashChange(param) {
   Belt_Option.map(Caml_option.nullable_to_opt(document.querySelector("#codeCanvas")), (function (canvas) {
           QueerCode$QueerLoop.drawCanvas(canvas, code);
           var url = canvas.toDataURL();
-          setBackground("body", "url(" + (url + ") 400px"));
+          setBackground("#overlay", "url(" + (url + ")"));
           return /* () */0;
         }));
   Util$QueerLoop.withQuerySelector("#current", (function (img) {
