@@ -77,7 +77,6 @@ function onHashChange(param) {
   (
       match ? Promise.resolve(hash.slice(1)) : Hash$QueerLoop.hexDigest("SHA-256", hash)
     ).then((function (hexHash) {
-          console.log(hexHash);
           setBackground("body", "#" + hexHash.slice(0, 6));
           return Promise.resolve(/* () */0);
         }));
@@ -121,10 +120,13 @@ function onTick(ts) {
 function init(param) {
   document.querySelector("#previous");
   var initialHash = window.location.hash;
-  var hash = initialHash === "" ? (window.location.hash = defaultColor, defaultColor) : initialHash;
-  onHashChange(/* () */0);
+  if (initialHash === "") {
+    window.location.hash = defaultColor;
+  } else {
+    onHashChange(/* () */0);
+  }
   var response = function (input) {
-    Hash$QueerLoop.hexDigest("SHA-256", hash + input).then((function (hexHash) {
+    Hash$QueerLoop.hexDigest("SHA-256", window.location.hash + input).then((function (hexHash) {
             window.location.hash = hexHash;
             return Promise.resolve(/* () */0);
           }));

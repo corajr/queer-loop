@@ -56,7 +56,6 @@ let onHashChange = _ => {
       Hash.hexDigest("SHA-256", hash)
   )
   |> Js.Promise.then_(hexHash => {
-       Js.log(hexHash);
        setBackground(
          "body",
          "#" ++ Js.String.slice(~from=0, ~to_=6, hexHash),
@@ -124,19 +123,19 @@ let init: unit => unit =
     let previousQrEl = document |> Document.querySelector("#previous");
 
     let initialHash = DomRe.Location.hash(WindowRe.location(window));
-    let hash =
-      if (initialHash == "") {
-        DomRe.Location.setHash(WindowRe.location(window), defaultHash);
-        defaultHash;
-      } else {
-        initialHash;
-      };
+    if (initialHash == "") {
+      DomRe.Location.setHash(WindowRe.location(window), defaultHash);
+    } else {
+      onHashChange();
+    };
 
-    onHashChange();
     /* Webapi.requestAnimationFrame(onTick); */
 
     let response = input =>
-      Hash.hexDigest("SHA-256", hash ++ input)
+      Hash.hexDigest(
+        "SHA-256",
+        DomRe.Location.hash(WindowRe.location(window)) ++ input,
+      )
       |> Js.Promise.then_(hexHash => {
            DomRe.Location.setHash(WindowRe.location(window), hexHash);
            Js.Promise.resolve();
