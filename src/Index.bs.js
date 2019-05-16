@@ -6,12 +6,12 @@ var Block = require("bs-platform/lib/js/block.js");
 var Curry = require("bs-platform/lib/js/curry.js");
 var Printf = require("bs-platform/lib/js/printf.js");
 var ElementRe = require("bs-webapi/src/dom/nodes/ElementRe.js");
-var Caml_array = require("bs-platform/lib/js/caml_array.js");
 var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
 var Pervasives = require("bs-platform/lib/js/pervasives.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_format = require("bs-platform/lib/js/caml_format.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
+var Hash$QueerLoop = require("./Hash.bs.js");
 var Util$QueerLoop = require("./Util.bs.js");
 var Scanner$QueerLoop = require("./Scanner.bs.js");
 var QrCodeGen$QueerLoop = require("./QrCodeGen.bs.js");
@@ -33,7 +33,7 @@ var defaultCode = QrCodeGen$QueerLoop.QrCode[/* _encodeText */0]("https://qqq.lu
 
 var defaultColor = "fff";
 
-function getNextHash(current) {
+function getNextHashInc(current) {
   var i;
   try {
     i = Caml_format.caml_int_of_string("0x" + current.slice(1));
@@ -41,21 +41,25 @@ function getNextHash(current) {
   catch (exn){
     i = 0;
   }
-  return Curry._1(Printf.sprintf(/* Format */[
-                  /* Char_literal */Block.__(12, [
-                      /* "#" */35,
-                      /* Int */Block.__(4, [
-                          /* Int_x */6,
-                          /* Lit_padding */Block.__(0, [
-                              /* Zeros */2,
-                              3
-                            ]),
-                          /* No_precision */0,
-                          /* End_of_format */0
-                        ])
-                    ]),
-                  "#%03x"
-                ]), (i + 1 | 0) % 4096);
+  return Promise.resolve(Curry._1(Printf.sprintf(/* Format */[
+                      /* Char_literal */Block.__(12, [
+                          /* "#" */35,
+                          /* Int */Block.__(4, [
+                              /* Int_x */6,
+                              /* Lit_padding */Block.__(0, [
+                                  /* Zeros */2,
+                                  3
+                                ]),
+                              /* No_precision */0,
+                              /* End_of_format */0
+                            ])
+                        ]),
+                      "#%03x"
+                    ]), (i + 1 | 0) % 4096));
+}
+
+function getNextHash(input) {
+  return Hash$QueerLoop.hexDigest("SHA-256", input);
 }
 
 var camerasRef = /* record */[/* contents : array */[]];
@@ -73,9 +77,11 @@ function setSrc (img,src){
 
 function onHashChange(param) {
   var hash = window.location.hash;
-  setBackground("body", hash);
+  if ((/[0-f]+/).test(hash)) {
+    setBackground("body", hash.slice(0, 7));
+  }
   Util$QueerLoop.withQuerySelector("#codeContents", (function (contents) {
-          contents.innerText = hash;
+          contents.innerText = decodeURIComponent(hash);
           return /* () */0;
         }));
   var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1]("https://" + (domain + ("/" + hash)), QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
@@ -114,25 +120,14 @@ function onTick(ts) {
 function init(param) {
   document.querySelector("#previous");
   var initialHash = window.location.hash;
-  if (initialHash === "") {
-    window.location.hash = defaultColor;
-  }
+  var hash = initialHash === "" ? (window.location.hash = defaultColor, defaultColor) : initialHash;
   onHashChange(/* () */0);
   var response = function (input) {
-    var match = codeRegex.exec(input);
-    if (match !== null) {
-      var match$1 = Caml_array.caml_array_get(match, 1);
-      if (match$1 == null) {
-        return /* () */0;
-      } else {
-        var nextHash = getNextHash(match$1);
-        window.location.hash = nextHash;
-        return /* () */0;
-      }
-    } else {
-      console.log("Ignoring (external barcode): " + input);
-      return /* () */0;
-    }
+    Hash$QueerLoop.hexDigest("SHA-256", hash + input).then((function (nextHash) {
+            window.location.hash = nextHash;
+            return Promise.resolve(/* () */0);
+          }));
+    return /* () */0;
   };
   UserMedia$QueerLoop.getCameras(/* () */0).then((function (cameras) {
             camerasRef[0] = cameras;
@@ -168,6 +163,7 @@ exports.codeRegex = codeRegex;
 exports.defaultCode = defaultCode;
 exports.defaultColor = defaultColor;
 exports.defaultHash = defaultHash;
+exports.getNextHashInc = getNextHashInc;
 exports.getNextHash = getNextHash;
 exports.camerasRef = camerasRef;
 exports.cameraIndex = cameraIndex;

@@ -24,15 +24,19 @@ let defaultColor = "fff";
 
 let defaultHash = defaultColor;
 
-let getNextHash = current => {
-  let i =
-    switch (int_of_string("0x" ++ Js.String.sliceToEnd(~from=1, current))) {
-    | i => i
-    | exception _ => 0
-    };
+let getNextHashInc: string => Js.Promise.t(string) =
+  current => {
+    let i =
+      switch (int_of_string("0x" ++ Js.String.sliceToEnd(~from=1, current))) {
+      | i => i
+      | exception _ => 0
+      };
 
-  Printf.sprintf("#%03x", (i + 1) mod 4096);
-};
+    Js.Promise.resolve(Printf.sprintf("#%03x", (i + 1) mod 4096));
+  };
+
+let getNextHash: string => Js.Promise.t(string) =
+  input => Hash.hexDigest("SHA-256", input);
 
 let camerasRef: ref(array(UserMedia.mediaDeviceInfo)) = ref([||]);
 let cameraIndex = ref(0);
@@ -49,9 +53,11 @@ let setSrc = [%bs.raw (img, src) => {|
 
 let onHashChange = _ => {
   let hash = DomRe.Location.hash(WindowRe.location(window));
-  setBackground("body", hash);
+  if (Js.Re.test_([%bs.re "/[0-f]+/"], hash)) {
+    setBackground("body", Js.String.slice(~from=0, ~to_=7, hash)) |> ignore;
+  };
   withQuerySelector("#codeContents", contents =>
-    HtmlElementRe.setInnerText(contents, hash)
+    HtmlElementRe.setInnerText(contents, QueerCode.decodeURIComponent(hash))
   );
   let code =
     Belt.Option.getWithDefault(
@@ -122,17 +128,12 @@ let init: unit => unit =
     /* Webapi.requestAnimationFrame(onTick); */
 
     let response = input =>
-      switch (Js.Re.exec_(codeRegex, input)) {
-      | Some(result) =>
-        switch (Js.Nullable.toOption(Js.Re.captures(result)[1])) {
-        | Some(hash) =>
-          let nextHash = getNextHash(hash);
-          DomRe.Location.setHash(WindowRe.location(window), nextHash);
-        | None => ()
-        }
-      | None => Js.log("Ignoring (external barcode): " ++ input)
-      /* TODO: maybe hash such barcodes as alternative entrances to loop? */
-      };
+      Hash.hexDigest("SHA-256", hash ++ input)
+      |> Js.Promise.then_(nextHash => {
+           DomRe.Location.setHash(WindowRe.location(window), nextHash);
+           Js.Promise.resolve();
+         })
+      |> ignore;
 
     /* WindowRe.addEventListener("click", _ => cycleCameras(scanner), window); */
 

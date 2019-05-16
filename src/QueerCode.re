@@ -99,6 +99,9 @@ let modulesToSvgString: array(array(bool)) => string = [%bs.raw
 [@bs.val]
 external encodeURIComponent : string => string = "encodeURIComponent";
 
+[@bs.val]
+external decodeURIComponent : string => string = "decodeURIComponent";
+
 let getSvgDataUri: QrCode.t => string =
   code => {
     let moduleArray = QrCode.getModules(code);
