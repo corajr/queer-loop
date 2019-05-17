@@ -200,7 +200,7 @@ let init: unit => unit =
         Hash.hexDigest("SHA-1", input)
         |> Js.Promise.then_(hexHash => {
              if (hexHash === currentSignature^
-                 || Belt.Set.String.has(previousCodes^, hexHash)) {
+                 || ! Belt.Set.String.has(previousCodes^, hexHash)) {
                setHash(Js.Date.toISOString(Js.Date.make()));
              };
              Js.Promise.resolve();

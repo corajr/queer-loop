@@ -5,54 +5,44 @@
         <script type="text/javascript" src="index.js"></script>
         <style type="text/css">
          body { margin: 0; }
-
          canvas {
              display: none;
              pointer-events: none;
          }
 
          video {
+             display: block;
              position: fixed;
-             min-width: 100%;
-             min-height: 100%;
+             min-width: 100vw;
+             min-height: 100vh;
              left: 50%;
              top: 50%;
-             transform: translate(-50%, -50%);
              opacity: 0.5;
              pointer-events: none;
-         }
-         #rainbowOverlay {
-             display: none;
+             transform: translate(-50%, -50%);
          }
 
          #past {
              display: flex;
              width: 100vw;
              flex-wrap: wrap;
+             justify-content: center;
              z-index: 99;
-             opacity: 0.5;
-         }
-
-         #overlay, #rainbowOverlay {
-             position: fixed;
-             min-width: 100%;
-             min-height: 100%;
-             opacity: 0.8;
+             opacity: 0.2;
          }
 
          .centeredSquare {
-            position: fixed;
-            width: 75vmin;
-            height: 75vmin;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
+             position: fixed;
+             width: 75vmin;
+             height: 75vmin;
+             left: 50%;
+             top: 50%;
+             transform: translate(-50%, -50%);
          }
 
          #current {
              z-index: 100;
          }
-
 
          #codeContents {
              position: fixed;
@@ -66,11 +56,11 @@
         </style>
     </head>
     <body>
+        <canvas id="snapshotCanvas"></canvas>
         <div id="past"></div>
         <img class="centeredSquare" id="current"></img>
         <div id="codeText">
             <span id="codeContents" contenteditable="true"></span>
         </div>
-        <canvas class="centeredSquare" id="snapshotCanvas"></canvas>
     </body>
 </html>

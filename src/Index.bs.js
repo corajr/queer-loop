@@ -176,7 +176,7 @@ function init(param) {
   var response = function (input) {
     if (input !== "") {
       Hash$QueerLoop.hexDigest("SHA-1", input).then((function (hexHash) {
-              if (hexHash === currentSignature[0] || Belt_SetString.has(previousCodes[0], hexHash)) {
+              if (hexHash === currentSignature[0] || !Belt_SetString.has(previousCodes[0], hexHash)) {
                 setHash(new Date().toISOString());
               }
               return Promise.resolve(/* () */0);
