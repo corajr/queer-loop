@@ -86,7 +86,6 @@ function setCode(input) {
                   return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
                                 var snapshotCtx = snapshotCanvas.getContext("2d");
                                 snapshotCtx.globalAlpha = 1.0;
-                                QueerCode$QueerLoop.drawCanvas(snapshotCanvas, code);
                                 var url = snapshotCanvas.toDataURL();
                                 currentSignature[0] = hash;
                                 previousCodes[hash] = url;
@@ -95,7 +94,9 @@ function setCode(input) {
                 }));
           Util$QueerLoop.withQuerySelector("#current", (function (img) {
                   var url = QueerCode$QueerLoop.getSvgDataUri(code, Js_dict.values(previousCodes));
-                  return setSrc(img, url);
+                  setSrc(img, url);
+                  previousCodes[hash] = url;
+                  return /* () */0;
                 }));
           return Promise.resolve(/* () */0);
         }));
@@ -158,8 +159,8 @@ function init(param) {
     onHashChange(/* () */0);
   }
   Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
-          canvas.width = 32;
-          canvas.height = 32;
+          canvas.width = 128;
+          canvas.height = 128;
           return /* () */0;
         }));
   Util$QueerLoop.withQuerySelector("#codeContents", (function (el) {

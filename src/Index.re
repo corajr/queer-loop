@@ -98,7 +98,7 @@ let setCode = input => {
          withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
            let snapshotCtx = getContext(snapshotCanvas);
            Ctx.setGlobalAlpha(snapshotCtx, 1.0);
-           QueerCode.drawCanvas(snapshotCanvas, code);
+           /* QueerCode.drawCanvas(snapshotCanvas, code); */
            let url = toDataURL(snapshotCanvas);
            /* addToPast(url); */
            currentSignature := hash;
@@ -111,6 +111,8 @@ let setCode = input => {
          let url =
            QueerCode.getSvgDataUri(code, Js.Dict.values(previousCodes));
          setSrc(img, url);
+         /* addToPast(url); */
+         Js.Dict.set(previousCodes, hash, url);
        })
        |> ignore;
        Js.Promise.resolve();
@@ -183,8 +185,8 @@ let init: unit => unit =
     };
 
     withQuerySelectorDom("#snapshotCanvas", canvas => {
-      setWidth(canvas, 32);
-      setHeight(canvas, 32);
+      setWidth(canvas, 128);
+      setHeight(canvas, 128);
     });
 
     withQuerySelector("#codeContents", el =>
