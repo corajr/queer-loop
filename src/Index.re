@@ -85,7 +85,7 @@ let onHashChange: unit => unit =
     setCode(hash);
 
     withQuerySelector("#codeContents", el =>
-      HtmlElementRe.setInnerText(el, hash)
+      HtmlElementRe.setInnerText(el, decodeURIComponent(hash))
     )
     |> ignore;
   };

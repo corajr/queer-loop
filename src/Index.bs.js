@@ -83,7 +83,7 @@ function onHashChange(param) {
   var hash = window.location.hash.slice(1);
   setCode(hash);
   Util$QueerLoop.withQuerySelector("#codeContents", (function (el) {
-          el.innerText = hash;
+          el.innerText = decodeURIComponent(hash);
           return /* () */0;
         }));
   return /* () */0;
