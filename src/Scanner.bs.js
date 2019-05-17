@@ -27,11 +27,19 @@ function scanUsingDeviceId(videoEl, deviceId, scanCallback) {
                   if (video.readyState === 4) {
                     var width = video.videoWidth;
                     var height = video.videoHeight;
-                    canvas.width = width;
-                    canvas.height = height;
+                    if (canvas.width !== width) {
+                      canvas.width = width;
+                      canvas.height = height;
+                    }
                     var ctx = canvas.getContext("2d");
                     ctx.drawImage(video, 0, 0);
                     if (frameCount[0] % 5 === 0) {
+                      Util$QueerLoop.withQuerySelectorDom("#codeCanvas", (function (codeCanvas) {
+                              var codeCtx = codeCanvas.getContext("2d");
+                              codeCtx.globalAlpha = 0.1;
+                              codeCtx.drawImage(canvas, 0, 0, codeCanvas.width, codeCanvas.height);
+                              return /* () */0;
+                            }));
                       var imageData = ctx.getImageData(0, 0, width, height);
                       worker.postMessage(/* tuple */[
                             imageData.data,

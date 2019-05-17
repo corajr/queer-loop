@@ -18,6 +18,12 @@ module Ctx = {
   [@bs.send]
   external drawImage : (t, ~image: imageSource, ~dx: int, ~dy: int) => unit =
     "";
+
+  [@bs.send]
+  external drawImageDestRect :
+    (t, ~image: imageSource, ~dx: int, ~dy: int, ~dw: int, ~dh: int) => unit =
+    "drawImage";
+
   [@bs.send]
   external getImageData :
     (t, ~sx: int, ~sy: int, ~sw: int, ~sh: int) => imageData =
@@ -28,6 +34,9 @@ module Ctx = {
 external getContext : (Dom.element, [@bs.as "2d"] _) => Ctx.t = "getContext";
 
 [@bs.send] external toDataURL : Dom.element => string = "";
+
+[@bs.get] external getHeight : Dom.element => int = "height";
+[@bs.get] external getWidth : Dom.element => int = "width";
 
 [@bs.set] external setHeight : (Dom.element, int) => unit = "height";
 [@bs.set] external setWidth : (Dom.element, int) => unit = "width";

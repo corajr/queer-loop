@@ -6,29 +6,48 @@
         <style type="text/css">
          body { margin: 0; }
 
-         canvas { display: none; }
-         video, #overlay, #rainbowOverlay {
+         #codeCanvas {
+             display: none;
+         }
+         canvas {
              position: fixed;
              min-width: 100%;
              min-height: 100%;
-             mix-blend-mode: overlay;
-         }
-         video {
-             opacity: 0.4;
-         }
-         #overlay, #rainbowOverlay {
-             opacity: 0.1;
-         }
-         #current {
-             position: fixed;
-             max-width: 100%;
-             max-height: 100%;
              left: 50%;
              top: 50%;
              transform: translate(-50%, -50%);
+             opacity: 0.5;
+         }
+         #rainbowOverlay {
+             display: none;
+         }
+         #overlay, #rainbowOverlay {
+             position: fixed;
+             min-width: 100%;
+             min-height: 100%;
+             opacity: 0.8;
+         }
+         video {
+             display: none;
+         }
+
+         .centeredSquare {
+            position: fixed;
+            width: 100vmin;
+            height: 100vmin;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+         }
+         #backdrop {
+             background: #fff;
+         }
+
+         #current {
              z-index: 100;
              mix-blend-mode: overlay;
          }
+
          #codeContents {
              position: fixed;
              left: 0;
@@ -56,7 +75,8 @@
         </svg>
 
         <div id="overlay"></div>
-        <img id="current"></img>
+        <div class="centeredSquare" id="backdrop"></div>
+        <img class="centeredSquare" id="current"></img>
         <div id="codeText">
             <span id="codeContents" contenteditable="true"></span>
         </div>

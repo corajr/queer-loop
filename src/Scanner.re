@@ -32,12 +32,26 @@ let scanUsingDeviceId:
            if (readyState(video) == 4) {
              let width = videoWidth(video);
              let height = videoHeight(video);
-             setWidth(canvas, width);
-             setHeight(canvas, height);
+             if (getWidth(canvas) !== width) {
+               setWidth(canvas, width);
+               setHeight(canvas, height);
+             };
              let ctx = getContext(canvas);
              Ctx.drawImage(ctx, ~image=video, ~dx=0, ~dy=0);
 
              if (frameCount^ mod 5 == 0) {
+               withQuerySelectorDom("#codeCanvas", codeCanvas => {
+                 let codeCtx = getContext(codeCanvas);
+                 Ctx.setGlobalAlpha(codeCtx, 0.1);
+                 Ctx.drawImageDestRect(
+                   codeCtx,
+                   ~image=canvas,
+                   ~dx=0,
+                   ~dy=0,
+                   ~dw=getWidth(codeCanvas),
+                   ~dh=getHeight(codeCanvas),
+                 );
+               });
                let imageData =
                  Ctx.getImageData(ctx, ~sx=0, ~sy=0, ~sw=width, ~sh=height);
                WebWorkers.postMessage(

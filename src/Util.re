@@ -1,5 +1,8 @@
 open Webapi.Dom;
 
+let withQuerySelectorDom = (query, f) =>
+  document |> Document.querySelector(query) |. Belt.Option.map(f);
+
 let withQuerySelector = (query, f) =>
   document
   |> Document.querySelector(query)

@@ -188,10 +188,10 @@ var qrcodegen = new function() {
 				throw "Value out of range";
 			var width = (size + border * 2) * scale;
       if (canvas.width != width) {
-			canvas.width = width;
-			      canvas.height = width;
-        };
-			var ctx = canvas.getContext("2d");
+          canvas.width = width;
+          canvas.height = width;
+      };
+      var ctx = canvas.getContext("2d");
 			for (var y = -border; y < size + border; y++) {
 				for (var x = -border; x < size + border; x++) {
 					ctx.fillStyle = this.getModule(x, y) ? "#000000" : "#FFFFFF";

@@ -65,11 +65,11 @@ let modulesToSvgString: (array(array(bool)), array(string)) => string = [%bs.raw
 		 if (border < 0)
 		 throw "Border must be non-negative";
 		 var parts = [];
-     var n = size + (border * 2);
+     var n = ~~((size + (border * 2)) / 2);
      var meta = foreignCodes.map((code, i) => {
        var x = i % n;
        var y = ~~(i / n);
-       return '<image href="' + code + '" x="' + x + '" y="' + y + '" width="1" height="1" />'
+       return '<image href="' + code + '" x="' + x * 2 + '" y="' + y * 2 + '" width="2" height="2" />'
      });
 		 for (var y = 0; y < size; y++) {
 		 for (var x = 0; x < size; x++) {
@@ -101,7 +101,7 @@ let modulesToSvgString: (array(array(bool)), array(string)) => string = [%bs.raw
      '</linearGradient></defs>' +
      '<rect width="100%" height="100%" fill="url(#rainbow)" mask="url(#mask)" />\n' +
      '<use href="#code" />' +
-     '<g style="mix-blend-mode: overlay">' + meta.join("") + '</g>' +
+     '<g>' + meta.join("") + '</g>' +
 		 '</svg>';
      |}
 ];

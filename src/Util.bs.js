@@ -6,6 +6,10 @@ var ElementRe = require("bs-webapi/src/dom/nodes/ElementRe.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 
+function withQuerySelectorDom(query, f) {
+  return Belt_Option.map(Caml_option.nullable_to_opt(document.querySelector(query)), f);
+}
+
 function withQuerySelector(query, f) {
   return Belt_Option.map(Belt_Option.flatMap(Caml_option.nullable_to_opt(document.querySelector(query)), ElementRe.asHtmlElement), f);
 }
@@ -14,6 +18,7 @@ function withQuerySelectorAll(query, f) {
   return $$Array.map(f, Array.prototype.slice.call(document.querySelectorAll(query)));
 }
 
+exports.withQuerySelectorDom = withQuerySelectorDom;
 exports.withQuerySelector = withQuerySelector;
 exports.withQuerySelectorAll = withQuerySelectorAll;
 /* ElementRe Not a pure module */
