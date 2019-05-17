@@ -49,16 +49,22 @@ var currentSignature = /* record */[/* contents */""];
 
 var canvasesRef = /* record */[/* contents : array */[]];
 
-function takeSnapshot(param) {
+function copyVideoToSnapshotCanvas(param) {
   return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
                 var snapshotCtx = snapshotCanvas.getContext("2d");
-                snapshotCtx.globalAlpha = 0.2;
-                $$Array.mapi((function (i, canvas) {
-                        var h = canvas.height;
-                        (canvas.width - h | 0) / 2 | 0;
-                        snapshotCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
-                        return /* () */0;
-                      }), canvasesRef[0]);
+                snapshotCtx.globalAlpha = 0.1;
+                return $$Array.mapi((function (i, canvas) {
+                              var h = canvas.height;
+                              (canvas.width - h | 0) / 2 | 0;
+                              snapshotCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+                              return /* () */0;
+                            }), canvasesRef[0]);
+              }));
+}
+
+function takeSnapshot(param) {
+  return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
+                snapshotCanvas.getContext("2d");
                 return snapshotCanvas.toDataURL("image/jpeg", 0.9);
               }));
 }
@@ -128,13 +134,12 @@ function setOpacity(elQuery, opacity) {
               }));
 }
 
+var frameCount = /* record */[/* contents */0];
+
 function onTick(ts) {
-  var scaled = ts * 0.0005;
-  var codeOpacity = 0.5 + Math.pow(Math.sin(scaled), 2.0) * 0.5;
-  var maybeCanvas = document.querySelector("#codeCanvas");
-  if (!(maybeCanvas == null)) {
-    var ctx = maybeCanvas.getContext("2d");
-    ctx.globalAlpha = codeOpacity;
+  frameCount[0] = frameCount[0] + 1 | 0;
+  if (frameCount[0] % 5 === 1) {
+    copyVideoToSnapshotCanvas(/* () */0);
   }
   requestAnimationFrame(onTick);
   return /* () */0;
@@ -193,6 +198,7 @@ function init(param) {
                               }), cameras));
             })).then((function (canvases) {
             canvasesRef[0] = canvases;
+            requestAnimationFrame(onTick);
             return Promise.resolve(/* () */0);
           })).catch((function (err) {
           console.error("getCameras failed", err);
@@ -223,6 +229,7 @@ exports.setSrc = setSrc;
 exports.previousCodes = previousCodes;
 exports.currentSignature = currentSignature;
 exports.canvasesRef = canvasesRef;
+exports.copyVideoToSnapshotCanvas = copyVideoToSnapshotCanvas;
 exports.takeSnapshot = takeSnapshot;
 exports.addToPast = addToPast;
 exports.setCode = setCode;
@@ -230,6 +237,7 @@ exports.getHash = getHash;
 exports.setHash = setHash;
 exports.onHashChange = onHashChange;
 exports.setOpacity = setOpacity;
+exports.frameCount = frameCount;
 exports.onTick = onTick;
 exports._onInput = _onInput;
 exports.onInput = onInput;

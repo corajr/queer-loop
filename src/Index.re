@@ -42,18 +42,11 @@ let currentSignature: ref(string) = ref("");
 
 let canvasesRef: ref(array(Dom.element)) = ref([||]);
 
-let takeSnapshot = _ =>
+let copyVideoToSnapshotCanvas = _ =>
   withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
     let snapshotCtx = getContext(snapshotCanvas);
 
-    /* Ctx.clearRect( */
-    /*   snapshotCtx, */
-    /*   0, */
-    /*   0, */
-    /*   getWidth(snapshotCanvas), */
-    /*   getHeight(snapshotCanvas), */
-    /* ); */
-    Ctx.setGlobalAlpha(snapshotCtx, 0.2);
+    Ctx.setGlobalAlpha(snapshotCtx, 0.1);
     Array.mapi(
       (i, canvas) => {
         let h = getHeight(canvas);
@@ -73,7 +66,11 @@ let takeSnapshot = _ =>
       },
       canvasesRef^,
     );
+  });
 
+let takeSnapshot = _ =>
+  withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
+    let snapshotCtx = getContext(snapshotCanvas);
     toDataURLjpg(snapshotCanvas, 0.9);
   });
 
@@ -158,16 +155,12 @@ let setOpacity = (elQuery, opacity) =>
        )
   );
 
-let rec onTick = ts => {
-  let scaled = ts *. 0.0005;
-  let codeOpacity = 0.5 +. sin(scaled) ** 2.0 *. 0.5;
+let frameCount = ref(0);
 
-  let maybeCanvas = document |> Document.querySelector("#codeCanvas");
-  switch (maybeCanvas) {
-  | Some(canvas) =>
-    let ctx = getContext(canvas);
-    Ctx.setGlobalAlpha(ctx, codeOpacity);
-  | None => ()
+let rec onTick = ts => {
+  frameCount := frameCount^ + 1;
+  if (frameCount^ mod 5 == 1) {
+    copyVideoToSnapshotCanvas() |> ignore;
   };
   Webapi.requestAnimationFrame(onTick);
 };
@@ -245,6 +238,8 @@ let init: unit => unit =
        })
     |> Js.Promise.then_(canvases => {
          canvasesRef := canvases;
+
+         Webapi.requestAnimationFrame(onTick);
 
          Js.Promise.resolve();
        })
