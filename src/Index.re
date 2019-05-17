@@ -39,10 +39,52 @@ let setSrc = [%bs.raw (img, src) => {|
 let previousCodes: Js.Dict.t(string) = Js.Dict.empty();
 let currentSignature: ref(string) = ref("");
 
+let canvasesRef: ref(array(Dom.element)) = ref([||]);
+
+let takeSnapshot = _ =>
+  withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
+    let snapshotCtx = getContext(snapshotCanvas);
+
+    Ctx.clearRect(
+      snapshotCtx,
+      0,
+      0,
+      getWidth(snapshotCanvas),
+      getHeight(snapshotCanvas),
+    );
+    Ctx.setGlobalAlpha(snapshotCtx, 1.0);
+    Array.mapi(
+      (i, canvas) => {
+        if (i == 1) {
+          Ctx.setGlobalAlpha(snapshotCtx, 0.5);
+        };
+        Ctx.drawImageDestRect(
+          snapshotCtx,
+          ~image=canvas,
+          ~dx=0,
+          ~dy=0,
+          ~dw=getWidth(snapshotCanvas),
+          ~dh=getHeight(snapshotCanvas),
+        );
+      },
+      canvasesRef^,
+    );
+  });
+
+let addToPast: string => unit =
+  dataUrl => {
+    let img = DocumentRe.createElement("img", document);
+    setSrc(img, dataUrl);
+    withQuerySelector("#past", past => HtmlElementRe.appendChild(img, past))
+    |> ignore;
+  };
+
 let setCode = input => {
+  takeSnapshot();
+
   let text = "https://" ++ domain ++ "/#" ++ input;
 
-  Hash.hexDigest("SHA-256", text)
+  Hash.hexDigest("SHA-1", text)
   |> Js.Promise.then_(hash => {
        setBackground("body", "#" ++ Js.String.slice(~from=0, ~to_=6, hash));
 
@@ -52,14 +94,17 @@ let setCode = input => {
            defaultCode,
          );
 
-       document
-       |> Document.querySelector("#codeCanvas")
-       |. Belt.Option.map(canvas => {
-            QueerCode.drawCanvas(canvas, code);
-            let url = toDataURL(canvas);
-            currentSignature := hash;
-            Js.Dict.set(previousCodes, hash, url);
-          })
+       withQuerySelectorDom("#codeCanvas", codeCanvas =>
+         withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
+           let snapshotCtx = getContext(snapshotCanvas);
+           Ctx.setGlobalAlpha(snapshotCtx, 1.0);
+           QueerCode.drawCanvas(snapshotCanvas, code);
+           let url = toDataURL(snapshotCanvas);
+           /* addToPast(url); */
+           currentSignature := hash;
+           Js.Dict.set(previousCodes, hash, url);
+         })
+       )
        |> ignore;
 
        withQuerySelector("#current", img => {
@@ -137,15 +182,18 @@ let init: unit => unit =
       onHashChange();
     };
 
+    withQuerySelectorDom("#snapshotCanvas", canvas => {
+      setWidth(canvas, 32);
+      setHeight(canvas, 32);
+    });
+
     withQuerySelector("#codeContents", el =>
       HtmlElementRe.addEventListener("input", evt => onInput(), el)
     );
 
-    /* Webapi.requestAnimationFrame(onTick); */
-
     let response = input =>
       if (input !== "") {
-        Hash.hexDigest("SHA-256", input)
+        Hash.hexDigest("SHA-1", input)
         |> Js.Promise.then_(hexHash => {
              if (hexHash === currentSignature^
                  || Belt.Option.isNone(Js.Dict.get(previousCodes, hexHash))) {
@@ -175,16 +223,19 @@ let init: unit => unit =
                  UserMedia.deviceIdGet(camera),
                  response,
                );
-
-               Js.Promise.resolve();
              },
              cameras,
            ),
          );
        })
+    |> Js.Promise.then_(canvases => {
+         canvasesRef := canvases;
+
+         Js.Promise.resolve();
+       })
     |> Js.Promise.catch(err => {
          Js.Console.error2("getCameras failed", err);
-         Js.Promise.resolve([||]);
+         Js.Promise.resolve();
        })
     |> ignore;
 

@@ -115,3 +115,47 @@ let getSvgDataUri: (QrCode.t, array(string)) => string =
 
 let drawCanvas: (Dom.element, QrCode.t) => unit =
   (el, code) => QrCode.drawCanvas(code, 1, 4, el);
+
+let drawCanvas_: (Dom.element, QrCode.t) => unit = [%bs.raw
+  (canvas, code) => {|
+     var size = code.modul
+	if (scale <= 0 || border < 0)
+		throw "Value out of range";
+	var width = (size + border * 2) * scale;
+  if (canvas.width != width) {
+    canvas.width = width;
+    canvas.height = width;
+  };
+  var ctx = canvas.getContext("2d");
+	for (var y = -border; y < size + border; y++) {
+	for (var x = -border; x < size + border; x++) {
+		ctx.fillStyle = this.getModule(x, y) ? "#000000" : "#FFFFFF";
+		ctx.fillRect((x + border) * scale, (y + border) * scale, scale, scale);
+	}
+}
+     |}
+];
+
+let drawCanvas: (Dom.element, QrCode.t) => unit =
+  (canvas, code) => {
+    open Canvas;
+    let size = QrCode.size(code);
+    let border = 2;
+    let width = size + border * 2;
+
+    if (getWidth(canvas) !== width) {
+      setWidth(canvas, width);
+      setHeight(canvas, width);
+    };
+
+    let ctx = getContext(canvas);
+    Ctx.setGlobalCompositeOperation(ctx, "difference");
+    Ctx.setFillStyle(ctx, "#FFFFFF");
+    for (y in - border to size + border) {
+      for (x in - border to size + border) {
+        if (QrCode.getModule(code, x, y)) {
+          Ctx.fillRect(ctx, x + border, y + border, 1, 1);
+        };
+      };
+    };
+  };

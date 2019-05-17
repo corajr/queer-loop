@@ -6,10 +6,11 @@
         <style type="text/css">
          body { margin: 0; }
 
-         #codeCanvas {
+         canvas {
              display: none;
          }
-         canvas {
+
+         video {
              position: fixed;
              min-width: 100%;
              min-height: 100%;
@@ -27,9 +28,6 @@
              min-height: 100%;
              opacity: 0.8;
          }
-         video {
-             display: none;
-         }
 
          .centeredSquare {
             position: fixed;
@@ -39,6 +37,7 @@
             top: 50%;
             transform: translate(-50%, -50%);
          }
+
          #backdrop {
              background: #fff;
          }
@@ -75,11 +74,13 @@
         </svg>
 
         <div id="overlay"></div>
+        <div id="past"></div>
         <div class="centeredSquare" id="backdrop"></div>
         <img class="centeredSquare" id="current"></img>
         <div id="codeText">
             <span id="codeContents" contenteditable="true"></span>
         </div>
         <canvas id="codeCanvas"></canvas>
+        <canvas id="snapshotCanvas"></canvas>
     </body>
 </html>

@@ -5,7 +5,7 @@ open Util;
 open Webapi.Dom;
 
 let scanUsingDeviceId:
-  (Dom.element, string, string => unit) => Js.Promise.t(unit) =
+  (Dom.element, string, string => unit) => Js.Promise.t(Dom.element) =
   (videoEl, deviceId, scanCallback) =>
     initStreamByDeviceId(videoEl, deviceId)
     |> Js.Promise.then_(video => {
@@ -36,22 +36,11 @@ let scanUsingDeviceId:
                setWidth(canvas, width);
                setHeight(canvas, height);
              };
-             let ctx = getContext(canvas);
-             Ctx.drawImage(ctx, ~image=video, ~dx=0, ~dy=0);
 
              if (frameCount^ mod 5 == 0) {
-               withQuerySelectorDom("#codeCanvas", codeCanvas => {
-                 let codeCtx = getContext(codeCanvas);
-                 Ctx.setGlobalAlpha(codeCtx, 0.1);
-                 Ctx.drawImageDestRect(
-                   codeCtx,
-                   ~image=canvas,
-                   ~dx=0,
-                   ~dy=0,
-                   ~dw=getWidth(codeCanvas),
-                   ~dh=getHeight(codeCanvas),
-                 );
-               });
+               let ctx = getContext(canvas);
+               Ctx.drawImage(ctx, ~image=video, ~dx=0, ~dy=0);
+
                let imageData =
                  Ctx.getImageData(ctx, ~sx=0, ~sy=0, ~sw=width, ~sh=height);
                WebWorkers.postMessage(
@@ -65,5 +54,5 @@ let scanUsingDeviceId:
            Webapi.requestAnimationFrame(onTick);
          };
          Webapi.requestAnimationFrame(onTick);
-         Js.Promise.resolve();
+         Js.Promise.resolve(canvas);
        });

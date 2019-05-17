@@ -122,8 +122,42 @@ function getSvgDataUri(code, foreignCodes) {
   return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
 }
 
-function drawCanvas(el, code) {
-  code.drawCanvas(1, 4, el);
+function drawCanvas_ (canvas,code){
+     var size = code.modul
+	if (scale <= 0 || border < 0)
+		throw "Value out of range";
+	var width = (size + border * 2) * scale;
+  if (canvas.width != width) {
+    canvas.width = width;
+    canvas.height = width;
+  };
+  var ctx = canvas.getContext("2d");
+	for (var y = -border; y < size + border; y++) {
+	for (var x = -border; x < size + border; x++) {
+		ctx.fillStyle = this.getModule(x, y) ? "#000000" : "#FFFFFF";
+		ctx.fillRect((x + border) * scale, (y + border) * scale, scale, scale);
+	}
+}
+     };
+
+function drawCanvas(canvas, code) {
+  var size = code.size;
+  var width = size + 4 | 0;
+  if (canvas.width !== width) {
+    canvas.width = width;
+    canvas.height = width;
+  }
+  var ctx = canvas.getContext("2d");
+  ctx.globalCompositeOperation = "difference";
+  ctx.fillStyle = "#FFFFFF";
+  for(var y = -2 ,y_finish = size + 2 | 0; y <= y_finish; ++y){
+    for(var x = -2 ,x_finish = size + 2 | 0; x <= x_finish; ++x){
+      if (code.getModule(x, y)) {
+        ctx.fillRect(x + 2 | 0, y + 2 | 0, 1, 1);
+      }
+      
+    }
+  }
   return /* () */0;
 }
 
@@ -132,5 +166,6 @@ exports.moduleArrayToRgbHex = moduleArrayToRgbHex;
 exports.rgbModulesToSvgString = rgbModulesToSvgString;
 exports.modulesToSvgString = modulesToSvgString;
 exports.getSvgDataUri = getSvgDataUri;
+exports.drawCanvas_ = drawCanvas_;
 exports.drawCanvas = drawCanvas;
 /* No side effect */

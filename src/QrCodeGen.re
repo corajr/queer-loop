@@ -35,7 +35,7 @@ module QrCode = {
 
   [@bs.send] external drawCanvas : (t, int, int, Dom.element) => unit = "";
 
-  [@bs.get] external size : t => string = "";
+  [@bs.get] external size : t => int = "";
 
   [@bs.send] external getModule : (t, int, int) => bool = "";
   [@bs.send] external getModules : t => array(array(bool)) = "";
