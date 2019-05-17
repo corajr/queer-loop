@@ -17,6 +17,7 @@
   "suffix": ".bs.js",
   "bs-dependencies": [
       "bs-webapi",
+      "re-debouncer",
       "bs-webworkers"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],

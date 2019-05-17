@@ -43,21 +43,23 @@
     <body>
         <svg id="rainbowOverlay">
             <linearGradient id="rainbow">' +
-            <stop offset="0.000%" stop-color="#ffb5b5" />' +
-            <stop offset="14.286%" stop-color="#fcdc85" />' +
-            <stop offset="28.571%" stop-color="#caf79c" />' +
-            <stop offset="42.857%" stop-color="#a8fdbf" />' +
-            <stop offset="57.143%" stop-color="#70feff" />' +
-            <stop offset="71.429%" stop-color="#a8bffd" />' +
-            <stop offset="85.714%" stop-color="#ca9cf7" />' +
-            <stop offset="100.000%" stop-color="#fc85dc" />' +
+                <stop offset="0.000%" stop-color="#ffb5b5" />' +
+                <stop offset="14.286%" stop-color="#fcdc85" />' +
+                <stop offset="28.571%" stop-color="#caf79c" />' +
+                <stop offset="42.857%" stop-color="#a8fdbf" />' +
+                <stop offset="57.143%" stop-color="#70feff" />' +
+                <stop offset="71.429%" stop-color="#a8bffd" />' +
+                <stop offset="85.714%" stop-color="#ca9cf7" />' +
+                <stop offset="100.000%" stop-color="#fc85dc" />' +
             </linearGradient></defs>' +
             <rect width="100%" height="100%" fill="url(#rainbow)"/>
         </svg>
 
         <div id="overlay"></div>
         <img id="current"></img>
-        <div id="codeText"><span id="codeContents"></span></div>
+        <div id="codeText">
+            <span id="codeContents" contenteditable="true"></span>
+        </div>
         <canvas id="codeCanvas"></canvas>
     </body>
 </html>
