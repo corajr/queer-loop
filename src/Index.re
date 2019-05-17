@@ -17,14 +17,11 @@ let setBackground = (selector, bgCss) =>
     )
   );
 
-let codeRegex =
-  Js.Re.fromString("https:\/\/" ++ domain ++ "\/#([^|]+)\|(.+)");
+let codeRegex = Js.Re.fromString("https:\/\/" ++ domain ++ "\/#(.+)");
 
 let defaultCode = QrCode._encodeText("https://" ++ domain, Ecc.low);
 
-let defaultColor = "fff";
-
-let defaultHash = "1DmDcC0JpKSBKQbo9YxoTdujAy7e+JUuGzTuLUW8uXg=|ZmZm";
+let defaultHash = "fff";
 
 let camerasRef: ref(array(UserMedia.mediaDeviceInfo)) = ref([||]);
 let cameraIndex = ref(0);
@@ -42,11 +39,13 @@ let setSrc = [%bs.raw (img, src) => {|
 let previousCodes: Js.Dict.t(string) = Js.Dict.empty();
 let currentSignature: ref(string) = ref("");
 
-let setCode = input =>
-  hmacSign(input)
-  |> Js.Promise.then_(b64 => {
-       let parts = Js.String.split("|", b64);
-       let text = "https://" ++ domain ++ "/#" ++ b64;
+let setCode = input => {
+  let text = "https://" ++ domain ++ "/#" ++ input;
+
+  Hash.hexDigest("SHA-256", text)
+  |> Js.Promise.then_(hash => {
+       setBackground("body", "#" ++ Js.String.slice(~from=0, ~to_=6, hash));
+
        let code =
          Belt.Option.getWithDefault(
            QrCode.encodeText(text, Ecc.medium),
@@ -58,8 +57,8 @@ let setCode = input =>
        |. Belt.Option.map(canvas => {
             QueerCode.drawCanvas(canvas, code);
             let url = toDataURL(canvas);
-            currentSignature := parts[0];
-            Js.Dict.set(previousCodes, parts[0], url);
+            currentSignature := hash;
+            Js.Dict.set(previousCodes, hash, url);
           })
        |> ignore;
 
@@ -69,47 +68,27 @@ let setCode = input =>
          setSrc(img, url);
        })
        |> ignore;
-
-       Js.Promise.resolve();
-     });
-
-let signAndSetHash = input =>
-  hmacSign(input)
-  |> Js.Promise.then_(b64 => {
-       DomRe.Location.setHash(WindowRe.location(window), b64);
        Js.Promise.resolve();
      })
   |> ignore;
+};
 
-let onHashChange = _ => {
-  let hash =
-    Js.String.sliceToEnd(
-      ~from=1,
-      DomRe.Location.hash(WindowRe.location(window)),
-    );
+let getHash = _ => DomRe.Location.hash(WindowRe.location(window));
 
-  if (Js.String.indexOf("|", hash) === (-1)) {
-    signAndSetHash(hash);
-  } else {
-    hmacVerify(hash)
-    |> Js.Promise.then_(((hex, data)) => {
-         setBackground("body", "#" ++ Js.String.slice(~from=0, ~to_=6, hex));
+let setHash = hash =>
+  DomRe.Location.setHash(WindowRe.location(window), hash);
 
-         withQuerySelector("#codeContents", contents =>
-           HtmlElementRe.setInnerText(contents, data)
-         );
+let onHashChange: unit => unit =
+  _ => {
+    let hash = Js.String.sliceToEnd(~from=1, getHash());
 
-         setCode(data);
+    setCode(hash);
 
-         Js.Promise.resolve();
-       })
-    |> Js.Promise.catch(err => {
-         Js.log(err);
-         Js.Promise.resolve();
-       })
+    withQuerySelector("#codeContents", el =>
+      HtmlElementRe.setInnerText(el, hash)
+    )
     |> ignore;
   };
-};
 
 let setOpacity = (elQuery, opacity) =>
   Belt.Option.(
@@ -143,17 +122,17 @@ let rec onTick = ts => {
 let _onInput = _ =>
   withQuerySelector("#codeContents", el => {
     let text = HtmlElementRe.innerText(el);
-    signAndSetHash(text);
+    setHash(encodeURIComponent(text));
   })
   |> ignore;
 
-let onInput = Debouncer.make(~wait=500, _onInput);
+let onInput = Debouncer.make(~wait=200, _onInput);
 
 let init: unit => unit =
   _ => {
-    let initialHash = DomRe.Location.hash(WindowRe.location(window));
+    let initialHash = getHash();
     if (initialHash == "") {
-      DomRe.Location.setHash(WindowRe.location(window), defaultHash);
+      setHash(defaultHash);
     } else {
       onHashChange();
     };
@@ -165,45 +144,17 @@ let init: unit => unit =
     /* Webapi.requestAnimationFrame(onTick); */
 
     let response = input =>
-      Js.Re.exec_(codeRegex, input)
-      |. Belt.Option.map(Js.Re.captures)
-      |. Belt.Option.map(captures =>
-           switch (
-             Js.Nullable.toOption(captures[1]),
-             Js.Nullable.toOption(captures[2]),
-           ) {
-           | (Some(signature), Some(data)) =>
-             switch (
-               signature === currentSignature^,
-               Js.Dict.get(previousCodes, signature),
-             ) {
-             | (false, Some(img)) => ()
-             | (true, Some(_))
-             | (_, None) =>
-               hmacVerify(signature ++ "|" ++ data)
-               |> Js.Promise.then_(((_hex, data)) =>
-                    Hash.hexDigest(
-                      "SHA-256",
-                      DomRe.Location.hash(WindowRe.location(window)) ++ data,
-                    )
-                  )
-               |> Js.Promise.then_(hexHash => {
-                    DomRe.Location.setHash(
-                      WindowRe.location(window),
-                      hexHash,
-                    );
-                    Js.Promise.resolve();
-                  })
-               |> Js.Promise.catch(err => {
-                    Js.log(err);
-                    Js.Promise.resolve();
-                  })
-               |> ignore
-             }
-           | _ => Js.log("no match: " ++ input)
-           }
-         )
-      |> ignore;
+      if (input !== "") {
+        Hash.hexDigest("SHA-256", input)
+        |> Js.Promise.then_(hexHash => {
+             if (hexHash === currentSignature^
+                 || Belt.Option.isNone(Js.Dict.get(previousCodes, hexHash))) {
+               setHash(hexHash);
+             };
+             Js.Promise.resolve();
+           })
+        |> ignore;
+      };
 
     /* WindowRe.addEventListener("click", _ => cycleCameras(scanner), window); */
 

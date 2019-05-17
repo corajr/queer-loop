@@ -1,3 +1,4 @@
+open Util;
 open QrCodeGen;
 
 let boolToHex = b => b ? "f" : "0";
@@ -104,12 +105,6 @@ let modulesToSvgString: (array(array(bool)), array(string)) => string = [%bs.raw
 		 '</svg>';
      |}
 ];
-
-[@bs.val]
-external encodeURIComponent : string => string = "encodeURIComponent";
-
-[@bs.val]
-external decodeURIComponent : string => string = "decodeURIComponent";
 
 let getSvgDataUri: (QrCode.t, array(string)) => string =
   (code, foreignCodes) => {

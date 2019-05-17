@@ -11,3 +11,9 @@ let withQuerySelectorAll = (query, f) =>
   |> Document.querySelectorAll(query)
   |> DomRe.NodeList.toArray
   |> Array.map(f);
+
+[@bs.val]
+external encodeURIComponent : string => string = "encodeURIComponent";
+
+[@bs.val]
+external decodeURIComponent : string => string = "decodeURIComponent";
