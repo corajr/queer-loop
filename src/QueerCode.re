@@ -164,7 +164,7 @@ let getSvgDataUri: (QrCode.t, option(string)) => string =
      <stop offset="100.000%" stop-color="#fc85dc" />
      </linearGradient></defs>
      $pastData
-     <rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.4" />
+     <rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.5" />
      <path d="$pathString" fill="black" />
      </svg>|j};
 

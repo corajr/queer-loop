@@ -178,6 +178,9 @@ function init(param) {
       return 0;
     }
   };
+  window.addEventListener("click", (function (param) {
+          return setHash(new Date().toISOString());
+        }));
   UserMedia$QueerLoop.getCameras(/* () */0).then((function (cameras) {
               camerasRef[0] = cameras;
               return Promise.all($$Array.map((function (camera) {
