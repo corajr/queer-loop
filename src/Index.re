@@ -113,8 +113,10 @@ let setCode = input =>
                  currentSignature^ !== "" ? Some(snapshotUrl) : None,
                );
              setSrc(img, url);
+             if (currentSignature^ !== "") {
+               addToPast(url);
+             };
              currentSignature := hash;
-             addToPast(url);
            })
          )
          |> ignore;
@@ -213,11 +215,11 @@ let init: unit => unit =
         |> ignore;
       };
 
-    WindowRe.addEventListener(
-      "click",
-      _ => setHash(Js.Date.toISOString(Js.Date.make())),
-      window,
-    );
+    /* WindowRe.addEventListener( */
+    /*   "click", */
+    /*   _ => setHash(Js.Date.toISOString(Js.Date.make())), */
+    /*   window, */
+    /* ); */
 
     UserMedia.getCameras()
     |> Js.Promise.then_(cameras => {

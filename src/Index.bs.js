@@ -87,8 +87,11 @@ function setCode(input) {
                                   var match = currentSignature[0] !== "";
                                   var url = QueerCode$QueerLoop.getSvgDataUri(code, match ? snapshotUrl : undefined);
                                   setSrc(img, url);
+                                  if (currentSignature[0] !== "") {
+                                    addToPast(url);
+                                  }
                                   currentSignature[0] = hash;
-                                  return addToPast(url);
+                                  return /* () */0;
                                 }));
                   }));
             return Promise.resolve(/* () */0);
@@ -178,9 +181,6 @@ function init(param) {
       return 0;
     }
   };
-  window.addEventListener("click", (function (param) {
-          return setHash(new Date().toISOString());
-        }));
   UserMedia$QueerLoop.getCameras(/* () */0).then((function (cameras) {
               camerasRef[0] = cameras;
               return Promise.all($$Array.map((function (camera) {
