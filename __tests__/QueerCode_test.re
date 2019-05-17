@@ -10,7 +10,7 @@ let qrCode = QrCode._encodeText("https://qqq.lu", Ecc.low);
 describe("QueerCode", () => {
   Only.describe("getSvgDataUri", () =>
     test("translates QR code data into QueerCode SVG", () =>
-      expect(getSvgDataUri(qrCode, [||])) |> toEqual("")
+      expect(getSvgDataUri(qrCode, None)) |> toEqual("")
     )
   );
 

@@ -69,6 +69,21 @@ function rgbModulesToSvgString (modules){
 		 '</svg>\n';
      };
 
+function getPathString(code) {
+  var size = code.size;
+  var modules = code.getModules();
+  var parts = /* array */[];
+  for(var y = 0 ,y_finish = size - 1 | 0; y <= y_finish; ++y){
+    for(var x = 0 ,x_finish = size - 1 | 0; x <= x_finish; ++x){
+      if (Caml_array.caml_array_get(Caml_array.caml_array_get(modules, y), x)) {
+        parts.push("M" + (String(x + 4 | 0) + ("," + (String(y + 4 | 0) + "h1v1h-1z"))));
+      }
+      
+    }
+  }
+  return parts.join(" ");
+}
+
 function modulesToSvgString (modules,foreignCodes){
      var border = 4;
      var size = modules.length;
@@ -94,11 +109,11 @@ function modulesToSvgString (modules,foreignCodes){
 		 '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n' +
 		 '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ' +
 		 (size + border * 2) + ' ' + (size + border * 2) + '" stroke="none">' +
-     '<symbol id="code"><path d="' + parts.join(" ") + '" fill="#000000" /></symbol>' +
+     '<symbol id="code"><path d="' + parts.join(" ") + '" /></symbol>' +
      '<defs>' +
      '<mask id="mask">' +
      '<rect width="100%" height="100%" fill="#FFFFFF" />\n' +
-     '<use href="#code" />' +
+     '<use href="#code" fill="#000000" />' +
      '</mask>' +
      '<linearGradient id="rainbow">' +
      '<stop offset="0.000%" stop-color="#ffb5b5" />' +
@@ -111,34 +126,24 @@ function modulesToSvgString (modules,foreignCodes){
      '<stop offset="100.000%" stop-color="#fc85dc" />' +
      '</linearGradient></defs>' +
      '<rect width="100%" height="100%" fill="url(#rainbow)" mask="url(#mask)" />\n' +
-     '<use href="#code" />' +
+     '<use href="#code" fill="#000000" />' +
      '<g>' + meta.join("") + '</g>' +
 		 '</svg>';
      };
 
-function getSvgDataUri(code, foreignCodes) {
+function _getSvgDataUri(code, foreignCodes) {
   var moduleArray = code.getModules();
   var svg = modulesToSvgString(moduleArray, foreignCodes);
   return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
 }
 
-function drawCanvas_ (canvas,code){
-     var size = code.modul
-	if (scale <= 0 || border < 0)
-		throw "Value out of range";
-	var width = (size + border * 2) * scale;
-  if (canvas.width != width) {
-    canvas.width = width;
-    canvas.height = width;
-  };
-  var ctx = canvas.getContext("2d");
-	for (var y = -border; y < size + border; y++) {
-	for (var x = -border; x < size + border; x++) {
-		ctx.fillStyle = this.getModule(x, y) ? "#000000" : "#FFFFFF";
-		ctx.fillRect((x + border) * scale, (y + border) * scale, scale, scale);
-	}
+function getSvgDataUri(code, maybePastUrl) {
+  var pathString = getPathString(code);
+  var sizeWithBorder = code.size + 8 | 0;
+  var pastData = maybePastUrl !== undefined ? "<image href=\"" + (String(maybePastUrl) + ("\" x=\"0\" y=\"0\" width=\"" + (String(sizeWithBorder) + ("\" height=\"" + (String(sizeWithBorder) + "\" />"))))) : "";
+  var svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + ("\" stroke=\"none\">\n     <defs>\n     <linearGradient id=\"rainbow\">\n     <stop offset=\"0.000%\" stop-color=\"#ffb5b5\" />\n     <stop offset=\"14.286%\" stop-color=\"#fcdc85\" />\n     <stop offset=\"28.571%\" stop-color=\"#caf79c\" />\n     <stop offset=\"42.857%\" stop-color=\"#a8fdbf\" />\n     <stop offset=\"57.143%\" stop-color=\"#70feff\" />\n     <stop offset=\"71.429%\" stop-color=\"#a8bffd\" />\n     <stop offset=\"85.714%\" stop-color=\"#ca9cf7\" />\n     <stop offset=\"100.000%\" stop-color=\"#fc85dc\" />\n     </linearGradient></defs>\n     " + (String(pastData) + ("\n     <rect width=\"100%\" height=\"100%\" fill=\"white\" fill-opacity=\"0.2\" />\n     <path d=\"" + (String(pathString) + "\" fill=\"black\" />\n     </svg>")))))));
+  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
 }
-     };
 
 function drawCanvas(canvas, code) {
   var size = code.size;
@@ -164,8 +169,9 @@ function drawCanvas(canvas, code) {
 exports.boolToHex = boolToHex;
 exports.moduleArrayToRgbHex = moduleArrayToRgbHex;
 exports.rgbModulesToSvgString = rgbModulesToSvgString;
+exports.getPathString = getPathString;
 exports.modulesToSvgString = modulesToSvgString;
+exports._getSvgDataUri = _getSvgDataUri;
 exports.getSvgDataUri = getSvgDataUri;
-exports.drawCanvas_ = drawCanvas_;
 exports.drawCanvas = drawCanvas;
 /* No side effect */

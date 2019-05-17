@@ -31,6 +31,23 @@ module Ctx = {
     "drawImage";
 
   [@bs.send]
+  external drawImageSourceRectDestRect :
+    (
+      t,
+      ~image: imageSource,
+      ~sx: int,
+      ~sy: int,
+      ~sw: int,
+      ~sh: int,
+      ~dx: int,
+      ~dy: int,
+      ~dw: int,
+      ~dh: int
+    ) =>
+    unit =
+    "drawImage";
+
+  [@bs.send]
   external getImageData :
     (t, ~sx: int, ~sy: int, ~sw: int, ~sh: int) => imageData =
     "";

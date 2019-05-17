@@ -3,13 +3,13 @@
 
 var $$Array = require("bs-platform/lib/js/array.js");
 var Curry = require("bs-platform/lib/js/curry.js");
-var Js_dict = require("bs-platform/lib/js/js_dict.js");
 var Debouncer = require("re-debouncer/src/Debouncer.bs.js");
 var ElementRe = require("bs-webapi/src/dom/nodes/ElementRe.js");
 var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
 var Pervasives = require("bs-platform/lib/js/pervasives.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
+var Belt_SetString = require("bs-platform/lib/js/belt_SetString.js");
 var Hash$QueerLoop = require("./Hash.bs.js");
 var Util$QueerLoop = require("./Util.bs.js");
 var Scanner$QueerLoop = require("./Scanner.bs.js");
@@ -30,8 +30,6 @@ var codeRegex = new RegExp("https:\\/\\/qqq.lu\\/#(.+)");
 
 var defaultCode = QrCodeGen$QueerLoop.QrCode[/* _encodeText */0]("https://qqq.lu", QrCodeGen$QueerLoop.Ecc[/* low */0]);
 
-var defaultHash = "fff";
-
 var camerasRef = /* record */[/* contents : array */[]];
 
 var cameraIndex = /* record */[/* contents */0];
@@ -45,7 +43,7 @@ function cycleCameras(scanner) {
 function setSrc (img,src){
      img.src = src;};
 
-var previousCodes = { };
+var previousCodes = /* record */[/* contents */Belt_SetString.empty];
 
 var currentSignature = /* record */[/* contents */""];
 
@@ -54,15 +52,14 @@ var canvasesRef = /* record */[/* contents : array */[]];
 function takeSnapshot(param) {
   return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
                 var snapshotCtx = snapshotCanvas.getContext("2d");
-                snapshotCtx.clearRect(0, 0, snapshotCanvas.width, snapshotCanvas.height);
-                snapshotCtx.globalAlpha = 1.0;
-                return $$Array.mapi((function (i, canvas) {
-                              if (i === 1) {
-                                snapshotCtx.globalAlpha = 0.5;
-                              }
-                              snapshotCtx.drawImage(canvas, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
-                              return /* () */0;
-                            }), canvasesRef[0]);
+                snapshotCtx.globalAlpha = 0.2;
+                $$Array.mapi((function (i, canvas) {
+                        var h = canvas.height;
+                        (canvas.width - h | 0) / 2 | 0;
+                        snapshotCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+                        return /* () */0;
+                      }), canvasesRef[0]);
+                return snapshotCanvas.toDataURL("image/jpeg", 0.9);
               }));
 }
 
@@ -77,30 +74,29 @@ function addToPast(dataUrl) {
 }
 
 function setCode(input) {
-  takeSnapshot(/* () */0);
-  var text = "https://" + (domain + ("/#" + input));
-  Hash$QueerLoop.hexDigest("SHA-1", text).then((function (hash) {
-          setBackground("body", "#" + hash.slice(0, 6));
-          var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
-          Util$QueerLoop.withQuerySelectorDom("#codeCanvas", (function (codeCanvas) {
-                  return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
-                                var snapshotCtx = snapshotCanvas.getContext("2d");
-                                snapshotCtx.globalAlpha = 1.0;
-                                var url = snapshotCanvas.toDataURL();
-                                currentSignature[0] = hash;
-                                previousCodes[hash] = url;
-                                return /* () */0;
-                              }));
-                }));
-          Util$QueerLoop.withQuerySelector("#current", (function (img) {
-                  var url = QueerCode$QueerLoop.getSvgDataUri(code, Js_dict.values(previousCodes));
-                  setSrc(img, url);
-                  previousCodes[hash] = url;
-                  return /* () */0;
-                }));
-          return Promise.resolve(/* () */0);
-        }));
-  return /* () */0;
+  var match = takeSnapshot(/* () */0);
+  if (match !== undefined) {
+    var snapshotUrl = match;
+    var text = "https://" + (domain + ("/#" + input));
+    Hash$QueerLoop.hexDigest("SHA-1", text).then((function (hash) {
+            setBackground("body", "#" + hash.slice(0, 6));
+            var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
+            Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
+                    return Util$QueerLoop.withQuerySelector("#current", (function (img) {
+                                  previousCodes[0] = Belt_SetString.add(previousCodes[0], hash);
+                                  var match = currentSignature[0] !== "";
+                                  var url = QueerCode$QueerLoop.getSvgDataUri(code, match ? snapshotUrl : undefined);
+                                  setSrc(img, url);
+                                  currentSignature[0] = hash;
+                                  return addToPast(url);
+                                }));
+                  }));
+            return Promise.resolve(/* () */0);
+          }));
+    return /* () */0;
+  } else {
+    return /* () */0;
+  }
 }
 
 function getHash(param) {
@@ -152,17 +148,17 @@ function _onInput(param) {
 var onInput = Debouncer.make(200, _onInput);
 
 function init(param) {
+  Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
+          canvas.width = 480;
+          canvas.height = 480;
+          return /* () */0;
+        }));
   var initialHash = window.location.hash;
   if (initialHash === "") {
-    setHash(defaultHash);
+    setHash(new Date().toISOString());
   } else {
     onHashChange(/* () */0);
   }
-  Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
-          canvas.width = 128;
-          canvas.height = 128;
-          return /* () */0;
-        }));
   Util$QueerLoop.withQuerySelector("#codeContents", (function (el) {
           el.addEventListener("input", (function (evt) {
                   return Curry._1(onInput, /* () */0);
@@ -172,8 +168,8 @@ function init(param) {
   var response = function (input) {
     if (input !== "") {
       Hash$QueerLoop.hexDigest("SHA-1", input).then((function (hexHash) {
-              if (hexHash === currentSignature[0] || Belt_Option.isNone(Js_dict.get(previousCodes, hexHash))) {
-                setHash(hexHash);
+              if (hexHash === currentSignature[0] || Belt_SetString.has(previousCodes[0], hexHash)) {
+                setHash(new Date().toISOString());
               }
               return Promise.resolve(/* () */0);
             }));
@@ -209,6 +205,8 @@ window.addEventListener("load", (function (param) {
 window.addEventListener("hashchange", (function (param) {
         return onHashChange(/* () */0);
       }));
+
+var defaultHash = "fff";
 
 exports.domain = domain;
 exports.setBackground = setBackground;

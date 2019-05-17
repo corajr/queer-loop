@@ -8,6 +8,7 @@
 
          canvas {
              display: none;
+             pointer-events: none;
          }
 
          video {
@@ -18,15 +19,18 @@
              top: 50%;
              transform: translate(-50%, -50%);
              opacity: 0.5;
+             pointer-events: none;
          }
          #rainbowOverlay {
              display: none;
          }
 
          #past {
-             max-width: 100%;
-             max-height: 100%;
              display: flex;
+             width: 100vw;
+             flex-wrap: wrap;
+             z-index: 99;
+             opacity: 0.5;
          }
 
          #overlay, #rainbowOverlay {
@@ -45,13 +49,8 @@
             transform: translate(-50%, -50%);
          }
 
-         #backdrop {
-             background: #fff;
-         }
-
          #current {
              z-index: 100;
-             mix-blend-mode: overlay;
          }
 
          #codeContents {
@@ -66,28 +65,11 @@
         </style>
     </head>
     <body>
-        <svg id="rainbowOverlay">
-            <linearGradient id="rainbow">' +
-                <stop offset="0.000%" stop-color="#ffb5b5" />' +
-                <stop offset="14.286%" stop-color="#fcdc85" />' +
-                <stop offset="28.571%" stop-color="#caf79c" />' +
-                <stop offset="42.857%" stop-color="#a8fdbf" />' +
-                <stop offset="57.143%" stop-color="#70feff" />' +
-                <stop offset="71.429%" stop-color="#a8bffd" />' +
-                <stop offset="85.714%" stop-color="#ca9cf7" />' +
-                <stop offset="100.000%" stop-color="#fc85dc" />' +
-            </linearGradient></defs>' +
-            <rect width="100%" height="100%" fill="url(#rainbow)"/>
-        </svg>
-
-        <div id="overlay"></div>
         <div id="past"></div>
-        <div class="centeredSquare" id="backdrop"></div>
         <img class="centeredSquare" id="current"></img>
         <div id="codeText">
             <span id="codeContents" contenteditable="true"></span>
         </div>
-        <canvas id="codeCanvas"></canvas>
         <canvas id="snapshotCanvas"></canvas>
     </body>
 </html>

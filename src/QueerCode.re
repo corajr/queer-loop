@@ -57,6 +57,31 @@ let rgbModulesToSvgString: array(array(string)) => string = [%bs.raw
      |}
 ];
 
+let getPathString: QrCode.t => string =
+  code => {
+    let size = QrCode.size(code);
+    let border = 4;
+    let modules = QrCode.getModules(code);
+    let parts = [||];
+    for (y in 0 to size - 1) {
+      for (x in 0 to size - 1) {
+        if (modules[y][x]) {
+          Js.Array.push(
+            "M"
+            ++ string_of_int(x + border)
+            ++ ","
+            ++ string_of_int(y + border)
+            ++ "h1v1h-1z",
+            parts,
+          )
+          |> ignore;
+        };
+      };
+    };
+
+    Js.Array.joinWith(" ", parts);
+  };
+
 let modulesToSvgString: (array(array(bool)), array(string)) => string = [%bs.raw
   (modules, foreignCodes) => {|
      var border = 4;
@@ -83,11 +108,11 @@ let modulesToSvgString: (array(array(bool)), array(string)) => string = [%bs.raw
 		 '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n' +
 		 '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ' +
 		 (size + border * 2) + ' ' + (size + border * 2) + '" stroke="none">' +
-     '<symbol id="code"><path d="' + parts.join(" ") + '" fill="#000000" /></symbol>' +
+     '<symbol id="code"><path d="' + parts.join(" ") + '" /></symbol>' +
      '<defs>' +
      '<mask id="mask">' +
      '<rect width="100%" height="100%" fill="#FFFFFF" />\n' +
-     '<use href="#code" />' +
+     '<use href="#code" fill="#000000" />' +
      '</mask>' +
      '<linearGradient id="rainbow">' +
      '<stop offset="0.000%" stop-color="#ffb5b5" />' +
@@ -100,41 +125,53 @@ let modulesToSvgString: (array(array(bool)), array(string)) => string = [%bs.raw
      '<stop offset="100.000%" stop-color="#fc85dc" />' +
      '</linearGradient></defs>' +
      '<rect width="100%" height="100%" fill="url(#rainbow)" mask="url(#mask)" />\n' +
-     '<use href="#code" />' +
+     '<use href="#code" fill="#000000" />' +
      '<g>' + meta.join("") + '</g>' +
 		 '</svg>';
      |}
 ];
 
-let getSvgDataUri: (QrCode.t, array(string)) => string =
+let _getSvgDataUri: (QrCode.t, array(string)) => string =
   (code, foreignCodes) => {
     let moduleArray = QrCode.getModules(code);
     let svg = modulesToSvgString(moduleArray, foreignCodes);
     "data:image/svg+xml;utf8," ++ encodeURIComponent(svg);
   };
 
-let drawCanvas: (Dom.element, QrCode.t) => unit =
-  (el, code) => QrCode.drawCanvas(code, 1, 4, el);
+let getSvgDataUri: (QrCode.t, option(string)) => string =
+  (code, maybePastUrl) => {
+    let pathString = getPathString(code);
+    let border = 4;
+    let sizeWithBorder = QrCode.size(code) + border * 2;
+    let sizeWithBorderMinusOne = sizeWithBorder - 1;
 
-let drawCanvas_: (Dom.element, QrCode.t) => unit = [%bs.raw
-  (canvas, code) => {|
-     var size = code.modul
-	if (scale <= 0 || border < 0)
-		throw "Value out of range";
-	var width = (size + border * 2) * scale;
-  if (canvas.width != width) {
-    canvas.width = width;
-    canvas.height = width;
+    let pastData =
+      switch (maybePastUrl) {
+      | Some(pastUrl) => {j|<image href="$pastUrl" x="0" y="0" width="$sizeWithBorder" height="$sizeWithBorder" />|j}
+      | None => ""
+      };
+
+    let svg = {j|<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 $sizeWithBorder $sizeWithBorder" stroke="none">
+     <defs>
+     <linearGradient id="rainbow">
+     <stop offset="0.000%" stop-color="#ffb5b5" />
+     <stop offset="14.286%" stop-color="#fcdc85" />
+     <stop offset="28.571%" stop-color="#caf79c" />
+     <stop offset="42.857%" stop-color="#a8fdbf" />
+     <stop offset="57.143%" stop-color="#70feff" />
+     <stop offset="71.429%" stop-color="#a8bffd" />
+     <stop offset="85.714%" stop-color="#ca9cf7" />
+     <stop offset="100.000%" stop-color="#fc85dc" />
+     </linearGradient></defs>
+     $pastData
+     <rect width="100%" height="100%" fill="white" fill-opacity="0.2" />
+     <path d="$pathString" fill="black" />
+     </svg>|j};
+
+    /* <rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.5" /> */
+
+    "data:image/svg+xml;utf8," ++ encodeURIComponent(svg);
   };
-  var ctx = canvas.getContext("2d");
-	for (var y = -border; y < size + border; y++) {
-	for (var x = -border; x < size + border; x++) {
-		ctx.fillStyle = this.getModule(x, y) ? "#000000" : "#FFFFFF";
-		ctx.fillRect((x + border) * scale, (y + border) * scale, scale, scale);
-	}
-}
-     |}
-];
 
 let drawCanvas: (Dom.element, QrCode.t) => unit =
   (canvas, code) => {
