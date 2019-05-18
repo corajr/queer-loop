@@ -95,12 +95,12 @@ function onClick(maybeHash, param) {
 function addToPast(hash, dataUrl) {
   var img = document.createElement("img");
   setSrc(img, dataUrl);
-  img.id = hash;
+  img.id = "x" + hash;
   var partial_arg = hash;
   img.addEventListener("click", (function (param) {
           return onClick(partial_arg, param);
         }));
-  Util$QueerLoop.withQuerySelector("#codes", (function (past) {
+  Util$QueerLoop.withQuerySelectorDom("#codes", (function (past) {
           past.appendChild(img);
           return /* () */0;
         }));
@@ -116,7 +116,7 @@ function setCode(input) {
             dataSeen[hash] = text;
             setBackground("body", "#" + hash.slice(0, 6));
             var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
-            Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (loopSvg) {
+            Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (loopSvg) {
                     return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
                                   previousCodes[0] = Belt_SetString.add(previousCodes[0], hash);
                                   dataSeen[hash] = text;
@@ -182,7 +182,7 @@ function init(param) {
           canvas.height = 480;
           return /* () */0;
         }));
-  Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (img) {
+  Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (img) {
           img.addEventListener("click", (function (param) {
                   return onClick(undefined, param);
                 }));

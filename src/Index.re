@@ -94,10 +94,12 @@ let addToPast: (string, string) => unit =
   (hash, dataUrl) => {
     let img = DocumentRe.createElement("img", document);
     setSrc(img, dataUrl);
-    ElementRe.setId(img, hash);
+    /* ElementRe.setClassName(img, "centeredSquareSmall queer-loop"); */
+    ElementRe.setId(img, "x" ++ hash);
     ElementRe.addEventListener("click", onClick(Some(hash)), img);
-    withQuerySelector("#codes", past => HtmlElementRe.appendChild(img, past))
-    |> ignore;
+
+    withQuerySelectorDom("#codes", past => ElementRe.appendChild(img, past));
+    ();
   };
 
 let setCode = input =>
@@ -120,7 +122,7 @@ let setCode = input =>
              defaultCode,
            );
 
-         withQuerySelectorDom("#queer-loop", loopSvg =>
+         withQuerySelectorDom(".queer-loop", loopSvg =>
            withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
              previousCodes := Belt.Set.String.add(previousCodes^, hash);
              Js.Dict.set(dataSeen, hash, text);
@@ -198,7 +200,7 @@ let init: unit => unit =
       setHeight(canvas, 480);
     });
 
-    withQuerySelectorDom("#queer-loop", img =>
+    withQuerySelectorDom(".queer-loop", img =>
       ElementRe.addEventListener("click", onClick(None), img)
     );
 

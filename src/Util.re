@@ -15,6 +15,12 @@ let withQuerySelectorAll = (query, f) =>
   |> DomRe.NodeList.toArray
   |> Array.map(f);
 
+let withQuerySelectorSub = (query, childQuery, f) =>
+  document
+  |> Document.querySelector(query)
+  |. Belt.Option.flatMap(ElementRe.querySelector(childQuery))
+  |. Belt.Option.map(f);
+
 [@bs.val]
 external encodeURIComponent : string => string = "encodeURIComponent";
 

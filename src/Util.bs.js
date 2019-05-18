@@ -18,6 +18,12 @@ function withQuerySelectorAll(query, f) {
   return $$Array.map(f, Array.prototype.slice.call(document.querySelectorAll(query)));
 }
 
+function withQuerySelectorSub(query, childQuery, f) {
+  return Belt_Option.map(Belt_Option.flatMap(Caml_option.nullable_to_opt(document.querySelector(query)), (function (param) {
+                    return Caml_option.nullable_to_opt(param.querySelector(childQuery));
+                  })), f);
+}
+
 function getHash(param) {
   return window.location.hash;
 }
@@ -30,6 +36,7 @@ function setHash(hash) {
 exports.withQuerySelectorDom = withQuerySelectorDom;
 exports.withQuerySelector = withQuerySelector;
 exports.withQuerySelectorAll = withQuerySelectorAll;
+exports.withQuerySelectorSub = withQuerySelectorSub;
 exports.getHash = getHash;
 exports.setHash = setHash;
 /* ElementRe Not a pure module */

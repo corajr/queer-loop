@@ -30,17 +30,24 @@
              top: 50%;
              transform: translate(-50%, -50%);
          }
-
          #codes {
              display: flex;
-             width: 100vw;
              flex-wrap: wrap;
-             z-index: 99;
+             justify-content: center;
          }
 
-         #queer-loop {
+         .centeredSquareSmall {
+            position: fixed;
+            width: 70vmin;
+            height: 70vmin;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+         }
+
+         .queer-loop {
              z-index: 100;
-             opacity: 0.8;
+             opacity: 0.99;
          }
 
          #codeContents {
@@ -58,7 +65,7 @@
         <div id="codes"></div>
 
         <canvas id="snapshotCanvas"></canvas>
-        <svg class="centeredSquare" id="queer-loop" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 31 31" stroke="none">
+        <svg class="centeredSquare queer-loop" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 31 31" stroke="none">
             <defs>
                 <linearGradient id="rainbow">
                     <stop offset="0.000%" stop-color="#ffb5b5" />
