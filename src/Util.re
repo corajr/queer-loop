@@ -20,3 +20,8 @@ external encodeURIComponent : string => string = "encodeURIComponent";
 
 [@bs.val]
 external decodeURIComponent : string => string = "decodeURIComponent";
+
+let getHash = _ => DomRe.Location.hash(WindowRe.location(window));
+
+let setHash = hash =>
+  DomRe.Location.setHash(WindowRe.location(window), hash);

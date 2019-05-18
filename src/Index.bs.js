@@ -3,6 +3,7 @@
 
 var $$Array = require("bs-platform/lib/js/array.js");
 var Curry = require("bs-platform/lib/js/curry.js");
+var Js_dict = require("bs-platform/lib/js/js_dict.js");
 var Debouncer = require("re-debouncer/src/Debouncer.bs.js");
 var ElementRe = require("bs-webapi/src/dom/nodes/ElementRe.js");
 var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
@@ -45,6 +46,8 @@ function setSrc (img,src){
 
 var previousCodes = /* record */[/* contents */Belt_SetString.empty];
 
+var dataSeen = { };
+
 var currentSignature = /* record */[/* contents */""];
 
 var canvasesRef = /* record */[/* contents : array */[]];
@@ -69,10 +72,35 @@ function takeSnapshot(param) {
               }));
 }
 
-function addToPast(dataUrl) {
+function setHashToNow(param) {
+  return Util$QueerLoop.setHash(new Date().toISOString());
+}
+
+function onClick(maybeHash, param) {
+  if (maybeHash !== undefined) {
+    var hash = maybeHash;
+    console.log(hash);
+    setBackground("body", "#" + hash.slice(0, 6));
+    var match = Js_dict.get(dataSeen, hash);
+    if (match !== undefined) {
+      return Util$QueerLoop.setHash(match.slice(16));
+    } else {
+      return /* () */0;
+    }
+  } else {
+    return Util$QueerLoop.setHash(new Date().toISOString());
+  }
+}
+
+function addToPast(hash, dataUrl) {
   var img = document.createElement("img");
   setSrc(img, dataUrl);
-  Util$QueerLoop.withQuerySelector("#past", (function (past) {
+  img.id = hash;
+  var partial_arg = hash;
+  img.addEventListener("click", (function (param) {
+          return onClick(partial_arg, param);
+        }));
+  Util$QueerLoop.withQuerySelector("#codes", (function (past) {
           past.appendChild(img);
           return /* () */0;
         }));
@@ -85,16 +113,18 @@ function setCode(input) {
     var snapshotUrl = match;
     var text = "https://" + (domain + ("/#" + input));
     Hash$QueerLoop.hexDigest("SHA-1", text).then((function (hash) {
+            dataSeen[hash] = text;
             setBackground("body", "#" + hash.slice(0, 6));
             var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
             Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
                     return Util$QueerLoop.withQuerySelector("#current", (function (img) {
                                   previousCodes[0] = Belt_SetString.add(previousCodes[0], hash);
+                                  dataSeen[hash] = text;
                                   var match = currentSignature[0] !== "";
-                                  var url = QueerCode$QueerLoop.getSvgDataUri(code, match ? snapshotUrl : undefined);
+                                  var url = QueerCode$QueerLoop.getSvgDataUri(code, text, match ? snapshotUrl : undefined);
                                   setSrc(img, url);
                                   if (currentSignature[0] !== "") {
-                                    addToPast(url);
+                                    addToPast(hash, url);
                                   }
                                   currentSignature[0] = hash;
                                   return /* () */0;
@@ -108,17 +138,8 @@ function setCode(input) {
   }
 }
 
-function getHash(param) {
-  return window.location.hash;
-}
-
-function setHash(hash) {
-  window.location.hash = hash;
-  return /* () */0;
-}
-
 function onHashChange(param) {
-  var hash = window.location.hash.slice(1);
+  var hash = Util$QueerLoop.getHash(/* () */0).slice(1);
   setCode(hash);
   Util$QueerLoop.withQuerySelector("#codeContents", (function (el) {
           el.innerText = decodeURIComponent(hash);
@@ -148,7 +169,7 @@ function onTick(ts) {
 function _onInput(param) {
   Util$QueerLoop.withQuerySelector("#codeContents", (function (el) {
           var text = el.innerText;
-          return setHash(encodeURIComponent(text));
+          return Util$QueerLoop.setHash(encodeURIComponent(text));
         }));
   return /* () */0;
 }
@@ -161,9 +182,15 @@ function init(param) {
           canvas.height = 480;
           return /* () */0;
         }));
-  var initialHash = window.location.hash;
+  Util$QueerLoop.withQuerySelectorDom("#current", (function (img) {
+          img.addEventListener("click", (function (param) {
+                  return onClick(undefined, param);
+                }));
+          return /* () */0;
+        }));
+  var initialHash = Util$QueerLoop.getHash(/* () */0);
   if (initialHash === "") {
-    setHash(new Date().toISOString());
+    Util$QueerLoop.setHash(new Date().toISOString());
   } else {
     onHashChange(/* () */0);
   }
@@ -176,8 +203,9 @@ function init(param) {
   var response = function (input) {
     if (input !== "") {
       Hash$QueerLoop.hexDigest("SHA-1", input).then((function (hexHash) {
-              if (hexHash === currentSignature[0] || !Belt_SetString.has(previousCodes[0], hexHash)) {
-                setHash(new Date().toISOString());
+              var alreadySeen = Belt_SetString.has(previousCodes[0], hexHash);
+              if (hexHash === currentSignature[0] || !alreadySeen) {
+                Util$QueerLoop.setHash(new Date().toISOString());
               }
               return Promise.resolve(/* () */0);
             }));
@@ -207,6 +235,10 @@ function init(param) {
   return /* () */0;
 }
 
+window.addEventListener("click", (function (param) {
+        return Util$QueerLoop.setHash(new Date().toISOString());
+      }));
+
 window.addEventListener("load", (function (param) {
         return init(/* () */0);
       }));
@@ -227,14 +259,15 @@ exports.cameraIndex = cameraIndex;
 exports.cycleCameras = cycleCameras;
 exports.setSrc = setSrc;
 exports.previousCodes = previousCodes;
+exports.dataSeen = dataSeen;
 exports.currentSignature = currentSignature;
 exports.canvasesRef = canvasesRef;
 exports.copyVideoToSnapshotCanvas = copyVideoToSnapshotCanvas;
 exports.takeSnapshot = takeSnapshot;
+exports.setHashToNow = setHashToNow;
+exports.onClick = onClick;
 exports.addToPast = addToPast;
 exports.setCode = setCode;
-exports.getHash = getHash;
-exports.setHash = setHash;
 exports.onHashChange = onHashChange;
 exports.setOpacity = setOpacity;
 exports.frameCount = frameCount;

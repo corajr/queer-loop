@@ -137,7 +137,7 @@ function _getSvgDataUri(code, foreignCodes) {
   return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
 }
 
-function getSvgDataUri(code, maybePastUrl) {
+function getSvgDataUri(code, data, maybePastUrl) {
   var pathString = getPathString(code);
   var sizeWithBorder = code.size + 8 | 0;
   var pastData = maybePastUrl !== undefined ? "<image href=\"" + (String(maybePastUrl) + ("\" x=\"0\" y=\"0\" width=\"" + (String(sizeWithBorder) + ("\" height=\"" + (String(sizeWithBorder) + "\" />"))))) : "";

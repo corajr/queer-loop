@@ -22,22 +22,20 @@
              transform: translate(-50%, -50%);
          }
 
-         #past {
-             display: flex;
-             width: 100vw;
-             flex-wrap: wrap;
-             justify-content: center;
-             z-index: 99;
-             opacity: 0.2;
-         }
-
          .centeredSquare {
              position: fixed;
-             width: 75vmin;
-             height: 75vmin;
+             width: 100vmin;
+             height: 100vmin;
              left: 50%;
              top: 50%;
              transform: translate(-50%, -50%);
+         }
+
+         #codes {
+             display: flex;
+             width: 100vw;
+             flex-wrap: wrap;
+             z-index: 99;
          }
 
          #current {
@@ -48,7 +46,7 @@
              position: fixed;
              left: 0;
              bottom: 0;
-             z-index: 101;
+             z-index: 101
              color: white;
              font-size: 12pt;
              font-family: "Courier New", monospace;
@@ -57,7 +55,7 @@
     </head>
     <body>
         <canvas id="snapshotCanvas"></canvas>
-        <div id="past"></div>
+        <div id="codes"></div>
         <img class="centeredSquare" id="current"></img>
         <div id="codeText">
             <span id="codeContents" contenteditable="true"></span>

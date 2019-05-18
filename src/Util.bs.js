@@ -18,7 +18,18 @@ function withQuerySelectorAll(query, f) {
   return $$Array.map(f, Array.prototype.slice.call(document.querySelectorAll(query)));
 }
 
+function getHash(param) {
+  return window.location.hash;
+}
+
+function setHash(hash) {
+  window.location.hash = hash;
+  return /* () */0;
+}
+
 exports.withQuerySelectorDom = withQuerySelectorDom;
 exports.withQuerySelector = withQuerySelector;
 exports.withQuerySelectorAll = withQuerySelectorAll;
+exports.getHash = getHash;
+exports.setHash = setHash;
 /* ElementRe Not a pure module */

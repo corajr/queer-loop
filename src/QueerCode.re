@@ -138,8 +138,8 @@ let _getSvgDataUri: (QrCode.t, array(string)) => string =
     "data:image/svg+xml;utf8," ++ encodeURIComponent(svg);
   };
 
-let getSvgDataUri: (QrCode.t, option(string)) => string =
-  (code, maybePastUrl) => {
+let getSvgDataUri: (QrCode.t, string, option(string)) => string =
+  (code, data, maybePastUrl) => {
     let pathString = getPathString(code);
     let border = 4;
     let sizeWithBorder = QrCode.size(code) + border * 2;

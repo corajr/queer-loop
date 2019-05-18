@@ -38,6 +38,8 @@ let setSrc = [%bs.raw (img, src) => {|
 
 let previousCodes: ref(Belt.Set.String.t) = ref(Belt.Set.String.empty);
 
+let dataSeen: Js.Dict.t(string) = Js.Dict.empty();
+
 let currentSignature: ref(string) = ref("");
 
 let canvasesRef: ref(array(Dom.element)) = ref([||]);
@@ -74,11 +76,27 @@ let takeSnapshot = _ =>
     toDataURLjpg(snapshotCanvas, 0.9);
   });
 
-let addToPast: string => unit =
-  dataUrl => {
+let setHashToNow = _ => setHash(Js.Date.toISOString(Js.Date.make()));
+
+let onClick = (maybeHash, _) =>
+  switch (maybeHash) {
+  | Some(hash) =>
+    Js.log(hash);
+    setBackground("body", "#" ++ Js.String.slice(~from=0, ~to_=6, hash));
+    switch (Js.Dict.get(dataSeen, hash)) {
+    | Some(data) => setHash(Js.String.sliceToEnd(~from=16, data))
+    | None => ()
+    };
+  | None => setHashToNow()
+  };
+
+let addToPast: (string, string) => unit =
+  (hash, dataUrl) => {
     let img = DocumentRe.createElement("img", document);
     setSrc(img, dataUrl);
-    withQuerySelector("#past", past => HtmlElementRe.appendChild(img, past))
+    ElementRe.setId(img, hash);
+    ElementRe.addEventListener("click", onClick(Some(hash)), img);
+    withQuerySelector("#codes", past => HtmlElementRe.appendChild(img, past))
     |> ignore;
   };
 
@@ -89,6 +107,8 @@ let setCode = input =>
 
     Hash.hexDigest("SHA-1", text)
     |> Js.Promise.then_(hash => {
+         Js.Dict.set(dataSeen, hash, text);
+
          setBackground(
            "body",
            "#" ++ Js.String.slice(~from=0, ~to_=6, hash),
@@ -103,15 +123,17 @@ let setCode = input =>
          withQuerySelectorDom("#snapshotCanvas", snapshotCanvas =>
            withQuerySelector("#current", img => {
              previousCodes := Belt.Set.String.add(previousCodes^, hash);
+             Js.Dict.set(dataSeen, hash, text);
 
              let url =
                QueerCode.getSvgDataUri(
                  code,
+                 text,
                  currentSignature^ !== "" ? Some(snapshotUrl) : None,
                );
              setSrc(img, url);
              if (currentSignature^ !== "") {
-               addToPast(url);
+               addToPast(hash, url);
              };
              currentSignature := hash;
            })
@@ -122,11 +144,6 @@ let setCode = input =>
     |> ignore;
   | None => ()
   };
-
-let getHash = _ => DomRe.Location.hash(WindowRe.location(window));
-
-let setHash = hash =>
-  DomRe.Location.setHash(WindowRe.location(window), hash);
 
 let onHashChange: unit => unit =
   _ => {
@@ -181,12 +198,13 @@ let init: unit => unit =
       setHeight(canvas, 480);
     });
 
+    withQuerySelectorDom("#current", img =>
+      ElementRe.addEventListener("click", onClick(None), img)
+    );
+
     let initialHash = getHash();
     if (initialHash == "") {
-      /* setHash(defaultHash); */
-      setHash(
-        Js.Date.toISOString(Js.Date.make()),
-      );
+      setHashToNow();
     } else {
       onHashChange();
     };
@@ -199,20 +217,15 @@ let init: unit => unit =
       if (input !== "") {
         Hash.hexDigest("SHA-1", input)
         |> Js.Promise.then_(hexHash => {
-             if (hexHash === currentSignature^
-                 || ! Belt.Set.String.has(previousCodes^, hexHash)) {
+             let alreadySeen = Belt.Set.String.has(previousCodes^, hexHash);
+
+             if (hexHash === currentSignature^ || ! alreadySeen) {
                setHash(Js.Date.toISOString(Js.Date.make()));
              };
              Js.Promise.resolve();
            })
         |> ignore;
       };
-
-    /* WindowRe.addEventListener( */
-    /*   "click", */
-    /*   _ => setHash(Js.Date.toISOString(Js.Date.make())), */
-    /*   window, */
-    /* ); */
 
     UserMedia.getCameras()
     |> Js.Promise.then_(cameras => {
@@ -251,6 +264,8 @@ let init: unit => unit =
 
     ();
   };
+
+WindowRe.addEventListener("click", _ => setHashToNow(), window);
 
 WindowRe.addEventListener("load", _ => init(), window);
 
