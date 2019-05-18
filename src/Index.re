@@ -120,10 +120,11 @@ let setCode = input =>
              defaultCode,
            );
 
-         withQuerySelectorDom("#snapshotCanvas", snapshotCanvas =>
-           withQuerySelector("#current", img => {
+         withQuerySelectorDom("#queer-loop", loopSvg =>
+           withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
              previousCodes := Belt.Set.String.add(previousCodes^, hash);
              Js.Dict.set(dataSeen, hash, text);
+             QueerCode.setCodeOnSvg(loopSvg, code);
 
              let url =
                QueerCode.getSvgDataUri(
@@ -131,7 +132,6 @@ let setCode = input =>
                  text,
                  currentSignature^ !== "" ? Some(snapshotUrl) : None,
                );
-             setSrc(img, url);
              if (currentSignature^ !== "") {
                addToPast(hash, url);
              };
@@ -198,7 +198,7 @@ let init: unit => unit =
       setHeight(canvas, 480);
     });
 
-    withQuerySelectorDom("#current", img =>
+    withQuerySelectorDom("#queer-loop", img =>
       ElementRe.addEventListener("click", onClick(None), img)
     );
 
@@ -264,8 +264,6 @@ let init: unit => unit =
 
     ();
   };
-
-WindowRe.addEventListener("click", _ => setHashToNow(), window);
 
 WindowRe.addEventListener("load", _ => init(), window);
 

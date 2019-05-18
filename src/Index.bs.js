@@ -116,13 +116,13 @@ function setCode(input) {
             dataSeen[hash] = text;
             setBackground("body", "#" + hash.slice(0, 6));
             var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
-            Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
-                    return Util$QueerLoop.withQuerySelector("#current", (function (img) {
+            Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (loopSvg) {
+                    return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
                                   previousCodes[0] = Belt_SetString.add(previousCodes[0], hash);
                                   dataSeen[hash] = text;
+                                  QueerCode$QueerLoop.setCodeOnSvg(loopSvg, code);
                                   var match = currentSignature[0] !== "";
                                   var url = QueerCode$QueerLoop.getSvgDataUri(code, text, match ? snapshotUrl : undefined);
-                                  setSrc(img, url);
                                   if (currentSignature[0] !== "") {
                                     addToPast(hash, url);
                                   }
@@ -182,7 +182,7 @@ function init(param) {
           canvas.height = 480;
           return /* () */0;
         }));
-  Util$QueerLoop.withQuerySelectorDom("#current", (function (img) {
+  Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (img) {
           img.addEventListener("click", (function (param) {
                   return onClick(undefined, param);
                 }));
@@ -234,10 +234,6 @@ function init(param) {
         }));
   return /* () */0;
 }
-
-window.addEventListener("click", (function (param) {
-        return Util$QueerLoop.setHash(new Date().toISOString());
-      }));
 
 window.addEventListener("load", (function (param) {
         return init(/* () */0);
