@@ -55,8 +55,8 @@ function copyVideoToSnapshotCanvas(param) {
                 snapshotCtx.globalAlpha = 0.1;
                 return $$Array.mapi((function (i, canvas) {
                               var h = canvas.height;
-                              (canvas.width - h | 0) / 2 | 0;
-                              snapshotCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+                              var x = (canvas.width - h | 0) / 2 | 0;
+                              snapshotCtx.drawImage(canvas, x, 0, h, h, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
                               return /* () */0;
                             }), canvasesRef[0]);
               }));

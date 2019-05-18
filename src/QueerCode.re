@@ -109,7 +109,7 @@ let createSvg:
         string_of_int(sizeWithBorder),
         snapshotImage,
       );
-      ElementRe.setAttribute("style", "opacity: 0.4", snapshotImage);
+      ElementRe.setAttribute("style", "opacity: 0.5", snapshotImage);
       ElementRe.appendChild(snapshotImage, childSvg);
     | None => ()
     };
@@ -142,6 +142,7 @@ let createSvg:
     ElementRe.setAttribute("width", "100%", rainbow);
     ElementRe.setAttribute("height", "100%", rainbow);
     ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
+    ElementRe.setAttribute("fill-opacity", "0.5", rainbow);
     ElementRe.setAttribute("mask", "url(#m" ++ hash ++ ")", rainbow);
 
     ElementRe.appendChild(rainbow, childSvg);

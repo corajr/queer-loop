@@ -54,10 +54,10 @@ let copyVideoToSnapshotCanvas = _ =>
         Ctx.drawImageSourceRectDestRect(
           snapshotCtx,
           ~image=canvas,
-          ~sx=0,
+          ~sx=x,
           ~sy=0,
-          ~sw=getWidth(canvas),
-          ~sh=getHeight(canvas),
+          ~sw=h,
+          ~sh=h,
           ~dx=0,
           ~dy=0,
           ~dw=getWidth(snapshotCanvas),

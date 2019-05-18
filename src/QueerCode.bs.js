@@ -50,7 +50,7 @@ function createSvg(parent, maybePrevious, maybeSnapshot, hash, code) {
     snapshotImage.setAttribute("y", "0");
     snapshotImage.setAttribute("width", String(sizeWithBorder));
     snapshotImage.setAttribute("height", String(sizeWithBorder));
-    snapshotImage.setAttribute("style", "opacity: 0.4");
+    snapshotImage.setAttribute("style", "opacity: 0.5");
     childSvg.appendChild(snapshotImage);
   }
   var mask = document.createElementNS(svgXmlns, "mask");
@@ -75,6 +75,7 @@ function createSvg(parent, maybePrevious, maybeSnapshot, hash, code) {
   rainbow.setAttribute("width", "100%");
   rainbow.setAttribute("height", "100%");
   rainbow.setAttribute("fill", "url(#rainbow)");
+  rainbow.setAttribute("fill-opacity", "0.5");
   rainbow.setAttribute("mask", "url(#m" + (hash + ")"));
   childSvg.appendChild(rainbow);
   var use2 = document.createElementNS(svgXmlns, "use");
