@@ -10,7 +10,6 @@ var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
 var Pervasives = require("bs-platform/lib/js/pervasives.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
-var Belt_SetString = require("bs-platform/lib/js/belt_SetString.js");
 var Hash$QueerLoop = require("./Hash.bs.js");
 var Util$QueerLoop = require("./Util.bs.js");
 var Scanner$QueerLoop = require("./Scanner.bs.js");
@@ -43,8 +42,6 @@ function cycleCameras(scanner) {
 
 function setSrc (img,src){
      img.src = src;};
-
-var previousCodes = /* record */[/* contents */Belt_SetString.empty];
 
 var dataSeen = { };
 
@@ -79,11 +76,12 @@ function setHashToNow(param) {
 function onClick(maybeHash, param) {
   if (maybeHash !== undefined) {
     var hash = maybeHash;
-    console.log(hash);
     setBackground("body", "#" + hash.slice(0, 6));
     var match = Js_dict.get(dataSeen, hash);
     if (match !== undefined) {
-      return Util$QueerLoop.setHash(match.slice(16));
+      var data = match;
+      console.log(data.slice(16));
+      return Util$QueerLoop.setHash(data.slice(16));
     } else {
       return /* () */0;
     }
@@ -108,44 +106,49 @@ function addToPast(hash, dataUrl) {
 }
 
 function setCode(input) {
-  var match = takeSnapshot(/* () */0);
-  if (match !== undefined) {
-    var snapshotUrl = match;
-    var text = "https://" + (domain + ("/#" + input));
-    Hash$QueerLoop.hexDigest("SHA-1", text).then((function (hash) {
+  var text = "https://" + (domain + ("/#" + input));
+  Hash$QueerLoop.hexDigest("SHA-1", text).then((function (hash) {
+          var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hash));
+          if (!alreadySeen) {
             dataSeen[hash] = text;
-            setBackground("body", "#" + hash.slice(0, 6));
-            var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
-            Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (loopSvg) {
-                    return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
-                                  previousCodes[0] = Belt_SetString.add(previousCodes[0], hash);
-                                  dataSeen[hash] = text;
-                                  QueerCode$QueerLoop.setCodeOnSvg(loopSvg, code);
-                                  var match = currentSignature[0] !== "";
-                                  var url = QueerCode$QueerLoop.getSvgDataUri(code, text, match ? snapshotUrl : undefined);
-                                  if (currentSignature[0] !== "") {
-                                    addToPast(hash, url);
-                                  }
-                                  currentSignature[0] = hash;
-                                  return /* () */0;
-                                }));
-                  }));
-            return Promise.resolve(/* () */0);
-          }));
-    return /* () */0;
-  } else {
-    return /* () */0;
-  }
+          }
+          setBackground("body", "#" + hash.slice(0, 6));
+          var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
+          Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (loopContainer) {
+                  var match = takeSnapshot(/* () */0);
+                  if (match !== undefined) {
+                    var maybePrevious = loopContainer.querySelector("svg");
+                    if (!(maybePrevious == null)) {
+                      loopContainer.removeChild(maybePrevious);
+                    }
+                    var svg = QueerCode$QueerLoop.createSvg(loopContainer, (maybePrevious == null) ? undefined : Caml_option.some(maybePrevious), match, code);
+                    var url = QueerCode$QueerLoop.svgToDataURL(svg);
+                    if (currentSignature[0] !== "") {
+                      addToPast(hash, url);
+                    }
+                    currentSignature[0] = hash;
+                    return /* () */0;
+                  } else {
+                    return /* () */0;
+                  }
+                }));
+          return Promise.resolve(/* () */0);
+        }));
+  return /* () */0;
 }
+
+var setText = Debouncer.make(200, (function (hash) {
+        Util$QueerLoop.withQuerySelector("#codeContents", (function (el) {
+                el.innerText = decodeURIComponent(hash);
+                return /* () */0;
+              }));
+        return /* () */0;
+      }));
 
 function onHashChange(param) {
   var hash = Util$QueerLoop.getHash(/* () */0).slice(1);
   setCode(hash);
-  Util$QueerLoop.withQuerySelector("#codeContents", (function (el) {
-          el.innerText = decodeURIComponent(hash);
-          return /* () */0;
-        }));
-  return /* () */0;
+  return Curry._1(setText, hash);
 }
 
 function setOpacity(elQuery, opacity) {
@@ -203,7 +206,7 @@ function init(param) {
   var response = function (input) {
     if (input !== "") {
       Hash$QueerLoop.hexDigest("SHA-1", input).then((function (hexHash) {
-              var alreadySeen = Belt_SetString.has(previousCodes[0], hexHash);
+              var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hexHash));
               if (hexHash === currentSignature[0] || !alreadySeen) {
                 Util$QueerLoop.setHash(new Date().toISOString());
               }
@@ -254,7 +257,6 @@ exports.camerasRef = camerasRef;
 exports.cameraIndex = cameraIndex;
 exports.cycleCameras = cycleCameras;
 exports.setSrc = setSrc;
-exports.previousCodes = previousCodes;
 exports.dataSeen = dataSeen;
 exports.currentSignature = currentSignature;
 exports.canvasesRef = canvasesRef;
@@ -264,6 +266,7 @@ exports.setHashToNow = setHashToNow;
 exports.onClick = onClick;
 exports.addToPast = addToPast;
 exports.setCode = setCode;
+exports.setText = setText;
 exports.onHashChange = onHashChange;
 exports.setOpacity = setOpacity;
 exports.frameCount = frameCount;

@@ -30,24 +30,19 @@
              top: 50%;
              transform: translate(-50%, -50%);
          }
+
          #codes {
              display: flex;
              flex-wrap: wrap;
              justify-content: center;
          }
-
-         .centeredSquareSmall {
-            position: fixed;
-            width: 70vmin;
-            height: 70vmin;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
+         #codes img {
+             mix-blend-mode: overlay;
          }
 
          .queer-loop {
              z-index: 100;
-             opacity: 0.99;
+             opacity: 0.9;
          }
 
          #codeContents {
@@ -65,21 +60,22 @@
         <div id="codes"></div>
 
         <canvas id="snapshotCanvas"></canvas>
-        <svg class="centeredSquare queer-loop" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 31 31" stroke="none">
-            <defs>
-                <linearGradient id="rainbow">
-                    <stop offset="0.000%" stop-color="#ffb5b5" />
-                    <stop offset="14.286%" stop-color="#fcdc85" />
-                    <stop offset="28.571%" stop-color="#caf79c" />
-                    <stop offset="42.857%" stop-color="#a8fdbf" />
-                    <stop offset="57.143%" stop-color="#70feff" />
-                    <stop offset="71.429%" stop-color="#a8bffd" />
-                    <stop offset="85.714%" stop-color="#ca9cf7" />
-                    <stop offset="100.000%" stop-color="#fc85dc" />
-                </linearGradient></defs>
-            <rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.8" />
-            <path id="current" />
-        </svg>
+        <div class="centeredSquare queer-loop">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" stroke="none">
+                <defs>
+                    <linearGradient id="rainbow">
+                        <stop offset="0.000%" stop-color="#ffb5b5" />
+                        <stop offset="14.286%" stop-color="#fcdc85" />
+                        <stop offset="28.571%" stop-color="#caf79c" />
+                        <stop offset="42.857%" stop-color="#a8fdbf" />
+                        <stop offset="57.143%" stop-color="#70feff" />
+                        <stop offset="71.429%" stop-color="#a8bffd" />
+                        <stop offset="85.714%" stop-color="#ca9cf7" />
+                        <stop offset="100.000%" stop-color="#fc85dc" />
+                    </linearGradient></defs>
+                <!-- <rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.8" /> -->
+            </svg>
+        </div>
         <div id="codeText">
             <span id="codeContents" contenteditable="true"></span>
         </div>

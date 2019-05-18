@@ -1,10 +1,10 @@
 open Util;
 open QrCodeGen;
+open Webapi.Dom;
 
-let getPathString: QrCode.t => string =
-  code => {
+let getPathString: (QrCode.t, int) => string =
+  (code, border) => {
     let size = QrCode.size(code);
-    let border = 4;
     let modules = QrCode.getModules(code);
     let parts = [||];
     for (y in 0 to size - 1) {
@@ -28,8 +28,8 @@ let getPathString: QrCode.t => string =
 
 let getSvgDataUri: (QrCode.t, string, option(string)) => string =
   (code, data, maybePastUrl) => {
-    let pathString = getPathString(code);
     let border = 4;
+    let pathString = getPathString(code, border);
     let sizeWithBorder = QrCode.size(code) + border * 2;
     let sizeWithBorderMinusOne = sizeWithBorder - 1;
 
@@ -52,27 +52,95 @@ let getSvgDataUri: (QrCode.t, string, option(string)) => string =
      <stop offset="100.000%" stop-color="#fc85dc" />
      </linearGradient></defs>
      $pastData
-     <rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.5" />
+     <rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.4" />
      <path d="$pathString" fill="black" />
      </svg>|j};
 
     "data:image/svg+xml;utf8," ++ encodeURIComponent(svg);
   };
 
-let setCodeOnSvg: (Dom.element, QrCode.t) => unit =
-  (svg, code) => {
+let svgXmlns = "http://www.w3.org/2000/svg";
+
+let createSvg:
+  (Dom.element, option(Dom.element), option(string), QrCode.t) => Dom.element =
+  (parent, maybePrevious, maybeSnapshot, code) => {
     let size = QrCode.size(code);
     let border = 4;
     let sizeWithBorder = size + border * 2;
     let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
 
-    ElementRe.setAttribute("viewBox", viewBox, svg);
-    ElementRe.querySelector("#current", svg)
-    |. Belt.Option.map(currentPath =>
-         ElementRe.setAttribute("d", getPathString(code), currentPath)
-       );
+    let childSvg = DocumentRe.createElementNS(svgXmlns, "svg", document);
+    ElementRe.setAttribute("viewBox", viewBox, childSvg);
 
-    ();
+    let past = DocumentRe.createElementNS(svgXmlns, "g", document);
+    let scaleFactor = 1.0 -. 2.0 /. float_of_int(sizeWithBorder);
+    let cornerOffset = 1;
+    /* let scaleFactor = 3.0 /. float_of_int(sizeWithBorder); */
+    /* let cornerOffset = border + 2; */
+    let scaleFactorString = Js.Float.toString(scaleFactor);
+    ElementRe.setAttribute(
+      "transform",
+      {j|translate($cornerOffset,$cornerOffset) scale($scaleFactor)|j},
+      past,
+    );
+
+    switch (maybePrevious) {
+    | Some(previous) => ElementRe.appendChild(previous, past)
+    | None => ()
+    };
+
+    ElementRe.appendChild(past, childSvg);
+
+    switch (maybeSnapshot) {
+    | Some(snapshotURL) =>
+      let snapshotImage =
+        DocumentRe.createElementNS(svgXmlns, "image", document);
+      ElementRe.setAttribute("href", snapshotURL, snapshotImage);
+      ElementRe.setAttribute("x", "0", snapshotImage);
+      ElementRe.setAttribute("y", "0", snapshotImage);
+      ElementRe.setAttribute(
+        "width",
+        string_of_int(sizeWithBorder),
+        snapshotImage,
+      );
+      ElementRe.setAttribute(
+        "height",
+        string_of_int(sizeWithBorder),
+        snapshotImage,
+      );
+      ElementRe.setAttribute("style", "opacity: 0.4", snapshotImage);
+      ElementRe.appendChild(snapshotImage, childSvg);
+    | None => ()
+    };
+
+    let rainbow = DocumentRe.createElementNS(svgXmlns, "rect", document);
+    ElementRe.setAttribute("width", "100%", rainbow);
+    ElementRe.setAttribute("height", "100%", rainbow);
+    ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
+    ElementRe.setAttribute("fill-opacity", "0.7", rainbow);
+
+    ElementRe.appendChild(rainbow, childSvg);
+
+    let path = DocumentRe.createElementNS(svgXmlns, "path", document);
+    ElementRe.setAttribute("d", getPathString(code, border), path);
+    ElementRe.setAttribute("fill", "#000000", path);
+    ElementRe.setAttribute("fill-opacity", "0.5", path);
+    ElementRe.appendChild(path, childSvg);
+
+    ElementRe.appendChild(childSvg, parent);
+    childSvg;
+  };
+
+module XMLSerializer = {
+  type t;
+  [@bs.new] external make : unit => t = "XMLSerializer";
+  [@bs.send] external serializeToString : (t, Dom.element) => string = "";
+};
+let svgToDataURL: Dom.element => string =
+  svg => {
+    let xmlSerializer = XMLSerializer.make();
+    let str = XMLSerializer.serializeToString(xmlSerializer, svg);
+    "data:image/svg+xml;utf8," ++ encodeURIComponent(str);
   };
 
 let drawCanvas: (Dom.element, QrCode.t) => unit =

@@ -36,8 +36,6 @@ let cycleCameras = scanner => {
 let setSrc = [%bs.raw (img, src) => {|
      img.src = src;|}];
 
-let previousCodes: ref(Belt.Set.String.t) = ref(Belt.Set.String.empty);
-
 let dataSeen: Js.Dict.t(string) = Js.Dict.empty();
 
 let currentSignature: ref(string) = ref("");
@@ -81,10 +79,11 @@ let setHashToNow = _ => setHash(Js.Date.toISOString(Js.Date.make()));
 let onClick = (maybeHash, _) =>
   switch (maybeHash) {
   | Some(hash) =>
-    Js.log(hash);
     setBackground("body", "#" ++ Js.String.slice(~from=0, ~to_=6, hash));
     switch (Js.Dict.get(dataSeen, hash)) {
-    | Some(data) => setHash(Js.String.sliceToEnd(~from=16, data))
+    | Some(data) =>
+      Js.log(Js.String.sliceToEnd(~from=16, data));
+      setHash(Js.String.sliceToEnd(~from=16, data));
     | None => ()
     };
   | None => setHashToNow()
@@ -94,7 +93,6 @@ let addToPast: (string, string) => unit =
   (hash, dataUrl) => {
     let img = DocumentRe.createElement("img", document);
     setSrc(img, dataUrl);
-    /* ElementRe.setClassName(img, "centeredSquareSmall queer-loop"); */
     ElementRe.setId(img, "x" ++ hash);
     ElementRe.addEventListener("click", onClick(Some(hash)), img);
 
@@ -102,61 +100,72 @@ let addToPast: (string, string) => unit =
     ();
   };
 
-let setCode = input =>
-  switch (takeSnapshot()) {
-  | Some(snapshotUrl) =>
-    let text = "https://" ++ domain ++ "/#" ++ input;
+let setCode = input => {
+  let text = "https://" ++ domain ++ "/#" ++ input;
 
-    Hash.hexDigest("SHA-1", text)
-    |> Js.Promise.then_(hash => {
+  Hash.hexDigest("SHA-1", text)
+  |> Js.Promise.then_(hash => {
+       let alreadySeen = Belt.Option.isSome(Js.Dict.get(dataSeen, hash));
+       if (! alreadySeen) {
          Js.Dict.set(dataSeen, hash, text);
+       };
 
-         setBackground(
-           "body",
-           "#" ++ Js.String.slice(~from=0, ~to_=6, hash),
+       setBackground("body", "#" ++ Js.String.slice(~from=0, ~to_=6, hash));
+
+       let code =
+         Belt.Option.getWithDefault(
+           QrCode.encodeText(text, Ecc.medium),
+           defaultCode,
          );
 
-         let code =
-           Belt.Option.getWithDefault(
-             QrCode.encodeText(text, Ecc.medium),
-             defaultCode,
-           );
+       withQuerySelectorDom(".queer-loop", loopContainer =>
+         switch (takeSnapshot()) {
+         | Some(snapshotUrl) =>
+           let maybePrevious = ElementRe.querySelector("svg", loopContainer);
 
-         withQuerySelectorDom(".queer-loop", loopSvg =>
-           withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
-             previousCodes := Belt.Set.String.add(previousCodes^, hash);
-             Js.Dict.set(dataSeen, hash, text);
-             QueerCode.setCodeOnSvg(loopSvg, code);
+           switch (maybePrevious) {
+           | Some(previous) =>
+             ElementRe.removeChild(previous, loopContainer) |> ignore
+           | None => ()
+           };
 
-             let url =
-               QueerCode.getSvgDataUri(
-                 code,
-                 text,
-                 currentSignature^ !== "" ? Some(snapshotUrl) : None,
-               );
-             if (currentSignature^ !== "") {
-               addToPast(hash, url);
-             };
-             currentSignature := hash;
-           })
-         )
-         |> ignore;
-         Js.Promise.resolve();
-       })
-    |> ignore;
-  | None => ()
-  };
+           let svg =
+             QueerCode.createSvg(
+               loopContainer,
+               maybePrevious,
+               Some(snapshotUrl),
+               code,
+             );
+
+           let url = QueerCode.svgToDataURL(svg);
+
+           if (currentSignature^ !== "") {
+             addToPast(hash, url);
+           };
+           currentSignature := hash;
+         | None => ()
+         }
+       )
+       |> ignore;
+       Js.Promise.resolve();
+     })
+  |> ignore;
+};
+
+let setText =
+  Debouncer.make(~wait=200, hash =>
+    withQuerySelector("#codeContents", el =>
+      HtmlElementRe.setInnerText(el, decodeURIComponent(hash))
+    )
+    |> ignore
+  );
 
 let onHashChange: unit => unit =
   _ => {
     let hash = Js.String.sliceToEnd(~from=1, getHash());
 
     setCode(hash);
-
-    withQuerySelector("#codeContents", el =>
-      HtmlElementRe.setInnerText(el, decodeURIComponent(hash))
-    )
-    |> ignore;
+    setText(hash);
   };
 
 let setOpacity = (elQuery, opacity) =>
@@ -219,7 +228,8 @@ let init: unit => unit =
       if (input !== "") {
         Hash.hexDigest("SHA-1", input)
         |> Js.Promise.then_(hexHash => {
-             let alreadySeen = Belt.Set.String.has(previousCodes^, hexHash);
+             let alreadySeen =
+               Belt.Option.isSome(Js.Dict.get(dataSeen, hexHash));
 
              if (hexHash === currentSignature^ || ! alreadySeen) {
                setHash(Js.Date.toISOString(Js.Date.make()));

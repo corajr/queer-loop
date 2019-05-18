@@ -2,17 +2,16 @@
 'use strict';
 
 var Caml_array = require("bs-platform/lib/js/caml_array.js");
-var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 
-function getPathString(code) {
+function getPathString(code, border) {
   var size = code.size;
   var modules = code.getModules();
   var parts = /* array */[];
   for(var y = 0 ,y_finish = size - 1 | 0; y <= y_finish; ++y){
     for(var x = 0 ,x_finish = size - 1 | 0; x <= x_finish; ++x){
       if (Caml_array.caml_array_get(Caml_array.caml_array_get(modules, y), x)) {
-        parts.push("M" + (String(x + 4 | 0) + ("," + (String(y + 4 | 0) + "h1v1h-1z"))));
+        parts.push("M" + (String(x + border | 0) + ("," + (String(y + border | 0) + "h1v1h-1z"))));
       }
       
     }
@@ -21,23 +20,60 @@ function getPathString(code) {
 }
 
 function getSvgDataUri(code, data, maybePastUrl) {
-  var pathString = getPathString(code);
+  var pathString = getPathString(code, 4);
   var sizeWithBorder = code.size + 8 | 0;
   var pastData = maybePastUrl !== undefined ? "<image href=\"" + (String(maybePastUrl) + ("\" x=\"0\" y=\"0\" width=\"" + (String(sizeWithBorder) + ("\" height=\"" + (String(sizeWithBorder) + "\" />"))))) : "";
-  var svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + ("\" stroke=\"none\">\n     <defs>\n     <linearGradient id=\"rainbow\">\n     <stop offset=\"0.000%\" stop-color=\"#ffb5b5\" />\n     <stop offset=\"14.286%\" stop-color=\"#fcdc85\" />\n     <stop offset=\"28.571%\" stop-color=\"#caf79c\" />\n     <stop offset=\"42.857%\" stop-color=\"#a8fdbf\" />\n     <stop offset=\"57.143%\" stop-color=\"#70feff\" />\n     <stop offset=\"71.429%\" stop-color=\"#a8bffd\" />\n     <stop offset=\"85.714%\" stop-color=\"#ca9cf7\" />\n     <stop offset=\"100.000%\" stop-color=\"#fc85dc\" />\n     </linearGradient></defs>\n     " + (String(pastData) + ("\n     <rect width=\"100%\" height=\"100%\" fill=\"url(#rainbow)\" fill-opacity=\"0.5\" />\n     <path d=\"" + (String(pathString) + "\" fill=\"black\" />\n     </svg>")))))));
+  var svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + ("\" stroke=\"none\">\n     <defs>\n     <linearGradient id=\"rainbow\">\n     <stop offset=\"0.000%\" stop-color=\"#ffb5b5\" />\n     <stop offset=\"14.286%\" stop-color=\"#fcdc85\" />\n     <stop offset=\"28.571%\" stop-color=\"#caf79c\" />\n     <stop offset=\"42.857%\" stop-color=\"#a8fdbf\" />\n     <stop offset=\"57.143%\" stop-color=\"#70feff\" />\n     <stop offset=\"71.429%\" stop-color=\"#a8bffd\" />\n     <stop offset=\"85.714%\" stop-color=\"#ca9cf7\" />\n     <stop offset=\"100.000%\" stop-color=\"#fc85dc\" />\n     </linearGradient></defs>\n     " + (String(pastData) + ("\n     <rect width=\"100%\" height=\"100%\" fill=\"url(#rainbow)\" fill-opacity=\"0.4\" />\n     <path d=\"" + (String(pathString) + "\" fill=\"black\" />\n     </svg>")))))));
   return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
 }
 
-function setCodeOnSvg(svg, code) {
+var svgXmlns = "http://www.w3.org/2000/svg";
+
+function createSvg(parent, maybePrevious, maybeSnapshot, code) {
   var size = code.size;
   var sizeWithBorder = size + 8 | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
-  svg.setAttribute("viewBox", viewBox);
-  Belt_Option.map(Caml_option.nullable_to_opt(svg.querySelector("#current")), (function (currentPath) {
-          currentPath.setAttribute("d", getPathString(code));
-          return /* () */0;
-        }));
-  return /* () */0;
+  var childSvg = document.createElementNS(svgXmlns, "svg");
+  childSvg.setAttribute("viewBox", viewBox);
+  var past = document.createElementNS(svgXmlns, "g");
+  var scaleFactor = 1.0 - 2.0 / sizeWithBorder;
+  scaleFactor.toString();
+  past.setAttribute("transform", "translate(" + (String(1) + ("," + (String(1) + (") scale(" + (String(scaleFactor) + ")"))))));
+  if (maybePrevious !== undefined) {
+    past.appendChild(Caml_option.valFromOption(maybePrevious));
+  }
+  childSvg.appendChild(past);
+  if (maybeSnapshot !== undefined) {
+    var snapshotImage = document.createElementNS(svgXmlns, "image");
+    snapshotImage.setAttribute("href", maybeSnapshot);
+    snapshotImage.setAttribute("x", "0");
+    snapshotImage.setAttribute("y", "0");
+    snapshotImage.setAttribute("width", String(sizeWithBorder));
+    snapshotImage.setAttribute("height", String(sizeWithBorder));
+    snapshotImage.setAttribute("style", "opacity: 0.4");
+    childSvg.appendChild(snapshotImage);
+  }
+  var rainbow = document.createElementNS(svgXmlns, "rect");
+  rainbow.setAttribute("width", "100%");
+  rainbow.setAttribute("height", "100%");
+  rainbow.setAttribute("fill", "url(#rainbow)");
+  rainbow.setAttribute("fill-opacity", "0.7");
+  childSvg.appendChild(rainbow);
+  var path = document.createElementNS(svgXmlns, "path");
+  path.setAttribute("d", getPathString(code, 4));
+  path.setAttribute("fill", "#000000");
+  path.setAttribute("fill-opacity", "0.5");
+  childSvg.appendChild(path);
+  parent.appendChild(childSvg);
+  return childSvg;
+}
+
+var $$XMLSerializer = /* module */[];
+
+function svgToDataURL(svg) {
+  var xmlSerializer = new XMLSerializer();
+  var str = xmlSerializer.serializeToString(svg);
+  return "data:image/svg+xml;utf8," + encodeURIComponent(str);
 }
 
 function drawCanvas(canvas, code) {
@@ -63,6 +99,9 @@ function drawCanvas(canvas, code) {
 
 exports.getPathString = getPathString;
 exports.getSvgDataUri = getSvgDataUri;
-exports.setCodeOnSvg = setCodeOnSvg;
+exports.svgXmlns = svgXmlns;
+exports.createSvg = createSvg;
+exports.$$XMLSerializer = $$XMLSerializer;
+exports.svgToDataURL = svgToDataURL;
 exports.drawCanvas = drawCanvas;
 /* No side effect */
