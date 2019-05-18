@@ -62,8 +62,9 @@ let getSvgDataUri: (QrCode.t, string, option(string)) => string =
 let svgXmlns = "http://www.w3.org/2000/svg";
 
 let createSvg:
-  (Dom.element, option(Dom.element), option(string), QrCode.t) => Dom.element =
-  (parent, maybePrevious, maybeSnapshot, code) => {
+  (Dom.element, option(Dom.element), option(string), string, QrCode.t) =>
+  Dom.element =
+  (parent, maybePrevious, maybeSnapshot, hash, code) => {
     let size = QrCode.size(code);
     let border = 4;
     let sizeWithBorder = size + border * 2;
@@ -113,19 +114,43 @@ let createSvg:
     | None => ()
     };
 
+    let mask = DocumentRe.createElementNS(svgXmlns, "mask", document);
+    ElementRe.setId(mask, "m" ++ hash);
+
+    let blank = DocumentRe.createElementNS(svgXmlns, "rect", document);
+    ElementRe.setAttribute("width", "100%", blank);
+    ElementRe.setAttribute("height", "100%", blank);
+    ElementRe.setAttribute("fill", "#FFFFFF", blank);
+    ElementRe.appendChild(blank, mask);
+
+    let symbol = DocumentRe.createElementNS(svgXmlns, "symbol", document);
+    ElementRe.setId(symbol, "s" ++ hash);
+
+    let path = DocumentRe.createElementNS(svgXmlns, "path", document);
+    ElementRe.setAttribute("d", getPathString(code, border), path);
+    ElementRe.appendChild(path, symbol);
+    ElementRe.appendChild(symbol, childSvg);
+
+    let use = DocumentRe.createElementNS(svgXmlns, "use", document);
+    ElementRe.setAttribute("href", "#s" ++ hash, use);
+    ElementRe.setAttribute("fill", "#000000", use);
+    ElementRe.appendChild(use, mask);
+
+    ElementRe.appendChild(mask, childSvg);
+
     let rainbow = DocumentRe.createElementNS(svgXmlns, "rect", document);
     ElementRe.setAttribute("width", "100%", rainbow);
     ElementRe.setAttribute("height", "100%", rainbow);
     ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
-    ElementRe.setAttribute("fill-opacity", "0.7", rainbow);
+    ElementRe.setAttribute("mask", "url(#m" ++ hash ++ ")", rainbow);
 
     ElementRe.appendChild(rainbow, childSvg);
 
-    let path = DocumentRe.createElementNS(svgXmlns, "path", document);
-    ElementRe.setAttribute("d", getPathString(code, border), path);
-    ElementRe.setAttribute("fill", "#000000", path);
-    ElementRe.setAttribute("fill-opacity", "0.5", path);
-    ElementRe.appendChild(path, childSvg);
+    let use2 = DocumentRe.createElementNS(svgXmlns, "use", document);
+    ElementRe.setAttribute("href", "#s" ++ hash, use2);
+    ElementRe.setAttribute("fill", "#000000", use2);
+    ElementRe.setAttribute("fill-opacity", "0.5", use2);
+    ElementRe.appendChild(use2, childSvg);
 
     ElementRe.appendChild(childSvg, parent);
     childSvg;

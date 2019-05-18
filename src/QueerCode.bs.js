@@ -29,7 +29,7 @@ function getSvgDataUri(code, data, maybePastUrl) {
 
 var svgXmlns = "http://www.w3.org/2000/svg";
 
-function createSvg(parent, maybePrevious, maybeSnapshot, code) {
+function createSvg(parent, maybePrevious, maybeSnapshot, hash, code) {
   var size = code.size;
   var sizeWithBorder = size + 8 | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
@@ -53,17 +53,35 @@ function createSvg(parent, maybePrevious, maybeSnapshot, code) {
     snapshotImage.setAttribute("style", "opacity: 0.4");
     childSvg.appendChild(snapshotImage);
   }
+  var mask = document.createElementNS(svgXmlns, "mask");
+  mask.id = "m" + hash;
+  var blank = document.createElementNS(svgXmlns, "rect");
+  blank.setAttribute("width", "100%");
+  blank.setAttribute("height", "100%");
+  blank.setAttribute("fill", "#FFFFFF");
+  mask.appendChild(blank);
+  var symbol = document.createElementNS(svgXmlns, "symbol");
+  symbol.id = "s" + hash;
+  var path = document.createElementNS(svgXmlns, "path");
+  path.setAttribute("d", getPathString(code, 4));
+  symbol.appendChild(path);
+  childSvg.appendChild(symbol);
+  var use = document.createElementNS(svgXmlns, "use");
+  use.setAttribute("href", "#s" + hash);
+  use.setAttribute("fill", "#000000");
+  mask.appendChild(use);
+  childSvg.appendChild(mask);
   var rainbow = document.createElementNS(svgXmlns, "rect");
   rainbow.setAttribute("width", "100%");
   rainbow.setAttribute("height", "100%");
   rainbow.setAttribute("fill", "url(#rainbow)");
-  rainbow.setAttribute("fill-opacity", "0.7");
+  rainbow.setAttribute("mask", "url(#m" + (hash + ")"));
   childSvg.appendChild(rainbow);
-  var path = document.createElementNS(svgXmlns, "path");
-  path.setAttribute("d", getPathString(code, 4));
-  path.setAttribute("fill", "#000000");
-  path.setAttribute("fill-opacity", "0.5");
-  childSvg.appendChild(path);
+  var use2 = document.createElementNS(svgXmlns, "use");
+  use2.setAttribute("href", "#s" + hash);
+  use2.setAttribute("fill", "#000000");
+  use2.setAttribute("fill-opacity", "0.5");
+  childSvg.appendChild(use2);
   parent.appendChild(childSvg);
   return childSvg;
 }

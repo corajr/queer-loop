@@ -134,6 +134,7 @@ let setCode = input => {
                loopContainer,
                maybePrevious,
                Some(snapshotUrl),
+               hash,
                code,
              );
 

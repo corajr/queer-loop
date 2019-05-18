@@ -121,7 +121,7 @@ function setCode(input) {
                     if (!(maybePrevious == null)) {
                       loopContainer.removeChild(maybePrevious);
                     }
-                    var svg = QueerCode$QueerLoop.createSvg(loopContainer, (maybePrevious == null) ? undefined : Caml_option.some(maybePrevious), match, code);
+                    var svg = QueerCode$QueerLoop.createSvg(loopContainer, (maybePrevious == null) ? undefined : Caml_option.some(maybePrevious), match, hash, code);
                     var url = QueerCode$QueerLoop.svgToDataURL(svg);
                     if (currentSignature[0] !== "") {
                       addToPast(hash, url);
