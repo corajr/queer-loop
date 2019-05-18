@@ -258,7 +258,7 @@ let init: unit => unit =
                  response,
                );
              },
-             cameras,
+             Js.Array.slice(~start=0, ~end_=1, cameras),
            ),
          );
        })

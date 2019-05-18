@@ -226,7 +226,7 @@ function init(param) {
                                         return /* () */0;
                                       }));
                                 return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, response);
-                              }), cameras));
+                              }), cameras.slice(0, 1)));
             })).then((function (canvases) {
             canvasesRef[0] = canvases;
             requestAnimationFrame(onTick);
