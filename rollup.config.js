@@ -5,6 +5,7 @@ export default [{
     output: {
         name: 'index',
         file: 'index.js',
+        sourcemap: true,
         format: 'iife'
     },
     plugins: [
@@ -16,6 +17,7 @@ export default [{
     output: {
         name: 'worker',
         file: 'worker.js',
+        sourcemap: true,
         format: 'iife'
     },
     plugins: [

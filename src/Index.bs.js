@@ -118,11 +118,12 @@ function setCode(input) {
             dataSeen[hash] = text;
             setBackground("body", "#" + hash.slice(0, 6));
             var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
-            Util$QueerLoop.withQuerySelectorDom("svg", (function (root) {
-                    return Util$QueerLoop.withQuerySelectorDom("#localGroup", (function (loopContainer) {
+            Util$QueerLoop.withQuerySelectorDom("body", (function (root) {
+                    return Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (loopContainer) {
                                   var match = takeSnapshot(/* () */0);
                                   if (match !== undefined) {
                                     var maybePrevious = loopContainer.querySelector("svg");
+                                    console.log("hey");
                                     if (!(maybePrevious == null)) {
                                       loopContainer.removeChild(maybePrevious);
                                     }
@@ -239,7 +240,7 @@ function init(param) {
                                         return /* () */0;
                                       }));
                                 return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, response);
-                              }), cameras.slice(0, 1)));
+                              }), cameras));
             })).then((function (canvases) {
             canvasesRef[0] = canvases;
             requestAnimationFrame(onTick);

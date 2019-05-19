@@ -1,11 +1,67 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>loading queer-loop...</title>
+        <title>queer-loop</title>
+        <script type="text/javascript" src="index.js"></script>
+        <style type="text/css">
+         body { margin: 0; }
+         canvas, video {
+             display: none;
+             pointer-events: none;
+         }
+
+         #snapshotCanvas {
+             display: block;
+             position: fixed;
+             min-width: 100vw;
+             min-height: 100vh;
+             left: 50%;
+             top: 50%;
+             opacity: 0.5;
+             pointer-events: none;
+             transform: translate(-50%, -50%);
+         }
+
+         .centeredSquare {
+             position: fixed;
+             width: 75vmin;
+             height: 75vmin;
+             left: 50%;
+             top: 50%;
+             transform: translate(-50%, -50%);
+         }
+
+         #codes {
+             display: flex;
+             flex-wrap: wrap;
+             justify-content: center;
+         }
+         #codes img {
+             mix-blend-mode: overlay;
+         }
+         .queer-loop {
+             z-index: 100;
+             opacity: 0.9;
+         }
+
+         #codeContents {
+             position: fixed;
+             left: 0;
+             bottom: 0;
+             z-index: 101
+             color: white;
+             font-size: 12pt;
+             font-family: "Courier New", monospace;
+         }
+        </style>
     </head>
     <body>
-        <script type="text/javascript">
-            window.location.href = window.location.pathname + "up.svg" + window.location.hash;
-        </script>
+        <div id="codes"></div>
+
+        <canvas id="snapshotCanvas"></canvas>
+        <div class="centeredSquare queer-loop"></div>
+        <div id="codeText">
+            <span id="codeContents" contenteditable="true"></span>
+        </div>
     </body>
 </html>

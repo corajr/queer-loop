@@ -109,6 +109,7 @@ let setCode = input => {
   Hash.hexDigest("SHA-1", text)
   |> Js.Promise.then_(hash => {
        let alreadySeen = Belt.Option.isSome(Js.Dict.get(dataSeen, hash));
+
        if (! alreadySeen) {
          Js.Dict.set(dataSeen, hash, text);
 
@@ -123,13 +124,13 @@ let setCode = input => {
              defaultCode,
            );
 
-         withQuerySelectorDom("svg", root =>
-           withQuerySelectorDom("#localGroup", loopContainer =>
+         withQuerySelectorDom("body", root =>
+           withQuerySelectorDom(".queer-loop", loopContainer =>
              switch (takeSnapshot()) {
              | Some(snapshotUrl) =>
                let maybePrevious =
                  ElementRe.querySelector("svg", loopContainer);
-
+               Js.log("hey");
                switch (maybePrevious) {
                | Some(previous) =>
                  ElementRe.removeChild(previous, loopContainer) |> ignore
@@ -185,6 +186,13 @@ let setText =
 let onHashChange: unit => unit =
   _ => {
     let hash = Js.String.sliceToEnd(~from=1, getHash());
+
+    /* let hexPromise = */
+    /*     Hash.hexDigest(hash) */
+    /*     |> Js.Promise.then_(hexHashOfLocationHash => { */
+    /*          Js.log(hexHashOfLocationHash); */
+    /*          Js.Promise.resolve(); */
+    /*        }); */
 
     setCode(hash);
     setText(hash);
@@ -281,7 +289,8 @@ let init: unit => unit =
                  response,
                );
              },
-             Js.Array.slice(~start=0, ~end_=1, cameras),
+             /* Js.Array.slice(~start=0, ~end_=1, cameras), */
+             cameras,
            ),
          );
        })

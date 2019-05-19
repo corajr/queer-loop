@@ -2901,3 +2901,4 @@
     /*  Not a pure module */
 
 }());
+//# sourceMappingURL=worker.js.map
