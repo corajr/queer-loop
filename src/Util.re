@@ -1,5 +1,8 @@
 open Webapi.Dom;
 
+let htmlNs = "http://www.w3.org/1999/xhtml";
+let svgNs = "http://www.w3.org/2000/svg";
+
 let withQuerySelectorDom = (query, f) =>
   document |> Document.querySelector(query) |. Belt.Option.map(f);
 

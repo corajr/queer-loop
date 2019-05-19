@@ -1,19 +1,5 @@
 "use strict";
 
-(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(['exports'], factory);
-    } else if (typeof exports === 'object' && typeof exports.nodeName !== 'string') {
-        // CommonJS
-        factory(exports);
-    } else {
-        // Browser globals
-        factory((root.commonJsStrict = {}));
-    }
-}(typeof self !== 'undefined' ? self : this, function (exports) {
-
-
 /*
  * QR Code generator library (JavaScript)
  * 
@@ -1064,11 +1050,17 @@ var qrcodegen = new function() {
 	
 };
 
-    exports.QrCode = qrcodegen.QrCode;
-    exports.encodeSegments = function() {
-        return qrcodegen.QrCode.encodeSegments.apply(qrcodegen.QrCode, arguments);
-    };
-    exports.encodeText = qrcodegen.QrCode.encodeText;
-    exports.Ecc = qrcodegen.QrCode.Ecc;
-    exports.QrSegment = qrcodegen.QrSegment;
-}));
+function encodeText() {
+    return qrcodegen.QrCode.encodeText.apply(qrcodegen.QrCode, arguments);
+};
+
+const QrCode = qrcodegen.QrCode;
+const Ecc = qrcodegen.QrCode.Ecc;
+const QrSegment = qrcodegen.QrSegment;
+
+export {
+    QrCode,
+    encodeText,
+    Ecc,
+    QrSegment,
+};

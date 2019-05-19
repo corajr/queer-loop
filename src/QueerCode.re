@@ -59,7 +59,79 @@ let getSvgDataUri: (QrCode.t, string, option(string)) => string =
     "data:image/svg+xml;utf8," ++ encodeURIComponent(svg);
   };
 
-let svgXmlns = "http://www.w3.org/2000/svg";
+let svgNs = "http://www.w3.org/2000/svg";
+
+let createQrCodePathElement: (QrCode.t, int) => Dom.element =
+  (code, border) => {
+    let path = DocumentRe.createElementNS(svgNs, "path", document);
+    ElementRe.setAttribute("d", getPathString(code, border), path);
+    path;
+  };
+
+let createRainbowGradient: unit => Dom.element =
+  _ => {
+    let gradient =
+      DocumentRe.createElementNS(svgNs, "linearGradient", document);
+
+    ElementRe.setId(gradient, "rainbow");
+    for (i in 0 to 7) {
+      let stop = DocumentRe.createElementNS(svgNs, "stop", document);
+      ElementRe.setAttribute(
+        "offset",
+        Js.Float.toString(100.0 *. float_of_int(i) /. 7.0) ++ "%",
+        stop,
+      );
+      ElementRe.setAttribute(
+        "stop-color",
+        "hsl("
+        ++ Js.Float.toString(float_of_int(i) /. 8.0)
+        ++ "turn,100%,85%)",
+        stop,
+      );
+      ElementRe.appendChild(stop, gradient);
+    };
+
+    gradient;
+  };
+
+let createSimpleSvg: (QrCode.t, int, option(string)) => Dom.element =
+  (code, border, maybeDataURL) => {
+    let size = QrCode.size(code);
+    let sizeWithBorder = size + border * 2;
+    let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
+
+    let svg = DocumentRe.createElementNS(svgNs, "svg", document);
+    ElementRe.setAttribute("viewBox", viewBox, svg);
+
+    let defs = DocumentRe.createElementNS(svgNs, "defs", document);
+    let rainbowGradient = createRainbowGradient();
+    ElementRe.appendChild(rainbowGradient, defs);
+    ElementRe.appendChild(defs, svg);
+
+    switch (maybeDataURL) {
+    | Some(url) =>
+      let background = DocumentRe.createElementNS(svgNs, "image", document);
+      ElementRe.setAttribute("x", "0", background);
+      ElementRe.setAttribute("y", "0", background);
+      ElementRe.setAttribute("width", "100%", background);
+      ElementRe.setAttribute("height", "100%", background);
+      ElementRe.setAttribute("href", url, background);
+      ElementRe.appendChild(background, svg);
+    | None => ()
+    };
+
+    let rainbow = DocumentRe.createElementNS(svgNs, "rect", document);
+    ElementRe.setAttribute("width", "100%", rainbow);
+    ElementRe.setAttribute("height", "100%", rainbow);
+    ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
+    ElementRe.setAttribute("fill-opacity", "0.5", rainbow);
+    ElementRe.appendChild(rainbow, svg);
+
+    let path = createQrCodePathElement(code, border);
+    ElementRe.appendChild(path, svg);
+
+    svg;
+  };
 
 let createSvg:
   (Dom.element, option(Dom.element), option(string), string, QrCode.t) =>
@@ -70,10 +142,10 @@ let createSvg:
     let sizeWithBorder = size + border * 2;
     let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
 
-    let childSvg = DocumentRe.createElementNS(svgXmlns, "svg", document);
+    let childSvg = DocumentRe.createElementNS(svgNs, "svg", document);
     ElementRe.setAttribute("viewBox", viewBox, childSvg);
 
-    let past = DocumentRe.createElementNS(svgXmlns, "g", document);
+    let past = DocumentRe.createElementNS(svgNs, "g", document);
     let scaleFactor = 1.0 -. 2.0 /. float_of_int(sizeWithBorder);
     let cornerOffset = 1;
     /* let scaleFactor = 3.0 /. float_of_int(sizeWithBorder); */
@@ -95,7 +167,7 @@ let createSvg:
     switch (maybeSnapshot) {
     | Some(snapshotURL) =>
       let snapshotImage =
-        DocumentRe.createElementNS(svgXmlns, "image", document);
+        DocumentRe.createElementNS(svgNs, "image", document);
       ElementRe.setAttribute("href", snapshotURL, snapshotImage);
       ElementRe.setAttribute("x", "0", snapshotImage);
       ElementRe.setAttribute("y", "0", snapshotImage);
@@ -114,31 +186,30 @@ let createSvg:
     | None => ()
     };
 
-    let mask = DocumentRe.createElementNS(svgXmlns, "mask", document);
+    let mask = DocumentRe.createElementNS(svgNs, "mask", document);
     ElementRe.setId(mask, "m" ++ hash);
 
-    let blank = DocumentRe.createElementNS(svgXmlns, "rect", document);
+    let blank = DocumentRe.createElementNS(svgNs, "rect", document);
     ElementRe.setAttribute("width", "100%", blank);
     ElementRe.setAttribute("height", "100%", blank);
     ElementRe.setAttribute("fill", "#FFFFFF", blank);
     ElementRe.appendChild(blank, mask);
 
-    let symbol = DocumentRe.createElementNS(svgXmlns, "symbol", document);
+    let symbol = DocumentRe.createElementNS(svgNs, "symbol", document);
     ElementRe.setId(symbol, "s" ++ hash);
 
-    let path = DocumentRe.createElementNS(svgXmlns, "path", document);
-    ElementRe.setAttribute("d", getPathString(code, border), path);
+    let path = createQrCodePathElement(code, border);
     ElementRe.appendChild(path, symbol);
     ElementRe.appendChild(symbol, childSvg);
 
-    let use = DocumentRe.createElementNS(svgXmlns, "use", document);
+    let use = DocumentRe.createElementNS(svgNs, "use", document);
     ElementRe.setAttribute("href", "#s" ++ hash, use);
     ElementRe.setAttribute("fill", "#000000", use);
     ElementRe.appendChild(use, mask);
 
     ElementRe.appendChild(mask, childSvg);
 
-    let rainbow = DocumentRe.createElementNS(svgXmlns, "rect", document);
+    let rainbow = DocumentRe.createElementNS(svgNs, "rect", document);
     ElementRe.setAttribute("width", "100%", rainbow);
     ElementRe.setAttribute("height", "100%", rainbow);
     ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
@@ -147,8 +218,9 @@ let createSvg:
 
     ElementRe.appendChild(rainbow, childSvg);
 
-    let use2 = DocumentRe.createElementNS(svgXmlns, "use", document);
+    let use2 = DocumentRe.createElementNS(svgNs, "use", document);
     ElementRe.setAttribute("href", "#s" ++ hash, use2);
+    ElementRe.setAttribute("stroke-width", "0.01", use2);
     ElementRe.setAttribute("fill", "#000000", use2);
     ElementRe.setAttribute("fill-opacity", "0.5", use2);
     ElementRe.appendChild(use2, childSvg);

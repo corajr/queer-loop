@@ -23,6 +23,8 @@ let defaultCode = QrCode._encodeText("https://" ++ domain, Ecc.low);
 
 let defaultHash = "fff";
 
+let initialHash: ref(string) = ref("");
+
 let camerasRef: ref(array(UserMedia.mediaDeviceInfo)) = ref([||]);
 let cameraIndex = ref(0);
 
@@ -74,7 +76,8 @@ let takeSnapshot = _ =>
     toDataURLjpg(snapshotCanvas, 0.9);
   });
 
-let setHashToNow = _ => setHash(Js.Date.toISOString(Js.Date.make()));
+let getTimestamp = _ => Js.Date.toISOString(Js.Date.make());
+let setHashToNow = _ => setHash(getTimestamp());
 
 let onClick = (maybeHash, _) =>
   switch (maybeHash) {
@@ -108,46 +111,64 @@ let setCode = input => {
        let alreadySeen = Belt.Option.isSome(Js.Dict.get(dataSeen, hash));
        if (! alreadySeen) {
          Js.Dict.set(dataSeen, hash, text);
-       };
 
-       setBackground("body", "#" ++ Js.String.slice(~from=0, ~to_=6, hash));
-
-       let code =
-         Belt.Option.getWithDefault(
-           QrCode.encodeText(text, Ecc.medium),
-           defaultCode,
+         setBackground(
+           "body",
+           "#" ++ Js.String.slice(~from=0, ~to_=6, hash),
          );
 
-       withQuerySelectorDom(".queer-loop", loopContainer =>
-         switch (takeSnapshot()) {
-         | Some(snapshotUrl) =>
-           let maybePrevious = ElementRe.querySelector("svg", loopContainer);
+         let code =
+           Belt.Option.getWithDefault(
+             QrCode.encodeText(text, Ecc.medium),
+             defaultCode,
+           );
 
-           switch (maybePrevious) {
-           | Some(previous) =>
-             ElementRe.removeChild(previous, loopContainer) |> ignore
-           | None => ()
-           };
+         withQuerySelectorDom("svg", root =>
+           withQuerySelectorDom("#localGroup", loopContainer =>
+             switch (takeSnapshot()) {
+             | Some(snapshotUrl) =>
+               let maybePrevious =
+                 ElementRe.querySelector("svg", loopContainer);
 
-           let svg =
-             QueerCode.createSvg(
-               loopContainer,
-               maybePrevious,
-               Some(snapshotUrl),
-               hash,
-               code,
-             );
+               switch (maybePrevious) {
+               | Some(previous) =>
+                 ElementRe.removeChild(previous, loopContainer) |> ignore
+               | None => ()
+               };
 
-           let url = QueerCode.svgToDataURL(svg);
+               /* let svg = */
+               /*   QueerCode.createSvg( */
+               /*     loopContainer, */
+               /*     maybePrevious, */
+               /*     Some(snapshotUrl), */
+               /*     hash, */
+               /*     code, */
+               /*   ); */
 
-           if (currentSignature^ !== "") {
-             addToPast(hash, url);
-           };
-           currentSignature := hash;
-         | None => ()
-         }
-       )
-       |> ignore;
+               let svg =
+                 QueerCode.createSimpleSvg(
+                   code,
+                   4,
+                   input !== initialHash^ ? Some(snapshotUrl) : None,
+                 );
+               ElementRe.appendChild(svg, loopContainer);
+               let url = QueerCode.svgToDataURL(svg);
+
+               withQuerySelectorDom("#codes", container => {
+                 let img =
+                   DocumentRe.createElementNS(htmlNs, "img", document);
+                 ElementRe.setAttribute("src", url, img);
+                 ElementRe.appendChild(img, container);
+               });
+
+               currentSignature := hash;
+             | None => ()
+             }
+           )
+         )
+         |> ignore;
+       };
+
        Js.Promise.resolve();
      })
   |> ignore;
@@ -155,8 +176,8 @@ let setCode = input => {
 
 let setText =
   Debouncer.make(~wait=200, hash =>
-    withQuerySelector("#codeContents", el =>
-      HtmlElementRe.setInnerText(el, decodeURIComponent(hash))
+    withQuerySelectorDom("#codeContents", el =>
+      ElementRe.setInnerText(el, decodeURIComponent(hash))
     )
     |> ignore
   );
@@ -195,8 +216,8 @@ let rec onTick = ts => {
 };
 
 let _onInput = _ =>
-  withQuerySelector("#codeContents", el => {
-    let text = HtmlElementRe.innerText(el);
+  withQuerySelectorDom("#codeContents", el => {
+    let text = ElementRe.innerText(el);
     setHash(encodeURIComponent(text));
   })
   |> ignore;
@@ -210,19 +231,20 @@ let init: unit => unit =
       setHeight(canvas, 480);
     });
 
-    withQuerySelectorDom(".queer-loop", img =>
+    withQuerySelectorDom(".codes", img =>
       ElementRe.addEventListener("click", onClick(None), img)
     );
 
-    let initialHash = getHash();
-    if (initialHash == "") {
-      setHashToNow();
+    initialHash := Js.String.sliceToEnd(~from=1, getHash());
+    if (initialHash^ == "") {
+      initialHash := getTimestamp();
+      setHash(initialHash^);
     } else {
       onHashChange();
     };
 
-    withQuerySelector("#codeContents", el =>
-      HtmlElementRe.addEventListener("input", evt => onInput(), el)
+    withQuerySelectorDom("#codeContents", el =>
+      ElementRe.addEventListener("input", _evt => onInput(), el)
     );
 
     let response = input =>
@@ -233,7 +255,7 @@ let init: unit => unit =
                Belt.Option.isSome(Js.Dict.get(dataSeen, hexHash));
 
              if (hexHash === currentSignature^ || ! alreadySeen) {
-               setHash(Js.Date.toISOString(Js.Date.make()));
+               setHashToNow();
              };
              Js.Promise.resolve();
            })
@@ -247,9 +269,10 @@ let init: unit => unit =
          Js.Promise.all(
            Array.map(
              camera => {
-               let videoEl = DocumentRe.createElement("video", document);
-               withQuerySelector("body", body =>
-                 HtmlElementRe.appendChild(videoEl, body)
+               let videoEl =
+                 DocumentRe.createElementNS(htmlNs, "video", document);
+               withQuerySelectorDom("#htmlContainer", body =>
+                 ElementRe.appendChild(videoEl, body)
                );
 
                Scanner.scanUsingDeviceId(

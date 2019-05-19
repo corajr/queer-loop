@@ -1,616 +1,5439 @@
-/******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/";
-/******/
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/Index.bs.js");
-/******/ })
-/************************************************************************/
-/******/ ({
-
-/***/ "./node_modules/bs-platform/lib/js/array.js":
-/*!**************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/array.js ***!
-  \**************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Curry = __webpack_require__(/*! ./curry.js */ \"./node_modules/bs-platform/lib/js/curry.js\");\nvar Caml_array = __webpack_require__(/*! ./caml_array.js */ \"./node_modules/bs-platform/lib/js/caml_array.js\");\nvar Caml_exceptions = __webpack_require__(/*! ./caml_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_exceptions.js\");\nvar Caml_js_exceptions = __webpack_require__(/*! ./caml_js_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_js_exceptions.js\");\nvar Caml_builtin_exceptions = __webpack_require__(/*! ./caml_builtin_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js\");\n\nfunction init(l, f) {\n  if (l === 0) {\n    return /* array */[];\n  } else if (l < 0) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"Array.init\"\n        ];\n  } else {\n    var res = Caml_array.caml_make_vect(l, Curry._1(f, 0));\n    for(var i = 1 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n      res[i] = Curry._1(f, i);\n    }\n    return res;\n  }\n}\n\nfunction make_matrix(sx, sy, init) {\n  var res = Caml_array.caml_make_vect(sx, /* array */[]);\n  for(var x = 0 ,x_finish = sx - 1 | 0; x <= x_finish; ++x){\n    res[x] = Caml_array.caml_make_vect(sy, init);\n  }\n  return res;\n}\n\nfunction copy(a) {\n  var l = a.length;\n  if (l === 0) {\n    return /* array */[];\n  } else {\n    return Caml_array.caml_array_sub(a, 0, l);\n  }\n}\n\nfunction append(a1, a2) {\n  var l1 = a1.length;\n  if (l1 === 0) {\n    return copy(a2);\n  } else if (a2.length === 0) {\n    return Caml_array.caml_array_sub(a1, 0, l1);\n  } else {\n    return a1.concat(a2);\n  }\n}\n\nfunction sub(a, ofs, len) {\n  if (len < 0 || ofs > (a.length - len | 0)) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"Array.sub\"\n        ];\n  } else {\n    return Caml_array.caml_array_sub(a, ofs, len);\n  }\n}\n\nfunction fill(a, ofs, len, v) {\n  if (ofs < 0 || len < 0 || ofs > (a.length - len | 0)) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"Array.fill\"\n        ];\n  } else {\n    for(var i = ofs ,i_finish = (ofs + len | 0) - 1 | 0; i <= i_finish; ++i){\n      a[i] = v;\n    }\n    return /* () */0;\n  }\n}\n\nfunction blit(a1, ofs1, a2, ofs2, len) {\n  if (len < 0 || ofs1 < 0 || ofs1 > (a1.length - len | 0) || ofs2 < 0 || ofs2 > (a2.length - len | 0)) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"Array.blit\"\n        ];\n  } else {\n    return Caml_array.caml_array_blit(a1, ofs1, a2, ofs2, len);\n  }\n}\n\nfunction iter(f, a) {\n  for(var i = 0 ,i_finish = a.length - 1 | 0; i <= i_finish; ++i){\n    Curry._1(f, a[i]);\n  }\n  return /* () */0;\n}\n\nfunction map(f, a) {\n  var l = a.length;\n  if (l === 0) {\n    return /* array */[];\n  } else {\n    var r = Caml_array.caml_make_vect(l, Curry._1(f, a[0]));\n    for(var i = 1 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n      r[i] = Curry._1(f, a[i]);\n    }\n    return r;\n  }\n}\n\nfunction iteri(f, a) {\n  for(var i = 0 ,i_finish = a.length - 1 | 0; i <= i_finish; ++i){\n    Curry._2(f, i, a[i]);\n  }\n  return /* () */0;\n}\n\nfunction mapi(f, a) {\n  var l = a.length;\n  if (l === 0) {\n    return /* array */[];\n  } else {\n    var r = Caml_array.caml_make_vect(l, Curry._2(f, 0, a[0]));\n    for(var i = 1 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n      r[i] = Curry._2(f, i, a[i]);\n    }\n    return r;\n  }\n}\n\nfunction to_list(a) {\n  var _i = a.length - 1 | 0;\n  var _res = /* [] */0;\n  while(true) {\n    var res = _res;\n    var i = _i;\n    if (i < 0) {\n      return res;\n    } else {\n      _res = /* :: */[\n        a[i],\n        res\n      ];\n      _i = i - 1 | 0;\n      continue ;\n    }\n  };\n}\n\nfunction list_length(_accu, _param) {\n  while(true) {\n    var param = _param;\n    var accu = _accu;\n    if (param) {\n      _param = param[1];\n      _accu = accu + 1 | 0;\n      continue ;\n    } else {\n      return accu;\n    }\n  };\n}\n\nfunction of_list(l) {\n  if (l) {\n    var a = Caml_array.caml_make_vect(list_length(0, l), l[0]);\n    var _i = 1;\n    var _param = l[1];\n    while(true) {\n      var param = _param;\n      var i = _i;\n      if (param) {\n        a[i] = param[0];\n        _param = param[1];\n        _i = i + 1 | 0;\n        continue ;\n      } else {\n        return a;\n      }\n    };\n  } else {\n    return /* array */[];\n  }\n}\n\nfunction fold_left(f, x, a) {\n  var r = x;\n  for(var i = 0 ,i_finish = a.length - 1 | 0; i <= i_finish; ++i){\n    r = Curry._2(f, r, a[i]);\n  }\n  return r;\n}\n\nfunction fold_right(f, a, x) {\n  var r = x;\n  for(var i = a.length - 1 | 0; i >= 0; --i){\n    r = Curry._2(f, a[i], r);\n  }\n  return r;\n}\n\nvar Bottom = Caml_exceptions.create(\"Array.Bottom\");\n\nfunction sort(cmp, a) {\n  var maxson = function (l, i) {\n    var i31 = ((i + i | 0) + i | 0) + 1 | 0;\n    var x = i31;\n    if ((i31 + 2 | 0) < l) {\n      if (Curry._2(cmp, Caml_array.caml_array_get(a, i31), Caml_array.caml_array_get(a, i31 + 1 | 0)) < 0) {\n        x = i31 + 1 | 0;\n      }\n      if (Curry._2(cmp, Caml_array.caml_array_get(a, x), Caml_array.caml_array_get(a, i31 + 2 | 0)) < 0) {\n        x = i31 + 2 | 0;\n      }\n      return x;\n    } else if ((i31 + 1 | 0) < l && Curry._2(cmp, Caml_array.caml_array_get(a, i31), Caml_array.caml_array_get(a, i31 + 1 | 0)) < 0) {\n      return i31 + 1 | 0;\n    } else if (i31 < l) {\n      return i31;\n    } else {\n      throw [\n            Bottom,\n            i\n          ];\n    }\n  };\n  var trickle = function (l, i, e) {\n    try {\n      var l$1 = l;\n      var _i = i;\n      var e$1 = e;\n      while(true) {\n        var i$1 = _i;\n        var j = maxson(l$1, i$1);\n        if (Curry._2(cmp, Caml_array.caml_array_get(a, j), e$1) > 0) {\n          Caml_array.caml_array_set(a, i$1, Caml_array.caml_array_get(a, j));\n          _i = j;\n          continue ;\n        } else {\n          return Caml_array.caml_array_set(a, i$1, e$1);\n        }\n      };\n    }\n    catch (raw_exn){\n      var exn = Caml_js_exceptions.internalToOCamlException(raw_exn);\n      if (exn[0] === Bottom) {\n        return Caml_array.caml_array_set(a, exn[1], e);\n      } else {\n        throw exn;\n      }\n    }\n  };\n  var bubble = function (l, i) {\n    try {\n      var l$1 = l;\n      var _i = i;\n      while(true) {\n        var i$1 = _i;\n        var j = maxson(l$1, i$1);\n        Caml_array.caml_array_set(a, i$1, Caml_array.caml_array_get(a, j));\n        _i = j;\n        continue ;\n      };\n    }\n    catch (raw_exn){\n      var exn = Caml_js_exceptions.internalToOCamlException(raw_exn);\n      if (exn[0] === Bottom) {\n        return exn[1];\n      } else {\n        throw exn;\n      }\n    }\n  };\n  var trickleup = function (_i, e) {\n    while(true) {\n      var i = _i;\n      var father = (i - 1 | 0) / 3 | 0;\n      if (i === father) {\n        throw [\n              Caml_builtin_exceptions.assert_failure,\n              /* tuple */[\n                \"array.ml\",\n                173,\n                4\n              ]\n            ];\n      }\n      if (Curry._2(cmp, Caml_array.caml_array_get(a, father), e) < 0) {\n        Caml_array.caml_array_set(a, i, Caml_array.caml_array_get(a, father));\n        if (father > 0) {\n          _i = father;\n          continue ;\n        } else {\n          return Caml_array.caml_array_set(a, 0, e);\n        }\n      } else {\n        return Caml_array.caml_array_set(a, i, e);\n      }\n    };\n  };\n  var l = a.length;\n  for(var i = ((l + 1 | 0) / 3 | 0) - 1 | 0; i >= 0; --i){\n    trickle(l, i, Caml_array.caml_array_get(a, i));\n  }\n  for(var i$1 = l - 1 | 0; i$1 >= 2; --i$1){\n    var e = Caml_array.caml_array_get(a, i$1);\n    Caml_array.caml_array_set(a, i$1, Caml_array.caml_array_get(a, 0));\n    trickleup(bubble(i$1, 0), e);\n  }\n  if (l > 1) {\n    var e$1 = Caml_array.caml_array_get(a, 1);\n    Caml_array.caml_array_set(a, 1, Caml_array.caml_array_get(a, 0));\n    return Caml_array.caml_array_set(a, 0, e$1);\n  } else {\n    return 0;\n  }\n}\n\nfunction stable_sort(cmp, a) {\n  var merge = function (src1ofs, src1len, src2, src2ofs, src2len, dst, dstofs) {\n    var src1r = src1ofs + src1len | 0;\n    var src2r = src2ofs + src2len | 0;\n    var _i1 = src1ofs;\n    var _s1 = Caml_array.caml_array_get(a, src1ofs);\n    var _i2 = src2ofs;\n    var _s2 = Caml_array.caml_array_get(src2, src2ofs);\n    var _d = dstofs;\n    while(true) {\n      var d = _d;\n      var s2 = _s2;\n      var i2 = _i2;\n      var s1 = _s1;\n      var i1 = _i1;\n      if (Curry._2(cmp, s1, s2) <= 0) {\n        Caml_array.caml_array_set(dst, d, s1);\n        var i1$1 = i1 + 1 | 0;\n        if (i1$1 < src1r) {\n          _d = d + 1 | 0;\n          _s1 = Caml_array.caml_array_get(a, i1$1);\n          _i1 = i1$1;\n          continue ;\n        } else {\n          return blit(src2, i2, dst, d + 1 | 0, src2r - i2 | 0);\n        }\n      } else {\n        Caml_array.caml_array_set(dst, d, s2);\n        var i2$1 = i2 + 1 | 0;\n        if (i2$1 < src2r) {\n          _d = d + 1 | 0;\n          _s2 = Caml_array.caml_array_get(src2, i2$1);\n          _i2 = i2$1;\n          continue ;\n        } else {\n          return blit(a, i1, dst, d + 1 | 0, src1r - i1 | 0);\n        }\n      }\n    };\n  };\n  var isortto = function (srcofs, dst, dstofs, len) {\n    for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){\n      var e = Caml_array.caml_array_get(a, srcofs + i | 0);\n      var j = (dstofs + i | 0) - 1 | 0;\n      while(j >= dstofs && Curry._2(cmp, Caml_array.caml_array_get(dst, j), e) > 0) {\n        Caml_array.caml_array_set(dst, j + 1 | 0, Caml_array.caml_array_get(dst, j));\n        j = j - 1 | 0;\n      };\n      Caml_array.caml_array_set(dst, j + 1 | 0, e);\n    }\n    return /* () */0;\n  };\n  var sortto = function (srcofs, dst, dstofs, len) {\n    if (len <= 5) {\n      return isortto(srcofs, dst, dstofs, len);\n    } else {\n      var l1 = len / 2 | 0;\n      var l2 = len - l1 | 0;\n      sortto(srcofs + l1 | 0, dst, dstofs + l1 | 0, l2);\n      sortto(srcofs, a, srcofs + l2 | 0, l1);\n      return merge(srcofs + l2 | 0, l1, dst, dstofs + l1 | 0, l2, dst, dstofs);\n    }\n  };\n  var l = a.length;\n  if (l <= 5) {\n    return isortto(0, a, 0, l);\n  } else {\n    var l1 = l / 2 | 0;\n    var l2 = l - l1 | 0;\n    var t = Caml_array.caml_make_vect(l2, Caml_array.caml_array_get(a, 0));\n    sortto(l1, t, 0, l2);\n    sortto(0, a, l2, l1);\n    return merge(l2, l1, t, 0, l2, a, 0);\n  }\n}\n\nvar create_matrix = make_matrix;\n\nvar concat = Caml_array.caml_array_concat;\n\nvar fast_sort = stable_sort;\n\nexports.init = init;\nexports.make_matrix = make_matrix;\nexports.create_matrix = create_matrix;\nexports.append = append;\nexports.concat = concat;\nexports.sub = sub;\nexports.copy = copy;\nexports.fill = fill;\nexports.blit = blit;\nexports.to_list = to_list;\nexports.of_list = of_list;\nexports.iter = iter;\nexports.map = map;\nexports.iteri = iteri;\nexports.mapi = mapi;\nexports.fold_left = fold_left;\nexports.fold_right = fold_right;\nexports.sort = sort;\nexports.stable_sort = stable_sort;\nexports.fast_sort = fast_sort;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/array.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/belt_Array.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/belt_Array.js ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Curry = __webpack_require__(/*! ./curry.js */ \"./node_modules/bs-platform/lib/js/curry.js\");\nvar Js_math = __webpack_require__(/*! ./js_math.js */ \"./node_modules/bs-platform/lib/js/js_math.js\");\nvar Caml_option = __webpack_require__(/*! ./caml_option.js */ \"./node_modules/bs-platform/lib/js/caml_option.js\");\nvar Caml_primitive = __webpack_require__(/*! ./caml_primitive.js */ \"./node_modules/bs-platform/lib/js/caml_primitive.js\");\n\nfunction get(arr, i) {\n  if (i >= 0 && i < arr.length) {\n    return Caml_option.some(arr[i]);\n  }\n  \n}\n\nfunction getExn(arr, i) {\n  if (!(i >= 0 && i < arr.length)) {\n    throw new Error(\"File \\\"belt_Array.ml\\\", line 25, characters 6-12\");\n  }\n  return arr[i];\n}\n\nfunction set(arr, i, v) {\n  if (i >= 0 && i < arr.length) {\n    arr[i] = v;\n    return true;\n  } else {\n    return false;\n  }\n}\n\nfunction setExn(arr, i, v) {\n  if (!(i >= 0 && i < arr.length)) {\n    throw new Error(\"File \\\"belt_Array.ml\\\", line 31, characters 4-10\");\n  }\n  arr[i] = v;\n  return /* () */0;\n}\n\nfunction swapUnsafe(xs, i, j) {\n  var tmp = xs[i];\n  xs[i] = xs[j];\n  xs[j] = tmp;\n  return /* () */0;\n}\n\nfunction shuffleInPlace(xs) {\n  var len = xs.length;\n  for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){\n    swapUnsafe(xs, i, Js_math.random_int(i, len));\n  }\n  return /* () */0;\n}\n\nfunction shuffle(xs) {\n  var result = xs.slice(0);\n  shuffleInPlace(result);\n  return result;\n}\n\nfunction reverseInPlace(xs) {\n  var len = xs.length;\n  var xs$1 = xs;\n  var ofs = 0;\n  var len$1 = len;\n  for(var i = 0 ,i_finish = (len$1 / 2 | 0) - 1 | 0; i <= i_finish; ++i){\n    swapUnsafe(xs$1, ofs + i | 0, ((ofs + len$1 | 0) - i | 0) - 1 | 0);\n  }\n  return /* () */0;\n}\n\nfunction reverse(xs) {\n  var len = xs.length;\n  var result = new Array(len);\n  for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){\n    result[i] = xs[(len - 1 | 0) - i | 0];\n  }\n  return result;\n}\n\nfunction make(l, f) {\n  if (l <= 0) {\n    return /* array */[];\n  } else {\n    var res = new Array(l);\n    for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n      res[i] = f;\n    }\n    return res;\n  }\n}\n\nfunction makeByU(l, f) {\n  if (l <= 0) {\n    return /* array */[];\n  } else {\n    var res = new Array(l);\n    for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n      res[i] = f(i);\n    }\n    return res;\n  }\n}\n\nfunction makeBy(l, f) {\n  return makeByU(l, Curry.__1(f));\n}\n\nfunction makeByAndShuffleU(l, f) {\n  var u = makeByU(l, f);\n  shuffleInPlace(u);\n  return u;\n}\n\nfunction makeByAndShuffle(l, f) {\n  return makeByAndShuffleU(l, Curry.__1(f));\n}\n\nfunction range(start, finish) {\n  var cut = finish - start | 0;\n  if (cut < 0) {\n    return /* array */[];\n  } else {\n    var arr = new Array(cut + 1 | 0);\n    for(var i = 0; i <= cut; ++i){\n      arr[i] = start + i | 0;\n    }\n    return arr;\n  }\n}\n\nfunction rangeBy(start, finish, step) {\n  var cut = finish - start | 0;\n  if (cut < 0 || step <= 0) {\n    return /* array */[];\n  } else {\n    var nb = (cut / step | 0) + 1 | 0;\n    var arr = new Array(nb);\n    var cur = start;\n    for(var i = 0 ,i_finish = nb - 1 | 0; i <= i_finish; ++i){\n      arr[i] = cur;\n      cur = cur + step | 0;\n    }\n    return arr;\n  }\n}\n\nfunction zip(xs, ys) {\n  var lenx = xs.length;\n  var leny = ys.length;\n  var len = lenx < leny ? lenx : leny;\n  var s = new Array(len);\n  for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){\n    s[i] = /* tuple */[\n      xs[i],\n      ys[i]\n    ];\n  }\n  return s;\n}\n\nfunction zipByU(xs, ys, f) {\n  var lenx = xs.length;\n  var leny = ys.length;\n  var len = lenx < leny ? lenx : leny;\n  var s = new Array(len);\n  for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){\n    s[i] = f(xs[i], ys[i]);\n  }\n  return s;\n}\n\nfunction zipBy(xs, ys, f) {\n  return zipByU(xs, ys, Curry.__2(f));\n}\n\nfunction concat(a1, a2) {\n  var l1 = a1.length;\n  var l2 = a2.length;\n  var a1a2 = new Array(l1 + l2 | 0);\n  for(var i = 0 ,i_finish = l1 - 1 | 0; i <= i_finish; ++i){\n    a1a2[i] = a1[i];\n  }\n  for(var i$1 = 0 ,i_finish$1 = l2 - 1 | 0; i$1 <= i_finish$1; ++i$1){\n    a1a2[l1 + i$1 | 0] = a2[i$1];\n  }\n  return a1a2;\n}\n\nfunction concatMany(arrs) {\n  var lenArrs = arrs.length;\n  var totalLen = 0;\n  for(var i = 0 ,i_finish = lenArrs - 1 | 0; i <= i_finish; ++i){\n    totalLen = totalLen + arrs[i].length | 0;\n  }\n  var result = new Array(totalLen);\n  totalLen = 0;\n  for(var j = 0 ,j_finish = lenArrs - 1 | 0; j <= j_finish; ++j){\n    var cur = arrs[j];\n    for(var k = 0 ,k_finish = cur.length - 1 | 0; k <= k_finish; ++k){\n      result[totalLen] = cur[k];\n      totalLen = totalLen + 1 | 0;\n    }\n  }\n  return result;\n}\n\nfunction slice(a, offset, len) {\n  if (len <= 0) {\n    return /* array */[];\n  } else {\n    var lena = a.length;\n    var ofs = offset < 0 ? Caml_primitive.caml_int_max(lena + offset | 0, 0) : offset;\n    var hasLen = lena - ofs | 0;\n    var copyLength = hasLen < len ? hasLen : len;\n    if (copyLength <= 0) {\n      return /* array */[];\n    } else {\n      var result = new Array(copyLength);\n      for(var i = 0 ,i_finish = copyLength - 1 | 0; i <= i_finish; ++i){\n        result[i] = a[ofs + i | 0];\n      }\n      return result;\n    }\n  }\n}\n\nfunction sliceToEnd(a, offset) {\n  var lena = a.length;\n  var ofs = offset < 0 ? Caml_primitive.caml_int_max(lena + offset | 0, 0) : offset;\n  var len = lena - ofs | 0;\n  var result = new Array(len);\n  for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){\n    result[i] = a[ofs + i | 0];\n  }\n  return result;\n}\n\nfunction fill(a, offset, len, v) {\n  if (len > 0) {\n    var lena = a.length;\n    var ofs = offset < 0 ? Caml_primitive.caml_int_max(lena + offset | 0, 0) : offset;\n    var hasLen = lena - ofs | 0;\n    var fillLength = hasLen < len ? hasLen : len;\n    if (fillLength > 0) {\n      for(var i = ofs ,i_finish = (ofs + fillLength | 0) - 1 | 0; i <= i_finish; ++i){\n        a[i] = v;\n      }\n      return /* () */0;\n    } else {\n      return 0;\n    }\n  } else {\n    return 0;\n  }\n}\n\nfunction blitUnsafe(a1, srcofs1, a2, srcofs2, blitLength) {\n  if (srcofs2 <= srcofs1) {\n    for(var j = 0 ,j_finish = blitLength - 1 | 0; j <= j_finish; ++j){\n      a2[j + srcofs2 | 0] = a1[j + srcofs1 | 0];\n    }\n    return /* () */0;\n  } else {\n    for(var j$1 = blitLength - 1 | 0; j$1 >= 0; --j$1){\n      a2[j$1 + srcofs2 | 0] = a1[j$1 + srcofs1 | 0];\n    }\n    return /* () */0;\n  }\n}\n\nfunction blit(a1, ofs1, a2, ofs2, len) {\n  var lena1 = a1.length;\n  var lena2 = a2.length;\n  var srcofs1 = ofs1 < 0 ? Caml_primitive.caml_int_max(lena1 + ofs1 | 0, 0) : ofs1;\n  var srcofs2 = ofs2 < 0 ? Caml_primitive.caml_int_max(lena2 + ofs2 | 0, 0) : ofs2;\n  var blitLength = Caml_primitive.caml_int_min(len, Caml_primitive.caml_int_min(lena1 - srcofs1 | 0, lena2 - srcofs2 | 0));\n  if (srcofs2 <= srcofs1) {\n    for(var j = 0 ,j_finish = blitLength - 1 | 0; j <= j_finish; ++j){\n      a2[j + srcofs2 | 0] = a1[j + srcofs1 | 0];\n    }\n    return /* () */0;\n  } else {\n    for(var j$1 = blitLength - 1 | 0; j$1 >= 0; --j$1){\n      a2[j$1 + srcofs2 | 0] = a1[j$1 + srcofs1 | 0];\n    }\n    return /* () */0;\n  }\n}\n\nfunction forEachU(a, f) {\n  for(var i = 0 ,i_finish = a.length - 1 | 0; i <= i_finish; ++i){\n    f(a[i]);\n  }\n  return /* () */0;\n}\n\nfunction forEach(a, f) {\n  return forEachU(a, Curry.__1(f));\n}\n\nfunction mapU(a, f) {\n  var l = a.length;\n  var r = new Array(l);\n  for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n    r[i] = f(a[i]);\n  }\n  return r;\n}\n\nfunction map(a, f) {\n  return mapU(a, Curry.__1(f));\n}\n\nfunction getByU(a, p) {\n  var l = a.length;\n  var i = 0;\n  var r = undefined;\n  while(r === undefined && i < l) {\n    var v = a[i];\n    if (p(v)) {\n      r = Caml_option.some(v);\n    }\n    i = i + 1 | 0;\n  };\n  return r;\n}\n\nfunction getBy(a, p) {\n  return getByU(a, Curry.__1(p));\n}\n\nfunction getIndexByU(a, p) {\n  var l = a.length;\n  var i = 0;\n  var r = undefined;\n  while(r === undefined && i < l) {\n    var v = a[i];\n    if (p(v)) {\n      r = i;\n    }\n    i = i + 1 | 0;\n  };\n  return r;\n}\n\nfunction getIndexBy(a, p) {\n  return getIndexByU(a, Curry.__1(p));\n}\n\nfunction keepU(a, f) {\n  var l = a.length;\n  var r = new Array(l);\n  var j = 0;\n  for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n    var v = a[i];\n    if (f(v)) {\n      r[j] = v;\n      j = j + 1 | 0;\n    }\n    \n  }\n  r.length = j;\n  return r;\n}\n\nfunction keep(a, f) {\n  return keepU(a, Curry.__1(f));\n}\n\nfunction keepWithIndexU(a, f) {\n  var l = a.length;\n  var r = new Array(l);\n  var j = 0;\n  for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n    var v = a[i];\n    if (f(v, i)) {\n      r[j] = v;\n      j = j + 1 | 0;\n    }\n    \n  }\n  r.length = j;\n  return r;\n}\n\nfunction keepWithIndex(a, f) {\n  return keepWithIndexU(a, Curry.__2(f));\n}\n\nfunction keepMapU(a, f) {\n  var l = a.length;\n  var r = new Array(l);\n  var j = 0;\n  for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n    var v = a[i];\n    var match = f(v);\n    if (match !== undefined) {\n      r[j] = Caml_option.valFromOption(match);\n      j = j + 1 | 0;\n    }\n    \n  }\n  r.length = j;\n  return r;\n}\n\nfunction keepMap(a, f) {\n  return keepMapU(a, Curry.__1(f));\n}\n\nfunction forEachWithIndexU(a, f) {\n  for(var i = 0 ,i_finish = a.length - 1 | 0; i <= i_finish; ++i){\n    f(i, a[i]);\n  }\n  return /* () */0;\n}\n\nfunction forEachWithIndex(a, f) {\n  return forEachWithIndexU(a, Curry.__2(f));\n}\n\nfunction mapWithIndexU(a, f) {\n  var l = a.length;\n  var r = new Array(l);\n  for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n    r[i] = f(i, a[i]);\n  }\n  return r;\n}\n\nfunction mapWithIndex(a, f) {\n  return mapWithIndexU(a, Curry.__2(f));\n}\n\nfunction reduceU(a, x, f) {\n  var r = x;\n  for(var i = 0 ,i_finish = a.length - 1 | 0; i <= i_finish; ++i){\n    r = f(r, a[i]);\n  }\n  return r;\n}\n\nfunction reduce(a, x, f) {\n  return reduceU(a, x, Curry.__2(f));\n}\n\nfunction reduceReverseU(a, x, f) {\n  var r = x;\n  for(var i = a.length - 1 | 0; i >= 0; --i){\n    r = f(r, a[i]);\n  }\n  return r;\n}\n\nfunction reduceReverse(a, x, f) {\n  return reduceReverseU(a, x, Curry.__2(f));\n}\n\nfunction reduceReverse2U(a, b, x, f) {\n  var r = x;\n  var len = Caml_primitive.caml_int_min(a.length, b.length);\n  for(var i = len - 1 | 0; i >= 0; --i){\n    r = f(r, a[i], b[i]);\n  }\n  return r;\n}\n\nfunction reduceReverse2(a, b, x, f) {\n  return reduceReverse2U(a, b, x, Curry.__3(f));\n}\n\nfunction reduceWithIndexU(a, x, f) {\n  var r = x;\n  for(var i = 0 ,i_finish = a.length - 1 | 0; i <= i_finish; ++i){\n    r = f(r, a[i], i);\n  }\n  return r;\n}\n\nfunction reduceWithIndex(a, x, f) {\n  return reduceWithIndexU(a, x, Curry.__3(f));\n}\n\nfunction everyU(arr, b) {\n  var len = arr.length;\n  var arr$1 = arr;\n  var _i = 0;\n  var b$1 = b;\n  var len$1 = len;\n  while(true) {\n    var i = _i;\n    if (i === len$1) {\n      return true;\n    } else if (b$1(arr$1[i])) {\n      _i = i + 1 | 0;\n      continue ;\n    } else {\n      return false;\n    }\n  };\n}\n\nfunction every(arr, f) {\n  return everyU(arr, Curry.__1(f));\n}\n\nfunction someU(arr, b) {\n  var len = arr.length;\n  var arr$1 = arr;\n  var _i = 0;\n  var b$1 = b;\n  var len$1 = len;\n  while(true) {\n    var i = _i;\n    if (i === len$1) {\n      return false;\n    } else if (b$1(arr$1[i])) {\n      return true;\n    } else {\n      _i = i + 1 | 0;\n      continue ;\n    }\n  };\n}\n\nfunction some(arr, f) {\n  return someU(arr, Curry.__1(f));\n}\n\nfunction everyAux2(arr1, arr2, _i, b, len) {\n  while(true) {\n    var i = _i;\n    if (i === len) {\n      return true;\n    } else if (b(arr1[i], arr2[i])) {\n      _i = i + 1 | 0;\n      continue ;\n    } else {\n      return false;\n    }\n  };\n}\n\nfunction every2U(a, b, p) {\n  return everyAux2(a, b, 0, p, Caml_primitive.caml_int_min(a.length, b.length));\n}\n\nfunction every2(a, b, p) {\n  return every2U(a, b, Curry.__2(p));\n}\n\nfunction some2U(a, b, p) {\n  var arr1 = a;\n  var arr2 = b;\n  var _i = 0;\n  var b$1 = p;\n  var len = Caml_primitive.caml_int_min(a.length, b.length);\n  while(true) {\n    var i = _i;\n    if (i === len) {\n      return false;\n    } else if (b$1(arr1[i], arr2[i])) {\n      return true;\n    } else {\n      _i = i + 1 | 0;\n      continue ;\n    }\n  };\n}\n\nfunction some2(a, b, p) {\n  return some2U(a, b, Curry.__2(p));\n}\n\nfunction eqU(a, b, p) {\n  var lena = a.length;\n  var lenb = b.length;\n  if (lena === lenb) {\n    return everyAux2(a, b, 0, p, lena);\n  } else {\n    return false;\n  }\n}\n\nfunction eq(a, b, p) {\n  return eqU(a, b, Curry.__2(p));\n}\n\nfunction cmpU(a, b, p) {\n  var lena = a.length;\n  var lenb = b.length;\n  if (lena > lenb) {\n    return 1;\n  } else if (lena < lenb) {\n    return -1;\n  } else {\n    var arr1 = a;\n    var arr2 = b;\n    var _i = 0;\n    var b$1 = p;\n    var len = lena;\n    while(true) {\n      var i = _i;\n      if (i === len) {\n        return 0;\n      } else {\n        var c = b$1(arr1[i], arr2[i]);\n        if (c === 0) {\n          _i = i + 1 | 0;\n          continue ;\n        } else {\n          return c;\n        }\n      }\n    };\n  }\n}\n\nfunction cmp(a, b, p) {\n  return cmpU(a, b, Curry.__2(p));\n}\n\nfunction partitionU(a, f) {\n  var l = a.length;\n  var i = 0;\n  var j = 0;\n  var a1 = new Array(l);\n  var a2 = new Array(l);\n  for(var ii = 0 ,ii_finish = l - 1 | 0; ii <= ii_finish; ++ii){\n    var v = a[ii];\n    if (f(v)) {\n      a1[i] = v;\n      i = i + 1 | 0;\n    } else {\n      a2[j] = v;\n      j = j + 1 | 0;\n    }\n  }\n  a1.length = i;\n  a2.length = j;\n  return /* tuple */[\n          a1,\n          a2\n        ];\n}\n\nfunction partition(a, f) {\n  return partitionU(a, Curry.__1(f));\n}\n\nfunction unzip(a) {\n  var l = a.length;\n  var a1 = new Array(l);\n  var a2 = new Array(l);\n  for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n    var match = a[i];\n    a1[i] = match[0];\n    a2[i] = match[1];\n  }\n  return /* tuple */[\n          a1,\n          a2\n        ];\n}\n\nexports.get = get;\nexports.getExn = getExn;\nexports.set = set;\nexports.setExn = setExn;\nexports.shuffleInPlace = shuffleInPlace;\nexports.shuffle = shuffle;\nexports.reverseInPlace = reverseInPlace;\nexports.reverse = reverse;\nexports.make = make;\nexports.range = range;\nexports.rangeBy = rangeBy;\nexports.makeByU = makeByU;\nexports.makeBy = makeBy;\nexports.makeByAndShuffleU = makeByAndShuffleU;\nexports.makeByAndShuffle = makeByAndShuffle;\nexports.zip = zip;\nexports.zipByU = zipByU;\nexports.zipBy = zipBy;\nexports.unzip = unzip;\nexports.concat = concat;\nexports.concatMany = concatMany;\nexports.slice = slice;\nexports.sliceToEnd = sliceToEnd;\nexports.fill = fill;\nexports.blit = blit;\nexports.blitUnsafe = blitUnsafe;\nexports.forEachU = forEachU;\nexports.forEach = forEach;\nexports.mapU = mapU;\nexports.map = map;\nexports.getByU = getByU;\nexports.getBy = getBy;\nexports.getIndexByU = getIndexByU;\nexports.getIndexBy = getIndexBy;\nexports.keepU = keepU;\nexports.keep = keep;\nexports.keepWithIndexU = keepWithIndexU;\nexports.keepWithIndex = keepWithIndex;\nexports.keepMapU = keepMapU;\nexports.keepMap = keepMap;\nexports.forEachWithIndexU = forEachWithIndexU;\nexports.forEachWithIndex = forEachWithIndex;\nexports.mapWithIndexU = mapWithIndexU;\nexports.mapWithIndex = mapWithIndex;\nexports.partitionU = partitionU;\nexports.partition = partition;\nexports.reduceU = reduceU;\nexports.reduce = reduce;\nexports.reduceReverseU = reduceReverseU;\nexports.reduceReverse = reduceReverse;\nexports.reduceReverse2U = reduceReverse2U;\nexports.reduceReverse2 = reduceReverse2;\nexports.reduceWithIndexU = reduceWithIndexU;\nexports.reduceWithIndex = reduceWithIndex;\nexports.someU = someU;\nexports.some = some;\nexports.everyU = everyU;\nexports.every = every;\nexports.every2U = every2U;\nexports.every2 = every2;\nexports.some2U = some2U;\nexports.some2 = some2;\nexports.cmpU = cmpU;\nexports.cmp = cmp;\nexports.eqU = eqU;\nexports.eq = eq;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/belt_Array.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/belt_Option.js":
-/*!********************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/belt_Option.js ***!
-  \********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Curry = __webpack_require__(/*! ./curry.js */ \"./node_modules/bs-platform/lib/js/curry.js\");\nvar Caml_option = __webpack_require__(/*! ./caml_option.js */ \"./node_modules/bs-platform/lib/js/caml_option.js\");\n\nfunction getExn(param) {\n  if (param !== undefined) {\n    return Caml_option.valFromOption(param);\n  } else {\n    throw new Error(\"getExn\");\n  }\n}\n\nfunction mapWithDefaultU(opt, $$default, f) {\n  if (opt !== undefined) {\n    return f(Caml_option.valFromOption(opt));\n  } else {\n    return $$default;\n  }\n}\n\nfunction mapWithDefault(opt, $$default, f) {\n  return mapWithDefaultU(opt, $$default, Curry.__1(f));\n}\n\nfunction mapU(opt, f) {\n  if (opt !== undefined) {\n    return Caml_option.some(f(Caml_option.valFromOption(opt)));\n  }\n  \n}\n\nfunction map(opt, f) {\n  return mapU(opt, Curry.__1(f));\n}\n\nfunction flatMapU(opt, f) {\n  if (opt !== undefined) {\n    return f(Caml_option.valFromOption(opt));\n  }\n  \n}\n\nfunction flatMap(opt, f) {\n  return flatMapU(opt, Curry.__1(f));\n}\n\nfunction getWithDefault(opt, $$default) {\n  if (opt !== undefined) {\n    return Caml_option.valFromOption(opt);\n  } else {\n    return $$default;\n  }\n}\n\nfunction isSome(param) {\n  return param !== undefined;\n}\n\nfunction isNone(x) {\n  return x === undefined;\n}\n\nfunction eqU(a, b, f) {\n  if (a !== undefined) {\n    if (b !== undefined) {\n      return f(Caml_option.valFromOption(a), Caml_option.valFromOption(b));\n    } else {\n      return false;\n    }\n  } else {\n    return b === undefined;\n  }\n}\n\nfunction eq(a, b, f) {\n  return eqU(a, b, Curry.__2(f));\n}\n\nfunction cmpU(a, b, f) {\n  if (a !== undefined) {\n    if (b !== undefined) {\n      return f(Caml_option.valFromOption(a), Caml_option.valFromOption(b));\n    } else {\n      return 1;\n    }\n  } else if (b !== undefined) {\n    return -1;\n  } else {\n    return 0;\n  }\n}\n\nfunction cmp(a, b, f) {\n  return cmpU(a, b, Curry.__2(f));\n}\n\nexports.getExn = getExn;\nexports.mapWithDefaultU = mapWithDefaultU;\nexports.mapWithDefault = mapWithDefault;\nexports.mapU = mapU;\nexports.map = map;\nexports.flatMapU = flatMapU;\nexports.flatMap = flatMap;\nexports.getWithDefault = getWithDefault;\nexports.isSome = isSome;\nexports.isNone = isNone;\nexports.eqU = eqU;\nexports.eq = eq;\nexports.cmpU = cmpU;\nexports.cmp = cmp;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/belt_Option.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/block.js":
-/*!**************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/block.js ***!
-  \**************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nfunction __(tag, block) {\n  block.tag = tag;\n  return block;\n}\n\nfunction record(meta, xs) {\n  return Object.defineProperty(xs, Symbol.for(\"BsRecord\"), {\n              value: meta\n            });\n}\n\nfunction variant(meta, tag, xs) {\n  xs.tag = tag;\n  return Object.defineProperty(xs, Symbol.for(\"BsVariant\"), {\n              value: meta\n            });\n}\n\nfunction simpleVariant(meta, xs) {\n  return Object.defineProperty(xs, Symbol.for(\"BsVariant\"), {\n              value: meta\n            });\n}\n\nfunction localModule(meta, xs) {\n  return Object.defineProperty(xs, Symbol.for(\"BsLocalModule\"), {\n              value: meta\n            });\n}\n\nfunction polyVar(meta, xs) {\n  return Object.defineProperty(xs, Symbol.for(\"BsPolyVar\"), {\n              value: meta\n            });\n}\n\nfunction spliceApply (fn,args){\n  var i, argLen; \n  argLen = args.length\n  var applied = []\n  for(i = 0; i < argLen - 1; ++i){\n    applied.push(args[i])\n  }\n  var lastOne = args[argLen - 1]\n  for(i = 0; i < lastOne.length; ++i ){\n    applied.push(lastOne[i])\n  }\n  return fn.apply(null,applied)\n};\n\nfunction spliceObjApply (obj,name,args){\n  var i, argLen; \n  argLen = args.length\n  var applied = []\n  for(i = 0; i < argLen - 1; ++i){\n    applied.push(args[i])\n  }\n  var lastOne = args[argLen - 1]\n  for(i = 0; i < lastOne.length; ++i ){\n    applied.push(lastOne[i])\n  }\n  return (obj[name]).apply(obj,applied)\n};\n\nexports.__ = __;\nexports.record = record;\nexports.variant = variant;\nexports.simpleVariant = simpleVariant;\nexports.localModule = localModule;\nexports.polyVar = polyVar;\nexports.spliceApply = spliceApply;\nexports.spliceObjApply = spliceObjApply;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/block.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_array.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_array.js ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Caml_builtin_exceptions = __webpack_require__(/*! ./caml_builtin_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js\");\n\nfunction caml_array_sub(x, offset, len) {\n  var result = new Array(len);\n  var j = 0;\n  var i = offset;\n  while(j < len) {\n    result[j] = x[i];\n    j = j + 1 | 0;\n    i = i + 1 | 0;\n  };\n  return result;\n}\n\nfunction len(_acc, _l) {\n  while(true) {\n    var l = _l;\n    var acc = _acc;\n    if (l) {\n      _l = l[1];\n      _acc = l[0].length + acc | 0;\n      continue ;\n    } else {\n      return acc;\n    }\n  };\n}\n\nfunction fill(arr, _i, _l) {\n  while(true) {\n    var l = _l;\n    var i = _i;\n    if (l) {\n      var x = l[0];\n      var l$1 = x.length;\n      var k = i;\n      var j = 0;\n      while(j < l$1) {\n        arr[k] = x[j];\n        k = k + 1 | 0;\n        j = j + 1 | 0;\n      };\n      _l = l[1];\n      _i = k;\n      continue ;\n    } else {\n      return /* () */0;\n    }\n  };\n}\n\nfunction caml_array_concat(l) {\n  var v = len(0, l);\n  var result = new Array(v);\n  fill(result, 0, l);\n  return result;\n}\n\nfunction caml_array_set(xs, index, newval) {\n  if (index < 0 || index >= xs.length) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"index out of bounds\"\n        ];\n  } else {\n    xs[index] = newval;\n    return /* () */0;\n  }\n}\n\nfunction caml_array_get(xs, index) {\n  if (index < 0 || index >= xs.length) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"index out of bounds\"\n        ];\n  } else {\n    return xs[index];\n  }\n}\n\nfunction caml_make_vect(len, init) {\n  var b = new Array(len);\n  for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){\n    b[i] = init;\n  }\n  return b;\n}\n\nfunction caml_make_float_vect(len) {\n  var b = new Array(len);\n  for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){\n    b[i] = 0;\n  }\n  return b;\n}\n\nfunction caml_array_blit(a1, i1, a2, i2, len) {\n  if (i2 <= i1) {\n    for(var j = 0 ,j_finish = len - 1 | 0; j <= j_finish; ++j){\n      a2[j + i2 | 0] = a1[j + i1 | 0];\n    }\n    return /* () */0;\n  } else {\n    for(var j$1 = len - 1 | 0; j$1 >= 0; --j$1){\n      a2[j$1 + i2 | 0] = a1[j$1 + i1 | 0];\n    }\n    return /* () */0;\n  }\n}\n\nfunction caml_array_dup(prim) {\n  return prim.slice(0);\n}\n\nexports.caml_array_dup = caml_array_dup;\nexports.caml_array_sub = caml_array_sub;\nexports.caml_array_concat = caml_array_concat;\nexports.caml_make_vect = caml_make_vect;\nexports.caml_make_float_vect = caml_make_float_vect;\nexports.caml_array_blit = caml_array_blit;\nexports.caml_array_get = caml_array_get;\nexports.caml_array_set = caml_array_set;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_array.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js":
-/*!********************************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js ***!
-  \********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nvar out_of_memory = /* tuple */[\n  \"Out_of_memory\",\n  0\n];\n\nvar sys_error = /* tuple */[\n  \"Sys_error\",\n  -1\n];\n\nvar failure = /* tuple */[\n  \"Failure\",\n  -2\n];\n\nvar invalid_argument = /* tuple */[\n  \"Invalid_argument\",\n  -3\n];\n\nvar end_of_file = /* tuple */[\n  \"End_of_file\",\n  -4\n];\n\nvar division_by_zero = /* tuple */[\n  \"Division_by_zero\",\n  -5\n];\n\nvar not_found = /* tuple */[\n  \"Not_found\",\n  -6\n];\n\nvar match_failure = /* tuple */[\n  \"Match_failure\",\n  -7\n];\n\nvar stack_overflow = /* tuple */[\n  \"Stack_overflow\",\n  -8\n];\n\nvar sys_blocked_io = /* tuple */[\n  \"Sys_blocked_io\",\n  -9\n];\n\nvar assert_failure = /* tuple */[\n  \"Assert_failure\",\n  -10\n];\n\nvar undefined_recursive_module = /* tuple */[\n  \"Undefined_recursive_module\",\n  -11\n];\n\nout_of_memory.tag = 248;\n\nsys_error.tag = 248;\n\nfailure.tag = 248;\n\ninvalid_argument.tag = 248;\n\nend_of_file.tag = 248;\n\ndivision_by_zero.tag = 248;\n\nnot_found.tag = 248;\n\nmatch_failure.tag = 248;\n\nstack_overflow.tag = 248;\n\nsys_blocked_io.tag = 248;\n\nassert_failure.tag = 248;\n\nundefined_recursive_module.tag = 248;\n\nexports.out_of_memory = out_of_memory;\nexports.sys_error = sys_error;\nexports.failure = failure;\nexports.invalid_argument = invalid_argument;\nexports.end_of_file = end_of_file;\nexports.division_by_zero = division_by_zero;\nexports.not_found = not_found;\nexports.match_failure = match_failure;\nexports.stack_overflow = stack_overflow;\nexports.sys_blocked_io = sys_blocked_io;\nexports.assert_failure = assert_failure;\nexports.undefined_recursive_module = undefined_recursive_module;\n/*  Not a pure module */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_bytes.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_bytes.js ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Caml_builtin_exceptions = __webpack_require__(/*! ./caml_builtin_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js\");\n\nfunction get(s, i) {\n  if (i < 0 || i >= s.length) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"index out of bounds\"\n        ];\n  } else {\n    return s[i];\n  }\n}\n\nfunction caml_fill_bytes(s, i, l, c) {\n  if (l > 0) {\n    for(var k = i ,k_finish = (l + i | 0) - 1 | 0; k <= k_finish; ++k){\n      s[k] = c;\n    }\n    return /* () */0;\n  } else {\n    return 0;\n  }\n}\n\nfunction caml_create_bytes(len) {\n  if (len < 0) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"String.create\"\n        ];\n  } else {\n    var result = new Array(len);\n    for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){\n      result[i] = /* \"\\000\" */0;\n    }\n    return result;\n  }\n}\n\nfunction caml_blit_bytes(s1, i1, s2, i2, len) {\n  if (len > 0) {\n    if (s1 === s2) {\n      var s1$1 = s1;\n      var i1$1 = i1;\n      var i2$1 = i2;\n      var len$1 = len;\n      if (i1$1 < i2$1) {\n        var range_a = (s1$1.length - i2$1 | 0) - 1 | 0;\n        var range_b = len$1 - 1 | 0;\n        var range = range_a > range_b ? range_b : range_a;\n        for(var j = range; j >= 0; --j){\n          s1$1[i2$1 + j | 0] = s1$1[i1$1 + j | 0];\n        }\n        return /* () */0;\n      } else if (i1$1 > i2$1) {\n        var range_a$1 = (s1$1.length - i1$1 | 0) - 1 | 0;\n        var range_b$1 = len$1 - 1 | 0;\n        var range$1 = range_a$1 > range_b$1 ? range_b$1 : range_a$1;\n        for(var k = 0; k <= range$1; ++k){\n          s1$1[i2$1 + k | 0] = s1$1[i1$1 + k | 0];\n        }\n        return /* () */0;\n      } else {\n        return 0;\n      }\n    } else {\n      var off1 = s1.length - i1 | 0;\n      if (len <= off1) {\n        for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){\n          s2[i2 + i | 0] = s1[i1 + i | 0];\n        }\n        return /* () */0;\n      } else {\n        for(var i$1 = 0 ,i_finish$1 = off1 - 1 | 0; i$1 <= i_finish$1; ++i$1){\n          s2[i2 + i$1 | 0] = s1[i1 + i$1 | 0];\n        }\n        for(var i$2 = off1 ,i_finish$2 = len - 1 | 0; i$2 <= i_finish$2; ++i$2){\n          s2[i2 + i$2 | 0] = /* \"\\000\" */0;\n        }\n        return /* () */0;\n      }\n    }\n  } else {\n    return 0;\n  }\n}\n\nfunction bytes_to_string(a) {\n  var bytes = a;\n  var i = 0;\n  var len = a.length;\n  var s = \"\";\n  var s_len = len;\n  if (i === 0 && len <= 4096 && len === bytes.length) {\n    return String.fromCharCode.apply(null, bytes);\n  } else {\n    var offset = 0;\n    while(s_len > 0) {\n      var next = s_len < 1024 ? s_len : 1024;\n      var tmp_bytes = new Array(next);\n      caml_blit_bytes(bytes, offset, tmp_bytes, 0, next);\n      s = s + String.fromCharCode.apply(null, tmp_bytes);\n      s_len = s_len - next | 0;\n      offset = offset + next | 0;\n    };\n    return s;\n  }\n}\n\nfunction caml_blit_string(s1, i1, s2, i2, len) {\n  if (len > 0) {\n    var off1 = s1.length - i1 | 0;\n    if (len <= off1) {\n      for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){\n        s2[i2 + i | 0] = s1.charCodeAt(i1 + i | 0);\n      }\n      return /* () */0;\n    } else {\n      for(var i$1 = 0 ,i_finish$1 = off1 - 1 | 0; i$1 <= i_finish$1; ++i$1){\n        s2[i2 + i$1 | 0] = s1.charCodeAt(i1 + i$1 | 0);\n      }\n      for(var i$2 = off1 ,i_finish$2 = len - 1 | 0; i$2 <= i_finish$2; ++i$2){\n        s2[i2 + i$2 | 0] = /* \"\\000\" */0;\n      }\n      return /* () */0;\n    }\n  } else {\n    return 0;\n  }\n}\n\nfunction bytes_of_string(s) {\n  var len = s.length;\n  var res = new Array(len);\n  for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){\n    res[i] = s.charCodeAt(i);\n  }\n  return res;\n}\n\nexports.caml_create_bytes = caml_create_bytes;\nexports.caml_fill_bytes = caml_fill_bytes;\nexports.get = get;\nexports.bytes_to_string = bytes_to_string;\nexports.caml_blit_bytes = caml_blit_bytes;\nexports.caml_blit_string = caml_blit_string;\nexports.bytes_of_string = bytes_of_string;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_bytes.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_exceptions.js":
-/*!************************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_exceptions.js ***!
-  \************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nvar id = /* record */[/* contents */0];\n\nfunction caml_set_oo_id(b) {\n  b[1] = id[0];\n  id[0] += 1;\n  return b;\n}\n\nfunction caml_fresh_oo_id(param) {\n  id[0] += 1;\n  return id[0];\n}\n\nfunction create(str) {\n  var v_001 = caml_fresh_oo_id(/* () */0);\n  var v = /* tuple */[\n    str,\n    v_001\n  ];\n  v.tag = 248;\n  return v;\n}\n\nfunction caml_is_extension(e) {\n  if (e === undefined) {\n    return false;\n  } else if (e.tag === 248) {\n    return true;\n  } else {\n    var slot = e[0];\n    if (slot !== undefined) {\n      return slot.tag === 248;\n    } else {\n      return false;\n    }\n  }\n}\n\nexports.caml_set_oo_id = caml_set_oo_id;\nexports.caml_fresh_oo_id = caml_fresh_oo_id;\nexports.create = create;\nexports.caml_is_extension = caml_is_extension;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_exceptions.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_format.js":
-/*!********************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_format.js ***!
-  \********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Caml_int32 = __webpack_require__(/*! ./caml_int32.js */ \"./node_modules/bs-platform/lib/js/caml_int32.js\");\nvar Caml_int64 = __webpack_require__(/*! ./caml_int64.js */ \"./node_modules/bs-platform/lib/js/caml_int64.js\");\nvar Caml_utils = __webpack_require__(/*! ./caml_utils.js */ \"./node_modules/bs-platform/lib/js/caml_utils.js\");\nvar Caml_builtin_exceptions = __webpack_require__(/*! ./caml_builtin_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js\");\n\nfunction parse_digit(c) {\n  if (c >= 65) {\n    if (c >= 97) {\n      if (c >= 123) {\n        return -1;\n      } else {\n        return c - 87 | 0;\n      }\n    } else if (c >= 91) {\n      return -1;\n    } else {\n      return c - 55 | 0;\n    }\n  } else if (c > 57 || c < 48) {\n    return -1;\n  } else {\n    return c - /* \"0\" */48 | 0;\n  }\n}\n\nfunction int_of_string_base(param) {\n  switch (param) {\n    case 0 : \n        return 8;\n    case 1 : \n        return 16;\n    case 2 : \n        return 10;\n    case 3 : \n        return 2;\n    \n  }\n}\n\nfunction parse_sign_and_base(s) {\n  var sign = 1;\n  var base = /* Dec */2;\n  var i = 0;\n  var match = s.charCodeAt(i);\n  switch (match) {\n    case 43 : \n        i = i + 1 | 0;\n        break;\n    case 44 : \n        break;\n    case 45 : \n        sign = -1;\n        i = i + 1 | 0;\n        break;\n    default:\n      \n  }\n  if (s[i] === \"0\") {\n    var match$1 = s.charCodeAt(i + 1 | 0);\n    if (match$1 >= 89) {\n      if (match$1 >= 111) {\n        if (match$1 < 121) {\n          switch (match$1 - 111 | 0) {\n            case 0 : \n                base = /* Oct */0;\n                i = i + 2 | 0;\n                break;\n            case 6 : \n                i = i + 2 | 0;\n                break;\n            case 1 : \n            case 2 : \n            case 3 : \n            case 4 : \n            case 5 : \n            case 7 : \n            case 8 : \n                break;\n            case 9 : \n                base = /* Hex */1;\n                i = i + 2 | 0;\n                break;\n            \n          }\n        }\n        \n      } else if (match$1 === 98) {\n        base = /* Bin */3;\n        i = i + 2 | 0;\n      }\n      \n    } else if (match$1 !== 66) {\n      if (match$1 >= 79) {\n        switch (match$1 - 79 | 0) {\n          case 0 : \n              base = /* Oct */0;\n              i = i + 2 | 0;\n              break;\n          case 6 : \n              i = i + 2 | 0;\n              break;\n          case 1 : \n          case 2 : \n          case 3 : \n          case 4 : \n          case 5 : \n          case 7 : \n          case 8 : \n              break;\n          case 9 : \n              base = /* Hex */1;\n              i = i + 2 | 0;\n              break;\n          \n        }\n      }\n      \n    } else {\n      base = /* Bin */3;\n      i = i + 2 | 0;\n    }\n  }\n  return /* tuple */[\n          i,\n          sign,\n          base\n        ];\n}\n\nfunction caml_int_of_string(s) {\n  var match = parse_sign_and_base(s);\n  var i = match[0];\n  var base = int_of_string_base(match[2]);\n  var threshold = 4294967295;\n  var len = s.length;\n  var c = i < len ? s.charCodeAt(i) : /* \"\\000\" */0;\n  var d = parse_digit(c);\n  if (d < 0 || d >= base) {\n    throw [\n          Caml_builtin_exceptions.failure,\n          \"int_of_string\"\n        ];\n  }\n  var aux = function (_acc, _k) {\n    while(true) {\n      var k = _k;\n      var acc = _acc;\n      if (k === len) {\n        return acc;\n      } else {\n        var a = s.charCodeAt(k);\n        if (a === /* \"_\" */95) {\n          _k = k + 1 | 0;\n          continue ;\n        } else {\n          var v = parse_digit(a);\n          if (v < 0 || v >= base) {\n            throw [\n                  Caml_builtin_exceptions.failure,\n                  \"int_of_string\"\n                ];\n          } else {\n            var acc$1 = base * acc + v;\n            if (acc$1 > threshold) {\n              throw [\n                    Caml_builtin_exceptions.failure,\n                    \"int_of_string\"\n                  ];\n            } else {\n              _k = k + 1 | 0;\n              _acc = acc$1;\n              continue ;\n            }\n          }\n        }\n      }\n    };\n  };\n  var res = match[1] * aux(d, i + 1 | 0);\n  var or_res = res | 0;\n  if (base === 10 && res !== or_res) {\n    throw [\n          Caml_builtin_exceptions.failure,\n          \"int_of_string\"\n        ];\n  }\n  return or_res;\n}\n\nfunction caml_int64_of_string(s) {\n  var match = parse_sign_and_base(s);\n  var hbase = match[2];\n  var i = match[0];\n  var base = Caml_int64.of_int32(int_of_string_base(hbase));\n  var sign = Caml_int64.of_int32(match[1]);\n  var threshold;\n  switch (hbase) {\n    case 0 : \n        threshold = /* int64 */[\n          /* hi */536870911,\n          /* lo */4294967295\n        ];\n        break;\n    case 1 : \n        threshold = /* int64 */[\n          /* hi */268435455,\n          /* lo */4294967295\n        ];\n        break;\n    case 2 : \n        threshold = /* int64 */[\n          /* hi */429496729,\n          /* lo */2576980377\n        ];\n        break;\n    case 3 : \n        threshold = /* int64 */[\n          /* hi */2147483647,\n          /* lo */4294967295\n        ];\n        break;\n    \n  }\n  var len = s.length;\n  var c = i < len ? s.charCodeAt(i) : /* \"\\000\" */0;\n  var d = Caml_int64.of_int32(parse_digit(c));\n  if (Caml_int64.lt(d, /* int64 */[\n          /* hi */0,\n          /* lo */0\n        ]) || Caml_int64.ge(d, base)) {\n    throw [\n          Caml_builtin_exceptions.failure,\n          \"int64_of_string\"\n        ];\n  }\n  var aux = function (_acc, _k) {\n    while(true) {\n      var k = _k;\n      var acc = _acc;\n      if (k === len) {\n        return acc;\n      } else {\n        var a = s.charCodeAt(k);\n        if (a === /* \"_\" */95) {\n          _k = k + 1 | 0;\n          continue ;\n        } else {\n          var v = Caml_int64.of_int32(parse_digit(a));\n          if (Caml_int64.lt(v, /* int64 */[\n                  /* hi */0,\n                  /* lo */0\n                ]) || Caml_int64.ge(v, base) || Caml_int64.gt(acc, threshold)) {\n            throw [\n                  Caml_builtin_exceptions.failure,\n                  \"int64_of_string\"\n                ];\n          } else {\n            var acc$1 = Caml_int64.add(Caml_int64.mul(base, acc), v);\n            _k = k + 1 | 0;\n            _acc = acc$1;\n            continue ;\n          }\n        }\n      }\n    };\n  };\n  var res = Caml_int64.mul(sign, aux(d, i + 1 | 0));\n  var or_res = Caml_int64.or_(res, /* int64 */[\n        /* hi */0,\n        /* lo */0\n      ]);\n  if (Caml_int64.eq(base, /* int64 */[\n          /* hi */0,\n          /* lo */10\n        ]) && Caml_int64.neq(res, or_res)) {\n    throw [\n          Caml_builtin_exceptions.failure,\n          \"int64_of_string\"\n        ];\n  }\n  return or_res;\n}\n\nfunction int_of_base(param) {\n  switch (param) {\n    case 0 : \n        return 8;\n    case 1 : \n        return 16;\n    case 2 : \n        return 10;\n    \n  }\n}\n\nfunction lowercase(c) {\n  if (c >= /* \"A\" */65 && c <= /* \"Z\" */90 || c >= /* \"\\192\" */192 && c <= /* \"\\214\" */214 || c >= /* \"\\216\" */216 && c <= /* \"\\222\" */222) {\n    return c + 32 | 0;\n  } else {\n    return c;\n  }\n}\n\nfunction parse_format(fmt) {\n  var len = fmt.length;\n  if (len > 31) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"format_int: format too long\"\n        ];\n  }\n  var f = /* record */[\n    /* justify */\"+\",\n    /* signstyle */\"-\",\n    /* filter */\" \",\n    /* alternate */false,\n    /* base : Dec */2,\n    /* signedconv */false,\n    /* width */0,\n    /* uppercase */false,\n    /* sign */1,\n    /* prec */-1,\n    /* conv */\"f\"\n  ];\n  var _i = 0;\n  while(true) {\n    var i = _i;\n    if (i >= len) {\n      return f;\n    } else {\n      var c = fmt.charCodeAt(i);\n      var exit = 0;\n      if (c >= 69) {\n        if (c >= 88) {\n          if (c >= 121) {\n            exit = 1;\n          } else {\n            switch (c - 88 | 0) {\n              case 0 : \n                  f[/* base */4] = /* Hex */1;\n                  f[/* uppercase */7] = true;\n                  _i = i + 1 | 0;\n                  continue ;\n              case 13 : \n              case 14 : \n              case 15 : \n                  exit = 5;\n                  break;\n              case 12 : \n              case 17 : \n                  exit = 4;\n                  break;\n              case 23 : \n                  f[/* base */4] = /* Oct */0;\n                  _i = i + 1 | 0;\n                  continue ;\n              case 29 : \n                  f[/* base */4] = /* Dec */2;\n                  _i = i + 1 | 0;\n                  continue ;\n              case 1 : \n              case 2 : \n              case 3 : \n              case 4 : \n              case 5 : \n              case 6 : \n              case 7 : \n              case 8 : \n              case 9 : \n              case 10 : \n              case 11 : \n              case 16 : \n              case 18 : \n              case 19 : \n              case 20 : \n              case 21 : \n              case 22 : \n              case 24 : \n              case 25 : \n              case 26 : \n              case 27 : \n              case 28 : \n              case 30 : \n              case 31 : \n                  exit = 1;\n                  break;\n              case 32 : \n                  f[/* base */4] = /* Hex */1;\n                  _i = i + 1 | 0;\n                  continue ;\n              \n            }\n          }\n        } else if (c >= 72) {\n          exit = 1;\n        } else {\n          f[/* signedconv */5] = true;\n          f[/* uppercase */7] = true;\n          f[/* conv */10] = String.fromCharCode(lowercase(c));\n          _i = i + 1 | 0;\n          continue ;\n        }\n      } else {\n        switch (c) {\n          case 35 : \n              f[/* alternate */3] = true;\n              _i = i + 1 | 0;\n              continue ;\n          case 32 : \n          case 43 : \n              exit = 2;\n              break;\n          case 45 : \n              f[/* justify */0] = \"-\";\n              _i = i + 1 | 0;\n              continue ;\n          case 46 : \n              f[/* prec */9] = 0;\n              var j = i + 1 | 0;\n              while((function(j){\n                  return function () {\n                    var w = fmt.charCodeAt(j) - /* \"0\" */48 | 0;\n                    return w >= 0 && w <= 9;\n                  }\n                  }(j))()) {\n                f[/* prec */9] = (Caml_int32.imul(f[/* prec */9], 10) + fmt.charCodeAt(j) | 0) - /* \"0\" */48 | 0;\n                j = j + 1 | 0;\n              };\n              _i = j;\n              continue ;\n          case 33 : \n          case 34 : \n          case 36 : \n          case 37 : \n          case 38 : \n          case 39 : \n          case 40 : \n          case 41 : \n          case 42 : \n          case 44 : \n          case 47 : \n              exit = 1;\n              break;\n          case 48 : \n              f[/* filter */2] = \"0\";\n              _i = i + 1 | 0;\n              continue ;\n          case 49 : \n          case 50 : \n          case 51 : \n          case 52 : \n          case 53 : \n          case 54 : \n          case 55 : \n          case 56 : \n          case 57 : \n              exit = 3;\n              break;\n          default:\n            exit = 1;\n        }\n      }\n      switch (exit) {\n        case 1 : \n            _i = i + 1 | 0;\n            continue ;\n        case 2 : \n            f[/* signstyle */1] = String.fromCharCode(c);\n            _i = i + 1 | 0;\n            continue ;\n        case 3 : \n            f[/* width */6] = 0;\n            var j$1 = i;\n            while((function(j$1){\n                return function () {\n                  var w = fmt.charCodeAt(j$1) - /* \"0\" */48 | 0;\n                  return w >= 0 && w <= 9;\n                }\n                }(j$1))()) {\n              f[/* width */6] = (Caml_int32.imul(f[/* width */6], 10) + fmt.charCodeAt(j$1) | 0) - /* \"0\" */48 | 0;\n              j$1 = j$1 + 1 | 0;\n            };\n            _i = j$1;\n            continue ;\n        case 4 : \n            f[/* signedconv */5] = true;\n            f[/* base */4] = /* Dec */2;\n            _i = i + 1 | 0;\n            continue ;\n        case 5 : \n            f[/* signedconv */5] = true;\n            f[/* conv */10] = String.fromCharCode(c);\n            _i = i + 1 | 0;\n            continue ;\n        \n      }\n    }\n  };\n}\n\nfunction finish_formatting(config, rawbuffer) {\n  var justify = config[/* justify */0];\n  var signstyle = config[/* signstyle */1];\n  var filter = config[/* filter */2];\n  var alternate = config[/* alternate */3];\n  var base = config[/* base */4];\n  var signedconv = config[/* signedconv */5];\n  var width = config[/* width */6];\n  var uppercase = config[/* uppercase */7];\n  var sign = config[/* sign */8];\n  var len = rawbuffer.length;\n  if (signedconv && (sign < 0 || signstyle !== \"-\")) {\n    len = len + 1 | 0;\n  }\n  if (alternate) {\n    if (base === /* Oct */0) {\n      len = len + 1 | 0;\n    } else if (base === /* Hex */1) {\n      len = len + 2 | 0;\n    }\n    \n  }\n  var buffer = \"\";\n  if (justify === \"+\" && filter === \" \") {\n    for(var i = len ,i_finish = width - 1 | 0; i <= i_finish; ++i){\n      buffer = buffer + filter;\n    }\n  }\n  if (signedconv) {\n    if (sign < 0) {\n      buffer = buffer + \"-\";\n    } else if (signstyle !== \"-\") {\n      buffer = buffer + signstyle;\n    }\n    \n  }\n  if (alternate && base === /* Oct */0) {\n    buffer = buffer + \"0\";\n  }\n  if (alternate && base === /* Hex */1) {\n    buffer = buffer + \"0x\";\n  }\n  if (justify === \"+\" && filter === \"0\") {\n    for(var i$1 = len ,i_finish$1 = width - 1 | 0; i$1 <= i_finish$1; ++i$1){\n      buffer = buffer + filter;\n    }\n  }\n  buffer = uppercase ? buffer + rawbuffer.toUpperCase() : buffer + rawbuffer;\n  if (justify === \"-\") {\n    for(var i$2 = len ,i_finish$2 = width - 1 | 0; i$2 <= i_finish$2; ++i$2){\n      buffer = buffer + \" \";\n    }\n  }\n  return buffer;\n}\n\nfunction caml_format_int(fmt, i) {\n  if (fmt === \"%d\") {\n    return String(i);\n  } else {\n    var f = parse_format(fmt);\n    var f$1 = f;\n    var i$1 = i;\n    var i$2 = i$1 < 0 ? (\n        f$1[/* signedconv */5] ? (f$1[/* sign */8] = -1, -i$1) : (i$1 >>> 0)\n      ) : i$1;\n    var s = i$2.toString(int_of_base(f$1[/* base */4]));\n    if (f$1[/* prec */9] >= 0) {\n      f$1[/* filter */2] = \" \";\n      var n = f$1[/* prec */9] - s.length | 0;\n      if (n > 0) {\n        s = Caml_utils.repeat(n, \"0\") + s;\n      }\n      \n    }\n    return finish_formatting(f$1, s);\n  }\n}\n\nfunction caml_int64_format(fmt, x) {\n  var f = parse_format(fmt);\n  var x$1 = f[/* signedconv */5] && Caml_int64.lt(x, /* int64 */[\n        /* hi */0,\n        /* lo */0\n      ]) ? (f[/* sign */8] = -1, Caml_int64.neg(x)) : x;\n  var s = \"\";\n  var match = f[/* base */4];\n  switch (match) {\n    case 0 : \n        var wbase = /* int64 */[\n          /* hi */0,\n          /* lo */8\n        ];\n        var cvtbl = \"01234567\";\n        if (Caml_int64.lt(x$1, /* int64 */[\n                /* hi */0,\n                /* lo */0\n              ])) {\n          var y = Caml_int64.discard_sign(x$1);\n          var match$1 = Caml_int64.div_mod(y, wbase);\n          var quotient = Caml_int64.add(/* int64 */[\n                /* hi */268435456,\n                /* lo */0\n              ], match$1[0]);\n          var modulus = match$1[1];\n          s = String.fromCharCode(cvtbl.charCodeAt(modulus[1] | 0)) + s;\n          while(Caml_int64.neq(quotient, /* int64 */[\n                  /* hi */0,\n                  /* lo */0\n                ])) {\n            var match$2 = Caml_int64.div_mod(quotient, wbase);\n            quotient = match$2[0];\n            modulus = match$2[1];\n            s = String.fromCharCode(cvtbl.charCodeAt(modulus[1] | 0)) + s;\n          };\n        } else {\n          var match$3 = Caml_int64.div_mod(x$1, wbase);\n          var quotient$1 = match$3[0];\n          var modulus$1 = match$3[1];\n          s = String.fromCharCode(cvtbl.charCodeAt(modulus$1[1] | 0)) + s;\n          while(Caml_int64.neq(quotient$1, /* int64 */[\n                  /* hi */0,\n                  /* lo */0\n                ])) {\n            var match$4 = Caml_int64.div_mod(quotient$1, wbase);\n            quotient$1 = match$4[0];\n            modulus$1 = match$4[1];\n            s = String.fromCharCode(cvtbl.charCodeAt(modulus$1[1] | 0)) + s;\n          };\n        }\n        break;\n    case 1 : \n        s = Caml_int64.to_hex(x$1) + s;\n        break;\n    case 2 : \n        var wbase$1 = /* int64 */[\n          /* hi */0,\n          /* lo */10\n        ];\n        var cvtbl$1 = \"0123456789\";\n        if (Caml_int64.lt(x$1, /* int64 */[\n                /* hi */0,\n                /* lo */0\n              ])) {\n          var y$1 = Caml_int64.discard_sign(x$1);\n          var match$5 = Caml_int64.div_mod(y$1, wbase$1);\n          var match$6 = Caml_int64.div_mod(Caml_int64.add(/* int64 */[\n                    /* hi */0,\n                    /* lo */8\n                  ], match$5[1]), wbase$1);\n          var quotient$2 = Caml_int64.add(Caml_int64.add(/* int64 */[\n                    /* hi */214748364,\n                    /* lo */3435973836\n                  ], match$5[0]), match$6[0]);\n          var modulus$2 = match$6[1];\n          s = String.fromCharCode(cvtbl$1.charCodeAt(modulus$2[1] | 0)) + s;\n          while(Caml_int64.neq(quotient$2, /* int64 */[\n                  /* hi */0,\n                  /* lo */0\n                ])) {\n            var match$7 = Caml_int64.div_mod(quotient$2, wbase$1);\n            quotient$2 = match$7[0];\n            modulus$2 = match$7[1];\n            s = String.fromCharCode(cvtbl$1.charCodeAt(modulus$2[1] | 0)) + s;\n          };\n        } else {\n          var match$8 = Caml_int64.div_mod(x$1, wbase$1);\n          var quotient$3 = match$8[0];\n          var modulus$3 = match$8[1];\n          s = String.fromCharCode(cvtbl$1.charCodeAt(modulus$3[1] | 0)) + s;\n          while(Caml_int64.neq(quotient$3, /* int64 */[\n                  /* hi */0,\n                  /* lo */0\n                ])) {\n            var match$9 = Caml_int64.div_mod(quotient$3, wbase$1);\n            quotient$3 = match$9[0];\n            modulus$3 = match$9[1];\n            s = String.fromCharCode(cvtbl$1.charCodeAt(modulus$3[1] | 0)) + s;\n          };\n        }\n        break;\n    \n  }\n  if (f[/* prec */9] >= 0) {\n    f[/* filter */2] = \" \";\n    var n = f[/* prec */9] - s.length | 0;\n    if (n > 0) {\n      s = Caml_utils.repeat(n, \"0\") + s;\n    }\n    \n  }\n  return finish_formatting(f, s);\n}\n\nfunction caml_format_float(fmt, x) {\n  var f = parse_format(fmt);\n  var prec = f[/* prec */9] < 0 ? 6 : f[/* prec */9];\n  var x$1 = x < 0 ? (f[/* sign */8] = -1, -x) : x;\n  var s = \"\";\n  if (isNaN(x$1)) {\n    s = \"nan\";\n    f[/* filter */2] = \" \";\n  } else if (isFinite(x$1)) {\n    var match = f[/* conv */10];\n    switch (match) {\n      case \"e\" : \n          s = x$1.toExponential(prec);\n          var i = s.length;\n          if (s[i - 3 | 0] === \"e\") {\n            s = s.slice(0, i - 1 | 0) + (\"0\" + s.slice(i - 1 | 0));\n          }\n          break;\n      case \"f\" : \n          s = x$1.toFixed(prec);\n          break;\n      case \"g\" : \n          var prec$1 = prec !== 0 ? prec : 1;\n          s = x$1.toExponential(prec$1 - 1 | 0);\n          var j = s.indexOf(\"e\");\n          var exp = Number(s.slice(j + 1 | 0)) | 0;\n          if (exp < -4 || x$1 >= 1e21 || x$1.toFixed().length > prec$1) {\n            var i$1 = j - 1 | 0;\n            while(s[i$1] === \"0\") {\n              i$1 = i$1 - 1 | 0;\n            };\n            if (s[i$1] === \".\") {\n              i$1 = i$1 - 1 | 0;\n            }\n            s = s.slice(0, i$1 + 1 | 0) + s.slice(j);\n            var i$2 = s.length;\n            if (s[i$2 - 3 | 0] === \"e\") {\n              s = s.slice(0, i$2 - 1 | 0) + (\"0\" + s.slice(i$2 - 1 | 0));\n            }\n            \n          } else {\n            var p = prec$1;\n            if (exp < 0) {\n              p = p - (exp + 1 | 0) | 0;\n              s = x$1.toFixed(p);\n            } else {\n              while((function () {\n                      s = x$1.toFixed(p);\n                      return s.length > (prec$1 + 1 | 0);\n                    })()) {\n                p = p - 1 | 0;\n              };\n            }\n            if (p !== 0) {\n              var k = s.length - 1 | 0;\n              while(s[k] === \"0\") {\n                k = k - 1 | 0;\n              };\n              if (s[k] === \".\") {\n                k = k - 1 | 0;\n              }\n              s = s.slice(0, k + 1 | 0);\n            }\n            \n          }\n          break;\n      default:\n        \n    }\n  } else {\n    s = \"inf\";\n    f[/* filter */2] = \" \";\n  }\n  return finish_formatting(f, s);\n}\n\nfunction float_of_string (s,exn){ \n\n    var res = +s;\n    if ((s.length > 0) && (res === res))\n        return res;\n    s = s.replace(/_/g, \"\");\n    res = +s;\n    if (((s.length > 0) && (res === res)) || /^[+-]?nan$/i.test(s)) {\n        return res;\n    };\n    if (/^\\+?inf(inity)?$/i.test(s))\n        return Infinity;\n    if (/^-inf(inity)?$/i.test(s))\n        return -Infinity;\n    throw exn;\n\n};\n\nfunction caml_float_of_string(s) {\n  return float_of_string(s, [\n              Caml_builtin_exceptions.failure,\n              \"float_of_string\"\n            ]);\n}\n\nvar caml_nativeint_format = caml_format_int;\n\nvar caml_int32_format = caml_format_int;\n\nvar caml_int32_of_string = caml_int_of_string;\n\nvar caml_nativeint_of_string = caml_int_of_string;\n\nexports.caml_format_float = caml_format_float;\nexports.caml_format_int = caml_format_int;\nexports.caml_nativeint_format = caml_nativeint_format;\nexports.caml_int32_format = caml_int32_format;\nexports.caml_float_of_string = caml_float_of_string;\nexports.caml_int64_format = caml_int64_format;\nexports.caml_int_of_string = caml_int_of_string;\nexports.caml_int32_of_string = caml_int32_of_string;\nexports.caml_int64_of_string = caml_int64_of_string;\nexports.caml_nativeint_of_string = caml_nativeint_of_string;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_format.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_int32.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_int32.js ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Caml_builtin_exceptions = __webpack_require__(/*! ./caml_builtin_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js\");\n\nfunction div(x, y) {\n  if (y === 0) {\n    throw Caml_builtin_exceptions.division_by_zero;\n  } else {\n    return x / y | 0;\n  }\n}\n\nfunction mod_(x, y) {\n  if (y === 0) {\n    throw Caml_builtin_exceptions.division_by_zero;\n  } else {\n    return x % y;\n  }\n}\n\nfunction caml_bswap16(x) {\n  return ((x & 255) << 8) | ((x & 65280) >>> 8);\n}\n\nfunction caml_int32_bswap(x) {\n  return ((x & 255) << 24) | ((x & 65280) << 8) | ((x & 16711680) >>> 8) | ((x & 4278190080) >>> 24);\n}\n\nvar imul = ( Math.imul || function (x,y) {\n  y |= 0; return ((((x >> 16) * y) << 16) + (x & 0xffff) * y)|0; \n}\n);\n\nvar caml_nativeint_bswap = caml_int32_bswap;\n\nexports.div = div;\nexports.mod_ = mod_;\nexports.caml_bswap16 = caml_bswap16;\nexports.caml_int32_bswap = caml_int32_bswap;\nexports.caml_nativeint_bswap = caml_nativeint_bswap;\nexports.imul = imul;\n/* imul Not a pure module */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_int32.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_int64.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_int64.js ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Caml_int32 = __webpack_require__(/*! ./caml_int32.js */ \"./node_modules/bs-platform/lib/js/caml_int32.js\");\nvar Caml_utils = __webpack_require__(/*! ./caml_utils.js */ \"./node_modules/bs-platform/lib/js/caml_utils.js\");\nvar Caml_primitive = __webpack_require__(/*! ./caml_primitive.js */ \"./node_modules/bs-platform/lib/js/caml_primitive.js\");\nvar Caml_builtin_exceptions = __webpack_require__(/*! ./caml_builtin_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js\");\n\nvar min_int = /* record */[\n  /* hi */-2147483648,\n  /* lo */0\n];\n\nvar max_int = /* record */[\n  /* hi */2147483647,\n  /* lo */1\n];\n\nvar one = /* record */[\n  /* hi */0,\n  /* lo */1\n];\n\nvar zero = /* record */[\n  /* hi */0,\n  /* lo */0\n];\n\nvar neg_one = /* record */[\n  /* hi */-1,\n  /* lo */4294967295\n];\n\nfunction neg_signed(x) {\n  return (x & 2147483648) !== 0;\n}\n\nfunction add(param, param$1) {\n  var other_low_ = param$1[/* lo */1];\n  var this_low_ = param[/* lo */1];\n  var lo = this_low_ + other_low_ & 4294967295;\n  var overflow = neg_signed(this_low_) && (neg_signed(other_low_) || !neg_signed(lo)) || neg_signed(other_low_) && !neg_signed(lo) ? 1 : 0;\n  var hi = param[/* hi */0] + param$1[/* hi */0] + overflow & 4294967295;\n  return /* record */[\n          /* hi */hi,\n          /* lo */(lo >>> 0)\n        ];\n}\n\nfunction not(param) {\n  var hi = param[/* hi */0] ^ -1;\n  var lo = param[/* lo */1] ^ -1;\n  return /* record */[\n          /* hi */hi,\n          /* lo */(lo >>> 0)\n        ];\n}\n\nfunction eq(x, y) {\n  if (x[/* hi */0] === y[/* hi */0]) {\n    return x[/* lo */1] === y[/* lo */1];\n  } else {\n    return false;\n  }\n}\n\nfunction equal_null(x, y) {\n  if (y !== null) {\n    return eq(x, y);\n  } else {\n    return false;\n  }\n}\n\nfunction equal_undefined(x, y) {\n  if (y !== undefined) {\n    return eq(x, y);\n  } else {\n    return false;\n  }\n}\n\nfunction equal_nullable(x, y) {\n  if (y == null) {\n    return false;\n  } else {\n    return eq(x, y);\n  }\n}\n\nfunction neg(x) {\n  if (eq(x, min_int)) {\n    return min_int;\n  } else {\n    return add(not(x), one);\n  }\n}\n\nfunction sub(x, y) {\n  return add(x, neg(y));\n}\n\nfunction lsl_(x, numBits) {\n  if (numBits === 0) {\n    return x;\n  } else {\n    var lo = x[/* lo */1];\n    if (numBits >= 32) {\n      return /* record */[\n              /* hi */(lo << (numBits - 32 | 0)),\n              /* lo */0\n            ];\n    } else {\n      var hi = (lo >>> (32 - numBits | 0)) | (x[/* hi */0] << numBits);\n      return /* record */[\n              /* hi */hi,\n              /* lo */((lo << numBits) >>> 0)\n            ];\n    }\n  }\n}\n\nfunction lsr_(x, numBits) {\n  if (numBits === 0) {\n    return x;\n  } else {\n    var hi = x[/* hi */0];\n    var offset = numBits - 32 | 0;\n    if (offset === 0) {\n      return /* record */[\n              /* hi */0,\n              /* lo */(hi >>> 0)\n            ];\n    } else if (offset > 0) {\n      var lo = (hi >>> offset);\n      return /* record */[\n              /* hi */0,\n              /* lo */(lo >>> 0)\n            ];\n    } else {\n      var hi$1 = (hi >>> numBits);\n      var lo$1 = (hi << (-offset | 0)) | (x[/* lo */1] >>> numBits);\n      return /* record */[\n              /* hi */hi$1,\n              /* lo */(lo$1 >>> 0)\n            ];\n    }\n  }\n}\n\nfunction asr_(x, numBits) {\n  if (numBits === 0) {\n    return x;\n  } else {\n    var hi = x[/* hi */0];\n    if (numBits < 32) {\n      var hi$1 = (hi >> numBits);\n      var lo = (hi << (32 - numBits | 0)) | (x[/* lo */1] >>> numBits);\n      return /* record */[\n              /* hi */hi$1,\n              /* lo */(lo >>> 0)\n            ];\n    } else {\n      var lo$1 = (hi >> (numBits - 32 | 0));\n      return /* record */[\n              /* hi */hi >= 0 ? 0 : -1,\n              /* lo */(lo$1 >>> 0)\n            ];\n    }\n  }\n}\n\nfunction is_zero(param) {\n  if (param[/* hi */0] !== 0 || param[/* lo */1] !== 0) {\n    return false;\n  } else {\n    return true;\n  }\n}\n\nfunction mul(_this, _other) {\n  while(true) {\n    var other = _other;\n    var $$this = _this;\n    var exit = 0;\n    var lo;\n    var this_hi = $$this[/* hi */0];\n    var exit$1 = 0;\n    var exit$2 = 0;\n    var exit$3 = 0;\n    if (this_hi !== 0 || $$this[/* lo */1] !== 0) {\n      exit$3 = 4;\n    } else {\n      return zero;\n    }\n    if (exit$3 === 4) {\n      if (other[/* hi */0] !== 0 || other[/* lo */1] !== 0) {\n        exit$2 = 3;\n      } else {\n        return zero;\n      }\n    }\n    if (exit$2 === 3) {\n      if (this_hi !== -2147483648 || $$this[/* lo */1] !== 0) {\n        exit$1 = 2;\n      } else {\n        lo = other[/* lo */1];\n        exit = 1;\n      }\n    }\n    if (exit$1 === 2) {\n      var other_hi = other[/* hi */0];\n      var lo$1 = $$this[/* lo */1];\n      var exit$4 = 0;\n      if (other_hi !== -2147483648 || other[/* lo */1] !== 0) {\n        exit$4 = 3;\n      } else {\n        lo = lo$1;\n        exit = 1;\n      }\n      if (exit$4 === 3) {\n        var other_lo = other[/* lo */1];\n        if (this_hi < 0) {\n          if (other_hi < 0) {\n            _other = neg(other);\n            _this = neg($$this);\n            continue ;\n          } else {\n            return neg(mul(neg($$this), other));\n          }\n        } else if (other_hi < 0) {\n          return neg(mul($$this, neg(other)));\n        } else {\n          var a48 = (this_hi >>> 16);\n          var a32 = this_hi & 65535;\n          var a16 = (lo$1 >>> 16);\n          var a00 = lo$1 & 65535;\n          var b48 = (other_hi >>> 16);\n          var b32 = other_hi & 65535;\n          var b16 = (other_lo >>> 16);\n          var b00 = other_lo & 65535;\n          var c48 = 0;\n          var c32 = 0;\n          var c16 = 0;\n          var c00 = a00 * b00;\n          c16 = (c00 >>> 16) + a16 * b00;\n          c32 = (c16 >>> 16);\n          c16 = (c16 & 65535) + a00 * b16;\n          c32 = c32 + (c16 >>> 16) + a32 * b00;\n          c48 = (c32 >>> 16);\n          c32 = (c32 & 65535) + a16 * b16;\n          c48 += (c32 >>> 16);\n          c32 = (c32 & 65535) + a00 * b32;\n          c48 += (c32 >>> 16);\n          c32 = c32 & 65535;\n          c48 = c48 + (a48 * b00 + a32 * b16 + a16 * b32 + a00 * b48) & 65535;\n          var hi = c32 | (c48 << 16);\n          var lo$2 = c00 & 65535 | ((c16 & 65535) << 16);\n          return /* record */[\n                  /* hi */hi,\n                  /* lo */(lo$2 >>> 0)\n                ];\n        }\n      }\n      \n    }\n    if (exit === 1) {\n      if ((lo & 1) === 0) {\n        return zero;\n      } else {\n        return min_int;\n      }\n    }\n    \n  };\n}\n\nfunction swap(param) {\n  var hi = Caml_int32.caml_int32_bswap(param[/* lo */1]);\n  var lo = Caml_int32.caml_int32_bswap(param[/* hi */0]);\n  return /* record */[\n          /* hi */hi,\n          /* lo */(lo >>> 0)\n        ];\n}\n\nfunction xor(param, param$1) {\n  return /* record */[\n          /* hi */param[/* hi */0] ^ param$1[/* hi */0],\n          /* lo */((param[/* lo */1] ^ param$1[/* lo */1]) >>> 0)\n        ];\n}\n\nfunction or_(param, param$1) {\n  return /* record */[\n          /* hi */param[/* hi */0] | param$1[/* hi */0],\n          /* lo */((param[/* lo */1] | param$1[/* lo */1]) >>> 0)\n        ];\n}\n\nfunction and_(param, param$1) {\n  return /* record */[\n          /* hi */param[/* hi */0] & param$1[/* hi */0],\n          /* lo */((param[/* lo */1] & param$1[/* lo */1]) >>> 0)\n        ];\n}\n\nfunction ge(param, param$1) {\n  var other_hi = param$1[/* hi */0];\n  var hi = param[/* hi */0];\n  if (hi > other_hi) {\n    return true;\n  } else if (hi < other_hi) {\n    return false;\n  } else {\n    return param[/* lo */1] >= param$1[/* lo */1];\n  }\n}\n\nfunction neq(x, y) {\n  return !eq(x, y);\n}\n\nfunction lt(x, y) {\n  return !ge(x, y);\n}\n\nfunction gt(x, y) {\n  if (x[/* hi */0] > y[/* hi */0]) {\n    return true;\n  } else if (x[/* hi */0] < y[/* hi */0]) {\n    return false;\n  } else {\n    return x[/* lo */1] > y[/* lo */1];\n  }\n}\n\nfunction le(x, y) {\n  return !gt(x, y);\n}\n\nfunction min(x, y) {\n  if (ge(x, y)) {\n    return y;\n  } else {\n    return x;\n  }\n}\n\nfunction max(x, y) {\n  if (gt(x, y)) {\n    return x;\n  } else {\n    return y;\n  }\n}\n\nfunction to_float(param) {\n  return param[/* hi */0] * (0x100000000) + param[/* lo */1];\n}\n\nfunction of_float(x) {\n  if (isNaN(x) || !isFinite(x)) {\n    return zero;\n  } else if (x <= -9.22337203685477581e+18) {\n    return min_int;\n  } else if (x + 1 >= 9.22337203685477581e+18) {\n    return max_int;\n  } else if (x < 0) {\n    return neg(of_float(-x));\n  } else {\n    var hi = x / 4294967296 | 0;\n    var lo = x % 4294967296 | 0;\n    return /* record */[\n            /* hi */hi,\n            /* lo */(lo >>> 0)\n          ];\n  }\n}\n\nfunction div(_self, _other) {\n  while(true) {\n    var other = _other;\n    var self = _self;\n    var self_hi = self[/* hi */0];\n    var exit = 0;\n    var exit$1 = 0;\n    if (other[/* hi */0] !== 0 || other[/* lo */1] !== 0) {\n      exit$1 = 2;\n    } else {\n      throw Caml_builtin_exceptions.division_by_zero;\n    }\n    if (exit$1 === 2) {\n      if (self_hi !== -2147483648) {\n        if (self_hi !== 0 || self[/* lo */1] !== 0) {\n          exit = 1;\n        } else {\n          return zero;\n        }\n      } else if (self[/* lo */1] !== 0) {\n        exit = 1;\n      } else if (eq(other, one) || eq(other, neg_one)) {\n        return self;\n      } else if (eq(other, min_int)) {\n        return one;\n      } else {\n        var other_hi = other[/* hi */0];\n        var half_this = asr_(self, 1);\n        var approx = lsl_(div(half_this, other), 1);\n        var exit$2 = 0;\n        if (approx[/* hi */0] !== 0 || approx[/* lo */1] !== 0) {\n          exit$2 = 3;\n        } else if (other_hi < 0) {\n          return one;\n        } else {\n          return neg(one);\n        }\n        if (exit$2 === 3) {\n          var y = mul(other, approx);\n          var rem = add(self, neg(y));\n          return add(approx, div(rem, other));\n        }\n        \n      }\n    }\n    if (exit === 1) {\n      var other_hi$1 = other[/* hi */0];\n      var exit$3 = 0;\n      if (other_hi$1 !== -2147483648 || other[/* lo */1] !== 0) {\n        exit$3 = 2;\n      } else {\n        return zero;\n      }\n      if (exit$3 === 2) {\n        if (self_hi < 0) {\n          if (other_hi$1 < 0) {\n            _other = neg(other);\n            _self = neg(self);\n            continue ;\n          } else {\n            return neg(div(neg(self), other));\n          }\n        } else if (other_hi$1 < 0) {\n          return neg(div(self, neg(other)));\n        } else {\n          var res = zero;\n          var rem$1 = self;\n          while(ge(rem$1, other)) {\n            var approx$1 = Caml_primitive.caml_float_max(1, Math.floor(to_float(rem$1) / to_float(other)));\n            var log2 = Math.ceil(Math.log(approx$1) / Math.LN2);\n            var delta = log2 <= 48 ? 1 : Math.pow(2, log2 - 48);\n            var approxRes = of_float(approx$1);\n            var approxRem = mul(approxRes, other);\n            while(approxRem[/* hi */0] < 0 || gt(approxRem, rem$1)) {\n              approx$1 -= delta;\n              approxRes = of_float(approx$1);\n              approxRem = mul(approxRes, other);\n            };\n            if (is_zero(approxRes)) {\n              approxRes = one;\n            }\n            res = add(res, approxRes);\n            rem$1 = add(rem$1, neg(approxRem));\n          };\n          return res;\n        }\n      }\n      \n    }\n    \n  };\n}\n\nfunction mod_(self, other) {\n  var y = mul(div(self, other), other);\n  return add(self, neg(y));\n}\n\nfunction div_mod(self, other) {\n  var quotient = div(self, other);\n  var y = mul(quotient, other);\n  return /* tuple */[\n          quotient,\n          add(self, neg(y))\n        ];\n}\n\nfunction compare(self, other) {\n  var v = Caml_primitive.caml_nativeint_compare(self[/* hi */0], other[/* hi */0]);\n  if (v === 0) {\n    return Caml_primitive.caml_nativeint_compare(self[/* lo */1], other[/* lo */1]);\n  } else {\n    return v;\n  }\n}\n\nfunction of_int32(lo) {\n  return /* record */[\n          /* hi */lo < 0 ? -1 : 0,\n          /* lo */(lo >>> 0)\n        ];\n}\n\nfunction to_int32(x) {\n  return x[/* lo */1] | 0;\n}\n\nfunction to_hex(x) {\n  var x_lo = x[/* lo */1];\n  var x_hi = x[/* hi */0];\n  var aux = function (v) {\n    return (v >>> 0).toString(16);\n  };\n  var exit = 0;\n  if (x_hi !== 0 || x_lo !== 0) {\n    exit = 1;\n  } else {\n    return \"0\";\n  }\n  if (exit === 1) {\n    if (x_lo !== 0) {\n      if (x_hi !== 0) {\n        var lo = aux(x_lo);\n        var pad = 8 - lo.length | 0;\n        if (pad <= 0) {\n          return aux(x_hi) + lo;\n        } else {\n          return aux(x_hi) + (Caml_utils.repeat(pad, \"0\") + lo);\n        }\n      } else {\n        return aux(x_lo);\n      }\n    } else {\n      return aux(x_hi) + \"00000000\";\n    }\n  }\n  \n}\n\nfunction discard_sign(x) {\n  return /* record */[\n          /* hi */2147483647 & x[/* hi */0],\n          /* lo */x[/* lo */1]\n        ];\n}\n\nfunction float_of_bits (x){ \n  return new Float64Array(new Int32Array([x[1],x[0]]).buffer)[0]\n};\n\nfunction bits_of_float(x) {\n  var buf = (new Int32Array(new Float64Array([x]).buffer));\n  return /* record */[\n          /* hi */buf[1],\n          /* lo */(buf[0] >>> 0)\n        ];\n}\n\nfunction get64(s, i) {\n  var hi = (s.charCodeAt(i + 4 | 0) << 32) | (s.charCodeAt(i + 5 | 0) << 40) | (s.charCodeAt(i + 6 | 0) << 48) | (s.charCodeAt(i + 7 | 0) << 56);\n  var lo = s.charCodeAt(i) | (s.charCodeAt(i + 1 | 0) << 8) | (s.charCodeAt(i + 2 | 0) << 16) | (s.charCodeAt(i + 3 | 0) << 24);\n  return /* record */[\n          /* hi */hi,\n          /* lo */(lo >>> 0)\n        ];\n}\n\nexports.min_int = min_int;\nexports.max_int = max_int;\nexports.one = one;\nexports.zero = zero;\nexports.not = not;\nexports.of_int32 = of_int32;\nexports.to_int32 = to_int32;\nexports.add = add;\nexports.neg = neg;\nexports.sub = sub;\nexports.lsl_ = lsl_;\nexports.lsr_ = lsr_;\nexports.asr_ = asr_;\nexports.is_zero = is_zero;\nexports.mul = mul;\nexports.xor = xor;\nexports.or_ = or_;\nexports.and_ = and_;\nexports.swap = swap;\nexports.ge = ge;\nexports.eq = eq;\nexports.neq = neq;\nexports.lt = lt;\nexports.gt = gt;\nexports.le = le;\nexports.equal_null = equal_null;\nexports.equal_undefined = equal_undefined;\nexports.equal_nullable = equal_nullable;\nexports.min = min;\nexports.max = max;\nexports.to_float = to_float;\nexports.of_float = of_float;\nexports.div = div;\nexports.mod_ = mod_;\nexports.compare = compare;\nexports.float_of_bits = float_of_bits;\nexports.bits_of_float = bits_of_float;\nexports.get64 = get64;\nexports.div_mod = div_mod;\nexports.to_hex = to_hex;\nexports.discard_sign = discard_sign;\n/* Caml_int32 Not a pure module */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_int64.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_io.js":
-/*!****************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_io.js ***!
-  \****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("/* WEBPACK VAR INJECTION */(function(process) {\n\nvar Curry = __webpack_require__(/*! ./curry.js */ \"./node_modules/bs-platform/lib/js/curry.js\");\n\nvar stdout = /* record */[\n  /* buffer */\"\",\n  /* output */(function (param, s) {\n      var v = s.length - 1 | 0;\n      if (( (typeof process !== \"undefined\") && process.stdout && process.stdout.write)) {\n        return ( process.stdout.write )(s);\n      } else if (s[v] === \"\\n\") {\n        console.log(s.slice(0, v));\n        return /* () */0;\n      } else {\n        console.log(s);\n        return /* () */0;\n      }\n    })\n];\n\nvar stderr = /* record */[\n  /* buffer */\"\",\n  /* output */(function (param, s) {\n      var v = s.length - 1 | 0;\n      if (s[v] === \"\\n\") {\n        console.log(s.slice(0, v));\n        return /* () */0;\n      } else {\n        console.log(s);\n        return /* () */0;\n      }\n    })\n];\n\nfunction caml_ml_flush(oc) {\n  if (oc[/* buffer */0] !== \"\") {\n    Curry._2(oc[/* output */1], oc, oc[/* buffer */0]);\n    oc[/* buffer */0] = \"\";\n    return /* () */0;\n  } else {\n    return 0;\n  }\n}\n\nfunction caml_ml_output(oc, str, offset, len) {\n  var str$1 = offset === 0 && len === str.length ? str : str.slice(offset, len);\n  if (( (typeof process !== \"undefined\") && process.stdout && process.stdout.write ) && oc === stdout) {\n    return ( process.stdout.write )(str$1);\n  } else {\n    var id = str$1.lastIndexOf(\"\\n\");\n    if (id < 0) {\n      oc[/* buffer */0] = oc[/* buffer */0] + str$1;\n      return /* () */0;\n    } else {\n      oc[/* buffer */0] = oc[/* buffer */0] + str$1.slice(0, id + 1 | 0);\n      caml_ml_flush(oc);\n      oc[/* buffer */0] = oc[/* buffer */0] + str$1.slice(id + 1 | 0);\n      return /* () */0;\n    }\n  }\n}\n\nfunction caml_ml_output_char(oc, $$char) {\n  return caml_ml_output(oc, String.fromCharCode($$char), 0, 1);\n}\n\nfunction caml_ml_out_channels_list(param) {\n  return /* :: */[\n          stdout,\n          /* :: */[\n            stderr,\n            /* [] */0\n          ]\n        ];\n}\n\nvar stdin = undefined;\n\nexports.stdin = stdin;\nexports.stdout = stdout;\nexports.stderr = stderr;\nexports.caml_ml_flush = caml_ml_flush;\nexports.caml_ml_output = caml_ml_output;\nexports.caml_ml_output_char = caml_ml_output_char;\nexports.caml_ml_out_channels_list = caml_ml_out_channels_list;\n/* No side effect */\n\n/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../process/browser.js */ \"./node_modules/process/browser.js\")))\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_io.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_js_exceptions.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_js_exceptions.js ***!
-  \***************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Caml_option = __webpack_require__(/*! ./caml_option.js */ \"./node_modules/bs-platform/lib/js/caml_option.js\");\nvar Caml_exceptions = __webpack_require__(/*! ./caml_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_exceptions.js\");\n\nvar $$Error = Caml_exceptions.create(\"Caml_js_exceptions.Error\");\n\nfunction internalToOCamlException(e) {\n  if (Caml_exceptions.caml_is_extension(e)) {\n    return e;\n  } else {\n    return [\n            $$Error,\n            e\n          ];\n  }\n}\n\nfunction caml_as_js_exn(exn) {\n  if (exn[0] === $$Error) {\n    return Caml_option.some(exn[1]);\n  }\n  \n}\n\nexports.$$Error = $$Error;\nexports.internalToOCamlException = internalToOCamlException;\nexports.caml_as_js_exn = caml_as_js_exn;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_js_exceptions.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_missing_polyfill.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_missing_polyfill.js ***!
-  \******************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nfunction not_implemented (s){\n  throw new Error(s + \" not implemented by BuckleScript yet\\n\")\n};\n\nexports.not_implemented = not_implemented;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_missing_polyfill.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_option.js":
-/*!********************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_option.js ***!
-  \********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nvar undefinedHeader = /* array */[];\n\nfunction some(x) {\n  if (x === undefined) {\n    var block = /* tuple */[\n      undefinedHeader,\n      0\n    ];\n    block.tag = 256;\n    return block;\n  } else if (x !== null && x[0] === undefinedHeader) {\n    var nid = x[1] + 1 | 0;\n    var block$1 = /* tuple */[\n      undefinedHeader,\n      nid\n    ];\n    block$1.tag = 256;\n    return block$1;\n  } else {\n    return x;\n  }\n}\n\nfunction nullable_to_opt(x) {\n  if (x === null || x === undefined) {\n    return undefined;\n  } else {\n    return some(x);\n  }\n}\n\nfunction undefined_to_opt(x) {\n  if (x === undefined) {\n    return undefined;\n  } else {\n    return some(x);\n  }\n}\n\nfunction null_to_opt(x) {\n  if (x === null) {\n    return undefined;\n  } else {\n    return some(x);\n  }\n}\n\nfunction valFromOption(x) {\n  if (x !== null && x[0] === undefinedHeader) {\n    var depth = x[1];\n    if (depth === 0) {\n      return undefined;\n    } else {\n      return /* tuple */[\n              undefinedHeader,\n              depth - 1 | 0\n            ];\n    }\n  } else {\n    return x;\n  }\n}\n\nfunction option_get(x) {\n  if (x === undefined) {\n    return undefined;\n  } else {\n    return valFromOption(x);\n  }\n}\n\nfunction option_get_unwrap(x) {\n  if (x === undefined) {\n    return undefined;\n  } else {\n    return valFromOption(x)[1];\n  }\n}\n\nexports.nullable_to_opt = nullable_to_opt;\nexports.undefined_to_opt = undefined_to_opt;\nexports.null_to_opt = null_to_opt;\nexports.valFromOption = valFromOption;\nexports.some = some;\nexports.option_get = option_get;\nexports.option_get_unwrap = option_get_unwrap;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_option.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_primitive.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_primitive.js ***!
-  \***********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nfunction caml_int_compare(x, y) {\n  if (x < y) {\n    return -1;\n  } else if (x === y) {\n    return 0;\n  } else {\n    return 1;\n  }\n}\n\nfunction caml_bool_compare(x, y) {\n  if (x) {\n    if (y) {\n      return 0;\n    } else {\n      return 1;\n    }\n  } else if (y) {\n    return -1;\n  } else {\n    return 0;\n  }\n}\n\nfunction caml_float_compare(x, y) {\n  if (x === y) {\n    return 0;\n  } else if (x < y) {\n    return -1;\n  } else if (x > y || x === x) {\n    return 1;\n  } else if (y === y) {\n    return -1;\n  } else {\n    return 0;\n  }\n}\n\nfunction caml_string_compare(s1, s2) {\n  if (s1 === s2) {\n    return 0;\n  } else if (s1 < s2) {\n    return -1;\n  } else {\n    return 1;\n  }\n}\n\nfunction caml_bytes_compare_aux(s1, s2, _off, len, def) {\n  while(true) {\n    var off = _off;\n    if (off < len) {\n      var a = s1[off];\n      var b = s2[off];\n      if (a > b) {\n        return 1;\n      } else if (a < b) {\n        return -1;\n      } else {\n        _off = off + 1 | 0;\n        continue ;\n      }\n    } else {\n      return def;\n    }\n  };\n}\n\nfunction caml_bytes_compare(s1, s2) {\n  var len1 = s1.length;\n  var len2 = s2.length;\n  if (len1 === len2) {\n    return caml_bytes_compare_aux(s1, s2, 0, len1, 0);\n  } else if (len1 < len2) {\n    return caml_bytes_compare_aux(s1, s2, 0, len1, -1);\n  } else {\n    return caml_bytes_compare_aux(s1, s2, 0, len2, 1);\n  }\n}\n\nfunction caml_bytes_equal(s1, s2) {\n  var len1 = s1.length;\n  var len2 = s2.length;\n  if (len1 === len2) {\n    var s1$1 = s1;\n    var s2$1 = s2;\n    var _off = 0;\n    var len = len1;\n    while(true) {\n      var off = _off;\n      if (off === len) {\n        return true;\n      } else {\n        var a = s1$1[off];\n        var b = s2$1[off];\n        if (a === b) {\n          _off = off + 1 | 0;\n          continue ;\n        } else {\n          return false;\n        }\n      }\n    };\n  } else {\n    return false;\n  }\n}\n\nfunction caml_bool_min(x, y) {\n  if (x) {\n    return y;\n  } else {\n    return x;\n  }\n}\n\nfunction caml_int_min(x, y) {\n  if (x < y) {\n    return x;\n  } else {\n    return y;\n  }\n}\n\nfunction caml_float_min(x, y) {\n  if (x < y) {\n    return x;\n  } else {\n    return y;\n  }\n}\n\nfunction caml_string_min(x, y) {\n  if (x < y) {\n    return x;\n  } else {\n    return y;\n  }\n}\n\nfunction caml_nativeint_min(x, y) {\n  if (x < y) {\n    return x;\n  } else {\n    return y;\n  }\n}\n\nfunction caml_int32_min(x, y) {\n  if (x < y) {\n    return x;\n  } else {\n    return y;\n  }\n}\n\nfunction caml_bool_max(x, y) {\n  if (x) {\n    return x;\n  } else {\n    return y;\n  }\n}\n\nfunction caml_int_max(x, y) {\n  if (x > y) {\n    return x;\n  } else {\n    return y;\n  }\n}\n\nfunction caml_float_max(x, y) {\n  if (x > y) {\n    return x;\n  } else {\n    return y;\n  }\n}\n\nfunction caml_string_max(x, y) {\n  if (x > y) {\n    return x;\n  } else {\n    return y;\n  }\n}\n\nfunction caml_nativeint_max(x, y) {\n  if (x > y) {\n    return x;\n  } else {\n    return y;\n  }\n}\n\nfunction caml_int32_max(x, y) {\n  if (x > y) {\n    return x;\n  } else {\n    return y;\n  }\n}\n\nvar caml_nativeint_compare = caml_int_compare;\n\nvar caml_int32_compare = caml_int_compare;\n\nexports.caml_bytes_compare = caml_bytes_compare;\nexports.caml_bytes_equal = caml_bytes_equal;\nexports.caml_int_compare = caml_int_compare;\nexports.caml_bool_compare = caml_bool_compare;\nexports.caml_float_compare = caml_float_compare;\nexports.caml_nativeint_compare = caml_nativeint_compare;\nexports.caml_string_compare = caml_string_compare;\nexports.caml_int32_compare = caml_int32_compare;\nexports.caml_bool_min = caml_bool_min;\nexports.caml_int_min = caml_int_min;\nexports.caml_float_min = caml_float_min;\nexports.caml_string_min = caml_string_min;\nexports.caml_nativeint_min = caml_nativeint_min;\nexports.caml_int32_min = caml_int32_min;\nexports.caml_bool_max = caml_bool_max;\nexports.caml_int_max = caml_int_max;\nexports.caml_float_max = caml_float_max;\nexports.caml_string_max = caml_string_max;\nexports.caml_nativeint_max = caml_nativeint_max;\nexports.caml_int32_max = caml_int32_max;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_primitive.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_string.js":
-/*!********************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_string.js ***!
-  \********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Caml_builtin_exceptions = __webpack_require__(/*! ./caml_builtin_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js\");\n\nfunction caml_string_get(s, i) {\n  if (i >= s.length || i < 0) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"index out of bounds\"\n        ];\n  } else {\n    return s.charCodeAt(i);\n  }\n}\n\nfunction caml_string_get16(s, i) {\n  return s.charCodeAt(i) + (s.charCodeAt(i + 1 | 0) << 8) | 0;\n}\n\nfunction caml_string_get32(s, i) {\n  return ((s.charCodeAt(i) + (s.charCodeAt(i + 1 | 0) << 8) | 0) + (s.charCodeAt(i + 2 | 0) << 16) | 0) + (s.charCodeAt(i + 3 | 0) << 24) | 0;\n}\n\nfunction get(s, i) {\n  if (i < 0 || i >= s.length) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"index out of bounds\"\n        ];\n  } else {\n    return s.charCodeAt(i);\n  }\n}\n\nexports.caml_string_get = caml_string_get;\nexports.caml_string_get16 = caml_string_get16;\nexports.caml_string_get32 = caml_string_get32;\nexports.get = get;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_string.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_sys.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_sys.js ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("/* WEBPACK VAR INJECTION */(function(process) {\n\nvar Caml_builtin_exceptions = __webpack_require__(/*! ./caml_builtin_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js\");\n\nfunction caml_sys_getenv(s) {\n  if (typeof process === \"undefined\" || (process.env) === undefined) {\n    throw Caml_builtin_exceptions.not_found;\n  } else {\n    var match = (process.env)[s];\n    if (match !== undefined) {\n      return match;\n    } else {\n      throw Caml_builtin_exceptions.not_found;\n    }\n  }\n}\n\nfunction caml_sys_time(param) {\n  if (typeof process === \"undefined\" || (process.uptime) === undefined) {\n    return -1;\n  } else {\n    return process.uptime();\n  }\n}\n\nfunction caml_sys_random_seed(param) {\n  return /* array */[((Date.now() | 0) ^ 4294967295) * Math.random() | 0];\n}\n\nfunction caml_sys_system_command(_cmd) {\n  return 127;\n}\n\nfunction caml_sys_getcwd(param) {\n  if (typeof process === \"undefined\") {\n    return \"/\";\n  } else {\n    return process.cwd();\n  }\n}\n\nfunction caml_sys_get_argv(param) {\n  if (typeof process === \"undefined\") {\n    return /* tuple */[\n            \"\",\n            /* array */[\"\"]\n          ];\n  } else {\n    var argv = (process.argv);\n    if (argv == null) {\n      return /* tuple */[\n              \"\",\n              /* array */[\"\"]\n            ];\n    } else {\n      return /* tuple */[\n              argv[0],\n              argv\n            ];\n    }\n  }\n}\n\nfunction caml_sys_exit(exit_code) {\n  if (typeof process !== \"undefined\") {\n    return process.exit(exit_code);\n  } else {\n    return 0;\n  }\n}\n\nfunction caml_sys_is_directory(_s) {\n  throw [\n        Caml_builtin_exceptions.failure,\n        \"caml_sys_is_directory not implemented\"\n      ];\n}\n\nfunction caml_sys_file_exists(_s) {\n  throw [\n        Caml_builtin_exceptions.failure,\n        \"caml_sys_file_exists not implemented\"\n      ];\n}\n\nexports.caml_sys_getenv = caml_sys_getenv;\nexports.caml_sys_time = caml_sys_time;\nexports.caml_sys_random_seed = caml_sys_random_seed;\nexports.caml_sys_system_command = caml_sys_system_command;\nexports.caml_sys_getcwd = caml_sys_getcwd;\nexports.caml_sys_get_argv = caml_sys_get_argv;\nexports.caml_sys_exit = caml_sys_exit;\nexports.caml_sys_is_directory = caml_sys_is_directory;\nexports.caml_sys_file_exists = caml_sys_file_exists;\n/* No side effect */\n\n/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../process/browser.js */ \"./node_modules/process/browser.js\")))\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_sys.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/caml_utils.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/caml_utils.js ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nfunction repeat (count,self){\n    if (self.repeat){\n        return self.repeat(count)\n    }\n    if (self.length == 0 || count == 0) {\n            return '';\n        }\n    // Ensuring count is a 31-bit integer allows us to heavily optimize the\n    // main part. But anyway, most current (August 2014) browsers can't handle\n    // strings 1 << 28 chars or longer, so:\n    if (self.length * count >= 1 << 28) {\n            throw new RangeError('repeat count must not overflow maximum string size');\n    }\n    var rpt = '';\n    for (;;) {\n            if ((count & 1) == 1) {\n                rpt += self;\n            }\n            count >>>= 1;\n            if (count == 0) {\n                break;\n            }\n            self += self;\n    }\n    return rpt;\n\n};\n\nexports.repeat = repeat;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/caml_utils.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/camlinternalFormatBasics.js":
-/*!*********************************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/camlinternalFormatBasics.js ***!
-  \*********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Block = __webpack_require__(/*! ./block.js */ \"./node_modules/bs-platform/lib/js/block.js\");\n\nfunction erase_rel(param) {\n  if (typeof param === \"number\") {\n    return /* End_of_fmtty */0;\n  } else {\n    switch (param.tag | 0) {\n      case 0 : \n          return /* Char_ty */Block.__(0, [erase_rel(param[0])]);\n      case 1 : \n          return /* String_ty */Block.__(1, [erase_rel(param[0])]);\n      case 2 : \n          return /* Int_ty */Block.__(2, [erase_rel(param[0])]);\n      case 3 : \n          return /* Int32_ty */Block.__(3, [erase_rel(param[0])]);\n      case 4 : \n          return /* Nativeint_ty */Block.__(4, [erase_rel(param[0])]);\n      case 5 : \n          return /* Int64_ty */Block.__(5, [erase_rel(param[0])]);\n      case 6 : \n          return /* Float_ty */Block.__(6, [erase_rel(param[0])]);\n      case 7 : \n          return /* Bool_ty */Block.__(7, [erase_rel(param[0])]);\n      case 8 : \n          return /* Format_arg_ty */Block.__(8, [\n                    param[0],\n                    erase_rel(param[1])\n                  ]);\n      case 9 : \n          var ty1 = param[0];\n          return /* Format_subst_ty */Block.__(9, [\n                    ty1,\n                    ty1,\n                    erase_rel(param[2])\n                  ]);\n      case 10 : \n          return /* Alpha_ty */Block.__(10, [erase_rel(param[0])]);\n      case 11 : \n          return /* Theta_ty */Block.__(11, [erase_rel(param[0])]);\n      case 12 : \n          return /* Any_ty */Block.__(12, [erase_rel(param[0])]);\n      case 13 : \n          return /* Reader_ty */Block.__(13, [erase_rel(param[0])]);\n      case 14 : \n          return /* Ignored_reader_ty */Block.__(14, [erase_rel(param[0])]);\n      \n    }\n  }\n}\n\nfunction concat_fmtty(fmtty1, fmtty2) {\n  if (typeof fmtty1 === \"number\") {\n    return fmtty2;\n  } else {\n    switch (fmtty1.tag | 0) {\n      case 0 : \n          return /* Char_ty */Block.__(0, [concat_fmtty(fmtty1[0], fmtty2)]);\n      case 1 : \n          return /* String_ty */Block.__(1, [concat_fmtty(fmtty1[0], fmtty2)]);\n      case 2 : \n          return /* Int_ty */Block.__(2, [concat_fmtty(fmtty1[0], fmtty2)]);\n      case 3 : \n          return /* Int32_ty */Block.__(3, [concat_fmtty(fmtty1[0], fmtty2)]);\n      case 4 : \n          return /* Nativeint_ty */Block.__(4, [concat_fmtty(fmtty1[0], fmtty2)]);\n      case 5 : \n          return /* Int64_ty */Block.__(5, [concat_fmtty(fmtty1[0], fmtty2)]);\n      case 6 : \n          return /* Float_ty */Block.__(6, [concat_fmtty(fmtty1[0], fmtty2)]);\n      case 7 : \n          return /* Bool_ty */Block.__(7, [concat_fmtty(fmtty1[0], fmtty2)]);\n      case 8 : \n          return /* Format_arg_ty */Block.__(8, [\n                    fmtty1[0],\n                    concat_fmtty(fmtty1[1], fmtty2)\n                  ]);\n      case 9 : \n          return /* Format_subst_ty */Block.__(9, [\n                    fmtty1[0],\n                    fmtty1[1],\n                    concat_fmtty(fmtty1[2], fmtty2)\n                  ]);\n      case 10 : \n          return /* Alpha_ty */Block.__(10, [concat_fmtty(fmtty1[0], fmtty2)]);\n      case 11 : \n          return /* Theta_ty */Block.__(11, [concat_fmtty(fmtty1[0], fmtty2)]);\n      case 12 : \n          return /* Any_ty */Block.__(12, [concat_fmtty(fmtty1[0], fmtty2)]);\n      case 13 : \n          return /* Reader_ty */Block.__(13, [concat_fmtty(fmtty1[0], fmtty2)]);\n      case 14 : \n          return /* Ignored_reader_ty */Block.__(14, [concat_fmtty(fmtty1[0], fmtty2)]);\n      \n    }\n  }\n}\n\nfunction concat_fmt(fmt1, fmt2) {\n  if (typeof fmt1 === \"number\") {\n    return fmt2;\n  } else {\n    switch (fmt1.tag | 0) {\n      case 0 : \n          return /* Char */Block.__(0, [concat_fmt(fmt1[0], fmt2)]);\n      case 1 : \n          return /* Caml_char */Block.__(1, [concat_fmt(fmt1[0], fmt2)]);\n      case 2 : \n          return /* String */Block.__(2, [\n                    fmt1[0],\n                    concat_fmt(fmt1[1], fmt2)\n                  ]);\n      case 3 : \n          return /* Caml_string */Block.__(3, [\n                    fmt1[0],\n                    concat_fmt(fmt1[1], fmt2)\n                  ]);\n      case 4 : \n          return /* Int */Block.__(4, [\n                    fmt1[0],\n                    fmt1[1],\n                    fmt1[2],\n                    concat_fmt(fmt1[3], fmt2)\n                  ]);\n      case 5 : \n          return /* Int32 */Block.__(5, [\n                    fmt1[0],\n                    fmt1[1],\n                    fmt1[2],\n                    concat_fmt(fmt1[3], fmt2)\n                  ]);\n      case 6 : \n          return /* Nativeint */Block.__(6, [\n                    fmt1[0],\n                    fmt1[1],\n                    fmt1[2],\n                    concat_fmt(fmt1[3], fmt2)\n                  ]);\n      case 7 : \n          return /* Int64 */Block.__(7, [\n                    fmt1[0],\n                    fmt1[1],\n                    fmt1[2],\n                    concat_fmt(fmt1[3], fmt2)\n                  ]);\n      case 8 : \n          return /* Float */Block.__(8, [\n                    fmt1[0],\n                    fmt1[1],\n                    fmt1[2],\n                    concat_fmt(fmt1[3], fmt2)\n                  ]);\n      case 9 : \n          return /* Bool */Block.__(9, [concat_fmt(fmt1[0], fmt2)]);\n      case 10 : \n          return /* Flush */Block.__(10, [concat_fmt(fmt1[0], fmt2)]);\n      case 11 : \n          return /* String_literal */Block.__(11, [\n                    fmt1[0],\n                    concat_fmt(fmt1[1], fmt2)\n                  ]);\n      case 12 : \n          return /* Char_literal */Block.__(12, [\n                    fmt1[0],\n                    concat_fmt(fmt1[1], fmt2)\n                  ]);\n      case 13 : \n          return /* Format_arg */Block.__(13, [\n                    fmt1[0],\n                    fmt1[1],\n                    concat_fmt(fmt1[2], fmt2)\n                  ]);\n      case 14 : \n          return /* Format_subst */Block.__(14, [\n                    fmt1[0],\n                    fmt1[1],\n                    concat_fmt(fmt1[2], fmt2)\n                  ]);\n      case 15 : \n          return /* Alpha */Block.__(15, [concat_fmt(fmt1[0], fmt2)]);\n      case 16 : \n          return /* Theta */Block.__(16, [concat_fmt(fmt1[0], fmt2)]);\n      case 17 : \n          return /* Formatting_lit */Block.__(17, [\n                    fmt1[0],\n                    concat_fmt(fmt1[1], fmt2)\n                  ]);\n      case 18 : \n          return /* Formatting_gen */Block.__(18, [\n                    fmt1[0],\n                    concat_fmt(fmt1[1], fmt2)\n                  ]);\n      case 19 : \n          return /* Reader */Block.__(19, [concat_fmt(fmt1[0], fmt2)]);\n      case 20 : \n          return /* Scan_char_set */Block.__(20, [\n                    fmt1[0],\n                    fmt1[1],\n                    concat_fmt(fmt1[2], fmt2)\n                  ]);\n      case 21 : \n          return /* Scan_get_counter */Block.__(21, [\n                    fmt1[0],\n                    concat_fmt(fmt1[1], fmt2)\n                  ]);\n      case 22 : \n          return /* Scan_next_char */Block.__(22, [concat_fmt(fmt1[0], fmt2)]);\n      case 23 : \n          return /* Ignored_param */Block.__(23, [\n                    fmt1[0],\n                    concat_fmt(fmt1[1], fmt2)\n                  ]);\n      case 24 : \n          return /* Custom */Block.__(24, [\n                    fmt1[0],\n                    fmt1[1],\n                    concat_fmt(fmt1[2], fmt2)\n                  ]);\n      \n    }\n  }\n}\n\nexports.concat_fmtty = concat_fmtty;\nexports.erase_rel = erase_rel;\nexports.concat_fmt = concat_fmt;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/camlinternalFormatBasics.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/curry.js":
-/*!**************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/curry.js ***!
-  \**************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Caml_array = __webpack_require__(/*! ./caml_array.js */ \"./node_modules/bs-platform/lib/js/caml_array.js\");\n\nfunction app(_f, _args) {\n  while(true) {\n    var args = _args;\n    var f = _f;\n    var init_arity = f.length;\n    var arity = init_arity === 0 ? 1 : init_arity;\n    var len = args.length;\n    var d = arity - len | 0;\n    if (d === 0) {\n      return f.apply(null, args);\n    } else if (d < 0) {\n      _args = Caml_array.caml_array_sub(args, arity, -d | 0);\n      _f = f.apply(null, Caml_array.caml_array_sub(args, 0, arity));\n      continue ;\n    } else {\n      return (function(f,args){\n      return function (x) {\n        return app(f, args.concat(/* array */[x]));\n      }\n      }(f,args));\n    }\n  };\n}\n\nfunction curry_1(o, a0, arity) {\n  switch (arity) {\n    case 1 : \n        return o(a0);\n    case 2 : \n        return (function (param) {\n            return o(a0, param);\n          });\n    case 3 : \n        return (function (param, param$1) {\n            return o(a0, param, param$1);\n          });\n    case 4 : \n        return (function (param, param$1, param$2) {\n            return o(a0, param, param$1, param$2);\n          });\n    case 5 : \n        return (function (param, param$1, param$2, param$3) {\n            return o(a0, param, param$1, param$2, param$3);\n          });\n    case 6 : \n        return (function (param, param$1, param$2, param$3, param$4) {\n            return o(a0, param, param$1, param$2, param$3, param$4);\n          });\n    case 7 : \n        return (function (param, param$1, param$2, param$3, param$4, param$5) {\n            return o(a0, param, param$1, param$2, param$3, param$4, param$5);\n          });\n    default:\n      return app(o, /* array */[a0]);\n  }\n}\n\nfunction _1(o, a0) {\n  var arity = o.length;\n  if (arity === 1) {\n    return o(a0);\n  } else {\n    return curry_1(o, a0, arity);\n  }\n}\n\nfunction __1(o) {\n  var arity = o.length;\n  if (arity === 1) {\n    return o;\n  } else {\n    return (function (a0) {\n        return _1(o, a0);\n      });\n  }\n}\n\nfunction curry_2(o, a0, a1, arity) {\n  switch (arity) {\n    case 1 : \n        return app(o(a0), /* array */[a1]);\n    case 2 : \n        return o(a0, a1);\n    case 3 : \n        return (function (param) {\n            return o(a0, a1, param);\n          });\n    case 4 : \n        return (function (param, param$1) {\n            return o(a0, a1, param, param$1);\n          });\n    case 5 : \n        return (function (param, param$1, param$2) {\n            return o(a0, a1, param, param$1, param$2);\n          });\n    case 6 : \n        return (function (param, param$1, param$2, param$3) {\n            return o(a0, a1, param, param$1, param$2, param$3);\n          });\n    case 7 : \n        return (function (param, param$1, param$2, param$3, param$4) {\n            return o(a0, a1, param, param$1, param$2, param$3, param$4);\n          });\n    default:\n      return app(o, /* array */[\n                  a0,\n                  a1\n                ]);\n  }\n}\n\nfunction _2(o, a0, a1) {\n  var arity = o.length;\n  if (arity === 2) {\n    return o(a0, a1);\n  } else {\n    return curry_2(o, a0, a1, arity);\n  }\n}\n\nfunction __2(o) {\n  var arity = o.length;\n  if (arity === 2) {\n    return o;\n  } else {\n    return (function (a0, a1) {\n        return _2(o, a0, a1);\n      });\n  }\n}\n\nfunction curry_3(o, a0, a1, a2, arity) {\n  switch (arity) {\n    case 1 : \n        return app(o(a0), /* array */[\n                    a1,\n                    a2\n                  ]);\n    case 2 : \n        return app(o(a0, a1), /* array */[a2]);\n    case 3 : \n        return o(a0, a1, a2);\n    case 4 : \n        return (function (param) {\n            return o(a0, a1, a2, param);\n          });\n    case 5 : \n        return (function (param, param$1) {\n            return o(a0, a1, a2, param, param$1);\n          });\n    case 6 : \n        return (function (param, param$1, param$2) {\n            return o(a0, a1, a2, param, param$1, param$2);\n          });\n    case 7 : \n        return (function (param, param$1, param$2, param$3) {\n            return o(a0, a1, a2, param, param$1, param$2, param$3);\n          });\n    default:\n      return app(o, /* array */[\n                  a0,\n                  a1,\n                  a2\n                ]);\n  }\n}\n\nfunction _3(o, a0, a1, a2) {\n  var arity = o.length;\n  if (arity === 3) {\n    return o(a0, a1, a2);\n  } else {\n    return curry_3(o, a0, a1, a2, arity);\n  }\n}\n\nfunction __3(o) {\n  var arity = o.length;\n  if (arity === 3) {\n    return o;\n  } else {\n    return (function (a0, a1, a2) {\n        return _3(o, a0, a1, a2);\n      });\n  }\n}\n\nfunction curry_4(o, a0, a1, a2, a3, arity) {\n  switch (arity) {\n    case 1 : \n        return app(o(a0), /* array */[\n                    a1,\n                    a2,\n                    a3\n                  ]);\n    case 2 : \n        return app(o(a0, a1), /* array */[\n                    a2,\n                    a3\n                  ]);\n    case 3 : \n        return app(o(a0, a1, a2), /* array */[a3]);\n    case 4 : \n        return o(a0, a1, a2, a3);\n    case 5 : \n        return (function (param) {\n            return o(a0, a1, a2, a3, param);\n          });\n    case 6 : \n        return (function (param, param$1) {\n            return o(a0, a1, a2, a3, param, param$1);\n          });\n    case 7 : \n        return (function (param, param$1, param$2) {\n            return o(a0, a1, a2, a3, param, param$1, param$2);\n          });\n    default:\n      return app(o, /* array */[\n                  a0,\n                  a1,\n                  a2,\n                  a3\n                ]);\n  }\n}\n\nfunction _4(o, a0, a1, a2, a3) {\n  var arity = o.length;\n  if (arity === 4) {\n    return o(a0, a1, a2, a3);\n  } else {\n    return curry_4(o, a0, a1, a2, a3, arity);\n  }\n}\n\nfunction __4(o) {\n  var arity = o.length;\n  if (arity === 4) {\n    return o;\n  } else {\n    return (function (a0, a1, a2, a3) {\n        return _4(o, a0, a1, a2, a3);\n      });\n  }\n}\n\nfunction curry_5(o, a0, a1, a2, a3, a4, arity) {\n  switch (arity) {\n    case 1 : \n        return app(o(a0), /* array */[\n                    a1,\n                    a2,\n                    a3,\n                    a4\n                  ]);\n    case 2 : \n        return app(o(a0, a1), /* array */[\n                    a2,\n                    a3,\n                    a4\n                  ]);\n    case 3 : \n        return app(o(a0, a1, a2), /* array */[\n                    a3,\n                    a4\n                  ]);\n    case 4 : \n        return app(o(a0, a1, a2, a3), /* array */[a4]);\n    case 5 : \n        return o(a0, a1, a2, a3, a4);\n    case 6 : \n        return (function (param) {\n            return o(a0, a1, a2, a3, a4, param);\n          });\n    case 7 : \n        return (function (param, param$1) {\n            return o(a0, a1, a2, a3, a4, param, param$1);\n          });\n    default:\n      return app(o, /* array */[\n                  a0,\n                  a1,\n                  a2,\n                  a3,\n                  a4\n                ]);\n  }\n}\n\nfunction _5(o, a0, a1, a2, a3, a4) {\n  var arity = o.length;\n  if (arity === 5) {\n    return o(a0, a1, a2, a3, a4);\n  } else {\n    return curry_5(o, a0, a1, a2, a3, a4, arity);\n  }\n}\n\nfunction __5(o) {\n  var arity = o.length;\n  if (arity === 5) {\n    return o;\n  } else {\n    return (function (a0, a1, a2, a3, a4) {\n        return _5(o, a0, a1, a2, a3, a4);\n      });\n  }\n}\n\nfunction curry_6(o, a0, a1, a2, a3, a4, a5, arity) {\n  switch (arity) {\n    case 1 : \n        return app(o(a0), /* array */[\n                    a1,\n                    a2,\n                    a3,\n                    a4,\n                    a5\n                  ]);\n    case 2 : \n        return app(o(a0, a1), /* array */[\n                    a2,\n                    a3,\n                    a4,\n                    a5\n                  ]);\n    case 3 : \n        return app(o(a0, a1, a2), /* array */[\n                    a3,\n                    a4,\n                    a5\n                  ]);\n    case 4 : \n        return app(o(a0, a1, a2, a3), /* array */[\n                    a4,\n                    a5\n                  ]);\n    case 5 : \n        return app(o(a0, a1, a2, a3, a4), /* array */[a5]);\n    case 6 : \n        return o(a0, a1, a2, a3, a4, a5);\n    case 7 : \n        return (function (param) {\n            return o(a0, a1, a2, a3, a4, a5, param);\n          });\n    default:\n      return app(o, /* array */[\n                  a0,\n                  a1,\n                  a2,\n                  a3,\n                  a4,\n                  a5\n                ]);\n  }\n}\n\nfunction _6(o, a0, a1, a2, a3, a4, a5) {\n  var arity = o.length;\n  if (arity === 6) {\n    return o(a0, a1, a2, a3, a4, a5);\n  } else {\n    return curry_6(o, a0, a1, a2, a3, a4, a5, arity);\n  }\n}\n\nfunction __6(o) {\n  var arity = o.length;\n  if (arity === 6) {\n    return o;\n  } else {\n    return (function (a0, a1, a2, a3, a4, a5) {\n        return _6(o, a0, a1, a2, a3, a4, a5);\n      });\n  }\n}\n\nfunction curry_7(o, a0, a1, a2, a3, a4, a5, a6, arity) {\n  switch (arity) {\n    case 1 : \n        return app(o(a0), /* array */[\n                    a1,\n                    a2,\n                    a3,\n                    a4,\n                    a5,\n                    a6\n                  ]);\n    case 2 : \n        return app(o(a0, a1), /* array */[\n                    a2,\n                    a3,\n                    a4,\n                    a5,\n                    a6\n                  ]);\n    case 3 : \n        return app(o(a0, a1, a2), /* array */[\n                    a3,\n                    a4,\n                    a5,\n                    a6\n                  ]);\n    case 4 : \n        return app(o(a0, a1, a2, a3), /* array */[\n                    a4,\n                    a5,\n                    a6\n                  ]);\n    case 5 : \n        return app(o(a0, a1, a2, a3, a4), /* array */[\n                    a5,\n                    a6\n                  ]);\n    case 6 : \n        return app(o(a0, a1, a2, a3, a4, a5), /* array */[a6]);\n    case 7 : \n        return o(a0, a1, a2, a3, a4, a5, a6);\n    default:\n      return app(o, /* array */[\n                  a0,\n                  a1,\n                  a2,\n                  a3,\n                  a4,\n                  a5,\n                  a6\n                ]);\n  }\n}\n\nfunction _7(o, a0, a1, a2, a3, a4, a5, a6) {\n  var arity = o.length;\n  if (arity === 7) {\n    return o(a0, a1, a2, a3, a4, a5, a6);\n  } else {\n    return curry_7(o, a0, a1, a2, a3, a4, a5, a6, arity);\n  }\n}\n\nfunction __7(o) {\n  var arity = o.length;\n  if (arity === 7) {\n    return o;\n  } else {\n    return (function (a0, a1, a2, a3, a4, a5, a6) {\n        return _7(o, a0, a1, a2, a3, a4, a5, a6);\n      });\n  }\n}\n\nfunction curry_8(o, a0, a1, a2, a3, a4, a5, a6, a7, arity) {\n  switch (arity) {\n    case 1 : \n        return app(o(a0), /* array */[\n                    a1,\n                    a2,\n                    a3,\n                    a4,\n                    a5,\n                    a6,\n                    a7\n                  ]);\n    case 2 : \n        return app(o(a0, a1), /* array */[\n                    a2,\n                    a3,\n                    a4,\n                    a5,\n                    a6,\n                    a7\n                  ]);\n    case 3 : \n        return app(o(a0, a1, a2), /* array */[\n                    a3,\n                    a4,\n                    a5,\n                    a6,\n                    a7\n                  ]);\n    case 4 : \n        return app(o(a0, a1, a2, a3), /* array */[\n                    a4,\n                    a5,\n                    a6,\n                    a7\n                  ]);\n    case 5 : \n        return app(o(a0, a1, a2, a3, a4), /* array */[\n                    a5,\n                    a6,\n                    a7\n                  ]);\n    case 6 : \n        return app(o(a0, a1, a2, a3, a4, a5), /* array */[\n                    a6,\n                    a7\n                  ]);\n    case 7 : \n        return app(o(a0, a1, a2, a3, a4, a5, a6), /* array */[a7]);\n    default:\n      return app(o, /* array */[\n                  a0,\n                  a1,\n                  a2,\n                  a3,\n                  a4,\n                  a5,\n                  a6,\n                  a7\n                ]);\n  }\n}\n\nfunction _8(o, a0, a1, a2, a3, a4, a5, a6, a7) {\n  var arity = o.length;\n  if (arity === 8) {\n    return o(a0, a1, a2, a3, a4, a5, a6, a7);\n  } else {\n    return curry_8(o, a0, a1, a2, a3, a4, a5, a6, a7, arity);\n  }\n}\n\nfunction __8(o) {\n  var arity = o.length;\n  if (arity === 8) {\n    return o;\n  } else {\n    return (function (a0, a1, a2, a3, a4, a5, a6, a7) {\n        return _8(o, a0, a1, a2, a3, a4, a5, a6, a7);\n      });\n  }\n}\n\nexports.app = app;\nexports.curry_1 = curry_1;\nexports._1 = _1;\nexports.__1 = __1;\nexports.curry_2 = curry_2;\nexports._2 = _2;\nexports.__2 = __2;\nexports.curry_3 = curry_3;\nexports._3 = _3;\nexports.__3 = __3;\nexports.curry_4 = curry_4;\nexports._4 = _4;\nexports.__4 = __4;\nexports.curry_5 = curry_5;\nexports._5 = _5;\nexports.__5 = __5;\nexports.curry_6 = curry_6;\nexports._6 = _6;\nexports.__6 = __6;\nexports.curry_7 = curry_7;\nexports._7 = _7;\nexports.__7 = __7;\nexports.curry_8 = curry_8;\nexports._8 = _8;\nexports.__8 = __8;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/curry.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/js_dict.js":
-/*!****************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/js_dict.js ***!
-  \****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Caml_option = __webpack_require__(/*! ./caml_option.js */ \"./node_modules/bs-platform/lib/js/caml_option.js\");\n\nfunction get(dict, k) {\n  if ((k in dict)) {\n    return Caml_option.some(dict[k]);\n  }\n  \n}\n\nfunction unsafeDeleteKey (dict,key){\n     delete dict[key];\n     return 0\n  };\n\nfunction entries(dict) {\n  var keys = Object.keys(dict);\n  var l = keys.length;\n  var values = new Array(l);\n  for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n    var key = keys[i];\n    values[i] = /* tuple */[\n      key,\n      dict[key]\n    ];\n  }\n  return values;\n}\n\nfunction values(dict) {\n  var keys = Object.keys(dict);\n  var l = keys.length;\n  var values$1 = new Array(l);\n  for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n    values$1[i] = dict[keys[i]];\n  }\n  return values$1;\n}\n\nfunction fromList(entries) {\n  var dict = { };\n  var _param = entries;\n  while(true) {\n    var param = _param;\n    if (param) {\n      var match = param[0];\n      dict[match[0]] = match[1];\n      _param = param[1];\n      continue ;\n    } else {\n      return dict;\n    }\n  };\n}\n\nfunction fromArray(entries) {\n  var dict = { };\n  var l = entries.length;\n  for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n    var match = entries[i];\n    dict[match[0]] = match[1];\n  }\n  return dict;\n}\n\nfunction map(f, source) {\n  var target = { };\n  var keys = Object.keys(source);\n  var l = keys.length;\n  for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){\n    var key = keys[i];\n    target[key] = f(source[key]);\n  }\n  return target;\n}\n\nexports.get = get;\nexports.unsafeDeleteKey = unsafeDeleteKey;\nexports.entries = entries;\nexports.values = values;\nexports.fromList = fromList;\nexports.fromArray = fromArray;\nexports.map = map;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/js_dict.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/js_int.js":
-/*!***************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/js_int.js ***!
-  \***************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nfunction equal(x, y) {\n  return x === y;\n}\n\nvar max = 2147483647;\n\nvar min = -2147483648;\n\nexports.equal = equal;\nexports.max = max;\nexports.min = min;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/js_int.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/js_math.js":
-/*!****************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/js_math.js ***!
-  \****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Js_int = __webpack_require__(/*! ./js_int.js */ \"./node_modules/bs-platform/lib/js/js_int.js\");\n\nfunction unsafe_ceil(prim) {\n  return Math.ceil(prim);\n}\n\nfunction ceil_int(f) {\n  if (f > Js_int.max) {\n    return Js_int.max;\n  } else if (f < Js_int.min) {\n    return Js_int.min;\n  } else {\n    return Math.ceil(f);\n  }\n}\n\nfunction unsafe_floor(prim) {\n  return Math.floor(prim);\n}\n\nfunction floor_int(f) {\n  if (f > Js_int.max) {\n    return Js_int.max;\n  } else if (f < Js_int.min) {\n    return Js_int.min;\n  } else {\n    return Math.floor(f);\n  }\n}\n\nfunction random_int(min, max) {\n  return floor_int(Math.random() * (max - min | 0)) + min | 0;\n}\n\nvar ceil = ceil_int;\n\nvar floor = floor_int;\n\nexports.unsafe_ceil = unsafe_ceil;\nexports.ceil_int = ceil_int;\nexports.ceil = ceil;\nexports.unsafe_floor = unsafe_floor;\nexports.floor_int = floor_int;\nexports.floor = floor;\nexports.random_int = random_int;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/js_math.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-platform/lib/js/pervasives.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/bs-platform/lib/js/pervasives.js ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Curry = __webpack_require__(/*! ./curry.js */ \"./node_modules/bs-platform/lib/js/curry.js\");\nvar Caml_io = __webpack_require__(/*! ./caml_io.js */ \"./node_modules/bs-platform/lib/js/caml_io.js\");\nvar Caml_sys = __webpack_require__(/*! ./caml_sys.js */ \"./node_modules/bs-platform/lib/js/caml_sys.js\");\nvar Caml_bytes = __webpack_require__(/*! ./caml_bytes.js */ \"./node_modules/bs-platform/lib/js/caml_bytes.js\");\nvar Caml_format = __webpack_require__(/*! ./caml_format.js */ \"./node_modules/bs-platform/lib/js/caml_format.js\");\nvar Caml_string = __webpack_require__(/*! ./caml_string.js */ \"./node_modules/bs-platform/lib/js/caml_string.js\");\nvar Caml_exceptions = __webpack_require__(/*! ./caml_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_exceptions.js\");\nvar Caml_missing_polyfill = __webpack_require__(/*! ./caml_missing_polyfill.js */ \"./node_modules/bs-platform/lib/js/caml_missing_polyfill.js\");\nvar Caml_builtin_exceptions = __webpack_require__(/*! ./caml_builtin_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js\");\nvar CamlinternalFormatBasics = __webpack_require__(/*! ./camlinternalFormatBasics.js */ \"./node_modules/bs-platform/lib/js/camlinternalFormatBasics.js\");\n\nfunction failwith(s) {\n  throw [\n        Caml_builtin_exceptions.failure,\n        s\n      ];\n}\n\nfunction invalid_arg(s) {\n  throw [\n        Caml_builtin_exceptions.invalid_argument,\n        s\n      ];\n}\n\nvar Exit = Caml_exceptions.create(\"Pervasives.Exit\");\n\nfunction abs(x) {\n  if (x >= 0) {\n    return x;\n  } else {\n    return -x | 0;\n  }\n}\n\nfunction lnot(x) {\n  return x ^ -1;\n}\n\nvar min_int = -2147483648;\n\nfunction classify_float(x) {\n  if (isFinite(x)) {\n    if (Math.abs(x) >= 2.2250738585072014e-308) {\n      return /* FP_normal */0;\n    } else if (x !== 0) {\n      return /* FP_subnormal */1;\n    } else {\n      return /* FP_zero */2;\n    }\n  } else if (isNaN(x)) {\n    return /* FP_nan */4;\n  } else {\n    return /* FP_infinite */3;\n  }\n}\n\nfunction char_of_int(n) {\n  if (n < 0 || n > 255) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"char_of_int\"\n        ];\n  } else {\n    return n;\n  }\n}\n\nfunction string_of_bool(b) {\n  if (b) {\n    return \"true\";\n  } else {\n    return \"false\";\n  }\n}\n\nfunction bool_of_string(param) {\n  switch (param) {\n    case \"false\" : \n        return false;\n    case \"true\" : \n        return true;\n    default:\n      throw [\n            Caml_builtin_exceptions.invalid_argument,\n            \"bool_of_string\"\n          ];\n  }\n}\n\nfunction valid_float_lexem(s) {\n  var l = s.length;\n  var _i = 0;\n  while(true) {\n    var i = _i;\n    if (i >= l) {\n      return s + \".\";\n    } else {\n      var match = Caml_string.get(s, i);\n      if (match >= 48) {\n        if (match >= 58) {\n          return s;\n        } else {\n          _i = i + 1 | 0;\n          continue ;\n        }\n      } else if (match !== 45) {\n        return s;\n      } else {\n        _i = i + 1 | 0;\n        continue ;\n      }\n    }\n  };\n}\n\nfunction string_of_float(f) {\n  return valid_float_lexem(Caml_format.caml_format_float(\"%.12g\", f));\n}\n\nfunction $at(l1, l2) {\n  if (l1) {\n    return /* :: */[\n            l1[0],\n            $at(l1[1], l2)\n          ];\n  } else {\n    return l2;\n  }\n}\n\nvar stdin = Caml_io.stdin;\n\nvar stdout = Caml_io.stdout;\n\nvar stderr = Caml_io.stderr;\n\nfunction open_out_gen(mode, perm, name) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_open_descriptor_out\");\n}\n\nfunction open_out(name) {\n  return open_out_gen(/* :: */[\n              /* Open_wronly */1,\n              /* :: */[\n                /* Open_creat */3,\n                /* :: */[\n                  /* Open_trunc */4,\n                  /* :: */[\n                    /* Open_text */7,\n                    /* [] */0\n                  ]\n                ]\n              ]\n            ], 438, name);\n}\n\nfunction open_out_bin(name) {\n  return open_out_gen(/* :: */[\n              /* Open_wronly */1,\n              /* :: */[\n                /* Open_creat */3,\n                /* :: */[\n                  /* Open_trunc */4,\n                  /* :: */[\n                    /* Open_binary */6,\n                    /* [] */0\n                  ]\n                ]\n              ]\n            ], 438, name);\n}\n\nfunction flush_all(param) {\n  var _param = Caml_io.caml_ml_out_channels_list(/* () */0);\n  while(true) {\n    var param$1 = _param;\n    if (param$1) {\n      try {\n        Caml_io.caml_ml_flush(param$1[0]);\n      }\n      catch (exn){\n        \n      }\n      _param = param$1[1];\n      continue ;\n    } else {\n      return /* () */0;\n    }\n  };\n}\n\nfunction output_bytes(oc, s) {\n  return Caml_io.caml_ml_output(oc, s, 0, s.length);\n}\n\nfunction output_string(oc, s) {\n  return Caml_io.caml_ml_output(oc, s, 0, s.length);\n}\n\nfunction output(oc, s, ofs, len) {\n  if (ofs < 0 || len < 0 || ofs > (s.length - len | 0)) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"output\"\n        ];\n  } else {\n    return Caml_io.caml_ml_output(oc, s, ofs, len);\n  }\n}\n\nfunction output_substring(oc, s, ofs, len) {\n  if (ofs < 0 || len < 0 || ofs > (s.length - len | 0)) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"output_substring\"\n        ];\n  } else {\n    return Caml_io.caml_ml_output(oc, s, ofs, len);\n  }\n}\n\nfunction output_value(chan, v) {\n  return Caml_missing_polyfill.not_implemented(\"caml_output_value\");\n}\n\nfunction close_out(oc) {\n  Caml_io.caml_ml_flush(oc);\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_close_channel\");\n}\n\nfunction close_out_noerr(oc) {\n  try {\n    Caml_io.caml_ml_flush(oc);\n  }\n  catch (exn){\n    \n  }\n  try {\n    return Caml_missing_polyfill.not_implemented(\"caml_ml_close_channel\");\n  }\n  catch (exn$1){\n    return /* () */0;\n  }\n}\n\nfunction open_in_gen(mode, perm, name) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_open_descriptor_in\");\n}\n\nfunction open_in(name) {\n  return open_in_gen(/* :: */[\n              /* Open_rdonly */0,\n              /* :: */[\n                /* Open_text */7,\n                /* [] */0\n              ]\n            ], 0, name);\n}\n\nfunction open_in_bin(name) {\n  return open_in_gen(/* :: */[\n              /* Open_rdonly */0,\n              /* :: */[\n                /* Open_binary */6,\n                /* [] */0\n              ]\n            ], 0, name);\n}\n\nfunction input(ic, s, ofs, len) {\n  if (ofs < 0 || len < 0 || ofs > (s.length - len | 0)) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"input\"\n        ];\n  } else {\n    return Caml_missing_polyfill.not_implemented(\"caml_ml_input\");\n  }\n}\n\nfunction unsafe_really_input(ic, s, _ofs, _len) {\n  while(true) {\n    var len = _len;\n    var ofs = _ofs;\n    if (len <= 0) {\n      return /* () */0;\n    } else {\n      var r = Caml_missing_polyfill.not_implemented(\"caml_ml_input\");\n      if (r === 0) {\n        throw Caml_builtin_exceptions.end_of_file;\n      } else {\n        _len = len - r | 0;\n        _ofs = ofs + r | 0;\n        continue ;\n      }\n    }\n  };\n}\n\nfunction really_input(ic, s, ofs, len) {\n  if (ofs < 0 || len < 0 || ofs > (s.length - len | 0)) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"really_input\"\n        ];\n  } else {\n    return unsafe_really_input(ic, s, ofs, len);\n  }\n}\n\nfunction really_input_string(ic, len) {\n  var s = Caml_bytes.caml_create_bytes(len);\n  really_input(ic, s, 0, len);\n  return Caml_bytes.bytes_to_string(s);\n}\n\nfunction input_line(chan) {\n  var build_result = function (buf, _pos, _param) {\n    while(true) {\n      var param = _param;\n      var pos = _pos;\n      if (param) {\n        var hd = param[0];\n        var len = hd.length;\n        Caml_bytes.caml_blit_bytes(hd, 0, buf, pos - len | 0, len);\n        _param = param[1];\n        _pos = pos - len | 0;\n        continue ;\n      } else {\n        return buf;\n      }\n    };\n  };\n  var scan = function (_accu, _len) {\n    while(true) {\n      var len = _len;\n      var accu = _accu;\n      var n = Caml_missing_polyfill.not_implemented(\"caml_ml_input_scan_line\");\n      if (n === 0) {\n        if (accu) {\n          return build_result(Caml_bytes.caml_create_bytes(len), len, accu);\n        } else {\n          throw Caml_builtin_exceptions.end_of_file;\n        }\n      } else if (n > 0) {\n        var res = Caml_bytes.caml_create_bytes(n - 1 | 0);\n        Caml_missing_polyfill.not_implemented(\"caml_ml_input\");\n        Caml_missing_polyfill.not_implemented(\"caml_ml_input_char\");\n        if (accu) {\n          var len$1 = (len + n | 0) - 1 | 0;\n          return build_result(Caml_bytes.caml_create_bytes(len$1), len$1, /* :: */[\n                      res,\n                      accu\n                    ]);\n        } else {\n          return res;\n        }\n      } else {\n        var beg = Caml_bytes.caml_create_bytes(-n | 0);\n        Caml_missing_polyfill.not_implemented(\"caml_ml_input\");\n        _len = len - n | 0;\n        _accu = /* :: */[\n          beg,\n          accu\n        ];\n        continue ;\n      }\n    };\n  };\n  return Caml_bytes.bytes_to_string(scan(/* [] */0, 0));\n}\n\nfunction close_in_noerr(ic) {\n  try {\n    return Caml_missing_polyfill.not_implemented(\"caml_ml_close_channel\");\n  }\n  catch (exn){\n    return /* () */0;\n  }\n}\n\nfunction print_char(c) {\n  return Caml_io.caml_ml_output_char(stdout, c);\n}\n\nfunction print_string(s) {\n  return output_string(stdout, s);\n}\n\nfunction print_bytes(s) {\n  return output_bytes(stdout, s);\n}\n\nfunction print_int(i) {\n  return output_string(stdout, String(i));\n}\n\nfunction print_float(f) {\n  return output_string(stdout, valid_float_lexem(Caml_format.caml_format_float(\"%.12g\", f)));\n}\n\nfunction print_newline(param) {\n  Caml_io.caml_ml_output_char(stdout, /* \"\\n\" */10);\n  return Caml_io.caml_ml_flush(stdout);\n}\n\nfunction prerr_char(c) {\n  return Caml_io.caml_ml_output_char(stderr, c);\n}\n\nfunction prerr_string(s) {\n  return output_string(stderr, s);\n}\n\nfunction prerr_bytes(s) {\n  return output_bytes(stderr, s);\n}\n\nfunction prerr_int(i) {\n  return output_string(stderr, String(i));\n}\n\nfunction prerr_float(f) {\n  return output_string(stderr, valid_float_lexem(Caml_format.caml_format_float(\"%.12g\", f)));\n}\n\nfunction prerr_newline(param) {\n  Caml_io.caml_ml_output_char(stderr, /* \"\\n\" */10);\n  return Caml_io.caml_ml_flush(stderr);\n}\n\nfunction read_line(param) {\n  Caml_io.caml_ml_flush(stdout);\n  return input_line(stdin);\n}\n\nfunction read_int(param) {\n  return Caml_format.caml_int_of_string((Caml_io.caml_ml_flush(stdout), input_line(stdin)));\n}\n\nfunction read_float(param) {\n  return Caml_format.caml_float_of_string((Caml_io.caml_ml_flush(stdout), input_line(stdin)));\n}\n\nfunction string_of_format(param) {\n  return param[1];\n}\n\nfunction $caret$caret(param, param$1) {\n  return /* Format */[\n          CamlinternalFormatBasics.concat_fmt(param[0], param$1[0]),\n          param[1] + (\"%,\" + param$1[1])\n        ];\n}\n\nvar exit_function = /* record */[/* contents */flush_all];\n\nfunction at_exit(f) {\n  var g = exit_function[0];\n  exit_function[0] = (function (param) {\n      Curry._1(f, /* () */0);\n      return Curry._1(g, /* () */0);\n    });\n  return /* () */0;\n}\n\nfunction do_at_exit(param) {\n  return Curry._1(exit_function[0], /* () */0);\n}\n\nfunction exit(retcode) {\n  do_at_exit(/* () */0);\n  return Caml_sys.caml_sys_exit(retcode);\n}\n\nvar max_int = 2147483647;\n\nvar epsilon_float = 2.220446049250313e-16;\n\nvar flush = Caml_io.caml_ml_flush;\n\nvar output_char = Caml_io.caml_ml_output_char;\n\nvar output_byte = Caml_io.caml_ml_output_char;\n\nfunction output_binary_int(prim, prim$1) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_output_int\");\n}\n\nfunction seek_out(prim, prim$1) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_seek_out\");\n}\n\nfunction pos_out(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_pos_out\");\n}\n\nfunction out_channel_length(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_channel_size\");\n}\n\nfunction set_binary_mode_out(prim, prim$1) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_set_binary_mode\");\n}\n\nfunction input_char(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_input_char\");\n}\n\nfunction input_byte(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_input_char\");\n}\n\nfunction input_binary_int(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_input_int\");\n}\n\nfunction input_value(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_input_value\");\n}\n\nfunction seek_in(prim, prim$1) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_seek_in\");\n}\n\nfunction pos_in(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_pos_in\");\n}\n\nfunction in_channel_length(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_channel_size\");\n}\n\nfunction close_in(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_close_channel\");\n}\n\nfunction set_binary_mode_in(prim, prim$1) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_set_binary_mode\");\n}\n\nfunction LargeFile_000(prim, prim$1) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_seek_out_64\");\n}\n\nfunction LargeFile_001(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_pos_out_64\");\n}\n\nfunction LargeFile_002(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_channel_size_64\");\n}\n\nfunction LargeFile_003(prim, prim$1) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_seek_in_64\");\n}\n\nfunction LargeFile_004(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_pos_in_64\");\n}\n\nfunction LargeFile_005(prim) {\n  return Caml_missing_polyfill.not_implemented(\"caml_ml_channel_size_64\");\n}\n\nvar LargeFile = [\n  LargeFile_000,\n  LargeFile_001,\n  LargeFile_002,\n  LargeFile_003,\n  LargeFile_004,\n  LargeFile_005\n];\n\nexports.invalid_arg = invalid_arg;\nexports.failwith = failwith;\nexports.Exit = Exit;\nexports.abs = abs;\nexports.max_int = max_int;\nexports.min_int = min_int;\nexports.lnot = lnot;\nexports.epsilon_float = epsilon_float;\nexports.classify_float = classify_float;\nexports.char_of_int = char_of_int;\nexports.string_of_bool = string_of_bool;\nexports.bool_of_string = bool_of_string;\nexports.string_of_float = string_of_float;\nexports.$at = $at;\nexports.stdin = stdin;\nexports.stdout = stdout;\nexports.stderr = stderr;\nexports.print_char = print_char;\nexports.print_string = print_string;\nexports.print_bytes = print_bytes;\nexports.print_int = print_int;\nexports.print_float = print_float;\nexports.print_newline = print_newline;\nexports.prerr_char = prerr_char;\nexports.prerr_string = prerr_string;\nexports.prerr_bytes = prerr_bytes;\nexports.prerr_int = prerr_int;\nexports.prerr_float = prerr_float;\nexports.prerr_newline = prerr_newline;\nexports.read_line = read_line;\nexports.read_int = read_int;\nexports.read_float = read_float;\nexports.open_out = open_out;\nexports.open_out_bin = open_out_bin;\nexports.open_out_gen = open_out_gen;\nexports.flush = flush;\nexports.flush_all = flush_all;\nexports.output_char = output_char;\nexports.output_string = output_string;\nexports.output_bytes = output_bytes;\nexports.output = output;\nexports.output_substring = output_substring;\nexports.output_byte = output_byte;\nexports.output_binary_int = output_binary_int;\nexports.output_value = output_value;\nexports.seek_out = seek_out;\nexports.pos_out = pos_out;\nexports.out_channel_length = out_channel_length;\nexports.close_out = close_out;\nexports.close_out_noerr = close_out_noerr;\nexports.set_binary_mode_out = set_binary_mode_out;\nexports.open_in = open_in;\nexports.open_in_bin = open_in_bin;\nexports.open_in_gen = open_in_gen;\nexports.input_char = input_char;\nexports.input_line = input_line;\nexports.input = input;\nexports.really_input = really_input;\nexports.really_input_string = really_input_string;\nexports.input_byte = input_byte;\nexports.input_binary_int = input_binary_int;\nexports.input_value = input_value;\nexports.seek_in = seek_in;\nexports.pos_in = pos_in;\nexports.in_channel_length = in_channel_length;\nexports.close_in = close_in;\nexports.close_in_noerr = close_in_noerr;\nexports.set_binary_mode_in = set_binary_mode_in;\nexports.LargeFile = LargeFile;\nexports.string_of_format = string_of_format;\nexports.$caret$caret = $caret$caret;\nexports.exit = exit;\nexports.at_exit = at_exit;\nexports.valid_float_lexem = valid_float_lexem;\nexports.unsafe_really_input = unsafe_really_input;\nexports.do_at_exit = do_at_exit;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-platform/lib/js/pervasives.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-webapi/src/dom/DomTypesRe.js":
-/*!******************************************************!*\
-  !*** ./node_modules/bs-webapi/src/dom/DomTypesRe.js ***!
-  \******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Caml_builtin_exceptions = __webpack_require__(/*! bs-platform/lib/js/caml_builtin_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js\");\n\nfunction encodeCompareHow(param) {\n  return param;\n}\n\nfunction decodeCompareResult(param) {\n  var switcher = param + 1 | 0;\n  if (switcher > 2 || switcher < 0) {\n    return /* Unknown */3;\n  } else {\n    return switcher;\n  }\n}\n\nfunction decodeCompatMode(param) {\n  switch (param) {\n    case \"BackCompat\" : \n        return /* BackCompat */0;\n    case \"CSS1Compat\" : \n        return /* CSS1Compat */1;\n    default:\n      return /* Unknown */2;\n  }\n}\n\nfunction encodeContentEditable(param) {\n  switch (param) {\n    case 0 : \n        return \"true\";\n    case 1 : \n        return \"false\";\n    case 2 : \n        return \"inherit\";\n    case 3 : \n        return \"\";\n    \n  }\n}\n\nfunction decodeContentEditable(param) {\n  switch (param) {\n    case \"false\" : \n        return /* False */1;\n    case \"inherit\" : \n        return /* Inherit */2;\n    case \"true\" : \n        return /* True */0;\n    default:\n      return /* Unknown */3;\n  }\n}\n\nfunction decodeDeltaMode(param) {\n  if (param > 2 || param < 0) {\n    throw [\n          Caml_builtin_exceptions.invalid_argument,\n          \"invalid deltaMode\"\n        ];\n  } else {\n    return param;\n  }\n}\n\nfunction encodeDesignMode(param) {\n  switch (param) {\n    case 0 : \n        return \"on\";\n    case 1 : \n        return \"off\";\n    case 2 : \n        return \"\";\n    \n  }\n}\n\nfunction decodeDesignMode(param) {\n  switch (param) {\n    case \"off\" : \n        return /* Off */1;\n    case \"on\" : \n        return /* On */0;\n    default:\n      return /* Unknown */2;\n  }\n}\n\nfunction encodeDir(param) {\n  switch (param) {\n    case 0 : \n        return \"ltr\";\n    case 1 : \n        return \"rtl\";\n    case 2 : \n        return \"\";\n    \n  }\n}\n\nfunction decodeDir(param) {\n  switch (param) {\n    case \"ltr\" : \n        return /* Ltr */0;\n    case \"rtl\" : \n        return /* Rtl */1;\n    default:\n      return /* Unknown */2;\n  }\n}\n\nfunction decodeEventPhase(param) {\n  if (param > 3 || param < 0) {\n    return /* Unknown */4;\n  } else {\n    return param;\n  }\n}\n\nfunction encodeFilterAction(param) {\n  return param + 1 | 0;\n}\n\nfunction encodeInsertPosition(param) {\n  switch (param) {\n    case 0 : \n        return \"beforebegin\";\n    case 1 : \n        return \"afterbegin\";\n    case 2 : \n        return \"beforeend\";\n    case 3 : \n        return \"afterend\";\n    \n  }\n}\n\nfunction encodeModifierKey(param) {\n  switch (param) {\n    case 0 : \n        return \"Alt\";\n    case 1 : \n        return \"AltGraph\";\n    case 2 : \n        return \"CapsLock\";\n    case 3 : \n        return \"Control\";\n    case 4 : \n        return \"Fn\";\n    case 5 : \n        return \"FnLock\";\n    case 6 : \n        return \"Hyper\";\n    case 7 : \n        return \"Meta\";\n    case 8 : \n        return \"NumLock\";\n    case 9 : \n        return \"ScrollLock\";\n    case 10 : \n        return \"Shift\";\n    case 11 : \n        return \"Super\";\n    case 12 : \n        return \"Symbol\";\n    case 13 : \n        return \"SymbolLock\";\n    \n  }\n}\n\nfunction decodeNodeType(param) {\n  var switcher = param - 1 | 0;\n  if (switcher > 11 || switcher < 0) {\n    return /* Unknown */12;\n  } else {\n    return switcher;\n  }\n}\n\nfunction decodePointerType(param) {\n  switch (param) {\n    case \"mouse\" : \n        return /* Mouse */0;\n    case \"pen\" : \n        return /* Pen */1;\n    case \"touch|\" : \n        return /* Touch */2;\n    default:\n      return /* Unknown */3;\n  }\n}\n\nfunction decodeReadyState(param) {\n  switch (param) {\n    case \"complete\" : \n        return /* Complete */2;\n    case \"interactive\" : \n        return /* Interactive */1;\n    case \"loading\" : \n        return /* Loading */0;\n    default:\n      return /* Unknown */3;\n  }\n}\n\nfunction decodeShadowRootMode(param) {\n  switch (param) {\n    case \"closed\" : \n        return /* Closed */1;\n    case \"open\" : \n        return /* Open */0;\n    default:\n      throw [\n            Caml_builtin_exceptions.invalid_argument,\n            \"Unknown shadowRootMode\"\n          ];\n  }\n}\n\nfunction decodeVisibilityState(param) {\n  switch (param) {\n    case \"hidden\" : \n        return /* Hidden */1;\n    case \"prerender\" : \n        return /* Prerender */2;\n    case \"unloaded\" : \n        return /* Unloaded */3;\n    case \"visible\" : \n        return /* Visible */0;\n    default:\n      return /* Unknown */4;\n  }\n}\n\nfunction many(param) {\n  if (param) {\n    return param[0] | many(param[1]);\n  } else {\n    return 0;\n  }\n}\n\nvar WhatToShow = /* module */[\n  /* _All */-1,\n  /* _Element */1,\n  /* _Attribute */2,\n  /* _Text */4,\n  /* _CDATASection */8,\n  /* _EntityReference */16,\n  /* _Entity */32,\n  /* _ProcessingInstruction */64,\n  /* _Comment */128,\n  /* _Document */256,\n  /* _DocumentType */512,\n  /* _DocumentFragment */1024,\n  /* _Notation */2048,\n  /* many */many\n];\n\nexports.encodeCompareHow = encodeCompareHow;\nexports.decodeCompareResult = decodeCompareResult;\nexports.decodeCompatMode = decodeCompatMode;\nexports.encodeContentEditable = encodeContentEditable;\nexports.decodeContentEditable = decodeContentEditable;\nexports.decodeDeltaMode = decodeDeltaMode;\nexports.encodeDesignMode = encodeDesignMode;\nexports.decodeDesignMode = decodeDesignMode;\nexports.encodeDir = encodeDir;\nexports.decodeDir = decodeDir;\nexports.decodeEventPhase = decodeEventPhase;\nexports.encodeFilterAction = encodeFilterAction;\nexports.encodeInsertPosition = encodeInsertPosition;\nexports.encodeModifierKey = encodeModifierKey;\nexports.decodeNodeType = decodeNodeType;\nexports.decodePointerType = decodePointerType;\nexports.decodeReadyState = decodeReadyState;\nexports.decodeShadowRootMode = decodeShadowRootMode;\nexports.decodeVisibilityState = decodeVisibilityState;\nexports.WhatToShow = WhatToShow;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-webapi/src/dom/DomTypesRe.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-webapi/src/dom/events/EventTargetRe.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/bs-webapi/src/dom/events/EventTargetRe.js ***!
-  \****************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nfunction Impl(T) {\n  return /* module */[];\n}\n\nexports.Impl = Impl;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-webapi/src/dom/events/EventTargetRe.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-webapi/src/dom/nodes/ChildNodeRe.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/bs-webapi/src/dom/nodes/ChildNodeRe.js ***!
-  \*************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nfunction Impl(T) {\n  return /* module */[];\n}\n\nexports.Impl = Impl;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-webapi/src/dom/nodes/ChildNodeRe.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-webapi/src/dom/nodes/ElementRe.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/bs-webapi/src/dom/nodes/ElementRe.js ***!
-  \***********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar Curry = __webpack_require__(/*! bs-platform/lib/js/curry.js */ \"./node_modules/bs-platform/lib/js/curry.js\");\nvar NodeRe = __webpack_require__(/*! ./NodeRe.js */ \"./node_modules/bs-webapi/src/dom/nodes/NodeRe.js\");\nvar DomTypesRe = __webpack_require__(/*! ../DomTypesRe.js */ \"./node_modules/bs-webapi/src/dom/DomTypesRe.js\");\nvar SlotableRe = __webpack_require__(/*! ./SlotableRe.js */ \"./node_modules/bs-webapi/src/dom/nodes/SlotableRe.js\");\nvar Caml_option = __webpack_require__(/*! bs-platform/lib/js/caml_option.js */ \"./node_modules/bs-platform/lib/js/caml_option.js\");\nvar ChildNodeRe = __webpack_require__(/*! ./ChildNodeRe.js */ \"./node_modules/bs-webapi/src/dom/nodes/ChildNodeRe.js\");\nvar ParentNodeRe = __webpack_require__(/*! ./ParentNodeRe.js */ \"./node_modules/bs-webapi/src/dom/nodes/ParentNodeRe.js\");\nvar EventTargetRe = __webpack_require__(/*! ../events/EventTargetRe.js */ \"./node_modules/bs-webapi/src/dom/events/EventTargetRe.js\");\nvar NonDocumentTypeChildNodeRe = __webpack_require__(/*! ./NonDocumentTypeChildNodeRe.js */ \"./node_modules/bs-webapi/src/dom/nodes/NonDocumentTypeChildNodeRe.js\");\n\nfunction ofNode(node) {\n  var match = NodeRe.nodeType(node) === /* Element */0;\n  if (match) {\n    return Caml_option.some(node);\n  }\n  \n}\n\nfunction Impl(T) {\n  var asHtmlElement = (\n    function (element) {\n      // BEWARE: Assumes \"contentEditable\" uniquely identifies an HTMLELement\n      return element.contentEditable !== undefined ?  element : null;\n    }\n  );\n  var asHtmlElement$1 = function (self) {\n    return Caml_option.null_to_opt(Curry._1(asHtmlElement, self));\n  };\n  var insertAdjacentElement = function (position, element, self) {\n    self.insertAdjacentElement(DomTypesRe.encodeInsertPosition(position), element);\n    return /* () */0;\n  };\n  var insertAdjacentHTML = function (position, text, self) {\n    self.insertAdjacentHTML(DomTypesRe.encodeInsertPosition(position), text);\n    return /* () */0;\n  };\n  var insertAdjacentText = function (position, text, self) {\n    self.insertAdjacentText(DomTypesRe.encodeInsertPosition(position), text);\n    return /* () */0;\n  };\n  return /* module */[\n          /* asHtmlElement */asHtmlElement$1,\n          /* ofNode */ofNode,\n          /* insertAdjacentElement */insertAdjacentElement,\n          /* insertAdjacentHTML */insertAdjacentHTML,\n          /* insertAdjacentText */insertAdjacentText\n        ];\n}\n\nvar include = NodeRe.Impl(/* module */[]);\n\nEventTargetRe.Impl(/* module */[]);\n\nParentNodeRe.Impl(/* module */[]);\n\nNonDocumentTypeChildNodeRe.Impl(/* module */[]);\n\nChildNodeRe.Impl(/* module */[]);\n\nSlotableRe.Impl(/* module */[]);\n\nvar asHtmlElement = (\n    function (element) {\n      // BEWARE: Assumes \"contentEditable\" uniquely identifies an HTMLELement\n      return element.contentEditable !== undefined ?  element : null;\n    }\n  );\n\nfunction asHtmlElement$1(self) {\n  return Caml_option.null_to_opt(Curry._1(asHtmlElement, self));\n}\n\nfunction insertAdjacentElement(position, element, self) {\n  self.insertAdjacentElement(DomTypesRe.encodeInsertPosition(position), element);\n  return /* () */0;\n}\n\nfunction insertAdjacentHTML(position, text, self) {\n  self.insertAdjacentHTML(DomTypesRe.encodeInsertPosition(position), text);\n  return /* () */0;\n}\n\nfunction insertAdjacentText(position, text, self) {\n  self.insertAdjacentText(DomTypesRe.encodeInsertPosition(position), text);\n  return /* () */0;\n}\n\nvar nodeType = include[0];\n\nexports.Impl = Impl;\nexports.nodeType = nodeType;\nexports.asHtmlElement = asHtmlElement$1;\nexports.ofNode = ofNode;\nexports.insertAdjacentElement = insertAdjacentElement;\nexports.insertAdjacentHTML = insertAdjacentHTML;\nexports.insertAdjacentText = insertAdjacentText;\n/* include Not a pure module */\n\n\n//# sourceURL=webpack:///./node_modules/bs-webapi/src/dom/nodes/ElementRe.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-webapi/src/dom/nodes/NodeRe.js":
-/*!********************************************************!*\
-  !*** ./node_modules/bs-webapi/src/dom/nodes/NodeRe.js ***!
-  \********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nvar DomTypesRe = __webpack_require__(/*! ../DomTypesRe.js */ \"./node_modules/bs-webapi/src/dom/DomTypesRe.js\");\nvar EventTargetRe = __webpack_require__(/*! ../events/EventTargetRe.js */ \"./node_modules/bs-webapi/src/dom/events/EventTargetRe.js\");\n\nfunction Impl(T) {\n  var nodeType = function (self) {\n    return DomTypesRe.decodeNodeType(self.nodeType);\n  };\n  return /* module */[/* nodeType */nodeType];\n}\n\nEventTargetRe.Impl(/* module */[]);\n\nfunction nodeType(self) {\n  return DomTypesRe.decodeNodeType(self.nodeType);\n}\n\nexports.Impl = Impl;\nexports.nodeType = nodeType;\n/*  Not a pure module */\n\n\n//# sourceURL=webpack:///./node_modules/bs-webapi/src/dom/nodes/NodeRe.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-webapi/src/dom/nodes/NonDocumentTypeChildNodeRe.js":
-/*!****************************************************************************!*\
-  !*** ./node_modules/bs-webapi/src/dom/nodes/NonDocumentTypeChildNodeRe.js ***!
-  \****************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nfunction Impl(T) {\n  return /* module */[];\n}\n\nexports.Impl = Impl;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-webapi/src/dom/nodes/NonDocumentTypeChildNodeRe.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-webapi/src/dom/nodes/ParentNodeRe.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/bs-webapi/src/dom/nodes/ParentNodeRe.js ***!
-  \**************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nfunction Impl(T) {\n  return /* module */[];\n}\n\nexports.Impl = Impl;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-webapi/src/dom/nodes/ParentNodeRe.js?");
-
-/***/ }),
-
-/***/ "./node_modules/bs-webapi/src/dom/nodes/SlotableRe.js":
-/*!************************************************************!*\
-  !*** ./node_modules/bs-webapi/src/dom/nodes/SlotableRe.js ***!
-  \************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\n\nfunction Impl(T) {\n  return /* module */[];\n}\n\nexports.Impl = Impl;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/bs-webapi/src/dom/nodes/SlotableRe.js?");
-
-/***/ }),
-
-/***/ "./node_modules/process/browser.js":
-/*!*****************************************!*\
-  !*** ./node_modules/process/browser.js ***!
-  \*****************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-eval("// shim for using process in browser\nvar process = module.exports = {};\n\n// cached from whatever global is present so that test runners that stub it\n// don't break things.  But we need to wrap it in a try catch in case it is\n// wrapped in strict mode code which doesn't define any globals.  It's inside a\n// function because try/catches deoptimize in certain engines.\n\nvar cachedSetTimeout;\nvar cachedClearTimeout;\n\nfunction defaultSetTimout() {\n    throw new Error('setTimeout has not been defined');\n}\nfunction defaultClearTimeout () {\n    throw new Error('clearTimeout has not been defined');\n}\n(function () {\n    try {\n        if (typeof setTimeout === 'function') {\n            cachedSetTimeout = setTimeout;\n        } else {\n            cachedSetTimeout = defaultSetTimout;\n        }\n    } catch (e) {\n        cachedSetTimeout = defaultSetTimout;\n    }\n    try {\n        if (typeof clearTimeout === 'function') {\n            cachedClearTimeout = clearTimeout;\n        } else {\n            cachedClearTimeout = defaultClearTimeout;\n        }\n    } catch (e) {\n        cachedClearTimeout = defaultClearTimeout;\n    }\n} ())\nfunction runTimeout(fun) {\n    if (cachedSetTimeout === setTimeout) {\n        //normal enviroments in sane situations\n        return setTimeout(fun, 0);\n    }\n    // if setTimeout wasn't available but was latter defined\n    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {\n        cachedSetTimeout = setTimeout;\n        return setTimeout(fun, 0);\n    }\n    try {\n        // when when somebody has screwed with setTimeout but no I.E. maddness\n        return cachedSetTimeout(fun, 0);\n    } catch(e){\n        try {\n            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally\n            return cachedSetTimeout.call(null, fun, 0);\n        } catch(e){\n            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error\n            return cachedSetTimeout.call(this, fun, 0);\n        }\n    }\n\n\n}\nfunction runClearTimeout(marker) {\n    if (cachedClearTimeout === clearTimeout) {\n        //normal enviroments in sane situations\n        return clearTimeout(marker);\n    }\n    // if clearTimeout wasn't available but was latter defined\n    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {\n        cachedClearTimeout = clearTimeout;\n        return clearTimeout(marker);\n    }\n    try {\n        // when when somebody has screwed with setTimeout but no I.E. maddness\n        return cachedClearTimeout(marker);\n    } catch (e){\n        try {\n            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally\n            return cachedClearTimeout.call(null, marker);\n        } catch (e){\n            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.\n            // Some versions of I.E. have different rules for clearTimeout vs setTimeout\n            return cachedClearTimeout.call(this, marker);\n        }\n    }\n\n\n\n}\nvar queue = [];\nvar draining = false;\nvar currentQueue;\nvar queueIndex = -1;\n\nfunction cleanUpNextTick() {\n    if (!draining || !currentQueue) {\n        return;\n    }\n    draining = false;\n    if (currentQueue.length) {\n        queue = currentQueue.concat(queue);\n    } else {\n        queueIndex = -1;\n    }\n    if (queue.length) {\n        drainQueue();\n    }\n}\n\nfunction drainQueue() {\n    if (draining) {\n        return;\n    }\n    var timeout = runTimeout(cleanUpNextTick);\n    draining = true;\n\n    var len = queue.length;\n    while(len) {\n        currentQueue = queue;\n        queue = [];\n        while (++queueIndex < len) {\n            if (currentQueue) {\n                currentQueue[queueIndex].run();\n            }\n        }\n        queueIndex = -1;\n        len = queue.length;\n    }\n    currentQueue = null;\n    draining = false;\n    runClearTimeout(timeout);\n}\n\nprocess.nextTick = function (fun) {\n    var args = new Array(arguments.length - 1);\n    if (arguments.length > 1) {\n        for (var i = 1; i < arguments.length; i++) {\n            args[i - 1] = arguments[i];\n        }\n    }\n    queue.push(new Item(fun, args));\n    if (queue.length === 1 && !draining) {\n        runTimeout(drainQueue);\n    }\n};\n\n// v8 likes predictible objects\nfunction Item(fun, array) {\n    this.fun = fun;\n    this.array = array;\n}\nItem.prototype.run = function () {\n    this.fun.apply(null, this.array);\n};\nprocess.title = 'browser';\nprocess.browser = true;\nprocess.env = {};\nprocess.argv = [];\nprocess.version = ''; // empty string to avoid regexp issues\nprocess.versions = {};\n\nfunction noop() {}\n\nprocess.on = noop;\nprocess.addListener = noop;\nprocess.once = noop;\nprocess.off = noop;\nprocess.removeListener = noop;\nprocess.removeAllListeners = noop;\nprocess.emit = noop;\nprocess.prependListener = noop;\nprocess.prependOnceListener = noop;\n\nprocess.listeners = function (name) { return [] }\n\nprocess.binding = function (name) {\n    throw new Error('process.binding is not supported');\n};\n\nprocess.cwd = function () { return '/' };\nprocess.chdir = function (dir) {\n    throw new Error('process.chdir is not supported');\n};\nprocess.umask = function() { return 0; };\n\n\n//# sourceURL=webpack:///./node_modules/process/browser.js?");
+var index = (function (exports) {
+  'use strict';
 
-/***/ }),
-
-/***/ "./node_modules/re-debouncer/src/Debouncer.bs.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/re-debouncer/src/Debouncer.bs.js ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("// Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE\n\n\nvar Curry = __webpack_require__(/*! bs-platform/lib/js/curry.js */ \"./node_modules/bs-platform/lib/js/curry.js\");\nvar Belt_Option = __webpack_require__(/*! bs-platform/lib/js/belt_Option.js */ \"./node_modules/bs-platform/lib/js/belt_Option.js\");\nvar Caml_option = __webpack_require__(/*! bs-platform/lib/js/caml_option.js */ \"./node_modules/bs-platform/lib/js/caml_option.js\");\n\nfunction makeCancelable($staropt$star, fn) {\n  var wait = $staropt$star !== undefined ? $staropt$star : 100;\n  var timerId = /* record */[/* contents */undefined];\n  var lastArg = /* record */[/* contents */undefined];\n  var lastCallTime = /* record */[/* contents */undefined];\n  var shouldInvoke = function (time) {\n    var match = lastCallTime[0];\n    if (match !== undefined) {\n      var timeSinceLastCall = time - match | 0;\n      if (timeSinceLastCall >= wait) {\n        return true;\n      } else {\n        return timeSinceLastCall < 0;\n      }\n    } else {\n      return true;\n    }\n  };\n  var remainingWait = function (time) {\n    var match = lastCallTime[0];\n    if (match !== undefined) {\n      var timeSinceLastCall = time - match | 0;\n      return wait - timeSinceLastCall | 0;\n    } else {\n      return wait;\n    }\n  };\n  var timerExpired = function (param) {\n    var match = timerId[0];\n    if (match !== undefined) {\n      clearTimeout(Caml_option.valFromOption(match));\n    }\n    var time = Date.now() | 0;\n    if (shouldInvoke(time)) {\n      var x = lastArg[0];\n      if (x !== undefined) {\n        lastArg[0] = undefined;\n        timerId[0] = undefined;\n        return Curry._1(fn, Caml_option.valFromOption(x));\n      } else {\n        timerId[0] = undefined;\n        return /* () */0;\n      }\n    } else {\n      timerId[0] = Caml_option.some(setTimeout(timerExpired, remainingWait(time)));\n      return /* () */0;\n    }\n  };\n  var schedule = function (x) {\n    var time = Date.now() | 0;\n    lastArg[0] = Caml_option.some(x);\n    lastCallTime[0] = time;\n    timerId[0] = Caml_option.some(setTimeout(timerExpired, wait));\n    return /* () */0;\n  };\n  var scheduled = function (param) {\n    return Belt_Option.isSome(timerId[0]);\n  };\n  var cancel = function (param) {\n    var match = timerId[0];\n    if (match !== undefined) {\n      clearTimeout(Caml_option.valFromOption(match));\n      timerId[0] = undefined;\n      lastArg[0] = undefined;\n      lastCallTime[0] = undefined;\n      return /* () */0;\n    } else {\n      return /* () */0;\n    }\n  };\n  var now = function (x) {\n    cancel(/* () */0);\n    return Curry._1(fn, x);\n  };\n  return /* record */[\n          /* invoke */now,\n          /* schedule */schedule,\n          /* scheduled */scheduled,\n          /* cancel */cancel\n        ];\n}\n\nfunction make(wait, fn) {\n  return makeCancelable(wait, fn)[/* schedule */1];\n}\n\nexports.make = make;\nexports.makeCancelable = makeCancelable;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./node_modules/re-debouncer/src/Debouncer.bs.js?");
-
-/***/ }),
-
-/***/ "./src/Hash.bs.js":
-/*!************************!*\
-  !*** ./src/Hash.bs.js ***!
-  \************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("// Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE\n\n\nvar Caml_array = __webpack_require__(/*! bs-platform/lib/js/caml_array.js */ \"./node_modules/bs-platform/lib/js/caml_array.js\");\nvar Caml_js_exceptions = __webpack_require__(/*! bs-platform/lib/js/caml_js_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_js_exceptions.js\");\nvar SubtleCrypto$QueerLoop = __webpack_require__(/*! ./SubtleCrypto.bs.js */ \"./src/SubtleCrypto.bs.js\");\nvar Caml_builtin_exceptions = __webpack_require__(/*! bs-platform/lib/js/caml_builtin_exceptions.js */ \"./node_modules/bs-platform/lib/js/caml_builtin_exceptions.js\");\n\nfunction abToStr (buf){\n  return String.fromCharCode.apply(null, new Uint8Array(buf));\n     };\n\nfunction abToHexAndBase64Str (buf){\n     var uint8 = new Uint8Array(buf);\n     var b64 = window.btoa(String.fromCharCode.apply(null, uint8));\n     var hex = Array.prototype.map.call(uint8, x => ('00' + x.toString(16)).slice(-2)).join('');\n     return [hex, b64];\n     };\n\nfunction abToHexStr (buf){\n     return Array.prototype.map.call(new Uint8Array(buf), x => ('00' + x.toString(16)).slice(-2)).join('');\n     };\n\nfunction str2ab (str){\n    var buf = new ArrayBuffer(str.length);\n    var bufView = new Uint8Array(buf);\n    for (var i=0, strLen=str.length; i < strLen; i++) {\n    bufView[i] = str.charCodeAt(i);\n  }\n      return buf;\n     };\n\nfunction b64ToAB(s) {\n  return str2ab(atob(s));\n}\n\nfunction abToB64(ab) {\n  return btoa(abToStr(ab));\n}\n\nfunction digest(algorithm, input) {\n  return window.crypto.subtle.digest(algorithm, str2ab(input)).then((function (output) {\n                return Promise.resolve(abToStr(output));\n              }));\n}\n\nfunction hexDigest(algorithm, input) {\n  return window.crypto.subtle.digest(algorithm, str2ab(input)).then((function (output) {\n                return Promise.resolve(abToHexStr(output));\n              }));\n}\n\nfunction hexAndBase64Digest(algorithm, input) {\n  return window.crypto.subtle.digest(algorithm, str2ab(input)).then((function (output) {\n                return Promise.resolve(abToHexAndBase64Str(output));\n              }));\n}\n\nfunction hmacSign(data) {\n  return SubtleCrypto$QueerLoop.defaultHmacKey.then((function (key) {\n                  var buf = str2ab(data);\n                  return Promise.all(/* tuple */[\n                              window.crypto.subtle.sign(SubtleCrypto$QueerLoop.defaultHmac, key, buf),\n                              Promise.resolve(buf)\n                            ]);\n                })).then((function (param) {\n                return Promise.resolve(btoa(abToStr(param[0])) + (\"|\" + btoa(abToStr(param[1]))));\n              }));\n}\n\nfunction hmacVerify(input) {\n  return SubtleCrypto$QueerLoop.defaultHmacKey.then((function (key) {\n                  var parts = input.split(\"|\");\n                  if (parts.length !== 2) {\n                    Promise.reject([\n                          Caml_builtin_exceptions.invalid_argument,\n                          input\n                        ]);\n                  }\n                  var exit = 0;\n                  var val;\n                  var val$1;\n                  try {\n                    val = str2ab(atob(Caml_array.caml_array_get(parts, 0)));\n                    val$1 = str2ab(atob(Caml_array.caml_array_get(parts, 1)));\n                    exit = 1;\n                  }\n                  catch (raw_e){\n                    var e = Caml_js_exceptions.internalToOCamlException(raw_e);\n                    console.log(parts);\n                    return Promise.reject(e);\n                  }\n                  if (exit === 1) {\n                    return Promise.all(/* tuple */[\n                                window.crypto.subtle.verify(SubtleCrypto$QueerLoop.defaultHmac, key, val, val$1),\n                                Promise.resolve(abToHexStr(val)),\n                                Promise.resolve(abToStr(val$1))\n                              ]);\n                  }\n                  \n                })).then((function (param) {\n                if (param[0]) {\n                  return Promise.resolve(/* tuple */[\n                              param[1],\n                              param[2]\n                            ]);\n                } else {\n                  return Promise.reject([\n                              Caml_builtin_exceptions.invalid_argument,\n                              input\n                            ]);\n                }\n              }));\n}\n\nexports.abToStr = abToStr;\nexports.abToHexAndBase64Str = abToHexAndBase64Str;\nexports.abToHexStr = abToHexStr;\nexports.str2ab = str2ab;\nexports.b64ToAB = b64ToAB;\nexports.abToB64 = abToB64;\nexports.digest = digest;\nexports.hexDigest = hexDigest;\nexports.hexAndBase64Digest = hexAndBase64Digest;\nexports.hmacSign = hmacSign;\nexports.hmacVerify = hmacVerify;\n/* SubtleCrypto-QueerLoop Not a pure module */\n\n\n//# sourceURL=webpack:///./src/Hash.bs.js?");
-
-/***/ }),
-
-/***/ "./src/Index.bs.js":
-/*!*************************!*\
-  !*** ./src/Index.bs.js ***!
-  \*************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("// Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE\n\n\nvar $$Array = __webpack_require__(/*! bs-platform/lib/js/array.js */ \"./node_modules/bs-platform/lib/js/array.js\");\nvar Curry = __webpack_require__(/*! bs-platform/lib/js/curry.js */ \"./node_modules/bs-platform/lib/js/curry.js\");\nvar Js_dict = __webpack_require__(/*! bs-platform/lib/js/js_dict.js */ \"./node_modules/bs-platform/lib/js/js_dict.js\");\nvar Debouncer = __webpack_require__(/*! re-debouncer/src/Debouncer.bs.js */ \"./node_modules/re-debouncer/src/Debouncer.bs.js\");\nvar ElementRe = __webpack_require__(/*! bs-webapi/src/dom/nodes/ElementRe.js */ \"./node_modules/bs-webapi/src/dom/nodes/ElementRe.js\");\nvar Caml_int32 = __webpack_require__(/*! bs-platform/lib/js/caml_int32.js */ \"./node_modules/bs-platform/lib/js/caml_int32.js\");\nvar Pervasives = __webpack_require__(/*! bs-platform/lib/js/pervasives.js */ \"./node_modules/bs-platform/lib/js/pervasives.js\");\nvar Belt_Option = __webpack_require__(/*! bs-platform/lib/js/belt_Option.js */ \"./node_modules/bs-platform/lib/js/belt_Option.js\");\nvar Caml_option = __webpack_require__(/*! bs-platform/lib/js/caml_option.js */ \"./node_modules/bs-platform/lib/js/caml_option.js\");\nvar Hash$QueerLoop = __webpack_require__(/*! ./Hash.bs.js */ \"./src/Hash.bs.js\");\nvar Util$QueerLoop = __webpack_require__(/*! ./Util.bs.js */ \"./src/Util.bs.js\");\nvar Scanner$QueerLoop = __webpack_require__(/*! ./Scanner.bs.js */ \"./src/Scanner.bs.js\");\nvar QrCodeGen$QueerLoop = __webpack_require__(/*! ./QrCodeGen.bs.js */ \"./src/QrCodeGen.bs.js\");\nvar QueerCode$QueerLoop = __webpack_require__(/*! ./QueerCode.bs.js */ \"./src/QueerCode.bs.js\");\nvar UserMedia$QueerLoop = __webpack_require__(/*! ./UserMedia.bs.js */ \"./src/UserMedia.bs.js\");\n\nvar domain = \"qqq.lu\";\n\nfunction setBackground(selector, bgCss) {\n  return Util$QueerLoop.withQuerySelector(selector, (function (el) {\n                el.style.setProperty(\"background\", bgCss, \"\");\n                return /* () */0;\n              }));\n}\n\nvar codeRegex = new RegExp(\"https:\\\\/\\\\/qqq.lu\\\\/#(.+)\");\n\nvar defaultCode = QrCodeGen$QueerLoop.QrCode[/* _encodeText */0](\"https://qqq.lu\", QrCodeGen$QueerLoop.Ecc[/* low */0]);\n\nvar camerasRef = /* record */[/* contents : array */[]];\n\nvar cameraIndex = /* record */[/* contents */0];\n\nfunction cycleCameras(scanner) {\n  var n = camerasRef[0].length;\n  cameraIndex[0] = Caml_int32.mod_(cameraIndex[0] + 1 | 0, n);\n  return /* () */0;\n}\n\nfunction setSrc (img,src){\n     img.src = src;};\n\nvar dataSeen = { };\n\nvar currentSignature = /* record */[/* contents */\"\"];\n\nvar canvasesRef = /* record */[/* contents : array */[]];\n\nfunction copyVideoToSnapshotCanvas(param) {\n  return Util$QueerLoop.withQuerySelectorDom(\"#snapshotCanvas\", (function (snapshotCanvas) {\n                var snapshotCtx = snapshotCanvas.getContext(\"2d\");\n                snapshotCtx.globalAlpha = 0.1;\n                return $$Array.mapi((function (i, canvas) {\n                              var h = canvas.height;\n                              var x = (canvas.width - h | 0) / 2 | 0;\n                              snapshotCtx.drawImage(canvas, x, 0, h, h, 0, 0, snapshotCanvas.width, snapshotCanvas.height);\n                              return /* () */0;\n                            }), canvasesRef[0]);\n              }));\n}\n\nfunction takeSnapshot(param) {\n  return Util$QueerLoop.withQuerySelectorDom(\"#snapshotCanvas\", (function (snapshotCanvas) {\n                snapshotCanvas.getContext(\"2d\");\n                return snapshotCanvas.toDataURL(\"image/jpeg\", 0.9);\n              }));\n}\n\nfunction setHashToNow(param) {\n  return Util$QueerLoop.setHash(new Date().toISOString());\n}\n\nfunction onClick(maybeHash, param) {\n  if (maybeHash !== undefined) {\n    var hash = maybeHash;\n    setBackground(\"body\", \"#\" + hash.slice(0, 6));\n    var match = Js_dict.get(dataSeen, hash);\n    if (match !== undefined) {\n      var data = match;\n      console.log(data.slice(16));\n      return Util$QueerLoop.setHash(data.slice(16));\n    } else {\n      return /* () */0;\n    }\n  } else {\n    return Util$QueerLoop.setHash(new Date().toISOString());\n  }\n}\n\nfunction addToPast(hash, dataUrl) {\n  var img = document.createElement(\"img\");\n  setSrc(img, dataUrl);\n  img.id = \"x\" + hash;\n  var partial_arg = hash;\n  img.addEventListener(\"click\", (function (param) {\n          return onClick(partial_arg, param);\n        }));\n  Util$QueerLoop.withQuerySelectorDom(\"#codes\", (function (past) {\n          past.appendChild(img);\n          return /* () */0;\n        }));\n  return /* () */0;\n}\n\nfunction setCode(input) {\n  var text = \"https://\" + (domain + (\"/#\" + input));\n  Hash$QueerLoop.hexDigest(\"SHA-1\", text).then((function (hash) {\n          var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hash));\n          if (!alreadySeen) {\n            dataSeen[hash] = text;\n          }\n          setBackground(\"body\", \"#\" + hash.slice(0, 6));\n          var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);\n          Util$QueerLoop.withQuerySelectorDom(\".queer-loop\", (function (loopContainer) {\n                  var match = takeSnapshot(/* () */0);\n                  if (match !== undefined) {\n                    var maybePrevious = loopContainer.querySelector(\"svg\");\n                    if (!(maybePrevious == null)) {\n                      loopContainer.removeChild(maybePrevious);\n                    }\n                    var svg = QueerCode$QueerLoop.createSvg(loopContainer, (maybePrevious == null) ? undefined : Caml_option.some(maybePrevious), match, hash, code);\n                    var url = QueerCode$QueerLoop.svgToDataURL(svg);\n                    if (currentSignature[0] !== \"\") {\n                      addToPast(hash, url);\n                    }\n                    currentSignature[0] = hash;\n                    return /* () */0;\n                  } else {\n                    return /* () */0;\n                  }\n                }));\n          return Promise.resolve(/* () */0);\n        }));\n  return /* () */0;\n}\n\nvar setText = Debouncer.make(200, (function (hash) {\n        Util$QueerLoop.withQuerySelector(\"#codeContents\", (function (el) {\n                el.innerText = decodeURIComponent(hash);\n                return /* () */0;\n              }));\n        return /* () */0;\n      }));\n\nfunction onHashChange(param) {\n  var hash = Util$QueerLoop.getHash(/* () */0).slice(1);\n  setCode(hash);\n  return Curry._1(setText, hash);\n}\n\nfunction setOpacity(elQuery, opacity) {\n  return Belt_Option.map(Belt_Option.flatMap(Caml_option.nullable_to_opt(document.querySelector(elQuery)), ElementRe.asHtmlElement), (function (body) {\n                body.style.setProperty(\"opacity\", Pervasives.string_of_float(opacity), \"\");\n                return /* () */0;\n              }));\n}\n\nvar frameCount = /* record */[/* contents */0];\n\nfunction onTick(ts) {\n  frameCount[0] = frameCount[0] + 1 | 0;\n  if (frameCount[0] % 5 === 1) {\n    copyVideoToSnapshotCanvas(/* () */0);\n  }\n  requestAnimationFrame(onTick);\n  return /* () */0;\n}\n\nfunction _onInput(param) {\n  Util$QueerLoop.withQuerySelector(\"#codeContents\", (function (el) {\n          var text = el.innerText;\n          return Util$QueerLoop.setHash(encodeURIComponent(text));\n        }));\n  return /* () */0;\n}\n\nvar onInput = Debouncer.make(200, _onInput);\n\nfunction init(param) {\n  Util$QueerLoop.withQuerySelectorDom(\"#snapshotCanvas\", (function (canvas) {\n          canvas.width = 480;\n          canvas.height = 480;\n          return /* () */0;\n        }));\n  Util$QueerLoop.withQuerySelectorDom(\".queer-loop\", (function (img) {\n          img.addEventListener(\"click\", (function (param) {\n                  return onClick(undefined, param);\n                }));\n          return /* () */0;\n        }));\n  var initialHash = Util$QueerLoop.getHash(/* () */0);\n  if (initialHash === \"\") {\n    Util$QueerLoop.setHash(new Date().toISOString());\n  } else {\n    onHashChange(/* () */0);\n  }\n  Util$QueerLoop.withQuerySelector(\"#codeContents\", (function (el) {\n          el.addEventListener(\"input\", (function (evt) {\n                  return Curry._1(onInput, /* () */0);\n                }));\n          return /* () */0;\n        }));\n  var response = function (input) {\n    if (input !== \"\") {\n      Hash$QueerLoop.hexDigest(\"SHA-1\", input).then((function (hexHash) {\n              var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hexHash));\n              if (hexHash === currentSignature[0] || !alreadySeen) {\n                Util$QueerLoop.setHash(new Date().toISOString());\n              }\n              return Promise.resolve(/* () */0);\n            }));\n      return /* () */0;\n    } else {\n      return 0;\n    }\n  };\n  UserMedia$QueerLoop.getCameras(/* () */0).then((function (cameras) {\n              camerasRef[0] = cameras;\n              return Promise.all($$Array.map((function (camera) {\n                                var videoEl = document.createElement(\"video\");\n                                Util$QueerLoop.withQuerySelector(\"body\", (function (body) {\n                                        body.appendChild(videoEl);\n                                        return /* () */0;\n                                      }));\n                                return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, response);\n                              }), cameras.slice(0, 1)));\n            })).then((function (canvases) {\n            canvasesRef[0] = canvases;\n            requestAnimationFrame(onTick);\n            return Promise.resolve(/* () */0);\n          })).catch((function (err) {\n          console.error(\"getCameras failed\", err);\n          return Promise.resolve(/* () */0);\n        }));\n  return /* () */0;\n}\n\nwindow.addEventListener(\"load\", (function (param) {\n        return init(/* () */0);\n      }));\n\nwindow.addEventListener(\"hashchange\", (function (param) {\n        return onHashChange(/* () */0);\n      }));\n\nvar defaultHash = \"fff\";\n\nexports.domain = domain;\nexports.setBackground = setBackground;\nexports.codeRegex = codeRegex;\nexports.defaultCode = defaultCode;\nexports.defaultHash = defaultHash;\nexports.camerasRef = camerasRef;\nexports.cameraIndex = cameraIndex;\nexports.cycleCameras = cycleCameras;\nexports.setSrc = setSrc;\nexports.dataSeen = dataSeen;\nexports.currentSignature = currentSignature;\nexports.canvasesRef = canvasesRef;\nexports.copyVideoToSnapshotCanvas = copyVideoToSnapshotCanvas;\nexports.takeSnapshot = takeSnapshot;\nexports.setHashToNow = setHashToNow;\nexports.onClick = onClick;\nexports.addToPast = addToPast;\nexports.setCode = setCode;\nexports.setText = setText;\nexports.onHashChange = onHashChange;\nexports.setOpacity = setOpacity;\nexports.frameCount = frameCount;\nexports.onTick = onTick;\nexports._onInput = _onInput;\nexports.onInput = onInput;\nexports.init = init;\n/* codeRegex Not a pure module */\n\n\n//# sourceURL=webpack:///./src/Index.bs.js?");
-
-/***/ }),
-
-/***/ "./src/QrCodeGen.bs.js":
-/*!*****************************!*\
-  !*** ./src/QrCodeGen.bs.js ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("// Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE\n\n\nvar Qrcodegen = __webpack_require__(/*! ./qrcodegen */ \"./src/qrcodegen.js\");\nvar Caml_option = __webpack_require__(/*! bs-platform/lib/js/caml_option.js */ \"./node_modules/bs-platform/lib/js/caml_option.js\");\n\nvar low = Qrcodegen.Ecc.LOW;\n\nvar medium = Qrcodegen.Ecc.MEDIUM;\n\nvar quartile = Qrcodegen.Ecc.QUARTILE;\n\nvar high = Qrcodegen.Ecc.HIGH;\n\nvar Ecc = /* module */[\n  /* low */low,\n  /* medium */medium,\n  /* quartile */quartile,\n  /* high */high\n];\n\nfunction _encodeText(prim, prim$1) {\n  return Qrcodegen.encodeText(prim, prim$1);\n}\n\nfunction encodeText(text, ecc) {\n  var exit = 0;\n  var code;\n  try {\n    code = Qrcodegen.encodeText(text, ecc);\n    exit = 1;\n  }\n  catch (exn){\n    return undefined;\n  }\n  if (exit === 1) {\n    return Caml_option.some(code);\n  }\n  \n}\n\nvar QrCode = /* module */[\n  /* _encodeText */_encodeText,\n  /* encodeText */encodeText\n];\n\nfunction _setSvg (t,el){\n     el.src = \"data:image/svg+xml;utf8,\" + encodeURIComponent(t);\n     };\n\nfunction setSvg(t, el) {\n  return _setSvg(t.toSvgString(4), el);\n}\n\nexports.Ecc = Ecc;\nexports.QrCode = QrCode;\nexports._setSvg = _setSvg;\nexports.setSvg = setSvg;\n/* low Not a pure module */\n\n\n//# sourceURL=webpack:///./src/QrCodeGen.bs.js?");
-
-/***/ }),
-
-/***/ "./src/QueerCode.bs.js":
-/*!*****************************!*\
-  !*** ./src/QueerCode.bs.js ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("// Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE\n\n\nvar Caml_array = __webpack_require__(/*! bs-platform/lib/js/caml_array.js */ \"./node_modules/bs-platform/lib/js/caml_array.js\");\nvar Caml_option = __webpack_require__(/*! bs-platform/lib/js/caml_option.js */ \"./node_modules/bs-platform/lib/js/caml_option.js\");\n\nfunction getPathString(code, border) {\n  var size = code.size;\n  var modules = code.getModules();\n  var parts = /* array */[];\n  for(var y = 0 ,y_finish = size - 1 | 0; y <= y_finish; ++y){\n    for(var x = 0 ,x_finish = size - 1 | 0; x <= x_finish; ++x){\n      if (Caml_array.caml_array_get(Caml_array.caml_array_get(modules, y), x)) {\n        parts.push(\"M\" + (String(x + border | 0) + (\",\" + (String(y + border | 0) + \"h1v1h-1z\"))));\n      }\n      \n    }\n  }\n  return parts.join(\" \");\n}\n\nfunction getSvgDataUri(code, data, maybePastUrl) {\n  var pathString = getPathString(code, 4);\n  var sizeWithBorder = code.size + 8 | 0;\n  var pastData = maybePastUrl !== undefined ? \"<image href=\\\"\" + (String(maybePastUrl) + (\"\\\" x=\\\"0\\\" y=\\\"0\\\" width=\\\"\" + (String(sizeWithBorder) + (\"\\\" height=\\\"\" + (String(sizeWithBorder) + \"\\\" />\"))))) : \"\";\n  var svg = \"<svg xmlns=\\\"http://www.w3.org/2000/svg\\\" version=\\\"1.1\\\" viewBox=\\\"0 0 \" + (String(sizeWithBorder) + (\" \" + (String(sizeWithBorder) + (\"\\\" stroke=\\\"none\\\">\\n     <defs>\\n     <linearGradient id=\\\"rainbow\\\">\\n     <stop offset=\\\"0.000%\\\" stop-color=\\\"#ffb5b5\\\" />\\n     <stop offset=\\\"14.286%\\\" stop-color=\\\"#fcdc85\\\" />\\n     <stop offset=\\\"28.571%\\\" stop-color=\\\"#caf79c\\\" />\\n     <stop offset=\\\"42.857%\\\" stop-color=\\\"#a8fdbf\\\" />\\n     <stop offset=\\\"57.143%\\\" stop-color=\\\"#70feff\\\" />\\n     <stop offset=\\\"71.429%\\\" stop-color=\\\"#a8bffd\\\" />\\n     <stop offset=\\\"85.714%\\\" stop-color=\\\"#ca9cf7\\\" />\\n     <stop offset=\\\"100.000%\\\" stop-color=\\\"#fc85dc\\\" />\\n     </linearGradient></defs>\\n     \" + (String(pastData) + (\"\\n     <rect width=\\\"100%\\\" height=\\\"100%\\\" fill=\\\"url(#rainbow)\\\" fill-opacity=\\\"0.4\\\" />\\n     <path d=\\\"\" + (String(pathString) + \"\\\" fill=\\\"black\\\" />\\n     </svg>\")))))));\n  return \"data:image/svg+xml;utf8,\" + encodeURIComponent(svg);\n}\n\nvar svgXmlns = \"http://www.w3.org/2000/svg\";\n\nfunction createSvg(parent, maybePrevious, maybeSnapshot, hash, code) {\n  var size = code.size;\n  var sizeWithBorder = size + 8 | 0;\n  var viewBox = \"0 0 \" + (String(sizeWithBorder) + (\" \" + (String(sizeWithBorder) + \"\")));\n  var childSvg = document.createElementNS(svgXmlns, \"svg\");\n  childSvg.setAttribute(\"viewBox\", viewBox);\n  var past = document.createElementNS(svgXmlns, \"g\");\n  var scaleFactor = 1.0 - 2.0 / sizeWithBorder;\n  scaleFactor.toString();\n  past.setAttribute(\"transform\", \"translate(\" + (String(1) + (\",\" + (String(1) + (\") scale(\" + (String(scaleFactor) + \")\"))))));\n  if (maybePrevious !== undefined) {\n    past.appendChild(Caml_option.valFromOption(maybePrevious));\n  }\n  childSvg.appendChild(past);\n  if (maybeSnapshot !== undefined) {\n    var snapshotImage = document.createElementNS(svgXmlns, \"image\");\n    snapshotImage.setAttribute(\"href\", maybeSnapshot);\n    snapshotImage.setAttribute(\"x\", \"0\");\n    snapshotImage.setAttribute(\"y\", \"0\");\n    snapshotImage.setAttribute(\"width\", String(sizeWithBorder));\n    snapshotImage.setAttribute(\"height\", String(sizeWithBorder));\n    snapshotImage.setAttribute(\"style\", \"opacity: 0.5\");\n    childSvg.appendChild(snapshotImage);\n  }\n  var mask = document.createElementNS(svgXmlns, \"mask\");\n  mask.id = \"m\" + hash;\n  var blank = document.createElementNS(svgXmlns, \"rect\");\n  blank.setAttribute(\"width\", \"100%\");\n  blank.setAttribute(\"height\", \"100%\");\n  blank.setAttribute(\"fill\", \"#FFFFFF\");\n  mask.appendChild(blank);\n  var symbol = document.createElementNS(svgXmlns, \"symbol\");\n  symbol.id = \"s\" + hash;\n  var path = document.createElementNS(svgXmlns, \"path\");\n  path.setAttribute(\"d\", getPathString(code, 4));\n  symbol.appendChild(path);\n  childSvg.appendChild(symbol);\n  var use = document.createElementNS(svgXmlns, \"use\");\n  use.setAttribute(\"href\", \"#s\" + hash);\n  use.setAttribute(\"fill\", \"#000000\");\n  mask.appendChild(use);\n  childSvg.appendChild(mask);\n  var rainbow = document.createElementNS(svgXmlns, \"rect\");\n  rainbow.setAttribute(\"width\", \"100%\");\n  rainbow.setAttribute(\"height\", \"100%\");\n  rainbow.setAttribute(\"fill\", \"url(#rainbow)\");\n  rainbow.setAttribute(\"fill-opacity\", \"0.5\");\n  rainbow.setAttribute(\"mask\", \"url(#m\" + (hash + \")\"));\n  childSvg.appendChild(rainbow);\n  var use2 = document.createElementNS(svgXmlns, \"use\");\n  use2.setAttribute(\"href\", \"#s\" + hash);\n  use2.setAttribute(\"fill\", \"#000000\");\n  use2.setAttribute(\"fill-opacity\", \"0.5\");\n  childSvg.appendChild(use2);\n  parent.appendChild(childSvg);\n  return childSvg;\n}\n\nvar $$XMLSerializer = /* module */[];\n\nfunction svgToDataURL(svg) {\n  var xmlSerializer = new XMLSerializer();\n  var str = xmlSerializer.serializeToString(svg);\n  return \"data:image/svg+xml;utf8,\" + encodeURIComponent(str);\n}\n\nfunction drawCanvas(canvas, code) {\n  var size = code.size;\n  var width = size + 4 | 0;\n  if (canvas.width !== width) {\n    canvas.width = width;\n    canvas.height = width;\n  }\n  var ctx = canvas.getContext(\"2d\");\n  ctx.globalCompositeOperation = \"difference\";\n  ctx.fillStyle = \"#FFFFFF\";\n  for(var y = -2 ,y_finish = size + 2 | 0; y <= y_finish; ++y){\n    for(var x = -2 ,x_finish = size + 2 | 0; x <= x_finish; ++x){\n      if (code.getModule(x, y)) {\n        ctx.fillRect(x + 2 | 0, y + 2 | 0, 1, 1);\n      }\n      \n    }\n  }\n  return /* () */0;\n}\n\nexports.getPathString = getPathString;\nexports.getSvgDataUri = getSvgDataUri;\nexports.svgXmlns = svgXmlns;\nexports.createSvg = createSvg;\nexports.$$XMLSerializer = $$XMLSerializer;\nexports.svgToDataURL = svgToDataURL;\nexports.drawCanvas = drawCanvas;\n/* No side effect */\n\n\n//# sourceURL=webpack:///./src/QueerCode.bs.js?");
-
-/***/ }),
-
-/***/ "./src/Scanner.bs.js":
-/*!***************************!*\
-  !*** ./src/Scanner.bs.js ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("// Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE\n\n\nvar Curry = __webpack_require__(/*! bs-platform/lib/js/curry.js */ \"./node_modules/bs-platform/lib/js/curry.js\");\nvar Caml_option = __webpack_require__(/*! bs-platform/lib/js/caml_option.js */ \"./node_modules/bs-platform/lib/js/caml_option.js\");\nvar Util$QueerLoop = __webpack_require__(/*! ./Util.bs.js */ \"./src/Util.bs.js\");\nvar UserMedia$QueerLoop = __webpack_require__(/*! ./UserMedia.bs.js */ \"./src/UserMedia.bs.js\");\n\nfunction scanUsingDeviceId(videoEl, deviceId, scanCallback) {\n  return UserMedia$QueerLoop.initStreamByDeviceId(videoEl, deviceId).then((function (video) {\n                var canvas = document.createElement(\"canvas\");\n                Util$QueerLoop.withQuerySelector(\"body\", (function (body) {\n                        body.appendChild(canvas);\n                        return /* () */0;\n                      }));\n                var worker = new Worker(\"worker.js\");\n                var msgBackHandler = function (e) {\n                  var maybeCode = e.data;\n                  if (maybeCode !== undefined) {\n                    Curry._1(scanCallback, Caml_option.valFromOption(maybeCode).data);\n                  }\n                  return /* () */0;\n                };\n                worker.onmessage = msgBackHandler;\n                var frameCount = /* record */[/* contents */0];\n                var onTick = function (param) {\n                  if (video.readyState === 4) {\n                    var width = video.videoWidth;\n                    var height = video.videoHeight;\n                    if (canvas.width !== width) {\n                      canvas.width = width;\n                      canvas.height = height;\n                    }\n                    if (frameCount[0] % 5 === 0) {\n                      var ctx = canvas.getContext(\"2d\");\n                      ctx.drawImage(video, 0, 0);\n                      var imageData = ctx.getImageData(0, 0, width, height);\n                      worker.postMessage(/* tuple */[\n                            imageData.data,\n                            width,\n                            height\n                          ]);\n                    }\n                    \n                  }\n                  frameCount[0] = frameCount[0] + 1 | 0;\n                  requestAnimationFrame(onTick);\n                  return /* () */0;\n                };\n                requestAnimationFrame(onTick);\n                return Promise.resolve(canvas);\n              }));\n}\n\nexports.scanUsingDeviceId = scanUsingDeviceId;\n/* Util-QueerLoop Not a pure module */\n\n\n//# sourceURL=webpack:///./src/Scanner.bs.js?");
-
-/***/ }),
-
-/***/ "./src/SubtleCrypto.bs.js":
-/*!********************************!*\
-  !*** ./src/SubtleCrypto.bs.js ***!
-  \********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("// Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE\n\n\n\nvar defaultHmac = {\n  name: \"HMAC\",\n  hash: \"SHA-256\"\n};\n\nfunction exportKeyJWK(key) {\n  return window.crypto.subtle.exportKey(\"jwk\", key).then((function (t) {\n                return Promise.resolve(JSON.stringify(t));\n              }));\n}\n\nfunction importKeyJWK(json) {\n  var parsed = JSON.parse(json);\n  return window.crypto.subtle.importKey(\"jwk\", parsed, defaultHmac, true, /* array */[\n              \"sign\",\n              \"verify\"\n            ]);\n}\n\nfunction generateHmac(param) {\n  return window.crypto.subtle.generateKey(defaultHmac, true, /* array */[\n              \"sign\",\n              \"verify\"\n            ]);\n}\n\nvar defaultHmacKeyJSON = \"{\\\"alg\\\":\\\"HS256\\\",\\\"ext\\\":true,\\\"k\\\":\\\"A-cS_q7opsDHm5vusaNtzSbaJcI153rl-2VVPXyliu2G5nKicquFkf-rcFNCyQkC50CDjzFdDhIh9WzzWSXXHw\\\",\\\"key_ops\\\":[\\\"sign\\\",\\\"verify\\\"],\\\"kty\\\":\\\"oct\\\"}\";\n\nvar defaultHmacKey = importKeyJWK(defaultHmacKeyJSON);\n\nexports.defaultHmac = defaultHmac;\nexports.exportKeyJWK = exportKeyJWK;\nexports.importKeyJWK = importKeyJWK;\nexports.generateHmac = generateHmac;\nexports.defaultHmacKeyJSON = defaultHmacKeyJSON;\nexports.defaultHmacKey = defaultHmacKey;\n/* defaultHmacKey Not a pure module */\n\n\n//# sourceURL=webpack:///./src/SubtleCrypto.bs.js?");
-
-/***/ }),
-
-/***/ "./src/UserMedia.bs.js":
-/*!*****************************!*\
-  !*** ./src/UserMedia.bs.js ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("// Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE\n\n\nvar ElementRe = __webpack_require__(/*! bs-webapi/src/dom/nodes/ElementRe.js */ \"./node_modules/bs-webapi/src/dom/nodes/ElementRe.js\");\nvar Belt_Array = __webpack_require__(/*! bs-platform/lib/js/belt_Array.js */ \"./node_modules/bs-platform/lib/js/belt_Array.js\");\nvar Caml_option = __webpack_require__(/*! bs-platform/lib/js/caml_option.js */ \"./node_modules/bs-platform/lib/js/caml_option.js\");\n\nfunction getCameras(param) {\n  return window.navigator.mediaDevices.enumerateDevices().then((function (devices) {\n                return Promise.resolve(Belt_Array.keep(devices, (function (x) {\n                                  return x.kind === \"videoinput\";\n                                })));\n              }));\n}\n\nfunction initStreamByDeviceId(videoEl, deviceId) {\n  return window.navigator.mediaDevices.getUserMedia({\n                video: {\n                  deviceId: deviceId\n                }\n              }).then((function (stream) {\n                videoEl.srcObject = stream;\n                var match = ElementRe.asHtmlElement(videoEl);\n                if (match !== undefined) {\n                  Caml_option.valFromOption(match).setAttribute(\"playsinline\", \"true\");\n                }\n                videoEl.play();\n                return Promise.resolve(videoEl);\n              }));\n}\n\nexports.getCameras = getCameras;\nexports.initStreamByDeviceId = initStreamByDeviceId;\n/* ElementRe Not a pure module */\n\n\n//# sourceURL=webpack:///./src/UserMedia.bs.js?");
-
-/***/ }),
-
-/***/ "./src/Util.bs.js":
-/*!************************!*\
-  !*** ./src/Util.bs.js ***!
-  \************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("// Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE\n\n\nvar $$Array = __webpack_require__(/*! bs-platform/lib/js/array.js */ \"./node_modules/bs-platform/lib/js/array.js\");\nvar ElementRe = __webpack_require__(/*! bs-webapi/src/dom/nodes/ElementRe.js */ \"./node_modules/bs-webapi/src/dom/nodes/ElementRe.js\");\nvar Belt_Option = __webpack_require__(/*! bs-platform/lib/js/belt_Option.js */ \"./node_modules/bs-platform/lib/js/belt_Option.js\");\nvar Caml_option = __webpack_require__(/*! bs-platform/lib/js/caml_option.js */ \"./node_modules/bs-platform/lib/js/caml_option.js\");\n\nfunction withQuerySelectorDom(query, f) {\n  return Belt_Option.map(Caml_option.nullable_to_opt(document.querySelector(query)), f);\n}\n\nfunction withQuerySelector(query, f) {\n  return Belt_Option.map(Belt_Option.flatMap(Caml_option.nullable_to_opt(document.querySelector(query)), ElementRe.asHtmlElement), f);\n}\n\nfunction withQuerySelectorAll(query, f) {\n  return $$Array.map(f, Array.prototype.slice.call(document.querySelectorAll(query)));\n}\n\nfunction withQuerySelectorSub(query, childQuery, f) {\n  return Belt_Option.map(Belt_Option.flatMap(Caml_option.nullable_to_opt(document.querySelector(query)), (function (param) {\n                    return Caml_option.nullable_to_opt(param.querySelector(childQuery));\n                  })), f);\n}\n\nfunction getHash(param) {\n  return window.location.hash;\n}\n\nfunction setHash(hash) {\n  window.location.hash = hash;\n  return /* () */0;\n}\n\nexports.withQuerySelectorDom = withQuerySelectorDom;\nexports.withQuerySelector = withQuerySelector;\nexports.withQuerySelectorAll = withQuerySelectorAll;\nexports.withQuerySelectorSub = withQuerySelectorSub;\nexports.getHash = getHash;\nexports.setHash = setHash;\n/* ElementRe Not a pure module */\n\n\n//# sourceURL=webpack:///./src/Util.bs.js?");
-
-/***/ }),
-
-/***/ "./src/qrcodegen.js":
-/*!**************************!*\
-  !*** ./src/qrcodegen.js ***!
-  \**************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;\n\n(function (root, factory) {\n    if (true) {\n        // AMD. Register as an anonymous module.\n        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),\n\t\t\t\t__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?\n\t\t\t\t(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),\n\t\t\t\t__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));\n    } else {}\n}(typeof self !== 'undefined' ? self : this, function (exports) {\n\n\n/*\n * QR Code generator library (JavaScript)\n * \n * Copyright (c) Project Nayuki. (MIT License)\n * https://www.nayuki.io/page/qr-code-generator-library\n * \n * Permission is hereby granted, free of charge, to any person obtaining a copy of\n * this software and associated documentation files (the \"Software\"), to deal in\n * the Software without restriction, including without limitation the rights to\n * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of\n * the Software, and to permit persons to whom the Software is furnished to do so,\n * subject to the following conditions:\n * - The above copyright notice and this permission notice shall be included in\n *   all copies or substantial portions of the Software.\n * - The Software is provided \"as is\", without warranty of any kind, express or\n *   implied, including but not limited to the warranties of merchantability,\n *   fitness for a particular purpose and noninfringement. In no event shall the\n *   authors or copyright holders be liable for any claim, damages or other\n *   liability, whether in an action of contract, tort or otherwise, arising from,\n *   out of or in connection with the Software or the use or other dealings in the\n *   Software.\n */\n\n\n\n/* \n * Module \"qrcodegen\", public members:\n * - Class QrCode:\n *   - Function encodeText(str text, QrCode.Ecc ecl) -> QrCode\n *   - Function encodeBinary(list<byte> data, QrCode.Ecc ecl) -> QrCode\n *   - Function encodeSegments(list<QrSegment> segs, QrCode.Ecc ecl,\n *         int minVersion=1, int maxVersion=40, mask=-1, boostEcl=true) -> QrCode\n *   - Constants int MIN_VERSION, MAX_VERSION\n *   - Constructor QrCode(int version, QrCode.Ecc ecl, list<byte> dataCodewords, int mask)\n *   - Fields int version, size, mask\n *   - Field QrCode.Ecc errorCorrectionLevel\n *   - Method getModule(int x, int y) -> bool\n *   - Method drawCanvas(int scale, int border, HTMLCanvasElement canvas) -> void\n *   - Method toSvgString(int border) -> str\n *   - Enum Ecc:\n *     - Constants LOW, MEDIUM, QUARTILE, HIGH\n *     - Field int ordinal\n * - Class QrSegment:\n *   - Function makeBytes(list<byte> data) -> QrSegment\n *   - Function makeNumeric(str data) -> QrSegment\n *   - Function makeAlphanumeric(str data) -> QrSegment\n *   - Function makeSegments(str text) -> list<QrSegment>\n *   - Function makeEci(int assignVal) -> QrSegment\n *   - Constructor QrSegment(QrSegment.Mode mode, int numChars, list<int> bitData)\n *   - Field QrSegment.Mode mode\n *   - Field int numChars\n *   - Method getData() -> list<int>\n *   - Constants RegExp NUMERIC_REGEX, ALPHANUMERIC_REGEX\n *   - Enum Mode:\n *     - Constants NUMERIC, ALPHANUMERIC, BYTE, KANJI, ECI\n */\nvar qrcodegen = new function() {\n\t\n\t/*---- QR Code symbol class ----*/\n\t\n\t/* \n\t * A class that represents a QR Code symbol, which is a type of two-dimension barcode.\n\t * Invented by Denso Wave and described in the ISO/IEC 18004 standard.\n\t * Instances of this class represent an immutable square grid of black and white cells.\n\t * The class provides static factory functions to create a QR Code from text or binary data.\n\t * The class covers the QR Code Model 2 specification, supporting all versions (sizes)\n\t * from 1 to 40, all 4 error correction levels, and 4 character encoding modes.\n\t * \n\t * Ways to create a QR Code object:\n\t * - High level: Take the payload data and call QrCode.encodeText() or QrCode.encodeBinary().\n\t * - Mid level: Custom-make the list of segments and call QrCode.encodeSegments().\n\t * - Low level: Custom-make the array of data codeword bytes (including\n\t *   segment headers and final padding, excluding error correction codewords),\n\t *   supply the appropriate version number, and call the QrCode() constructor.\n\t * (Note that all ways require supplying the desired error correction level.)\n\t * \n\t * This constructor creates a new QR Code with the given version number,\n\t * error correction level, data codeword bytes, and mask number.\n\t * This is a low-level API that most users should not use directly.\n\t * A mid-level API is the encodeSegments() function.\n\t */\n\tthis.QrCode = function(version, errCorLvl, dataCodewords, mask) {\n\t\t\n\t\t/*---- Constructor (low level) ----*/\n\t\t\n\t\t// Check scalar arguments\n\t\tif (version < MIN_VERSION || version > MAX_VERSION)\n\t\t\tthrow \"Version value out of range\";\n\t\tif (mask < -1 || mask > 7)\n\t\t\tthrow \"Mask value out of range\";\n\t\tif (!(errCorLvl instanceof Ecc))\n\t\t\tthrow \"QrCode.Ecc expected\";\n\t\tvar size = version * 4 + 17;\n\t\t\n\t\t// Initialize both grids to be size*size arrays of Boolean false\n\t\tvar row = [];\n\t\tfor (var i = 0; i < size; i++)\n\t\t\trow.push(false);\n\t\tvar modules    = [];  // Initially all white\n\t\tvar isFunction = [];\n\t\tfor (var i = 0; i < size; i++) {\n\t\t\tmodules   .push(row.slice());\n\t\t\tisFunction.push(row.slice());\n\t\t}\n\t\t\n\t\t// Compute ECC, draw modules\n\t\tdrawFunctionPatterns();\n\t\tvar allCodewords = addEccAndInterleave(dataCodewords);\n\t\tdrawCodewords(allCodewords);\n\t\t\n\t\t// Do masking\n\t\tif (mask == -1) {  // Automatically choose best mask\n\t\t\tvar minPenalty = Infinity;\n\t\t\tfor (var i = 0; i < 8; i++) {\n\t\t\t\tapplyMask(i);\n\t\t\t\tdrawFormatBits(i);\n\t\t\t\tvar penalty = getPenaltyScore();\n\t\t\t\tif (penalty < minPenalty) {\n\t\t\t\t\tmask = i;\n\t\t\t\t\tminPenalty = penalty;\n\t\t\t\t}\n\t\t\t\tapplyMask(i);  // Undoes the mask due to XOR\n\t\t\t}\n\t\t}\n\t\tif (mask < 0 || mask > 7)\n\t\t\tthrow \"Assertion error\";\n\t\tapplyMask(mask);  // Apply the final choice of mask\n\t\tdrawFormatBits(mask);  // Overwrite old format bits\n\t\t\n\t\tisFunction = null;\n\t\t\n\t\t\n\t\t/*---- Read-only instance properties ----*/\n\t\t\n\t\t// The version number of this QR Code, which is between 1 and 40 (inclusive).\n\t\t// This determines the size of this barcode.\n\t\tObject.defineProperty(this, \"version\", {value:version});\n\t\t\n\t\t// The width and height of this QR Code, measured in modules, between\n\t\t// 21 and 177 (inclusive). This is equal to version * 4 + 17.\n\t\tObject.defineProperty(this, \"size\", {value:size});\n\t\t\n\t\t// The error correction level used in this QR Code.\n\t\tObject.defineProperty(this, \"errorCorrectionLevel\", {value:errCorLvl});\n\t\t\n\t\t// The index of the mask pattern used in this QR Code, which is between 0 and 7 (inclusive).\n\t\t// Even if a QR Code is created with automatic masking requested (mask = -1),\n\t\t// the resulting object still has a mask value between 0 and 7.\n\t\tObject.defineProperty(this, \"mask\", {value:mask});\n\t\t\n\t\t\n\t\t/*---- Accessor methods ----*/\n\t\t\n\t\t// Returns the color of the module (pixel) at the given coordinates, which is false\n\t\t// for white or true for black. The top left corner has the coordinates (x=0, y=0).\n\t\t// If the given coordinates are out of bounds, then false (white) is returned.\n\t\tthis.getModule = function(x, y) {\n\t\t\treturn 0 <= x && x < size && 0 <= y && y < size && modules[y][x];\n\t\t};\n\n    this.getModules = function () { return modules; }\n\t\t\n\t\t\n\t\t/*---- Public instance methods ----*/\n\t\t\n\t\t// Draws this QR Code, with the given module scale and border modules, onto the given HTML\n\t\t// canvas element. The canvas's width and height is resized to (this.size + border * 2) * scale.\n\t\t// The drawn image is be purely black and white, and fully opaque.\n\t\t// The scale must be a positive integer and the border must be a non-negative integer.\n\t\tthis.drawCanvas = function(scale, border, canvas) {\n\t\t\tif (scale <= 0 || border < 0)\n\t\t\t\tthrow \"Value out of range\";\n\t\t\tvar width = (size + border * 2) * scale;\n      if (canvas.width != width) {\n          canvas.width = width;\n          canvas.height = width;\n      };\n      var ctx = canvas.getContext(\"2d\");\n\t\t\tfor (var y = -border; y < size + border; y++) {\n\t\t\t\tfor (var x = -border; x < size + border; x++) {\n\t\t\t\t\tctx.fillStyle = this.getModule(x, y) ? \"#000000\" : \"#FFFFFF\";\n\t\t\t\t\tctx.fillRect((x + border) * scale, (y + border) * scale, scale, scale);\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\t\t\n\t\t// Returns a string of SVG code for an image depicting this QR Code, with the given number\n\t\t// of border modules. The string always uses Unix newlines (\\n), regardless of the platform.\n\t\tthis.toSvgString = function(border) {\n\t\t\tif (border < 0)\n\t\t\t\tthrow \"Border must be non-negative\";\n\t\t\tvar parts = [];\n\t\t\tfor (var y = 0; y < size; y++) {\n\t\t\t\tfor (var x = 0; x < size; x++) {\n\t\t\t\t\tif (this.getModule(x, y))\n\t\t\t\t\t\tparts.push(\"M\" + (x + border) + \",\" + (y + border) + \"h1v1h-1z\");\n\t\t\t\t}\n\t\t\t}\n\t\t\treturn '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\\n' +\n\t\t\t\t'<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\\n' +\n\t\t\t\t'<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 ' +\n\t\t\t\t\t(size + border * 2) + ' ' + (size + border * 2) + '\" stroke=\"none\">\\n' +\n\t\t\t\t'\\t<rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\"/>\\n' +\n\t\t\t\t'\\t<path d=\"' + parts.join(\" \") + '\" fill=\"#000000\"/>\\n' +\n\t\t\t\t'</svg>\\n';\n\t\t};\n\t\t\n\t\t\n\t\t/*---- Private helper methods for constructor: Drawing function modules ----*/\n\t\t\n\t\t// Reads this object's version field, and draws and marks all function modules.\n\t\tfunction drawFunctionPatterns() {\n\t\t\t// Draw horizontal and vertical timing patterns\n\t\t\tfor (var i = 0; i < size; i++) {\n\t\t\t\tsetFunctionModule(6, i, i % 2 == 0);\n\t\t\t\tsetFunctionModule(i, 6, i % 2 == 0);\n\t\t\t}\n\t\t\t\n\t\t\t// Draw 3 finder patterns (all corners except bottom right; overwrites some timing modules)\n\t\t\tdrawFinderPattern(3, 3);\n\t\t\tdrawFinderPattern(size - 4, 3);\n\t\t\tdrawFinderPattern(3, size - 4);\n\t\t\t\n\t\t\t// Draw numerous alignment patterns\n\t\t\tvar alignPatPos = getAlignmentPatternPositions();\n\t\t\tvar numAlign = alignPatPos.length;\n\t\t\tfor (var i = 0; i < numAlign; i++) {\n\t\t\t\tfor (var j = 0; j < numAlign; j++) {\n\t\t\t\t\t// Don't draw on the three finder corners\n\t\t\t\t\tif (!(i == 0 && j == 0 || i == 0 && j == numAlign - 1 || i == numAlign - 1 && j == 0))\n\t\t\t\t\t\tdrawAlignmentPattern(alignPatPos[i], alignPatPos[j]);\n\t\t\t\t}\n\t\t\t}\n\t\t\t\n\t\t\t// Draw configuration data\n\t\t\tdrawFormatBits(0);  // Dummy mask value; overwritten later in the constructor\n\t\t\tdrawVersion();\n\t\t}\n\t\t\n\t\t\n\t\t// Draws two copies of the format bits (with its own error correction code)\n\t\t// based on the given mask and this object's error correction level field.\n\t\tfunction drawFormatBits(mask) {\n\t\t\t// Calculate error correction code and pack bits\n\t\t\tvar data = errCorLvl.formatBits << 3 | mask;  // errCorrLvl is uint2, mask is uint3\n\t\t\tvar rem = data;\n\t\t\tfor (var i = 0; i < 10; i++)\n\t\t\t\trem = (rem << 1) ^ ((rem >>> 9) * 0x537);\n\t\t\tvar bits = (data << 10 | rem) ^ 0x5412;  // uint15\n\t\t\tif (bits >>> 15 != 0)\n\t\t\t\tthrow \"Assertion error\";\n\t\t\t\n\t\t\t// Draw first copy\n\t\t\tfor (var i = 0; i <= 5; i++)\n\t\t\t\tsetFunctionModule(8, i, getBit(bits, i));\n\t\t\tsetFunctionModule(8, 7, getBit(bits, 6));\n\t\t\tsetFunctionModule(8, 8, getBit(bits, 7));\n\t\t\tsetFunctionModule(7, 8, getBit(bits, 8));\n\t\t\tfor (var i = 9; i < 15; i++)\n\t\t\t\tsetFunctionModule(14 - i, 8, getBit(bits, i));\n\t\t\t\n\t\t\t// Draw second copy\n\t\t\tfor (var i = 0; i < 8; i++)\n\t\t\t\tsetFunctionModule(size - 1 - i, 8, getBit(bits, i));\n\t\t\tfor (var i = 8; i < 15; i++)\n\t\t\t\tsetFunctionModule(8, size - 15 + i, getBit(bits, i));\n\t\t\tsetFunctionModule(8, size - 8, true);  // Always black\n\t\t}\n\t\t\n\t\t\n\t\t// Draws two copies of the version bits (with its own error correction code),\n\t\t// based on this object's version field, iff 7 <= version <= 40.\n\t\tfunction drawVersion() {\n\t\t\tif (version < 7)\n\t\t\t\treturn;\n\t\t\t\n\t\t\t// Calculate error correction code and pack bits\n\t\t\tvar rem = version;  // version is uint6, in the range [7, 40]\n\t\t\tfor (var i = 0; i < 12; i++)\n\t\t\t\trem = (rem << 1) ^ ((rem >>> 11) * 0x1F25);\n\t\t\tvar bits = version << 12 | rem;  // uint18\n\t\t\tif (bits >>> 18 != 0)\n\t\t\t\tthrow \"Assertion error\";\n\t\t\t\n\t\t\t// Draw two copies\n\t\t\tfor (var i = 0; i < 18; i++) {\n\t\t\t\tvar bit = getBit(bits, i);\n\t\t\t\tvar a = size - 11 + i % 3;\n\t\t\t\tvar b = Math.floor(i / 3);\n\t\t\t\tsetFunctionModule(a, b, bit);\n\t\t\t\tsetFunctionModule(b, a, bit);\n\t\t\t}\n\t\t}\n\t\t\n\t\t\n\t\t// Draws a 9*9 finder pattern including the border separator,\n\t\t// with the center module at (x, y). Modules can be out of bounds.\n\t\tfunction drawFinderPattern(x, y) {\n\t\t\tfor (var dy = -4; dy <= 4; dy++) {\n\t\t\t\tfor (var dx = -4; dx <= 4; dx++) {\n\t\t\t\t\tvar dist = Math.max(Math.abs(dx), Math.abs(dy));  // Chebyshev/infinity norm\n\t\t\t\t\tvar xx = x + dx, yy = y + dy;\n\t\t\t\t\tif (0 <= xx && xx < size && 0 <= yy && yy < size)\n\t\t\t\t\t\tsetFunctionModule(xx, yy, dist != 2 && dist != 4);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\t\n\t\t\n\t\t// Draws a 5*5 alignment pattern, with the center module\n\t\t// at (x, y). All modules must be in bounds.\n\t\tfunction drawAlignmentPattern(x, y) {\n\t\t\tfor (var dy = -2; dy <= 2; dy++) {\n\t\t\t\tfor (var dx = -2; dx <= 2; dx++)\n\t\t\t\t\tsetFunctionModule(x + dx, y + dy, Math.max(Math.abs(dx), Math.abs(dy)) != 1);\n\t\t\t}\n\t\t}\n\t\t\n\t\t\n\t\t// Sets the color of a module and marks it as a function module.\n\t\t// Only used by the constructor. Coordinates must be in bounds.\n\t\tfunction setFunctionModule(x, y, isBlack) {\n\t\t\tmodules[y][x] = isBlack;\n\t\t\tisFunction[y][x] = true;\n\t\t}\n\t\t\n\t\t\n\t\t/*---- Private helper methods for constructor: Codewords and masking ----*/\n\t\t\n\t\t// Returns a new byte string representing the given data with the appropriate error correction\n\t\t// codewords appended to it, based on this object's version and error correction level.\n\t\tfunction addEccAndInterleave(data) {\n\t\t\tif (data.length != QrCode.getNumDataCodewords(version, errCorLvl))\n\t\t\t\tthrow \"Invalid argument\";\n\t\t\t\n\t\t\t// Calculate parameter numbers\n\t\t\tvar numBlocks = QrCode.NUM_ERROR_CORRECTION_BLOCKS[errCorLvl.ordinal][version];\n\t\t\tvar blockEccLen = QrCode.ECC_CODEWORDS_PER_BLOCK  [errCorLvl.ordinal][version];\n\t\t\tvar rawCodewords = Math.floor(QrCode.getNumRawDataModules(version) / 8);\n\t\t\tvar numShortBlocks = numBlocks - rawCodewords % numBlocks;\n\t\t\tvar shortBlockLen = Math.floor(rawCodewords / numBlocks);\n\t\t\t\n\t\t\t// Split data into blocks and append ECC to each block\n\t\t\tvar blocks = [];\n\t\t\tvar rs = new ReedSolomonGenerator(blockEccLen);\n\t\t\tfor (var i = 0, k = 0; i < numBlocks; i++) {\n\t\t\t\tvar dat = data.slice(k, k + shortBlockLen - blockEccLen + (i < numShortBlocks ? 0 : 1));\n\t\t\t\tk += dat.length;\n\t\t\t\tvar ecc = rs.getRemainder(dat);\n\t\t\t\tif (i < numShortBlocks)\n\t\t\t\t\tdat.push(0);\n\t\t\t\tblocks.push(dat.concat(ecc));\n\t\t\t}\n\t\t\t\n\t\t\t// Interleave (not concatenate) the bytes from every block into a single sequence\n\t\t\tvar result = [];\n\t\t\tfor (var i = 0; i < blocks[0].length; i++) {\n\t\t\t\tfor (var j = 0; j < blocks.length; j++) {\n\t\t\t\t\t// Skip the padding byte in short blocks\n\t\t\t\t\tif (i != shortBlockLen - blockEccLen || j >= numShortBlocks)\n\t\t\t\t\t\tresult.push(blocks[j][i]);\n\t\t\t\t}\n\t\t\t}\n\t\t\tif (result.length != rawCodewords)\n\t\t\t\tthrow \"Assertion error\";\n\t\t\treturn result;\n\t\t}\n\t\t\n\t\t\n\t\t// Draws the given sequence of 8-bit codewords (data and error correction) onto the entire\n\t\t// data area of this QR Code. Function modules need to be marked off before this is called.\n\t\tfunction drawCodewords(data) {\n\t\t\tif (data.length != Math.floor(QrCode.getNumRawDataModules(version) / 8))\n\t\t\t\tthrow \"Invalid argument\";\n\t\t\tvar i = 0;  // Bit index into the data\n\t\t\t// Do the funny zigzag scan\n\t\t\tfor (var right = size - 1; right >= 1; right -= 2) {  // Index of right column in each column pair\n\t\t\t\tif (right == 6)\n\t\t\t\t\tright = 5;\n\t\t\t\tfor (var vert = 0; vert < size; vert++) {  // Vertical counter\n\t\t\t\t\tfor (var j = 0; j < 2; j++) {\n\t\t\t\t\t\tvar x = right - j;  // Actual x coordinate\n\t\t\t\t\t\tvar upward = ((right + 1) & 2) == 0;\n\t\t\t\t\t\tvar y = upward ? size - 1 - vert : vert;  // Actual y coordinate\n\t\t\t\t\t\tif (!isFunction[y][x] && i < data.length * 8) {\n\t\t\t\t\t\t\tmodules[y][x] = getBit(data[i >>> 3], 7 - (i & 7));\n\t\t\t\t\t\t\ti++;\n\t\t\t\t\t\t}\n\t\t\t\t\t\t// If this QR Code has any remainder bits (0 to 7), they were assigned as\n\t\t\t\t\t\t// 0/false/white by the constructor and are left unchanged by this method\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t\tif (i != data.length * 8)\n\t\t\t\tthrow \"Assertion error\";\n\t\t}\n\t\t\n\t\t\n\t\t// XORs the codeword modules in this QR Code with the given mask pattern.\n\t\t// The function modules must be marked and the codeword bits must be drawn\n\t\t// before masking. Due to the arithmetic of XOR, calling applyMask() with\n\t\t// the same mask value a second time will undo the mask. A final well-formed\n\t\t// QR Code needs exactly one (not zero, two, etc.) mask applied.\n\t\tfunction applyMask(mask) {\n\t\t\tif (mask < 0 || mask > 7)\n\t\t\t\tthrow \"Mask value out of range\";\n\t\t\tfor (var y = 0; y < size; y++) {\n\t\t\t\tfor (var x = 0; x < size; x++) {\n\t\t\t\t\tvar invert;\n\t\t\t\t\tswitch (mask) {\n\t\t\t\t\t\tcase 0:  invert = (x + y) % 2 == 0;                                  break;\n\t\t\t\t\t\tcase 1:  invert = y % 2 == 0;                                        break;\n\t\t\t\t\t\tcase 2:  invert = x % 3 == 0;                                        break;\n\t\t\t\t\t\tcase 3:  invert = (x + y) % 3 == 0;                                  break;\n\t\t\t\t\t\tcase 4:  invert = (Math.floor(x / 3) + Math.floor(y / 2)) % 2 == 0;  break;\n\t\t\t\t\t\tcase 5:  invert = x * y % 2 + x * y % 3 == 0;                        break;\n\t\t\t\t\t\tcase 6:  invert = (x * y % 2 + x * y % 3) % 2 == 0;                  break;\n\t\t\t\t\t\tcase 7:  invert = ((x + y) % 2 + x * y % 3) % 2 == 0;                break;\n\t\t\t\t\t\tdefault:  throw \"Assertion error\";\n\t\t\t\t\t}\n\t\t\t\t\tif (!isFunction[y][x] && invert)\n\t\t\t\t\t\tmodules[y][x] = !modules[y][x];\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\t\n\t\t\n\t\t// Calculates and returns the penalty score based on state of this QR Code's current modules.\n\t\t// This is used by the automatic mask choice algorithm to find the mask pattern that yields the lowest score.\n\t\tfunction getPenaltyScore() {\n\t\t\tvar result = 0;\n\t\t\t\n\t\t\t// Adjacent modules in row having same color, and finder-like patterns\n\t\t\tfor (var y = 0; y < size; y++) {\n\t\t\t\tvar runHistory = [0,0,0,0,0,0,0];\n\t\t\t\tvar color = false;\n\t\t\t\tvar runX = 0;\n\t\t\t\tfor (var x = 0; x < size; x++) {\n\t\t\t\t\tif (modules[y][x] == color) {\n\t\t\t\t\t\trunX++;\n\t\t\t\t\t\tif (runX == 5)\n\t\t\t\t\t\t\tresult += QrCode.PENALTY_N1;\n\t\t\t\t\t\telse if (runX > 5)\n\t\t\t\t\t\t\tresult++;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tQrCode.addRunToHistory(runX, runHistory);\n\t\t\t\t\t\tif (!color && QrCode.hasFinderLikePattern(runHistory))\n\t\t\t\t\t\t\tresult += QrCode.PENALTY_N3;\n\t\t\t\t\t\tcolor = modules[y][x];\n\t\t\t\t\t\trunX = 1;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tQrCode.addRunToHistory(runX, runHistory);\n\t\t\t\tif (color)\n\t\t\t\t\tQrCode.addRunToHistory(0, runHistory);  // Dummy run of white\n\t\t\t\tif (QrCode.hasFinderLikePattern(runHistory))\n\t\t\t\t\tresult += QrCode.PENALTY_N3;\n\t\t\t}\n\t\t\t// Adjacent modules in column having same color, and finder-like patterns\n\t\t\tfor (var x = 0; x < size; x++) {\n\t\t\t\tvar runHistory = [0,0,0,0,0,0,0];\n\t\t\t\tvar color = false;\n\t\t\t\tvar runY = 0;\n\t\t\t\tfor (var y = 0; y < size; y++) {\n\t\t\t\t\tif (modules[y][x] == color) {\n\t\t\t\t\t\trunY++;\n\t\t\t\t\t\tif (runY == 5)\n\t\t\t\t\t\t\tresult += QrCode.PENALTY_N1;\n\t\t\t\t\t\telse if (runY > 5)\n\t\t\t\t\t\t\tresult++;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tQrCode.addRunToHistory(runY, runHistory);\n\t\t\t\t\t\tif (!color && QrCode.hasFinderLikePattern(runHistory))\n\t\t\t\t\t\t\tresult += QrCode.PENALTY_N3;\n\t\t\t\t\t\tcolor = modules[y][x];\n\t\t\t\t\t\trunY = 1;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tQrCode.addRunToHistory(runY, runHistory);\n\t\t\t\tif (color)\n\t\t\t\t\tQrCode.addRunToHistory(0, runHistory);  // Dummy run of white\n\t\t\t\tif (QrCode.hasFinderLikePattern(runHistory))\n\t\t\t\t\tresult += QrCode.PENALTY_N3;\n\t\t\t}\n\t\t\t\n\t\t\t// 2*2 blocks of modules having same color\n\t\t\tfor (var y = 0; y < size - 1; y++) {\n\t\t\t\tfor (var x = 0; x < size - 1; x++) {\n\t\t\t\t\tvar   color = modules[y][x];\n\t\t\t\t\tif (  color == modules[y][x + 1] &&\n\t\t\t\t\t      color == modules[y + 1][x] &&\n\t\t\t\t\t      color == modules[y + 1][x + 1])\n\t\t\t\t\t\tresult += QrCode.PENALTY_N2;\n\t\t\t\t}\n\t\t\t}\n\t\t\t\n\t\t\t// Balance of black and white modules\n\t\t\tvar black = 0;\n\t\t\tmodules.forEach(function(row) {\n\t\t\t\trow.forEach(function(color) {\n\t\t\t\t\tif (color)\n\t\t\t\t\t\tblack++;\n\t\t\t\t});\n\t\t\t});\n\t\t\tvar total = size * size;  // Note that size is odd, so black/total != 1/2\n\t\t\t// Compute the smallest integer k >= 0 such that (45-5k)% <= black/total <= (55+5k)%\n\t\t\tvar k = Math.ceil(Math.abs(black * 20 - total * 10) / total) - 1;\n\t\t\tresult += k * QrCode.PENALTY_N4;\n\t\t\treturn result;\n\t\t}\n\t\t\n\t\t\n\t\t// Returns an ascending list of positions of alignment patterns for this version number.\n\t\t// Each position is in the range [0,177), and are used on both the x and y axes.\n\t\t// This could be implemented as lookup table of 40 variable-length lists of integers.\n\t\tfunction getAlignmentPatternPositions() {\n\t\t\tif (version == 1)\n\t\t\t\treturn [];\n\t\t\telse {\n\t\t\t\tvar numAlign = Math.floor(version / 7) + 2;\n\t\t\t\tvar step = (version == 32) ? 26 :\n\t\t\t\t\tMath.ceil((size - 13) / (numAlign*2 - 2)) * 2;\n\t\t\t\tvar result = [6];\n\t\t\t\tfor (var pos = size - 7; result.length < numAlign; pos -= step)\n\t\t\t\t\tresult.splice(1, 0, pos);\n\t\t\t\treturn result;\n\t\t\t}\n\t\t}\n\t\t\n\t\t\n\t\t// Returns true iff the i'th bit of x is set to 1.\n\t\tfunction getBit(x, i) {\n\t\t\treturn ((x >>> i) & 1) != 0;\n\t\t}\n\t};\n\t\n\t\n\t/*---- Static factory functions (high level) for QrCode ----*/\n\t\n\t/* \n\t * Returns a QR Code representing the given Unicode text string at the given error correction level.\n\t * As a conservative upper bound, this function is guaranteed to succeed for strings that have 738 or fewer\n\t * Unicode code points (not UTF-16 code units) if the low error correction level is used. The smallest possible\n\t * QR Code version is automatically chosen for the output. The ECC level of the result may be higher than the\n\t * ecl argument if it can be done without increasing the version.\n\t */\n\tthis.QrCode.encodeText = function(text, ecl) {\n\t\tvar segs = qrcodegen.QrSegment.makeSegments(text);\n\t\treturn this.encodeSegments(segs, ecl);\n\t};\n\t\n\t\n\t/* \n\t * Returns a QR Code representing the given binary data at the given error correction level.\n\t * This function always encodes using the binary segment mode, not any text mode. The maximum number of\n\t * bytes allowed is 2953. The smallest possible QR Code version is automatically chosen for the output.\n\t * The ECC level of the result may be higher than the ecl argument if it can be done without increasing the version.\n\t */\n\tthis.QrCode.encodeBinary = function(data, ecl) {\n\t\tvar seg = qrcodegen.QrSegment.makeBytes(data);\n\t\treturn this.encodeSegments([seg], ecl);\n\t};\n\t\n\t\n\t/*---- Static factory functions (mid level) for QrCode ----*/\n\t\n\t/* \n\t * Returns a QR Code representing the given segments with the given encoding parameters.\n\t * The smallest possible QR Code version within the given range is automatically\n\t * chosen for the output. Iff boostEcl is true, then the ECC level of the result\n\t * may be higher than the ecl argument if it can be done without increasing the\n\t * version. The mask number is either between 0 to 7 (inclusive) to force that\n\t * mask, or -1 to automatically choose an appropriate mask (which may be slow).\n\t * This function allows the user to create a custom sequence of segments that switches\n\t * between modes (such as alphanumeric and byte) to encode text in less space.\n\t * This is a mid-level API; the high-level API is encodeText() and encodeBinary().\n\t */\n\tthis.QrCode.encodeSegments = function(segs, ecl, minVersion, maxVersion, mask, boostEcl) {\n\t\tif (minVersion == undefined) minVersion = MIN_VERSION;\n\t\tif (maxVersion == undefined) maxVersion = MAX_VERSION;\n\t\tif (mask == undefined) mask = -1;\n\t\tif (boostEcl == undefined) boostEcl = true;\n\t\tif (!(MIN_VERSION <= minVersion && minVersion <= maxVersion && maxVersion <= MAX_VERSION) || mask < -1 || mask > 7)\n\t\t\tthrow \"Invalid value\";\n\t\t\n\t\t// Find the minimal version number to use\n\t\tvar version, dataUsedBits;\n\t\tfor (version = minVersion; ; version++) {\n\t\t\tvar dataCapacityBits = QrCode.getNumDataCodewords(version, ecl) * 8;  // Number of data bits available\n\t\t\tdataUsedBits = qrcodegen.QrSegment.getTotalBits(segs, version);\n\t\t\tif (dataUsedBits <= dataCapacityBits)\n\t\t\t\tbreak;  // This version number is found to be suitable\n\t\t\tif (version >= maxVersion)  // All versions in the range could not fit the given data\n\t\t\t\tthrow \"Data too long\";\n\t\t}\n\t\t\n\t\t// Increase the error correction level while the data still fits in the current version number\n\t\t[this.Ecc.MEDIUM, this.Ecc.QUARTILE, this.Ecc.HIGH].forEach(function(newEcl) {  // From low to high\n\t\t\tif (boostEcl && dataUsedBits <= QrCode.getNumDataCodewords(version, newEcl) * 8)\n\t\t\t\tecl = newEcl;\n\t\t});\n\t\t\n\t\t// Concatenate all segments to create the data bit string\n\t\tvar bb = new BitBuffer();\n\t\tsegs.forEach(function(seg) {\n\t\t\tbb.appendBits(seg.mode.modeBits, 4);\n\t\t\tbb.appendBits(seg.numChars, seg.mode.numCharCountBits(version));\n\t\t\tseg.getData().forEach(function(bit) {\n\t\t\t\tbb.push(bit);\n\t\t\t});\n\t\t});\n\t\tif (bb.length != dataUsedBits)\n\t\t\tthrow \"Assertion error\";\n\t\t\n\t\t// Add terminator and pad up to a byte if applicable\n\t\tvar dataCapacityBits = QrCode.getNumDataCodewords(version, ecl) * 8;\n\t\tif (bb.length > dataCapacityBits)\n\t\t\tthrow \"Assertion error\";\n\t\tbb.appendBits(0, Math.min(4, dataCapacityBits - bb.length));\n\t\tbb.appendBits(0, (8 - bb.length % 8) % 8);\n\t\tif (bb.length % 8 != 0)\n\t\t\tthrow \"Assertion error\";\n\t\t\n\t\t// Pad with alternating bytes until data capacity is reached\n\t\tfor (var padByte = 0xEC; bb.length < dataCapacityBits; padByte ^= 0xEC ^ 0x11)\n\t\t\tbb.appendBits(padByte, 8);\n\t\t\n\t\t// Pack bits into bytes in big endian\n\t\tvar dataCodewords = [];\n\t\twhile (dataCodewords.length * 8 < bb.length)\n\t\t\tdataCodewords.push(0);\n\t\tbb.forEach(function(bit, i) {\n\t\t\tdataCodewords[i >>> 3] |= bit << (7 - (i & 7));\n\t\t});\n\t\t\n\t\t// Create the QR Code object\n\t\treturn new this(version, ecl, dataCodewords, mask);\n\t};\n\t\n\t\n\t/*---- Private static helper functions for QrCode ----*/\n\t\n\tvar QrCode = {};  // Private object to assign properties to. Not the same object as 'this.QrCode'.\n\t\n\t\n\t// Returns the number of data bits that can be stored in a QR Code of the given version number, after\n\t// all function modules are excluded. This includes remainder bits, so it might not be a multiple of 8.\n\t// The result is in the range [208, 29648]. This could be implemented as a 40-entry lookup table.\n\tQrCode.getNumRawDataModules = function(ver) {\n\t\tif (ver < MIN_VERSION || ver > MAX_VERSION)\n\t\t\tthrow \"Version number out of range\";\n\t\tvar result = (16 * ver + 128) * ver + 64;\n\t\tif (ver >= 2) {\n\t\t\tvar numAlign = Math.floor(ver / 7) + 2;\n\t\t\tresult -= (25 * numAlign - 10) * numAlign - 55;\n\t\t\tif (ver >= 7)\n\t\t\t\tresult -= 36;\n\t\t}\n\t\treturn result;\n\t};\n\t\n\t\n\t// Returns the number of 8-bit data (i.e. not error correction) codewords contained in any\n\t// QR Code of the given version number and error correction level, with remainder bits discarded.\n\t// This stateless pure function could be implemented as a (40*4)-cell lookup table.\n\tQrCode.getNumDataCodewords = function(ver, ecl) {\n\t\treturn Math.floor(QrCode.getNumRawDataModules(ver) / 8) -\n\t\t\tQrCode.ECC_CODEWORDS_PER_BLOCK    [ecl.ordinal][ver] *\n\t\t\tQrCode.NUM_ERROR_CORRECTION_BLOCKS[ecl.ordinal][ver];\n\t};\n\t\n\t\n\t// Inserts the given value to the front of the given array, which shifts over the\n\t// existing values and deletes the last value. A helper function for getPenaltyScore().\n\tQrCode.addRunToHistory = function(run, history) {\n\t\thistory.pop();\n\t\thistory.unshift(run);\n\t};\n\t\n\t\n\t// Tests whether the given run history has the pattern of ratio 1:1:3:1:1 in the middle, and\n\t// surrounded by at least 4 on either or both ends. A helper function for getPenaltyScore().\n\t// Must only be called immediately after a run of white modules has ended.\n\tQrCode.hasFinderLikePattern = function(runHistory) {\n\t\tvar n = runHistory[1];\n\t\treturn n > 0 && runHistory[2] == n && runHistory[4] == n && runHistory[5] == n\n\t\t\t&& runHistory[3] == n * 3 && Math.max(runHistory[0], runHistory[6]) >= n * 4;\n\t};\n\t\n\t\n\t/*---- Constants and tables for QrCode ----*/\n\t\n\tvar MIN_VERSION =  1;  // The minimum version number supported in the QR Code Model 2 standard\n\tvar MAX_VERSION = 40;  // The maximum version number supported in the QR Code Model 2 standard\n\tObject.defineProperty(this.QrCode, \"MIN_VERSION\", {value:MIN_VERSION});\n\tObject.defineProperty(this.QrCode, \"MAX_VERSION\", {value:MAX_VERSION});\n\t\n\t// For use in getPenaltyScore(), when evaluating which mask is best.\n\tQrCode.PENALTY_N1 =  3;\n\tQrCode.PENALTY_N2 =  3;\n\tQrCode.PENALTY_N3 = 40;\n\tQrCode.PENALTY_N4 = 10;\n\t\n\tQrCode.ECC_CODEWORDS_PER_BLOCK = [\n\t\t// Version: (note that index 0 is for padding, and is set to an illegal value)\n\t\t//  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40    Error correction level\n\t\t[null,  7, 10, 15, 20, 26, 18, 20, 24, 30, 18, 20, 24, 26, 30, 22, 24, 28, 30, 28, 28, 28, 28, 30, 30, 26, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],  // Low\n\t\t[null, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26, 30, 22, 22, 24, 24, 28, 28, 26, 26, 26, 26, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28],  // Medium\n\t\t[null, 13, 22, 18, 26, 18, 24, 18, 22, 20, 24, 28, 26, 24, 20, 30, 24, 28, 28, 26, 30, 28, 30, 30, 30, 30, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],  // Quartile\n\t\t[null, 17, 28, 22, 16, 22, 28, 26, 26, 24, 28, 24, 28, 22, 24, 24, 30, 28, 28, 26, 28, 30, 24, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],  // High\n\t];\n\t\n\tQrCode.NUM_ERROR_CORRECTION_BLOCKS = [\n\t\t// Version: (note that index 0 is for padding, and is set to an illegal value)\n\t\t//  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40    Error correction level\n\t\t[null, 1, 1, 1, 1, 1, 2, 2, 2, 2, 4,  4,  4,  4,  4,  6,  6,  6,  6,  7,  8,  8,  9,  9, 10, 12, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 20, 21, 22, 24, 25],  // Low\n\t\t[null, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5,  5,  8,  9,  9, 10, 10, 11, 13, 14, 16, 17, 17, 18, 20, 21, 23, 25, 26, 28, 29, 31, 33, 35, 37, 38, 40, 43, 45, 47, 49],  // Medium\n\t\t[null, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8,  8, 10, 12, 16, 12, 17, 16, 18, 21, 20, 23, 23, 25, 27, 29, 34, 34, 35, 38, 40, 43, 45, 48, 51, 53, 56, 59, 62, 65, 68],  // Quartile\n\t\t[null, 1, 1, 2, 4, 4, 4, 5, 6, 8, 8, 11, 11, 16, 16, 18, 16, 19, 21, 25, 25, 25, 34, 30, 32, 35, 37, 40, 42, 45, 48, 51, 54, 57, 60, 63, 66, 70, 74, 77, 81],  // High\n\t];\n\t\n\t\n\t/*---- Public helper enumeration ----*/\n\t\n\t/* \n\t * The error correction level in a QR Code symbol. Immutable.\n\t */\n\tthis.QrCode.Ecc = {\n\t\tLOW     : new Ecc(0, 1),  // The QR Code can tolerate about  7% erroneous codewords\n\t\tMEDIUM  : new Ecc(1, 0),  // The QR Code can tolerate about 15% erroneous codewords\n\t\tQUARTILE: new Ecc(2, 3),  // The QR Code can tolerate about 25% erroneous codewords\n\t\tHIGH    : new Ecc(3, 2),  // The QR Code can tolerate about 30% erroneous codewords\n\t};\n\t\n\t\n\t// Private constructor.\n\tfunction Ecc(ord, fb) {\n\t\t// (Public) In the range 0 to 3 (unsigned 2-bit integer)\n\t\tObject.defineProperty(this, \"ordinal\", {value:ord});\n\t\t\n\t\t// (Package-private) In the range 0 to 3 (unsigned 2-bit integer)\n\t\tObject.defineProperty(this, \"formatBits\", {value:fb});\n\t}\n\t\n\t\n\t\n\t/*---- Data segment class ----*/\n\t\n\t/* \n\t * A segment of character/binary/control data in a QR Code symbol.\n\t * Instances of this class are immutable.\n\t * The mid-level way to create a segment is to take the payload data\n\t * and call a static factory function such as QrSegment.makeNumeric().\n\t * The low-level way to create a segment is to custom-make the bit buffer\n\t * and call the QrSegment() constructor with appropriate values.\n\t * This segment class imposes no length restrictions, but QR Codes have restrictions.\n\t * Even in the most favorable conditions, a QR Code can only hold 7089 characters of data.\n\t * Any segment longer than this is meaningless for the purpose of generating QR Codes.\n\t * This constructor creates a QR Code segment with the given attributes and data.\n\t * The character count (numChars) must agree with the mode and the bit buffer length,\n\t * but the constraint isn't checked. The given bit buffer is cloned and stored.\n\t */\n\tthis.QrSegment = function(mode, numChars, bitData) {\n\t\t/*---- Constructor (low level) ----*/\n\t\tif (numChars < 0 || !(mode instanceof Mode))\n\t\t\tthrow \"Invalid argument\";\n\t\t\n\t\t// The data bits of this segment. Accessed through getData().\n\t\tbitData = bitData.slice();  // Make defensive copy\n\t\t\n\t\t// The mode indicator of this segment.\n\t\tObject.defineProperty(this, \"mode\", {value:mode});\n\t\t\n\t\t// The length of this segment's unencoded data. Measured in characters for\n\t\t// numeric/alphanumeric/kanji mode, bytes for byte mode, and 0 for ECI mode.\n\t\t// Always zero or positive. Not the same as the data's bit length.\n\t\tObject.defineProperty(this, \"numChars\", {value:numChars});\n\t\t\n\t\t// Returns a new copy of the data bits of this segment.\n\t\tthis.getData = function() {\n\t\t\treturn bitData.slice();  // Make defensive copy\n\t\t};\n\t};\n\t\n\t\n\t/*---- Static factory functions (mid level) for QrSegment ----*/\n\t\n\t/* \n\t * Returns a segment representing the given binary data encoded in\n\t * byte mode. All input byte arrays are acceptable. Any text string\n\t * can be converted to UTF-8 bytes and encoded as a byte mode segment.\n\t */\n\tthis.QrSegment.makeBytes = function(data) {\n\t\tvar bb = new BitBuffer();\n\t\tdata.forEach(function(b) {\n\t\t\tbb.appendBits(b, 8);\n\t\t});\n\t\treturn new this(this.Mode.BYTE, data.length, bb);\n\t};\n\t\n\t\n\t/* \n\t * Returns a segment representing the given string of decimal digits encoded in numeric mode.\n\t */\n\tthis.QrSegment.makeNumeric = function(digits) {\n\t\tif (!this.NUMERIC_REGEX.test(digits))\n\t\t\tthrow \"String contains non-numeric characters\";\n\t\tvar bb = new BitBuffer();\n\t\tfor (var i = 0; i < digits.length; ) {  // Consume up to 3 digits per iteration\n\t\t\tvar n = Math.min(digits.length - i, 3);\n\t\t\tbb.appendBits(parseInt(digits.substring(i, i + n), 10), n * 3 + 1);\n\t\t\ti += n;\n\t\t}\n\t\treturn new this(this.Mode.NUMERIC, digits.length, bb);\n\t};\n\t\n\t\n\t/* \n\t * Returns a segment representing the given text string encoded in alphanumeric mode.\n\t * The characters allowed are: 0 to 9, A to Z (uppercase only), space,\n\t * dollar, percent, asterisk, plus, hyphen, period, slash, colon.\n\t */\n\tthis.QrSegment.makeAlphanumeric = function(text) {\n\t\tif (!this.ALPHANUMERIC_REGEX.test(text))\n\t\t\tthrow \"String contains unencodable characters in alphanumeric mode\";\n\t\tvar bb = new BitBuffer();\n\t\tvar i;\n\t\tfor (i = 0; i + 2 <= text.length; i += 2) {  // Process groups of 2\n\t\t\tvar temp = QrSegment.ALPHANUMERIC_CHARSET.indexOf(text.charAt(i)) * 45;\n\t\t\ttemp += QrSegment.ALPHANUMERIC_CHARSET.indexOf(text.charAt(i + 1));\n\t\t\tbb.appendBits(temp, 11);\n\t\t}\n\t\tif (i < text.length)  // 1 character remaining\n\t\t\tbb.appendBits(QrSegment.ALPHANUMERIC_CHARSET.indexOf(text.charAt(i)), 6);\n\t\treturn new this(this.Mode.ALPHANUMERIC, text.length, bb);\n\t};\n\t\n\t\n\t/* \n\t * Returns a new mutable list of zero or more segments to represent the given Unicode text string.\n\t * The result may use various segment modes and switch modes to optimize the length of the bit stream.\n\t */\n\tthis.QrSegment.makeSegments = function(text) {\n\t\t// Select the most efficient segment encoding automatically\n\t\tif (text == \"\")\n\t\t\treturn [];\n\t\telse if (this.NUMERIC_REGEX.test(text))\n\t\t\treturn [this.makeNumeric(text)];\n\t\telse if (this.ALPHANUMERIC_REGEX.test(text))\n\t\t\treturn [this.makeAlphanumeric(text)];\n\t\telse\n\t\t\treturn [this.makeBytes(toUtf8ByteArray(text))];\n\t};\n\t\n\t\n\t/* \n\t * Returns a segment representing an Extended Channel Interpretation\n\t * (ECI) designator with the given assignment value.\n\t */\n\tthis.QrSegment.makeEci = function(assignVal) {\n\t\tvar bb = new BitBuffer();\n\t\tif (assignVal < 0)\n\t\t\tthrow \"ECI assignment value out of range\";\n\t\telse if (assignVal < (1 << 7))\n\t\t\tbb.appendBits(assignVal, 8);\n\t\telse if (assignVal < (1 << 14)) {\n\t\t\tbb.appendBits(2, 2);\n\t\t\tbb.appendBits(assignVal, 14);\n\t\t} else if (assignVal < 1000000) {\n\t\t\tbb.appendBits(6, 3);\n\t\t\tbb.appendBits(assignVal, 21);\n\t\t} else\n\t\t\tthrow \"ECI assignment value out of range\";\n\t\treturn new this(this.Mode.ECI, 0, bb);\n\t};\n\t\n\t\n\t// (Package-private) Calculates and returns the number of bits needed to encode the given segments at the\n\t// given version. The result is infinity if a segment has too many characters to fit its length field.\n\tthis.QrSegment.getTotalBits = function(segs, version) {\n\t\tvar result = 0;\n\t\tfor (var i = 0; i < segs.length; i++) {\n\t\t\tvar seg = segs[i];\n\t\t\tvar ccbits = seg.mode.numCharCountBits(version);\n\t\t\tif (seg.numChars >= (1 << ccbits))\n\t\t\t\treturn Infinity;  // The segment's length doesn't fit the field's bit width\n\t\t\tresult += 4 + ccbits + seg.getData().length;\n\t\t}\n\t\treturn result;\n\t};\n\t\n\t\n\t/*---- Constants for QrSegment ----*/\n\t\n\tvar QrSegment = {};  // Private object to assign properties to. Not the same object as 'this.QrSegment'.\n\t\n\t// (Public) Describes precisely all strings that are encodable in numeric mode.\n\t// To test whether a string s is encodable: var ok = NUMERIC_REGEX.test(s);\n\t// A string is encodable iff each character is in the range 0 to 9.\n\tthis.QrSegment.NUMERIC_REGEX = /^[0-9]*$/;\n\t\n\t// (Public) Describes precisely all strings that are encodable in alphanumeric mode.\n\t// To test whether a string s is encodable: var ok = ALPHANUMERIC_REGEX.test(s);\n\t// A string is encodable iff each character is in the following set: 0 to 9, A to Z\n\t// (uppercase only), space, dollar, percent, asterisk, plus, hyphen, period, slash, colon.\n\tthis.QrSegment.ALPHANUMERIC_REGEX = /^[A-Z0-9 $%*+.\\/:-]*$/;\n\t\n\t// (Private) The set of all legal characters in alphanumeric mode,\n\t// where each character value maps to the index in the string.\n\tQrSegment.ALPHANUMERIC_CHARSET = \"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:\";\n\t\n\t\n\t/*---- Public helper enumeration ----*/\n\t\n\t/* \n\t * Describes how a segment's data bits are interpreted. Immutable.\n\t */\n\tthis.QrSegment.Mode = {  // Constants\n\t\tNUMERIC     : new Mode(0x1, [10, 12, 14]),\n\t\tALPHANUMERIC: new Mode(0x2, [ 9, 11, 13]),\n\t\tBYTE        : new Mode(0x4, [ 8, 16, 16]),\n\t\tKANJI       : new Mode(0x8, [ 8, 10, 12]),\n\t\tECI         : new Mode(0x7, [ 0,  0,  0]),\n\t};\n\t\n\t\n\t// Private constructor.\n\tfunction Mode(mode, ccbits) {\n\t\t// (Package-private) The mode indicator bits, which is a uint4 value (range 0 to 15).\n\t\tObject.defineProperty(this, \"modeBits\", {value:mode});\n\t\t\n\t\t// (Package-private) Returns the bit width of the character count field for a segment in\n\t\t// this mode in a QR Code at the given version number. The result is in the range [0, 16].\n\t\tthis.numCharCountBits = function(ver) {\n\t\t\treturn ccbits[Math.floor((ver + 7) / 17)];\n\t\t};\n\t}\n\t\n\t\n\t\n\t/*---- Private helper functions and classes ----*/\n\t\n\t// Returns a new array of bytes representing the given string encoded in UTF-8.\n\tfunction toUtf8ByteArray(str) {\n\t\tstr = encodeURI(str);\n\t\tvar result = [];\n\t\tfor (var i = 0; i < str.length; i++) {\n\t\t\tif (str.charAt(i) != \"%\")\n\t\t\t\tresult.push(str.charCodeAt(i));\n\t\t\telse {\n\t\t\t\tresult.push(parseInt(str.substring(i + 1, i + 3), 16));\n\t\t\t\ti += 2;\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\t\n\t\n\t\n\t/* \n\t * A private helper class that computes the Reed-Solomon error correction codewords for a sequence of\n\t * data codewords at a given degree. Objects are immutable, and the state only depends on the degree.\n\t * This class exists because each data block in a QR Code shares the same the divisor polynomial.\n\t * This constructor creates a Reed-Solomon ECC generator for the given degree. This could be implemented\n\t * as a lookup table over all possible parameter values, instead of as an algorithm.\n\t */\n\tfunction ReedSolomonGenerator(degree) {\n\t\tif (degree < 1 || degree > 255)\n\t\t\tthrow \"Degree out of range\";\n\t\t\n\t\t// Coefficients of the divisor polynomial, stored from highest to lowest power, excluding the leading term which\n\t\t// is always 1. For example the polynomial x^3 + 255x^2 + 8x + 93 is stored as the uint8 array {255, 8, 93}.\n\t\tvar coefficients = [];\n\t\t\n\t\t// Start with the monomial x^0\n\t\tfor (var i = 0; i < degree - 1; i++)\n\t\t\tcoefficients.push(0);\n\t\tcoefficients.push(1);\n\t\t\n\t\t// Compute the product polynomial (x - r^0) * (x - r^1) * (x - r^2) * ... * (x - r^{degree-1}),\n\t\t// drop the highest term, and store the rest of the coefficients in order of descending powers.\n\t\t// Note that r = 0x02, which is a generator element of this field GF(2^8/0x11D).\n\t\tvar root = 1;\n\t\tfor (var i = 0; i < degree; i++) {\n\t\t\t// Multiply the current product by (x - r^i)\n\t\t\tfor (var j = 0; j < coefficients.length; j++) {\n\t\t\t\tcoefficients[j] = ReedSolomonGenerator.multiply(coefficients[j], root);\n\t\t\t\tif (j + 1 < coefficients.length)\n\t\t\t\t\tcoefficients[j] ^= coefficients[j + 1];\n\t\t\t}\n\t\t\troot = ReedSolomonGenerator.multiply(root, 0x02);\n\t\t}\n\t\t\n\t\t// Computes and returns the Reed-Solomon error correction codewords for the given\n\t\t// sequence of data codewords. The returned object is always a new byte array.\n\t\t// This method does not alter this object's state (because it is immutable).\n\t\tthis.getRemainder = function(data) {\n\t\t\t// Compute the remainder by performing polynomial division\n\t\t\tvar result = coefficients.map(function() { return 0; });\n\t\t\tdata.forEach(function(b) {\n\t\t\t\tvar factor = b ^ result.shift();\n\t\t\t\tresult.push(0);\n\t\t\t\tcoefficients.forEach(function(coef, i) {\n\t\t\t\t\tresult[i] ^= ReedSolomonGenerator.multiply(coef, factor);\n\t\t\t\t});\n\t\t\t});\n\t\t\treturn result;\n\t\t};\n\t}\n\t\n\t// This static function returns the product of the two given field elements modulo GF(2^8/0x11D). The arguments and\n\t// result are unsigned 8-bit integers. This could be implemented as a lookup table of 256*256 entries of uint8.\n\tReedSolomonGenerator.multiply = function(x, y) {\n\t\tif (x >>> 8 != 0 || y >>> 8 != 0)\n\t\t\tthrow \"Byte out of range\";\n\t\t// Russian peasant multiplication\n\t\tvar z = 0;\n\t\tfor (var i = 7; i >= 0; i--) {\n\t\t\tz = (z << 1) ^ ((z >>> 7) * 0x11D);\n\t\t\tz ^= ((y >>> i) & 1) * x;\n\t\t}\n\t\tif (z >>> 8 != 0)\n\t\t\tthrow \"Assertion error\";\n\t\treturn z;\n\t};\n\t\n\t\n\t\n\t/* \n\t * A private helper class that represents an appendable sequence of bits (0s and 1s).\n\t * Mainly used by QrSegment. This constructor creates an empty bit buffer (length 0).\n\t */\n\tfunction BitBuffer() {\n\t\tArray.call(this);\n\t\t\n\t\t// Appends the given number of low-order bits of the given value\n\t\t// to this buffer. Requires 0 <= len <= 31 and 0 <= val < 2^len.\n\t\tthis.appendBits = function(val, len) {\n\t\t\tif (len < 0 || len > 31 || val >>> len != 0)\n\t\t\t\tthrow \"Value out of range\";\n\t\tfor (var i = len - 1; i >= 0; i--)  // Append bit by bit\n\t\t\t\tthis.push((val >>> i) & 1);\n\t\t};\n\t}\n\t\n\tBitBuffer.prototype = Object.create(Array.prototype);\n\tBitBuffer.prototype.constructor = BitBuffer;\n\t\n};\n\n    exports.QrCode = qrcodegen.QrCode;\n    exports.encodeSegments = function() {\n        return qrcodegen.QrCode.encodeSegments.apply(qrcodegen.QrCode, arguments);\n    };\n    exports.encodeText = qrcodegen.QrCode.encodeText;\n    exports.Ecc = qrcodegen.QrCode.Ecc;\n    exports.QrSegment = qrcodegen.QrSegment;\n}));\n\n\n//# sourceURL=webpack:///./src/qrcodegen.js?");
-
-/***/ })
-
-/******/ });
+  var out_of_memory = /* tuple */[
+    "Out_of_memory",
+    0
+  ];
+
+  var sys_error = /* tuple */[
+    "Sys_error",
+    -1
+  ];
+
+  var failure = /* tuple */[
+    "Failure",
+    -2
+  ];
+
+  var invalid_argument = /* tuple */[
+    "Invalid_argument",
+    -3
+  ];
+
+  var end_of_file = /* tuple */[
+    "End_of_file",
+    -4
+  ];
+
+  var division_by_zero = /* tuple */[
+    "Division_by_zero",
+    -5
+  ];
+
+  var not_found = /* tuple */[
+    "Not_found",
+    -6
+  ];
+
+  var match_failure = /* tuple */[
+    "Match_failure",
+    -7
+  ];
+
+  var stack_overflow = /* tuple */[
+    "Stack_overflow",
+    -8
+  ];
+
+  var sys_blocked_io = /* tuple */[
+    "Sys_blocked_io",
+    -9
+  ];
+
+  var assert_failure = /* tuple */[
+    "Assert_failure",
+    -10
+  ];
+
+  var undefined_recursive_module = /* tuple */[
+    "Undefined_recursive_module",
+    -11
+  ];
+
+  out_of_memory.tag = 248;
+
+  sys_error.tag = 248;
+
+  failure.tag = 248;
+
+  invalid_argument.tag = 248;
+
+  end_of_file.tag = 248;
+
+  division_by_zero.tag = 248;
+
+  not_found.tag = 248;
+
+  match_failure.tag = 248;
+
+  stack_overflow.tag = 248;
+
+  sys_blocked_io.tag = 248;
+
+  assert_failure.tag = 248;
+
+  undefined_recursive_module.tag = 248;
+  /*  Not a pure module */
+
+  function caml_array_sub(x, offset, len) {
+    var result = new Array(len);
+    var j = 0;
+    var i = offset;
+    while(j < len) {
+      result[j] = x[i];
+      j = j + 1 | 0;
+      i = i + 1 | 0;
+    }  return result;
+  }
+
+  function caml_array_get(xs, index) {
+    if (index < 0 || index >= xs.length) {
+      throw [
+            invalid_argument,
+            "index out of bounds"
+          ];
+    } else {
+      return xs[index];
+    }
+  }
+
+  function caml_make_vect(len, init) {
+    var b = new Array(len);
+    for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){
+      b[i] = init;
+    }
+    return b;
+  }
+  /* No side effect */
+
+  function app(_f, _args) {
+    while(true) {
+      var args = _args;
+      var f = _f;
+      var init_arity = f.length;
+      var arity = init_arity === 0 ? 1 : init_arity;
+      var len = args.length;
+      var d = arity - len | 0;
+      if (d === 0) {
+        return f.apply(null, args);
+      } else if (d < 0) {
+        _args = caml_array_sub(args, arity, -d | 0);
+        _f = f.apply(null, caml_array_sub(args, 0, arity));
+        continue ;
+      } else {
+        return (function(f,args){
+        return function (x) {
+          return app(f, args.concat(/* array */[x]));
+        }
+        }(f,args));
+      }
+    }}
+
+  function curry_1(o, a0, arity) {
+    switch (arity) {
+      case 1 : 
+          return o(a0);
+      case 2 : 
+          return (function (param) {
+              return o(a0, param);
+            });
+      case 3 : 
+          return (function (param, param$1) {
+              return o(a0, param, param$1);
+            });
+      case 4 : 
+          return (function (param, param$1, param$2) {
+              return o(a0, param, param$1, param$2);
+            });
+      case 5 : 
+          return (function (param, param$1, param$2, param$3) {
+              return o(a0, param, param$1, param$2, param$3);
+            });
+      case 6 : 
+          return (function (param, param$1, param$2, param$3, param$4) {
+              return o(a0, param, param$1, param$2, param$3, param$4);
+            });
+      case 7 : 
+          return (function (param, param$1, param$2, param$3, param$4, param$5) {
+              return o(a0, param, param$1, param$2, param$3, param$4, param$5);
+            });
+      default:
+        return app(o, /* array */[a0]);
+    }
+  }
+
+  function _1(o, a0) {
+    var arity = o.length;
+    if (arity === 1) {
+      return o(a0);
+    } else {
+      return curry_1(o, a0, arity);
+    }
+  }
+
+  function __1(o) {
+    var arity = o.length;
+    if (arity === 1) {
+      return o;
+    } else {
+      return (function (a0) {
+          return _1(o, a0);
+        });
+    }
+  }
+
+  function curry_2(o, a0, a1, arity) {
+    switch (arity) {
+      case 1 : 
+          return app(o(a0), /* array */[a1]);
+      case 2 : 
+          return o(a0, a1);
+      case 3 : 
+          return (function (param) {
+              return o(a0, a1, param);
+            });
+      case 4 : 
+          return (function (param, param$1) {
+              return o(a0, a1, param, param$1);
+            });
+      case 5 : 
+          return (function (param, param$1, param$2) {
+              return o(a0, a1, param, param$1, param$2);
+            });
+      case 6 : 
+          return (function (param, param$1, param$2, param$3) {
+              return o(a0, a1, param, param$1, param$2, param$3);
+            });
+      case 7 : 
+          return (function (param, param$1, param$2, param$3, param$4) {
+              return o(a0, a1, param, param$1, param$2, param$3, param$4);
+            });
+      default:
+        return app(o, /* array */[
+                    a0,
+                    a1
+                  ]);
+    }
+  }
+
+  function _2(o, a0, a1) {
+    var arity = o.length;
+    if (arity === 2) {
+      return o(a0, a1);
+    } else {
+      return curry_2(o, a0, a1, arity);
+    }
+  }
+  /* No side effect */
+
+  var id = /* record */[/* contents */0];
+
+  function caml_fresh_oo_id(param) {
+    id[0] += 1;
+    return id[0];
+  }
+
+  function create(str) {
+    var v_001 = caml_fresh_oo_id(/* () */0);
+    var v = /* tuple */[
+      str,
+      v_001
+    ];
+    v.tag = 248;
+    return v;
+  }
+
+  function caml_is_extension(e) {
+    if (e === undefined) {
+      return false;
+    } else if (e.tag === 248) {
+      return true;
+    } else {
+      var slot = e[0];
+      if (slot !== undefined) {
+        return slot.tag === 248;
+      } else {
+        return false;
+      }
+    }
+  }
+  /* No side effect */
+
+  var undefinedHeader = /* array */[];
+
+  function some(x) {
+    if (x === undefined) {
+      var block = /* tuple */[
+        undefinedHeader,
+        0
+      ];
+      block.tag = 256;
+      return block;
+    } else if (x !== null && x[0] === undefinedHeader) {
+      var nid = x[1] + 1 | 0;
+      var block$1 = /* tuple */[
+        undefinedHeader,
+        nid
+      ];
+      block$1.tag = 256;
+      return block$1;
+    } else {
+      return x;
+    }
+  }
+
+  function nullable_to_opt(x) {
+    if (x === null || x === undefined) {
+      return undefined;
+    } else {
+      return some(x);
+    }
+  }
+
+  function null_to_opt(x) {
+    if (x === null) {
+      return undefined;
+    } else {
+      return some(x);
+    }
+  }
+
+  function valFromOption(x) {
+    if (x !== null && x[0] === undefinedHeader) {
+      var depth = x[1];
+      if (depth === 0) {
+        return undefined;
+      } else {
+        return /* tuple */[
+                undefinedHeader,
+                depth - 1 | 0
+              ];
+      }
+    } else {
+      return x;
+    }
+  }
+  /* No side effect */
+
+  var $$Error = create("Caml_js_exceptions.Error");
+
+  function internalToOCamlException(e) {
+    if (caml_is_extension(e)) {
+      return e;
+    } else {
+      return [
+              $$Error,
+              e
+            ];
+    }
+  }
+  /* No side effect */
+
+  function map(f, a) {
+    var l = a.length;
+    if (l === 0) {
+      return /* array */[];
+    } else {
+      var r = caml_make_vect(l, _1(f, a[0]));
+      for(var i = 1 ,i_finish = l - 1 | 0; i <= i_finish; ++i){
+        r[i] = _1(f, a[i]);
+      }
+      return r;
+    }
+  }
+
+  function mapi(f, a) {
+    var l = a.length;
+    if (l === 0) {
+      return /* array */[];
+    } else {
+      var r = caml_make_vect(l, _2(f, 0, a[0]));
+      for(var i = 1 ,i_finish = l - 1 | 0; i <= i_finish; ++i){
+        r[i] = _2(f, i, a[i]);
+      }
+      return r;
+    }
+  }
+
+  var Bottom = create("Array.Bottom");
+  /* No side effect */
+
+  function get(dict, k) {
+    if ((k in dict)) {
+      return some(dict[k]);
+    }
+    
+  }
+  /* No side effect */
+
+  function mapU(opt, f) {
+    if (opt !== undefined) {
+      return some(f(valFromOption(opt)));
+    }
+    
+  }
+
+  function map$1(opt, f) {
+    return mapU(opt, __1(f));
+  }
+
+  function flatMapU(opt, f) {
+    if (opt !== undefined) {
+      return f(valFromOption(opt));
+    }
+    
+  }
+
+  function flatMap(opt, f) {
+    return flatMapU(opt, __1(f));
+  }
+
+  function getWithDefault(opt, $$default) {
+    if (opt !== undefined) {
+      return valFromOption(opt);
+    } else {
+      return $$default;
+    }
+  }
+
+  function isSome(param) {
+    return param !== undefined;
+  }
+  /* No side effect */
+
+  // Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE
+
+  function makeCancelable($staropt$star, fn) {
+    var wait = $staropt$star !== undefined ? $staropt$star : 100;
+    var timerId = /* record */[/* contents */undefined];
+    var lastArg = /* record */[/* contents */undefined];
+    var lastCallTime = /* record */[/* contents */undefined];
+    var shouldInvoke = function (time) {
+      var match = lastCallTime[0];
+      if (match !== undefined) {
+        var timeSinceLastCall = time - match | 0;
+        if (timeSinceLastCall >= wait) {
+          return true;
+        } else {
+          return timeSinceLastCall < 0;
+        }
+      } else {
+        return true;
+      }
+    };
+    var remainingWait = function (time) {
+      var match = lastCallTime[0];
+      if (match !== undefined) {
+        var timeSinceLastCall = time - match | 0;
+        return wait - timeSinceLastCall | 0;
+      } else {
+        return wait;
+      }
+    };
+    var timerExpired = function (param) {
+      var match = timerId[0];
+      if (match !== undefined) {
+        clearTimeout(valFromOption(match));
+      }
+      var time = Date.now() | 0;
+      if (shouldInvoke(time)) {
+        var x = lastArg[0];
+        if (x !== undefined) {
+          lastArg[0] = undefined;
+          timerId[0] = undefined;
+          return _1(fn, valFromOption(x));
+        } else {
+          timerId[0] = undefined;
+          return /* () */0;
+        }
+      } else {
+        timerId[0] = some(setTimeout(timerExpired, remainingWait(time)));
+        return /* () */0;
+      }
+    };
+    var schedule = function (x) {
+      var time = Date.now() | 0;
+      lastArg[0] = some(x);
+      lastCallTime[0] = time;
+      timerId[0] = some(setTimeout(timerExpired, wait));
+      return /* () */0;
+    };
+    var scheduled = function (param) {
+      return isSome(timerId[0]);
+    };
+    var cancel = function (param) {
+      var match = timerId[0];
+      if (match !== undefined) {
+        clearTimeout(valFromOption(match));
+        timerId[0] = undefined;
+        lastArg[0] = undefined;
+        lastCallTime[0] = undefined;
+        return /* () */0;
+      } else {
+        return /* () */0;
+      }
+    };
+    var now = function (x) {
+      cancel(/* () */0);
+      return _1(fn, x);
+    };
+    return /* record */[
+            /* invoke */now,
+            /* schedule */schedule,
+            /* scheduled */scheduled,
+            /* cancel */cancel
+          ];
+  }
+
+  function make(wait, fn) {
+    return makeCancelable(wait, fn)[/* schedule */1];
+  }
+  /* No side effect */
+
+  /* No side effect */
+
+  /* No side effect */
+
+  /*  Not a pure module */
+
+  /* No side effect */
+
+  /* No side effect */
+
+  /* No side effect */
+
+  /* No side effect */
+
+  var asHtmlElement = (
+      function (element) {
+        // BEWARE: Assumes "contentEditable" uniquely identifies an HTMLELement
+        return element.contentEditable !== undefined ?  element : null;
+      }
+    );
+
+  function asHtmlElement$1(self) {
+    return null_to_opt(_1(asHtmlElement, self));
+  }
+  /* include Not a pure module */
+
+  function mod_(x, y) {
+    if (y === 0) {
+      throw division_by_zero;
+    } else {
+      return x % y;
+    }
+  }
+
+  var imul = ( Math.imul || function (x,y) {
+    y |= 0; return ((((x >> 16) * y) << 16) + (x & 0xffff) * y)|0; 
+  }
+  );
+  /* imul Not a pure module */
+
+  /* No side effect */
+
+  /* No side effect */
+
+  /* No side effect */
+
+  /* No side effect */
+
+  /* No side effect */
+
+  /* Caml_int32 Not a pure module */
+
+  function lowercase(c) {
+    if (c >= /* "A" */65 && c <= /* "Z" */90 || c >= /* "\192" */192 && c <= /* "\214" */214 || c >= /* "\216" */216 && c <= /* "\222" */222) {
+      return c + 32 | 0;
+    } else {
+      return c;
+    }
+  }
+
+  function parse_format(fmt) {
+    var len = fmt.length;
+    if (len > 31) {
+      throw [
+            invalid_argument,
+            "format_int: format too long"
+          ];
+    }
+    var f = /* record */[
+      /* justify */"+",
+      /* signstyle */"-",
+      /* filter */" ",
+      /* alternate */false,
+      /* base : Dec */2,
+      /* signedconv */false,
+      /* width */0,
+      /* uppercase */false,
+      /* sign */1,
+      /* prec */-1,
+      /* conv */"f"
+    ];
+    var _i = 0;
+    while(true) {
+      var i = _i;
+      if (i >= len) {
+        return f;
+      } else {
+        var c = fmt.charCodeAt(i);
+        var exit = 0;
+        if (c >= 69) {
+          if (c >= 88) {
+            if (c >= 121) {
+              exit = 1;
+            } else {
+              switch (c - 88 | 0) {
+                case 0 : 
+                    f[/* base */4] = /* Hex */1;
+                    f[/* uppercase */7] = true;
+                    _i = i + 1 | 0;
+                    continue ;
+                case 13 : 
+                case 14 : 
+                case 15 : 
+                    exit = 5;
+                    break;
+                case 12 : 
+                case 17 : 
+                    exit = 4;
+                    break;
+                case 23 : 
+                    f[/* base */4] = /* Oct */0;
+                    _i = i + 1 | 0;
+                    continue ;
+                case 29 : 
+                    f[/* base */4] = /* Dec */2;
+                    _i = i + 1 | 0;
+                    continue ;
+                case 1 : 
+                case 2 : 
+                case 3 : 
+                case 4 : 
+                case 5 : 
+                case 6 : 
+                case 7 : 
+                case 8 : 
+                case 9 : 
+                case 10 : 
+                case 11 : 
+                case 16 : 
+                case 18 : 
+                case 19 : 
+                case 20 : 
+                case 21 : 
+                case 22 : 
+                case 24 : 
+                case 25 : 
+                case 26 : 
+                case 27 : 
+                case 28 : 
+                case 30 : 
+                case 31 : 
+                    exit = 1;
+                    break;
+                case 32 : 
+                    f[/* base */4] = /* Hex */1;
+                    _i = i + 1 | 0;
+                    continue ;
+                
+              }
+            }
+          } else if (c >= 72) {
+            exit = 1;
+          } else {
+            f[/* signedconv */5] = true;
+            f[/* uppercase */7] = true;
+            f[/* conv */10] = String.fromCharCode(lowercase(c));
+            _i = i + 1 | 0;
+            continue ;
+          }
+        } else {
+          switch (c) {
+            case 35 : 
+                f[/* alternate */3] = true;
+                _i = i + 1 | 0;
+                continue ;
+            case 32 : 
+            case 43 : 
+                exit = 2;
+                break;
+            case 45 : 
+                f[/* justify */0] = "-";
+                _i = i + 1 | 0;
+                continue ;
+            case 46 : 
+                f[/* prec */9] = 0;
+                var j = i + 1 | 0;
+                while((function(j){
+                    return function () {
+                      var w = fmt.charCodeAt(j) - /* "0" */48 | 0;
+                      return w >= 0 && w <= 9;
+                    }
+                    }(j))()) {
+                  f[/* prec */9] = (imul(f[/* prec */9], 10) + fmt.charCodeAt(j) | 0) - /* "0" */48 | 0;
+                  j = j + 1 | 0;
+                }              _i = j;
+                continue ;
+            case 33 : 
+            case 34 : 
+            case 36 : 
+            case 37 : 
+            case 38 : 
+            case 39 : 
+            case 40 : 
+            case 41 : 
+            case 42 : 
+            case 44 : 
+            case 47 : 
+                exit = 1;
+                break;
+            case 48 : 
+                f[/* filter */2] = "0";
+                _i = i + 1 | 0;
+                continue ;
+            case 49 : 
+            case 50 : 
+            case 51 : 
+            case 52 : 
+            case 53 : 
+            case 54 : 
+            case 55 : 
+            case 56 : 
+            case 57 : 
+                exit = 3;
+                break;
+            default:
+              exit = 1;
+          }
+        }
+        switch (exit) {
+          case 1 : 
+              _i = i + 1 | 0;
+              continue ;
+          case 2 : 
+              f[/* signstyle */1] = String.fromCharCode(c);
+              _i = i + 1 | 0;
+              continue ;
+          case 3 : 
+              f[/* width */6] = 0;
+              var j$1 = i;
+              while((function(j$1){
+                  return function () {
+                    var w = fmt.charCodeAt(j$1) - /* "0" */48 | 0;
+                    return w >= 0 && w <= 9;
+                  }
+                  }(j$1))()) {
+                f[/* width */6] = (imul(f[/* width */6], 10) + fmt.charCodeAt(j$1) | 0) - /* "0" */48 | 0;
+                j$1 = j$1 + 1 | 0;
+              }            _i = j$1;
+              continue ;
+          case 4 : 
+              f[/* signedconv */5] = true;
+              f[/* base */4] = /* Dec */2;
+              _i = i + 1 | 0;
+              continue ;
+          case 5 : 
+              f[/* signedconv */5] = true;
+              f[/* conv */10] = String.fromCharCode(c);
+              _i = i + 1 | 0;
+              continue ;
+          
+        }
+      }
+    }}
+
+  function finish_formatting(config, rawbuffer) {
+    var justify = config[/* justify */0];
+    var signstyle = config[/* signstyle */1];
+    var filter = config[/* filter */2];
+    var alternate = config[/* alternate */3];
+    var base = config[/* base */4];
+    var signedconv = config[/* signedconv */5];
+    var width = config[/* width */6];
+    var uppercase = config[/* uppercase */7];
+    var sign = config[/* sign */8];
+    var len = rawbuffer.length;
+    if (signedconv && (sign < 0 || signstyle !== "-")) {
+      len = len + 1 | 0;
+    }
+    if (alternate) {
+      if (base === /* Oct */0) {
+        len = len + 1 | 0;
+      } else if (base === /* Hex */1) {
+        len = len + 2 | 0;
+      }
+      
+    }
+    var buffer = "";
+    if (justify === "+" && filter === " ") {
+      for(var i = len ,i_finish = width - 1 | 0; i <= i_finish; ++i){
+        buffer = buffer + filter;
+      }
+    }
+    if (signedconv) {
+      if (sign < 0) {
+        buffer = buffer + "-";
+      } else if (signstyle !== "-") {
+        buffer = buffer + signstyle;
+      }
+      
+    }
+    if (alternate && base === /* Oct */0) {
+      buffer = buffer + "0";
+    }
+    if (alternate && base === /* Hex */1) {
+      buffer = buffer + "0x";
+    }
+    if (justify === "+" && filter === "0") {
+      for(var i$1 = len ,i_finish$1 = width - 1 | 0; i$1 <= i_finish$1; ++i$1){
+        buffer = buffer + filter;
+      }
+    }
+    buffer = uppercase ? buffer + rawbuffer.toUpperCase() : buffer + rawbuffer;
+    if (justify === "-") {
+      for(var i$2 = len ,i_finish$2 = width - 1 | 0; i$2 <= i_finish$2; ++i$2){
+        buffer = buffer + " ";
+      }
+    }
+    return buffer;
+  }
+
+  function caml_format_float(fmt, x) {
+    var f = parse_format(fmt);
+    var prec = f[/* prec */9] < 0 ? 6 : f[/* prec */9];
+    var x$1 = x < 0 ? (f[/* sign */8] = -1, -x) : x;
+    var s = "";
+    if (isNaN(x$1)) {
+      s = "nan";
+      f[/* filter */2] = " ";
+    } else if (isFinite(x$1)) {
+      var match = f[/* conv */10];
+      switch (match) {
+        case "e" : 
+            s = x$1.toExponential(prec);
+            var i = s.length;
+            if (s[i - 3 | 0] === "e") {
+              s = s.slice(0, i - 1 | 0) + ("0" + s.slice(i - 1 | 0));
+            }
+            break;
+        case "f" : 
+            s = x$1.toFixed(prec);
+            break;
+        case "g" : 
+            var prec$1 = prec !== 0 ? prec : 1;
+            s = x$1.toExponential(prec$1 - 1 | 0);
+            var j = s.indexOf("e");
+            var exp = Number(s.slice(j + 1 | 0)) | 0;
+            if (exp < -4 || x$1 >= 1e21 || x$1.toFixed().length > prec$1) {
+              var i$1 = j - 1 | 0;
+              while(s[i$1] === "0") {
+                i$1 = i$1 - 1 | 0;
+              }            if (s[i$1] === ".") {
+                i$1 = i$1 - 1 | 0;
+              }
+              s = s.slice(0, i$1 + 1 | 0) + s.slice(j);
+              var i$2 = s.length;
+              if (s[i$2 - 3 | 0] === "e") {
+                s = s.slice(0, i$2 - 1 | 0) + ("0" + s.slice(i$2 - 1 | 0));
+              }
+              
+            } else {
+              var p = prec$1;
+              if (exp < 0) {
+                p = p - (exp + 1 | 0) | 0;
+                s = x$1.toFixed(p);
+              } else {
+                while((function () {
+                        s = x$1.toFixed(p);
+                        return s.length > (prec$1 + 1 | 0);
+                      })()) {
+                  p = p - 1 | 0;
+                }            }
+              if (p !== 0) {
+                var k = s.length - 1 | 0;
+                while(s[k] === "0") {
+                  k = k - 1 | 0;
+                }              if (s[k] === ".") {
+                  k = k - 1 | 0;
+                }
+                s = s.slice(0, k + 1 | 0);
+              }
+              
+            }
+            break;
+        default:
+          
+      }
+    } else {
+      s = "inf";
+      f[/* filter */2] = " ";
+    }
+    return finish_formatting(f, s);
+  }
+  /* No side effect */
+
+  function get$1(s, i) {
+    if (i < 0 || i >= s.length) {
+      throw [
+            invalid_argument,
+            "index out of bounds"
+          ];
+    } else {
+      return s.charCodeAt(i);
+    }
+  }
+  /* No side effect */
+
+  /* No side effect */
+
+  /* No side effect */
+
+  /* No side effect */
+
+  var Exit = create("Pervasives.Exit");
+
+  function valid_float_lexem(s) {
+    var l = s.length;
+    var _i = 0;
+    while(true) {
+      var i = _i;
+      if (i >= l) {
+        return s + ".";
+      } else {
+        var match = get$1(s, i);
+        if (match >= 48) {
+          if (match >= 58) {
+            return s;
+          } else {
+            _i = i + 1 | 0;
+            continue ;
+          }
+        } else if (match !== 45) {
+          return s;
+        } else {
+          _i = i + 1 | 0;
+          continue ;
+        }
+      }
+    }}
+
+  function string_of_float(f) {
+    return valid_float_lexem(caml_format_float("%.12g", f));
+  }
+  /* No side effect */
+
+  // Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE
+
+
+  var defaultHmac = {
+    name: "HMAC",
+    hash: "SHA-256"
+  };
+
+  function importKeyJWK(json) {
+    var parsed = JSON.parse(json);
+    return window.crypto.subtle.importKey("jwk", parsed, defaultHmac, true, /* array */[
+                "sign",
+                "verify"
+              ]);
+  }
+
+  var defaultHmacKeyJSON = "{\"alg\":\"HS256\",\"ext\":true,\"k\":\"A-cS_q7opsDHm5vusaNtzSbaJcI153rl-2VVPXyliu2G5nKicquFkf-rcFNCyQkC50CDjzFdDhIh9WzzWSXXHw\",\"key_ops\":[\"sign\",\"verify\"],\"kty\":\"oct\"}";
+
+  var defaultHmacKey = importKeyJWK(defaultHmacKeyJSON);
+  /* defaultHmacKey Not a pure module */
+
+  // Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE
+
+  function abToHexStr (buf){
+       return Array.prototype.map.call(new Uint8Array(buf), x => ('00' + x.toString(16)).slice(-2)).join('');
+       }
+  function str2ab (str){
+      var buf = new ArrayBuffer(str.length);
+      var bufView = new Uint8Array(buf);
+      for (var i=0, strLen=str.length; i < strLen; i++) {
+      bufView[i] = str.charCodeAt(i);
+    }
+        return buf;
+       }
+  function hexDigest(algorithm, input) {
+    return window.crypto.subtle.digest(algorithm, str2ab(input)).then((function (output) {
+                  return Promise.resolve(abToHexStr(output));
+                }));
+  }
+  /* SubtleCrypto-QueerLoop Not a pure module */
+
+  // Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE
+
+  function withQuerySelectorDom(query, f) {
+    return map$1(nullable_to_opt(document.querySelector(query)), f);
+  }
+
+  function withQuerySelector(query, f) {
+    return map$1(flatMap(nullable_to_opt(document.querySelector(query)), asHtmlElement$1), f);
+  }
+
+  function getHash(param) {
+    return window.location.hash;
+  }
+
+  function setHash(hash) {
+    window.location.hash = hash;
+    return /* () */0;
+  }
+
+  var htmlNs = "http://www.w3.org/1999/xhtml";
+  /* ElementRe Not a pure module */
+
+  class BitMatrix {
+      static createEmpty(width, height) {
+          return new BitMatrix(new Uint8ClampedArray(width * height), width);
+      }
+      constructor(data, width) {
+          this.width = width;
+          this.height = data.length / width;
+          this.data = data;
+      }
+      get(x, y) {
+          if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+              return false;
+          }
+          return !!this.data[y * this.width + x];
+      }
+      set(x, y, v) {
+          this.data[y * this.width + x] = v ? 1 : 0;
+      }
+      setRegion(left, top, width, height, v) {
+          for (let y = top; y < top + height; y++) {
+              for (let x = left; x < left + width; x++) {
+                  this.set(x, y, !!v);
+              }
+          }
+      }
+  }
+
+  const REGION_SIZE = 8;
+  const MIN_DYNAMIC_RANGE = 24;
+  function numBetween(value, min, max) {
+      return value < min ? min : value > max ? max : value;
+  }
+  // Like BitMatrix but accepts arbitry Uint8 values
+  class Matrix {
+      constructor(width, height, buffer) {
+          this.width = width;
+          const bufferSize = width * height;
+          if (buffer && buffer.length !== bufferSize) {
+              throw new Error("Wrong buffer size");
+          }
+          this.data = buffer || new Uint8ClampedArray(bufferSize);
+      }
+      get(x, y) {
+          return this.data[y * this.width + x];
+      }
+      set(x, y, value) {
+          this.data[y * this.width + x] = value;
+      }
+  }
+  function binarize(data, width, height, returnInverted, greyscaleWeights, canOverwriteImage) {
+      const pixelCount = width * height;
+      if (data.length !== pixelCount * 4) {
+          throw new Error("Malformed data passed to binarizer.");
+      }
+      // assign the greyscale and binary image within the rgba buffer as the rgba image will not be needed after conversion
+      let bufferOffset = 0;
+      // Convert image to greyscale
+      let greyscaleBuffer;
+      if (canOverwriteImage) {
+          greyscaleBuffer = new Uint8ClampedArray(data.buffer, bufferOffset, pixelCount);
+          bufferOffset += pixelCount;
+      }
+      const greyscalePixels = new Matrix(width, height, greyscaleBuffer);
+      if (greyscaleWeights.useIntegerApproximation) {
+          for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                  const pixelPosition = (y * width + x) * 4;
+                  const r = data[pixelPosition];
+                  const g = data[pixelPosition + 1];
+                  const b = data[pixelPosition + 2];
+                  greyscalePixels.set(x, y, 
+                  // tslint:disable-next-line no-bitwise
+                  (greyscaleWeights.red * r + greyscaleWeights.green * g + greyscaleWeights.blue * b + 128) >> 8);
+              }
+          }
+      }
+      else {
+          for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                  const pixelPosition = (y * width + x) * 4;
+                  const r = data[pixelPosition];
+                  const g = data[pixelPosition + 1];
+                  const b = data[pixelPosition + 2];
+                  greyscalePixels.set(x, y, greyscaleWeights.red * r + greyscaleWeights.green * g + greyscaleWeights.blue * b);
+              }
+          }
+      }
+      const horizontalRegionCount = Math.ceil(width / REGION_SIZE);
+      const verticalRegionCount = Math.ceil(height / REGION_SIZE);
+      const blackPointsCount = horizontalRegionCount * verticalRegionCount;
+      let blackPointsBuffer;
+      if (canOverwriteImage) {
+          blackPointsBuffer = new Uint8ClampedArray(data.buffer, bufferOffset, blackPointsCount);
+          bufferOffset += blackPointsCount;
+      }
+      const blackPoints = new Matrix(horizontalRegionCount, verticalRegionCount, blackPointsBuffer);
+      for (let verticalRegion = 0; verticalRegion < verticalRegionCount; verticalRegion++) {
+          for (let hortizontalRegion = 0; hortizontalRegion < horizontalRegionCount; hortizontalRegion++) {
+              let min = Infinity;
+              let max = 0;
+              for (let y = 0; y < REGION_SIZE; y++) {
+                  for (let x = 0; x < REGION_SIZE; x++) {
+                      const pixelLumosity = greyscalePixels.get(hortizontalRegion * REGION_SIZE + x, verticalRegion * REGION_SIZE + y);
+                      min = Math.min(min, pixelLumosity);
+                      max = Math.max(max, pixelLumosity);
+                  }
+              }
+              // We could also compute the real average of all pixels but following the assumption that the qr code consists
+              // of bright and dark pixels and essentially not much in between, by (min + max)/2 we make the cut really between
+              // those two classes. If using the average over all pixel in a block of mostly bright pixels and few dark pixels,
+              // the avg would tend to the bright side and darker bright pixels could be interpreted as dark.
+              let average = (min + max) / 2;
+              // Small bias towards black by moving the threshold up. We do this, as in the finder patterns white holes tend
+              // to appear which makes them undetectable.
+              const blackBias = 1.1;
+              average = Math.min(255, average * blackBias);
+              if (max - min <= MIN_DYNAMIC_RANGE) {
+                  // If variation within the block is low, assume this is a block with only light or only
+                  // dark pixels. In that case we do not want to use the average, as it would divide this
+                  // low contrast area into black and white pixels, essentially creating data out of noise.
+                  //
+                  // Default the blackpoint for these blocks to be half the min - effectively white them out
+                  average = min / 2;
+                  if (verticalRegion > 0 && hortizontalRegion > 0) {
+                      // Correct the "white background" assumption for blocks that have neighbors by comparing
+                      // the pixels in this block to the previously calculated black points. This is based on
+                      // the fact that dark barcode symbology is always surrounded by some amount of light
+                      // background for which reasonable black point estimates were made. The bp estimated at
+                      // the boundaries is used for the interior.
+                      // The (min < bp) is arbitrary but works better than other heuristics that were tried.
+                      const averageNeighborBlackPoint = (blackPoints.get(hortizontalRegion, verticalRegion - 1) +
+                          (2 * blackPoints.get(hortizontalRegion - 1, verticalRegion)) +
+                          blackPoints.get(hortizontalRegion - 1, verticalRegion - 1)) / 4;
+                      if (min < averageNeighborBlackPoint) {
+                          average = averageNeighborBlackPoint; // no need to apply black bias as already applied to neighbors
+                      }
+                  }
+              }
+              blackPoints.set(hortizontalRegion, verticalRegion, average);
+          }
+      }
+      let binarized;
+      if (canOverwriteImage) {
+          const binarizedBuffer = new Uint8ClampedArray(data.buffer, bufferOffset, pixelCount);
+          bufferOffset += pixelCount;
+          binarized = new BitMatrix(binarizedBuffer, width);
+      }
+      else {
+          binarized = BitMatrix.createEmpty(width, height);
+      }
+      let inverted = null;
+      if (returnInverted) {
+          if (canOverwriteImage) {
+              const invertedBuffer = new Uint8ClampedArray(data.buffer, bufferOffset, pixelCount);
+              inverted = new BitMatrix(invertedBuffer, width);
+          }
+          else {
+              inverted = BitMatrix.createEmpty(width, height);
+          }
+      }
+      for (let verticalRegion = 0; verticalRegion < verticalRegionCount; verticalRegion++) {
+          for (let hortizontalRegion = 0; hortizontalRegion < horizontalRegionCount; hortizontalRegion++) {
+              const left = numBetween(hortizontalRegion, 2, horizontalRegionCount - 3);
+              const top = numBetween(verticalRegion, 2, verticalRegionCount - 3);
+              let sum = 0;
+              for (let xRegion = -2; xRegion <= 2; xRegion++) {
+                  for (let yRegion = -2; yRegion <= 2; yRegion++) {
+                      sum += blackPoints.get(left + xRegion, top + yRegion);
+                  }
+              }
+              const threshold = sum / 25;
+              for (let xRegion = 0; xRegion < REGION_SIZE; xRegion++) {
+                  for (let yRegion = 0; yRegion < REGION_SIZE; yRegion++) {
+                      const x = hortizontalRegion * REGION_SIZE + xRegion;
+                      const y = verticalRegion * REGION_SIZE + yRegion;
+                      const lum = greyscalePixels.get(x, y);
+                      binarized.set(x, y, lum <= threshold);
+                      if (returnInverted) {
+                          inverted.set(x, y, !(lum <= threshold));
+                      }
+                  }
+              }
+          }
+      }
+      if (returnInverted) {
+          return { binarized, inverted };
+      }
+      return { binarized };
+  }
+
+  // tslint:disable:no-bitwise
+  class BitStream {
+      constructor(bytes) {
+          this.byteOffset = 0;
+          this.bitOffset = 0;
+          this.bytes = bytes;
+      }
+      readBits(numBits) {
+          if (numBits < 1 || numBits > 32 || numBits > this.available()) {
+              throw new Error("Cannot read " + numBits.toString() + " bits");
+          }
+          let result = 0;
+          // First, read remainder from current byte
+          if (this.bitOffset > 0) {
+              const bitsLeft = 8 - this.bitOffset;
+              const toRead = numBits < bitsLeft ? numBits : bitsLeft;
+              const bitsToNotRead = bitsLeft - toRead;
+              const mask = (0xFF >> (8 - toRead)) << bitsToNotRead;
+              result = (this.bytes[this.byteOffset] & mask) >> bitsToNotRead;
+              numBits -= toRead;
+              this.bitOffset += toRead;
+              if (this.bitOffset === 8) {
+                  this.bitOffset = 0;
+                  this.byteOffset++;
+              }
+          }
+          // Next read whole bytes
+          if (numBits > 0) {
+              while (numBits >= 8) {
+                  result = (result << 8) | (this.bytes[this.byteOffset] & 0xFF);
+                  this.byteOffset++;
+                  numBits -= 8;
+              }
+              // Finally read a partial byte
+              if (numBits > 0) {
+                  const bitsToNotRead = 8 - numBits;
+                  const mask = (0xFF >> bitsToNotRead) << bitsToNotRead;
+                  result = (result << numBits) | ((this.bytes[this.byteOffset] & mask) >> bitsToNotRead);
+                  this.bitOffset += numBits;
+              }
+          }
+          return result;
+      }
+      available() {
+          return 8 * (this.bytes.length - this.byteOffset) - this.bitOffset;
+      }
+  }
+
+  // tslint:disable:no-bitwise
+  var Mode;
+  (function (Mode) {
+      Mode["Numeric"] = "numeric";
+      Mode["Alphanumeric"] = "alphanumeric";
+      Mode["Byte"] = "byte";
+      Mode["Kanji"] = "kanji";
+      Mode["ECI"] = "eci";
+  })(Mode || (Mode = {}));
+  var ModeByte;
+  (function (ModeByte) {
+      ModeByte[ModeByte["Terminator"] = 0] = "Terminator";
+      ModeByte[ModeByte["Numeric"] = 1] = "Numeric";
+      ModeByte[ModeByte["Alphanumeric"] = 2] = "Alphanumeric";
+      ModeByte[ModeByte["Byte"] = 4] = "Byte";
+      ModeByte[ModeByte["Kanji"] = 8] = "Kanji";
+      ModeByte[ModeByte["ECI"] = 7] = "ECI";
+      // StructuredAppend = 0x3,
+      // FNC1FirstPosition = 0x5,
+      // FNC1SecondPosition = 0x9,
+  })(ModeByte || (ModeByte = {}));
+  function decodeNumeric(stream, size) {
+      const bytes = [];
+      let text = "";
+      const characterCountSize = [10, 12, 14][size];
+      let length = stream.readBits(characterCountSize);
+      // Read digits in groups of 3
+      while (length >= 3) {
+          const num = stream.readBits(10);
+          if (num >= 1000) {
+              throw new Error("Invalid numeric value above 999");
+          }
+          const a = Math.floor(num / 100);
+          const b = Math.floor(num / 10) % 10;
+          const c = num % 10;
+          bytes.push(48 + a, 48 + b, 48 + c);
+          text += a.toString() + b.toString() + c.toString();
+          length -= 3;
+      }
+      // If the number of digits aren't a multiple of 3, the remaining digits are special cased.
+      if (length === 2) {
+          const num = stream.readBits(7);
+          if (num >= 100) {
+              throw new Error("Invalid numeric value above 99");
+          }
+          const a = Math.floor(num / 10);
+          const b = num % 10;
+          bytes.push(48 + a, 48 + b);
+          text += a.toString() + b.toString();
+      }
+      else if (length === 1) {
+          const num = stream.readBits(4);
+          if (num >= 10) {
+              throw new Error("Invalid numeric value above 9");
+          }
+          bytes.push(48 + num);
+          text += num.toString();
+      }
+      return { bytes, text };
+  }
+  const AlphanumericCharacterCodes = [
+      "0", "1", "2", "3", "4", "5", "6", "7", "8",
+      "9", "A", "B", "C", "D", "E", "F", "G", "H",
+      "I", "J", "K", "L", "M", "N", "O", "P", "Q",
+      "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+      " ", "$", "%", "*", "+", "-", ".", "/", ":",
+  ];
+  function decodeAlphanumeric(stream, size) {
+      const bytes = [];
+      let text = "";
+      const characterCountSize = [9, 11, 13][size];
+      let length = stream.readBits(characterCountSize);
+      while (length >= 2) {
+          const v = stream.readBits(11);
+          const a = Math.floor(v / 45);
+          const b = v % 45;
+          bytes.push(AlphanumericCharacterCodes[a].charCodeAt(0), AlphanumericCharacterCodes[b].charCodeAt(0));
+          text += AlphanumericCharacterCodes[a] + AlphanumericCharacterCodes[b];
+          length -= 2;
+      }
+      if (length === 1) {
+          const a = stream.readBits(6);
+          bytes.push(AlphanumericCharacterCodes[a].charCodeAt(0));
+          text += AlphanumericCharacterCodes[a];
+      }
+      return { bytes, text };
+  }
+  function decodeByte(stream, size) {
+      const bytes = [];
+      let text = "";
+      const characterCountSize = [8, 16, 16][size];
+      const length = stream.readBits(characterCountSize);
+      for (let i = 0; i < length; i++) {
+          const b = stream.readBits(8);
+          bytes.push(b);
+      }
+      try {
+          text += decodeURIComponent(bytes.map(b => `%${("0" + b.toString(16)).substr(-2)}`).join(""));
+      }
+      catch (_a) {
+          // failed to decode
+      }
+      return { bytes, text };
+  }
+  function decodeKanji(stream, size) {
+      const bytes = [];
+      const characterCountSize = [8, 10, 12][size];
+      const length = stream.readBits(characterCountSize);
+      for (let i = 0; i < length; i++) {
+          const k = stream.readBits(13);
+          let c = (Math.floor(k / 0xC0) << 8) | (k % 0xC0);
+          if (c < 0x1F00) {
+              c += 0x8140;
+          }
+          else {
+              c += 0xC140;
+          }
+          bytes.push(c >> 8, c & 0xFF);
+      }
+      const text = new TextDecoder("shift-jis").decode(Uint8Array.from(bytes));
+      return { bytes, text };
+  }
+  function decode(data, version) {
+      const stream = new BitStream(data);
+      // There are 3 'sizes' based on the version. 1-9 is small (0), 10-26 is medium (1) and 27-40 is large (2).
+      const size = version <= 9 ? 0 : version <= 26 ? 1 : 2;
+      const result = {
+          text: "",
+          bytes: [],
+          chunks: [],
+      };
+      while (stream.available() >= 4) {
+          const mode = stream.readBits(4);
+          if (mode === ModeByte.Terminator) {
+              return result;
+          }
+          else if (mode === ModeByte.ECI) {
+              if (stream.readBits(1) === 0) {
+                  result.chunks.push({
+                      type: Mode.ECI,
+                      assignmentNumber: stream.readBits(7),
+                  });
+              }
+              else if (stream.readBits(1) === 0) {
+                  result.chunks.push({
+                      type: Mode.ECI,
+                      assignmentNumber: stream.readBits(14),
+                  });
+              }
+              else if (stream.readBits(1) === 0) {
+                  result.chunks.push({
+                      type: Mode.ECI,
+                      assignmentNumber: stream.readBits(21),
+                  });
+              }
+              else {
+                  // ECI data seems corrupted
+                  result.chunks.push({
+                      type: Mode.ECI,
+                      assignmentNumber: -1,
+                  });
+              }
+          }
+          else if (mode === ModeByte.Numeric) {
+              const numericResult = decodeNumeric(stream, size);
+              result.text += numericResult.text;
+              result.bytes.push(...numericResult.bytes);
+              result.chunks.push({
+                  type: Mode.Numeric,
+                  text: numericResult.text,
+              });
+          }
+          else if (mode === ModeByte.Alphanumeric) {
+              const alphanumericResult = decodeAlphanumeric(stream, size);
+              result.text += alphanumericResult.text;
+              result.bytes.push(...alphanumericResult.bytes);
+              result.chunks.push({
+                  type: Mode.Alphanumeric,
+                  text: alphanumericResult.text,
+              });
+          }
+          else if (mode === ModeByte.Byte) {
+              const byteResult = decodeByte(stream, size);
+              result.text += byteResult.text;
+              result.bytes.push(...byteResult.bytes);
+              result.chunks.push({
+                  type: Mode.Byte,
+                  bytes: byteResult.bytes,
+                  text: byteResult.text,
+              });
+          }
+          else if (mode === ModeByte.Kanji) {
+              const kanjiResult = decodeKanji(stream, size);
+              result.text += kanjiResult.text;
+              result.bytes.push(...kanjiResult.bytes);
+              result.chunks.push({
+                  type: Mode.Kanji,
+                  bytes: kanjiResult.bytes,
+                  text: kanjiResult.text,
+              });
+          }
+      }
+      // If there is no data left, or the remaining bits are all 0, then that counts as a termination marker
+      if (stream.available() === 0 || stream.readBits(stream.available()) === 0) {
+          return result;
+      }
+  }
+
+  class GenericGFPoly {
+      constructor(field, coefficients) {
+          if (coefficients.length === 0) {
+              throw new Error("No coefficients.");
+          }
+          this.field = field;
+          const coefficientsLength = coefficients.length;
+          if (coefficientsLength > 1 && coefficients[0] === 0) {
+              // Leading term must be non-zero for anything except the constant polynomial "0"
+              let firstNonZero = 1;
+              while (firstNonZero < coefficientsLength && coefficients[firstNonZero] === 0) {
+                  firstNonZero++;
+              }
+              if (firstNonZero === coefficientsLength) {
+                  this.coefficients = field.zero.coefficients;
+              }
+              else {
+                  this.coefficients = new Uint8ClampedArray(coefficientsLength - firstNonZero);
+                  for (let i = 0; i < this.coefficients.length; i++) {
+                      this.coefficients[i] = coefficients[firstNonZero + i];
+                  }
+              }
+          }
+          else {
+              this.coefficients = coefficients;
+          }
+      }
+      degree() {
+          return this.coefficients.length - 1;
+      }
+      isZero() {
+          return this.coefficients[0] === 0;
+      }
+      getCoefficient(degree) {
+          return this.coefficients[this.coefficients.length - 1 - degree];
+      }
+      addOrSubtract(other) {
+          if (this.isZero()) {
+              return other;
+          }
+          if (other.isZero()) {
+              return this;
+          }
+          let smallerCoefficients = this.coefficients;
+          let largerCoefficients = other.coefficients;
+          if (smallerCoefficients.length > largerCoefficients.length) {
+              [smallerCoefficients, largerCoefficients] = [largerCoefficients, smallerCoefficients];
+          }
+          const sumDiff = new Uint8ClampedArray(largerCoefficients.length);
+          const lengthDiff = largerCoefficients.length - smallerCoefficients.length;
+          for (let i = 0; i < lengthDiff; i++) {
+              sumDiff[i] = largerCoefficients[i];
+          }
+          for (let i = lengthDiff; i < largerCoefficients.length; i++) {
+              sumDiff[i] = addOrSubtractGF(smallerCoefficients[i - lengthDiff], largerCoefficients[i]);
+          }
+          return new GenericGFPoly(this.field, sumDiff);
+      }
+      multiply(scalar) {
+          if (scalar === 0) {
+              return this.field.zero;
+          }
+          if (scalar === 1) {
+              return this;
+          }
+          const size = this.coefficients.length;
+          const product = new Uint8ClampedArray(size);
+          for (let i = 0; i < size; i++) {
+              product[i] = this.field.multiply(this.coefficients[i], scalar);
+          }
+          return new GenericGFPoly(this.field, product);
+      }
+      multiplyPoly(other) {
+          if (this.isZero() || other.isZero()) {
+              return this.field.zero;
+          }
+          const aCoefficients = this.coefficients;
+          const aLength = aCoefficients.length;
+          const bCoefficients = other.coefficients;
+          const bLength = bCoefficients.length;
+          const product = new Uint8ClampedArray(aLength + bLength - 1);
+          for (let i = 0; i < aLength; i++) {
+              const aCoeff = aCoefficients[i];
+              for (let j = 0; j < bLength; j++) {
+                  product[i + j] = addOrSubtractGF(product[i + j], this.field.multiply(aCoeff, bCoefficients[j]));
+              }
+          }
+          return new GenericGFPoly(this.field, product);
+      }
+      multiplyByMonomial(degree, coefficient) {
+          if (degree < 0) {
+              throw new Error("Invalid degree less than 0");
+          }
+          if (coefficient === 0) {
+              return this.field.zero;
+          }
+          const size = this.coefficients.length;
+          const product = new Uint8ClampedArray(size + degree);
+          for (let i = 0; i < size; i++) {
+              product[i] = this.field.multiply(this.coefficients[i], coefficient);
+          }
+          return new GenericGFPoly(this.field, product);
+      }
+      evaluateAt(a) {
+          let result = 0;
+          if (a === 0) {
+              // Just return the x^0 coefficient
+              return this.getCoefficient(0);
+          }
+          const size = this.coefficients.length;
+          if (a === 1) {
+              // Just the sum of the coefficients
+              this.coefficients.forEach((coefficient) => {
+                  result = addOrSubtractGF(result, coefficient);
+              });
+              return result;
+          }
+          result = this.coefficients[0];
+          for (let i = 1; i < size; i++) {
+              result = addOrSubtractGF(this.field.multiply(a, result), this.coefficients[i]);
+          }
+          return result;
+      }
+  }
+
+  function addOrSubtractGF(a, b) {
+      return a ^ b; // tslint:disable-line:no-bitwise
+  }
+  class GenericGF {
+      constructor(primitive, size, genBase) {
+          this.primitive = primitive;
+          this.size = size;
+          this.generatorBase = genBase;
+          this.expTable = new Array(this.size);
+          this.logTable = new Array(this.size);
+          let x = 1;
+          for (let i = 0; i < this.size; i++) {
+              this.expTable[i] = x;
+              x = x * 2;
+              if (x >= this.size) {
+                  x = (x ^ this.primitive) & (this.size - 1); // tslint:disable-line:no-bitwise
+              }
+          }
+          for (let i = 0; i < this.size - 1; i++) {
+              this.logTable[this.expTable[i]] = i;
+          }
+          this.zero = new GenericGFPoly(this, Uint8ClampedArray.from([0]));
+          this.one = new GenericGFPoly(this, Uint8ClampedArray.from([1]));
+      }
+      multiply(a, b) {
+          if (a === 0 || b === 0) {
+              return 0;
+          }
+          return this.expTable[(this.logTable[a] + this.logTable[b]) % (this.size - 1)];
+      }
+      inverse(a) {
+          if (a === 0) {
+              throw new Error("Can't invert 0");
+          }
+          return this.expTable[this.size - this.logTable[a] - 1];
+      }
+      buildMonomial(degree, coefficient) {
+          if (degree < 0) {
+              throw new Error("Invalid monomial degree less than 0");
+          }
+          if (coefficient === 0) {
+              return this.zero;
+          }
+          const coefficients = new Uint8ClampedArray(degree + 1);
+          coefficients[0] = coefficient;
+          return new GenericGFPoly(this, coefficients);
+      }
+      log(a) {
+          if (a === 0) {
+              throw new Error("Can't take log(0)");
+          }
+          return this.logTable[a];
+      }
+      exp(a) {
+          return this.expTable[a];
+      }
+  }
+
+  function runEuclideanAlgorithm(field, a, b, R) {
+      // Assume a's degree is >= b's
+      if (a.degree() < b.degree()) {
+          [a, b] = [b, a];
+      }
+      let rLast = a;
+      let r = b;
+      let tLast = field.zero;
+      let t = field.one;
+      // Run Euclidean algorithm until r's degree is less than R/2
+      while (r.degree() >= R / 2) {
+          const rLastLast = rLast;
+          const tLastLast = tLast;
+          rLast = r;
+          tLast = t;
+          // Divide rLastLast by rLast, with quotient in q and remainder in r
+          if (rLast.isZero()) {
+              // Euclidean algorithm already terminated?
+              return null;
+          }
+          r = rLastLast;
+          let q = field.zero;
+          const denominatorLeadingTerm = rLast.getCoefficient(rLast.degree());
+          const dltInverse = field.inverse(denominatorLeadingTerm);
+          while (r.degree() >= rLast.degree() && !r.isZero()) {
+              const degreeDiff = r.degree() - rLast.degree();
+              const scale = field.multiply(r.getCoefficient(r.degree()), dltInverse);
+              q = q.addOrSubtract(field.buildMonomial(degreeDiff, scale));
+              r = r.addOrSubtract(rLast.multiplyByMonomial(degreeDiff, scale));
+          }
+          t = q.multiplyPoly(tLast).addOrSubtract(tLastLast);
+          if (r.degree() >= rLast.degree()) {
+              return null;
+          }
+      }
+      const sigmaTildeAtZero = t.getCoefficient(0);
+      if (sigmaTildeAtZero === 0) {
+          return null;
+      }
+      const inverse = field.inverse(sigmaTildeAtZero);
+      return [t.multiply(inverse), r.multiply(inverse)];
+  }
+  function findErrorLocations(field, errorLocator) {
+      // This is a direct application of Chien's search
+      const numErrors = errorLocator.degree();
+      if (numErrors === 1) {
+          return [errorLocator.getCoefficient(1)];
+      }
+      const result = new Array(numErrors);
+      let errorCount = 0;
+      for (let i = 1; i < field.size && errorCount < numErrors; i++) {
+          if (errorLocator.evaluateAt(i) === 0) {
+              result[errorCount] = field.inverse(i);
+              errorCount++;
+          }
+      }
+      if (errorCount !== numErrors) {
+          return null;
+      }
+      return result;
+  }
+  function findErrorMagnitudes(field, errorEvaluator, errorLocations) {
+      // This is directly applying Forney's Formula
+      const s = errorLocations.length;
+      const result = new Array(s);
+      for (let i = 0; i < s; i++) {
+          const xiInverse = field.inverse(errorLocations[i]);
+          let denominator = 1;
+          for (let j = 0; j < s; j++) {
+              if (i !== j) {
+                  denominator = field.multiply(denominator, addOrSubtractGF(1, field.multiply(errorLocations[j], xiInverse)));
+              }
+          }
+          result[i] = field.multiply(errorEvaluator.evaluateAt(xiInverse), field.inverse(denominator));
+          if (field.generatorBase !== 0) {
+              result[i] = field.multiply(result[i], xiInverse);
+          }
+      }
+      return result;
+  }
+  function decode$1(bytes, twoS) {
+      const outputBytes = new Uint8ClampedArray(bytes.length);
+      outputBytes.set(bytes);
+      const field = new GenericGF(0x011D, 256, 0); // x^8 + x^4 + x^3 + x^2 + 1
+      const poly = new GenericGFPoly(field, outputBytes);
+      const syndromeCoefficients = new Uint8ClampedArray(twoS);
+      let error = false;
+      for (let s = 0; s < twoS; s++) {
+          const evaluation = poly.evaluateAt(field.exp(s + field.generatorBase));
+          syndromeCoefficients[syndromeCoefficients.length - 1 - s] = evaluation;
+          if (evaluation !== 0) {
+              error = true;
+          }
+      }
+      if (!error) {
+          return outputBytes;
+      }
+      const syndrome = new GenericGFPoly(field, syndromeCoefficients);
+      const sigmaOmega = runEuclideanAlgorithm(field, field.buildMonomial(twoS, 1), syndrome, twoS);
+      if (sigmaOmega === null) {
+          return null;
+      }
+      const errorLocations = findErrorLocations(field, sigmaOmega[0]);
+      if (errorLocations == null) {
+          return null;
+      }
+      const errorMagnitudes = findErrorMagnitudes(field, sigmaOmega[1], errorLocations);
+      for (let i = 0; i < errorLocations.length; i++) {
+          const position = outputBytes.length - 1 - field.log(errorLocations[i]);
+          if (position < 0) {
+              return null;
+          }
+          outputBytes[position] = addOrSubtractGF(outputBytes[position], errorMagnitudes[i]);
+      }
+      return outputBytes;
+  }
+
+  const VERSIONS = [
+      {
+          infoBits: null,
+          versionNumber: 1,
+          alignmentPatternCenters: [],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 7,
+                  ecBlocks: [{ numBlocks: 1, dataCodewordsPerBlock: 19 }],
+              },
+              {
+                  ecCodewordsPerBlock: 10,
+                  ecBlocks: [{ numBlocks: 1, dataCodewordsPerBlock: 16 }],
+              },
+              {
+                  ecCodewordsPerBlock: 13,
+                  ecBlocks: [{ numBlocks: 1, dataCodewordsPerBlock: 13 }],
+              },
+              {
+                  ecCodewordsPerBlock: 17,
+                  ecBlocks: [{ numBlocks: 1, dataCodewordsPerBlock: 9 }],
+              },
+          ],
+      },
+      {
+          infoBits: null,
+          versionNumber: 2,
+          alignmentPatternCenters: [6, 18],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 10,
+                  ecBlocks: [{ numBlocks: 1, dataCodewordsPerBlock: 34 }],
+              },
+              {
+                  ecCodewordsPerBlock: 16,
+                  ecBlocks: [{ numBlocks: 1, dataCodewordsPerBlock: 28 }],
+              },
+              {
+                  ecCodewordsPerBlock: 22,
+                  ecBlocks: [{ numBlocks: 1, dataCodewordsPerBlock: 22 }],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [{ numBlocks: 1, dataCodewordsPerBlock: 16 }],
+              },
+          ],
+      },
+      {
+          infoBits: null,
+          versionNumber: 3,
+          alignmentPatternCenters: [6, 22],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 15,
+                  ecBlocks: [{ numBlocks: 1, dataCodewordsPerBlock: 55 }],
+              },
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [{ numBlocks: 1, dataCodewordsPerBlock: 44 }],
+              },
+              {
+                  ecCodewordsPerBlock: 18,
+                  ecBlocks: [{ numBlocks: 2, dataCodewordsPerBlock: 17 }],
+              },
+              {
+                  ecCodewordsPerBlock: 22,
+                  ecBlocks: [{ numBlocks: 2, dataCodewordsPerBlock: 13 }],
+              },
+          ],
+      },
+      {
+          infoBits: null,
+          versionNumber: 4,
+          alignmentPatternCenters: [6, 26],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 20,
+                  ecBlocks: [{ numBlocks: 1, dataCodewordsPerBlock: 80 }],
+              },
+              {
+                  ecCodewordsPerBlock: 18,
+                  ecBlocks: [{ numBlocks: 2, dataCodewordsPerBlock: 32 }],
+              },
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [{ numBlocks: 2, dataCodewordsPerBlock: 24 }],
+              },
+              {
+                  ecCodewordsPerBlock: 16,
+                  ecBlocks: [{ numBlocks: 4, dataCodewordsPerBlock: 9 }],
+              },
+          ],
+      },
+      {
+          infoBits: null,
+          versionNumber: 5,
+          alignmentPatternCenters: [6, 30],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [{ numBlocks: 1, dataCodewordsPerBlock: 108 }],
+              },
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [{ numBlocks: 2, dataCodewordsPerBlock: 43 }],
+              },
+              {
+                  ecCodewordsPerBlock: 18,
+                  ecBlocks: [
+                      { numBlocks: 2, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 22,
+                  ecBlocks: [
+                      { numBlocks: 2, dataCodewordsPerBlock: 11 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 12 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: null,
+          versionNumber: 6,
+          alignmentPatternCenters: [6, 34],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 18,
+                  ecBlocks: [{ numBlocks: 2, dataCodewordsPerBlock: 68 }],
+              },
+              {
+                  ecCodewordsPerBlock: 16,
+                  ecBlocks: [{ numBlocks: 4, dataCodewordsPerBlock: 27 }],
+              },
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [{ numBlocks: 4, dataCodewordsPerBlock: 19 }],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [{ numBlocks: 4, dataCodewordsPerBlock: 15 }],
+              },
+          ],
+      },
+      {
+          infoBits: 0x07C94,
+          versionNumber: 7,
+          alignmentPatternCenters: [6, 22, 38],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 20,
+                  ecBlocks: [{ numBlocks: 2, dataCodewordsPerBlock: 78 }],
+              },
+              {
+                  ecCodewordsPerBlock: 18,
+                  ecBlocks: [{ numBlocks: 4, dataCodewordsPerBlock: 31 }],
+              },
+              {
+                  ecCodewordsPerBlock: 18,
+                  ecBlocks: [
+                      { numBlocks: 2, dataCodewordsPerBlock: 14 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 15 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 13 },
+                      { numBlocks: 1, dataCodewordsPerBlock: 14 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x085BC,
+          versionNumber: 8,
+          alignmentPatternCenters: [6, 24, 42],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [{ numBlocks: 2, dataCodewordsPerBlock: 97 }],
+              },
+              {
+                  ecCodewordsPerBlock: 22,
+                  ecBlocks: [
+                      { numBlocks: 2, dataCodewordsPerBlock: 38 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 39 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 22,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 18 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 19 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 14 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 15 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x09A99,
+          versionNumber: 9,
+          alignmentPatternCenters: [6, 26, 46],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [{ numBlocks: 2, dataCodewordsPerBlock: 116 }],
+              },
+              {
+                  ecCodewordsPerBlock: 22,
+                  ecBlocks: [
+                      { numBlocks: 3, dataCodewordsPerBlock: 36 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 37 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 20,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 16 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 17 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 12 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 13 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x0A4D3,
+          versionNumber: 10,
+          alignmentPatternCenters: [6, 28, 50],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 18,
+                  ecBlocks: [
+                      { numBlocks: 2, dataCodewordsPerBlock: 68 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 69 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 43 },
+                      { numBlocks: 1, dataCodewordsPerBlock: 44 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [
+                      { numBlocks: 6, dataCodewordsPerBlock: 19 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 20 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 6, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x0BBF6,
+          versionNumber: 11,
+          alignmentPatternCenters: [6, 30, 54],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 20,
+                  ecBlocks: [{ numBlocks: 4, dataCodewordsPerBlock: 81 }],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 1, dataCodewordsPerBlock: 50 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 51 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 22 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 23 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [
+                      { numBlocks: 3, dataCodewordsPerBlock: 12 },
+                      { numBlocks: 8, dataCodewordsPerBlock: 13 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x0C762,
+          versionNumber: 12,
+          alignmentPatternCenters: [6, 32, 58],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [
+                      { numBlocks: 2, dataCodewordsPerBlock: 92 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 93 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 22,
+                  ecBlocks: [
+                      { numBlocks: 6, dataCodewordsPerBlock: 36 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 37 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 20 },
+                      { numBlocks: 6, dataCodewordsPerBlock: 21 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 7, dataCodewordsPerBlock: 14 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 15 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x0D847,
+          versionNumber: 13,
+          alignmentPatternCenters: [6, 34, 62],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [{ numBlocks: 4, dataCodewordsPerBlock: 107 }],
+              },
+              {
+                  ecCodewordsPerBlock: 22,
+                  ecBlocks: [
+                      { numBlocks: 8, dataCodewordsPerBlock: 37 },
+                      { numBlocks: 1, dataCodewordsPerBlock: 38 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [
+                      { numBlocks: 8, dataCodewordsPerBlock: 20 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 21 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 22,
+                  ecBlocks: [
+                      { numBlocks: 12, dataCodewordsPerBlock: 11 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 12 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x0E60D,
+          versionNumber: 14,
+          alignmentPatternCenters: [6, 26, 46, 66],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 3, dataCodewordsPerBlock: 115 },
+                      { numBlocks: 1, dataCodewordsPerBlock: 116 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 40 },
+                      { numBlocks: 5, dataCodewordsPerBlock: 41 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 20,
+                  ecBlocks: [
+                      { numBlocks: 11, dataCodewordsPerBlock: 16 },
+                      { numBlocks: 5, dataCodewordsPerBlock: 17 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [
+                      { numBlocks: 11, dataCodewordsPerBlock: 12 },
+                      { numBlocks: 5, dataCodewordsPerBlock: 13 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x0F928,
+          versionNumber: 15,
+          alignmentPatternCenters: [6, 26, 48, 70],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 22,
+                  ecBlocks: [
+                      { numBlocks: 5, dataCodewordsPerBlock: 87 },
+                      { numBlocks: 1, dataCodewordsPerBlock: 88 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [
+                      { numBlocks: 5, dataCodewordsPerBlock: 41 },
+                      { numBlocks: 5, dataCodewordsPerBlock: 42 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 5, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 7, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [
+                      { numBlocks: 11, dataCodewordsPerBlock: 12 },
+                      { numBlocks: 7, dataCodewordsPerBlock: 13 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x10B78,
+          versionNumber: 16,
+          alignmentPatternCenters: [6, 26, 50, 74],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [
+                      { numBlocks: 5, dataCodewordsPerBlock: 98 },
+                      { numBlocks: 1, dataCodewordsPerBlock: 99 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 7, dataCodewordsPerBlock: 45 },
+                      { numBlocks: 3, dataCodewordsPerBlock: 46 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [
+                      { numBlocks: 15, dataCodewordsPerBlock: 19 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 20 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 3, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 13, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x1145D,
+          versionNumber: 17,
+          alignmentPatternCenters: [6, 30, 54, 78],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 1, dataCodewordsPerBlock: 107 },
+                      { numBlocks: 5, dataCodewordsPerBlock: 108 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 10, dataCodewordsPerBlock: 46 },
+                      { numBlocks: 1, dataCodewordsPerBlock: 47 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 1, dataCodewordsPerBlock: 22 },
+                      { numBlocks: 15, dataCodewordsPerBlock: 23 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 2, dataCodewordsPerBlock: 14 },
+                      { numBlocks: 17, dataCodewordsPerBlock: 15 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x12A17,
+          versionNumber: 18,
+          alignmentPatternCenters: [6, 30, 56, 82],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 5, dataCodewordsPerBlock: 120 },
+                      { numBlocks: 1, dataCodewordsPerBlock: 121 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [
+                      { numBlocks: 9, dataCodewordsPerBlock: 43 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 44 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 17, dataCodewordsPerBlock: 22 },
+                      { numBlocks: 1, dataCodewordsPerBlock: 23 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 2, dataCodewordsPerBlock: 14 },
+                      { numBlocks: 19, dataCodewordsPerBlock: 15 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x13532,
+          versionNumber: 19,
+          alignmentPatternCenters: [6, 30, 58, 86],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 3, dataCodewordsPerBlock: 113 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 114 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [
+                      { numBlocks: 3, dataCodewordsPerBlock: 44 },
+                      { numBlocks: 11, dataCodewordsPerBlock: 45 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [
+                      { numBlocks: 17, dataCodewordsPerBlock: 21 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 22 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [
+                      { numBlocks: 9, dataCodewordsPerBlock: 13 },
+                      { numBlocks: 16, dataCodewordsPerBlock: 14 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x149A6,
+          versionNumber: 20,
+          alignmentPatternCenters: [6, 34, 62, 90],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 3, dataCodewordsPerBlock: 107 },
+                      { numBlocks: 5, dataCodewordsPerBlock: 108 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [
+                      { numBlocks: 3, dataCodewordsPerBlock: 41 },
+                      { numBlocks: 13, dataCodewordsPerBlock: 42 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 15, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 5, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 15, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 10, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x15683,
+          versionNumber: 21,
+          alignmentPatternCenters: [6, 28, 50, 72, 94],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 116 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 117 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [{ numBlocks: 17, dataCodewordsPerBlock: 42 }],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 17, dataCodewordsPerBlock: 22 },
+                      { numBlocks: 6, dataCodewordsPerBlock: 23 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 19, dataCodewordsPerBlock: 16 },
+                      { numBlocks: 6, dataCodewordsPerBlock: 17 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x168C9,
+          versionNumber: 22,
+          alignmentPatternCenters: [6, 26, 50, 74, 98],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 2, dataCodewordsPerBlock: 111 },
+                      { numBlocks: 7, dataCodewordsPerBlock: 112 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [{ numBlocks: 17, dataCodewordsPerBlock: 46 }],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 7, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 16, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 24,
+                  ecBlocks: [{ numBlocks: 34, dataCodewordsPerBlock: 13 }],
+              },
+          ],
+      },
+      {
+          infoBits: 0x177EC,
+          versionNumber: 23,
+          alignmentPatternCenters: [6, 30, 54, 74, 102],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 121 },
+                      { numBlocks: 5, dataCodewordsPerBlock: 122 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 47 },
+                      { numBlocks: 14, dataCodewordsPerBlock: 48 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 11, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 14, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 16, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 14, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x18EC4,
+          versionNumber: 24,
+          alignmentPatternCenters: [6, 28, 54, 80, 106],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 6, dataCodewordsPerBlock: 117 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 118 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 6, dataCodewordsPerBlock: 45 },
+                      { numBlocks: 14, dataCodewordsPerBlock: 46 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 11, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 16, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 30, dataCodewordsPerBlock: 16 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 17 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x191E1,
+          versionNumber: 25,
+          alignmentPatternCenters: [6, 32, 58, 84, 110],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 26,
+                  ecBlocks: [
+                      { numBlocks: 8, dataCodewordsPerBlock: 106 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 107 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 8, dataCodewordsPerBlock: 47 },
+                      { numBlocks: 13, dataCodewordsPerBlock: 48 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 7, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 22, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 22, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 13, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x1AFAB,
+          versionNumber: 26,
+          alignmentPatternCenters: [6, 30, 58, 86, 114],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 10, dataCodewordsPerBlock: 114 },
+                      { numBlocks: 2, dataCodewordsPerBlock: 115 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 19, dataCodewordsPerBlock: 46 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 47 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 28, dataCodewordsPerBlock: 22 },
+                      { numBlocks: 6, dataCodewordsPerBlock: 23 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 33, dataCodewordsPerBlock: 16 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 17 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x1B08E,
+          versionNumber: 27,
+          alignmentPatternCenters: [6, 34, 62, 90, 118],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 8, dataCodewordsPerBlock: 122 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 123 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 22, dataCodewordsPerBlock: 45 },
+                      { numBlocks: 3, dataCodewordsPerBlock: 46 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 8, dataCodewordsPerBlock: 23 },
+                      { numBlocks: 26, dataCodewordsPerBlock: 24 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 12, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 28, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x1CC1A,
+          versionNumber: 28,
+          alignmentPatternCenters: [6, 26, 50, 74, 98, 122],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 3, dataCodewordsPerBlock: 117 },
+                      { numBlocks: 10, dataCodewordsPerBlock: 118 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 3, dataCodewordsPerBlock: 45 },
+                      { numBlocks: 23, dataCodewordsPerBlock: 46 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 31, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 11, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 31, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x1D33F,
+          versionNumber: 29,
+          alignmentPatternCenters: [6, 30, 54, 78, 102, 126],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 7, dataCodewordsPerBlock: 116 },
+                      { numBlocks: 7, dataCodewordsPerBlock: 117 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 21, dataCodewordsPerBlock: 45 },
+                      { numBlocks: 7, dataCodewordsPerBlock: 46 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 1, dataCodewordsPerBlock: 23 },
+                      { numBlocks: 37, dataCodewordsPerBlock: 24 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 19, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 26, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x1ED75,
+          versionNumber: 30,
+          alignmentPatternCenters: [6, 26, 52, 78, 104, 130],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 5, dataCodewordsPerBlock: 115 },
+                      { numBlocks: 10, dataCodewordsPerBlock: 116 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 19, dataCodewordsPerBlock: 47 },
+                      { numBlocks: 10, dataCodewordsPerBlock: 48 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 15, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 25, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 23, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 25, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x1F250,
+          versionNumber: 31,
+          alignmentPatternCenters: [6, 30, 56, 82, 108, 134],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 13, dataCodewordsPerBlock: 115 },
+                      { numBlocks: 3, dataCodewordsPerBlock: 116 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 2, dataCodewordsPerBlock: 46 },
+                      { numBlocks: 29, dataCodewordsPerBlock: 47 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 42, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 1, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 23, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 28, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x209D5,
+          versionNumber: 32,
+          alignmentPatternCenters: [6, 34, 60, 86, 112, 138],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [{ numBlocks: 17, dataCodewordsPerBlock: 115 }],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 10, dataCodewordsPerBlock: 46 },
+                      { numBlocks: 23, dataCodewordsPerBlock: 47 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 10, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 35, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 19, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 35, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x216F0,
+          versionNumber: 33,
+          alignmentPatternCenters: [6, 30, 58, 86, 114, 142],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 17, dataCodewordsPerBlock: 115 },
+                      { numBlocks: 1, dataCodewordsPerBlock: 116 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 14, dataCodewordsPerBlock: 46 },
+                      { numBlocks: 21, dataCodewordsPerBlock: 47 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 29, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 19, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 11, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 46, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x228BA,
+          versionNumber: 34,
+          alignmentPatternCenters: [6, 34, 62, 90, 118, 146],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 13, dataCodewordsPerBlock: 115 },
+                      { numBlocks: 6, dataCodewordsPerBlock: 116 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 14, dataCodewordsPerBlock: 46 },
+                      { numBlocks: 23, dataCodewordsPerBlock: 47 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 44, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 7, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 59, dataCodewordsPerBlock: 16 },
+                      { numBlocks: 1, dataCodewordsPerBlock: 17 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x2379F,
+          versionNumber: 35,
+          alignmentPatternCenters: [6, 30, 54, 78, 102, 126, 150],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 12, dataCodewordsPerBlock: 121 },
+                      { numBlocks: 7, dataCodewordsPerBlock: 122 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 12, dataCodewordsPerBlock: 47 },
+                      { numBlocks: 26, dataCodewordsPerBlock: 48 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 39, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 14, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 22, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 41, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x24B0B,
+          versionNumber: 36,
+          alignmentPatternCenters: [6, 24, 50, 76, 102, 128, 154],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 6, dataCodewordsPerBlock: 121 },
+                      { numBlocks: 14, dataCodewordsPerBlock: 122 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 6, dataCodewordsPerBlock: 47 },
+                      { numBlocks: 34, dataCodewordsPerBlock: 48 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 46, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 10, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 2, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 64, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x2542E,
+          versionNumber: 37,
+          alignmentPatternCenters: [6, 28, 54, 80, 106, 132, 158],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 17, dataCodewordsPerBlock: 122 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 123 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 29, dataCodewordsPerBlock: 46 },
+                      { numBlocks: 14, dataCodewordsPerBlock: 47 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 49, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 10, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 24, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 46, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x26A64,
+          versionNumber: 38,
+          alignmentPatternCenters: [6, 32, 58, 84, 110, 136, 162],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 4, dataCodewordsPerBlock: 122 },
+                      { numBlocks: 18, dataCodewordsPerBlock: 123 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 13, dataCodewordsPerBlock: 46 },
+                      { numBlocks: 32, dataCodewordsPerBlock: 47 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 48, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 14, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 42, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 32, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x27541,
+          versionNumber: 39,
+          alignmentPatternCenters: [6, 26, 54, 82, 110, 138, 166],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 20, dataCodewordsPerBlock: 117 },
+                      { numBlocks: 4, dataCodewordsPerBlock: 118 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 40, dataCodewordsPerBlock: 47 },
+                      { numBlocks: 7, dataCodewordsPerBlock: 48 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 43, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 22, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 10, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 67, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+      {
+          infoBits: 0x28C69,
+          versionNumber: 40,
+          alignmentPatternCenters: [6, 30, 58, 86, 114, 142, 170],
+          errorCorrectionLevels: [
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 19, dataCodewordsPerBlock: 118 },
+                      { numBlocks: 6, dataCodewordsPerBlock: 119 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 28,
+                  ecBlocks: [
+                      { numBlocks: 18, dataCodewordsPerBlock: 47 },
+                      { numBlocks: 31, dataCodewordsPerBlock: 48 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 34, dataCodewordsPerBlock: 24 },
+                      { numBlocks: 34, dataCodewordsPerBlock: 25 },
+                  ],
+              },
+              {
+                  ecCodewordsPerBlock: 30,
+                  ecBlocks: [
+                      { numBlocks: 20, dataCodewordsPerBlock: 15 },
+                      { numBlocks: 61, dataCodewordsPerBlock: 16 },
+                  ],
+              },
+          ],
+      },
+  ];
+
+  // tslint:disable:no-bitwise
+  function numBitsDiffering(x, y) {
+      let z = x ^ y;
+      let bitCount = 0;
+      while (z) {
+          bitCount++;
+          z &= z - 1;
+      }
+      return bitCount;
+  }
+  function pushBit(bit, byte) {
+      return (byte << 1) | bit;
+  }
+  // tslint:enable:no-bitwise
+  const FORMAT_INFO_TABLE = [
+      { bits: 0x5412, formatInfo: { errorCorrectionLevel: 1, dataMask: 0 } },
+      { bits: 0x5125, formatInfo: { errorCorrectionLevel: 1, dataMask: 1 } },
+      { bits: 0x5E7C, formatInfo: { errorCorrectionLevel: 1, dataMask: 2 } },
+      { bits: 0x5B4B, formatInfo: { errorCorrectionLevel: 1, dataMask: 3 } },
+      { bits: 0x45F9, formatInfo: { errorCorrectionLevel: 1, dataMask: 4 } },
+      { bits: 0x40CE, formatInfo: { errorCorrectionLevel: 1, dataMask: 5 } },
+      { bits: 0x4F97, formatInfo: { errorCorrectionLevel: 1, dataMask: 6 } },
+      { bits: 0x4AA0, formatInfo: { errorCorrectionLevel: 1, dataMask: 7 } },
+      { bits: 0x77C4, formatInfo: { errorCorrectionLevel: 0, dataMask: 0 } },
+      { bits: 0x72F3, formatInfo: { errorCorrectionLevel: 0, dataMask: 1 } },
+      { bits: 0x7DAA, formatInfo: { errorCorrectionLevel: 0, dataMask: 2 } },
+      { bits: 0x789D, formatInfo: { errorCorrectionLevel: 0, dataMask: 3 } },
+      { bits: 0x662F, formatInfo: { errorCorrectionLevel: 0, dataMask: 4 } },
+      { bits: 0x6318, formatInfo: { errorCorrectionLevel: 0, dataMask: 5 } },
+      { bits: 0x6C41, formatInfo: { errorCorrectionLevel: 0, dataMask: 6 } },
+      { bits: 0x6976, formatInfo: { errorCorrectionLevel: 0, dataMask: 7 } },
+      { bits: 0x1689, formatInfo: { errorCorrectionLevel: 3, dataMask: 0 } },
+      { bits: 0x13BE, formatInfo: { errorCorrectionLevel: 3, dataMask: 1 } },
+      { bits: 0x1CE7, formatInfo: { errorCorrectionLevel: 3, dataMask: 2 } },
+      { bits: 0x19D0, formatInfo: { errorCorrectionLevel: 3, dataMask: 3 } },
+      { bits: 0x0762, formatInfo: { errorCorrectionLevel: 3, dataMask: 4 } },
+      { bits: 0x0255, formatInfo: { errorCorrectionLevel: 3, dataMask: 5 } },
+      { bits: 0x0D0C, formatInfo: { errorCorrectionLevel: 3, dataMask: 6 } },
+      { bits: 0x083B, formatInfo: { errorCorrectionLevel: 3, dataMask: 7 } },
+      { bits: 0x355F, formatInfo: { errorCorrectionLevel: 2, dataMask: 0 } },
+      { bits: 0x3068, formatInfo: { errorCorrectionLevel: 2, dataMask: 1 } },
+      { bits: 0x3F31, formatInfo: { errorCorrectionLevel: 2, dataMask: 2 } },
+      { bits: 0x3A06, formatInfo: { errorCorrectionLevel: 2, dataMask: 3 } },
+      { bits: 0x24B4, formatInfo: { errorCorrectionLevel: 2, dataMask: 4 } },
+      { bits: 0x2183, formatInfo: { errorCorrectionLevel: 2, dataMask: 5 } },
+      { bits: 0x2EDA, formatInfo: { errorCorrectionLevel: 2, dataMask: 6 } },
+      { bits: 0x2BED, formatInfo: { errorCorrectionLevel: 2, dataMask: 7 } },
+  ];
+  const DATA_MASKS = [
+      (p) => ((p.y + p.x) % 2) === 0,
+      (p) => (p.y % 2) === 0,
+      (p) => p.x % 3 === 0,
+      (p) => (p.y + p.x) % 3 === 0,
+      (p) => (Math.floor(p.y / 2) + Math.floor(p.x / 3)) % 2 === 0,
+      (p) => ((p.x * p.y) % 2) + ((p.x * p.y) % 3) === 0,
+      (p) => ((((p.y * p.x) % 2) + (p.y * p.x) % 3) % 2) === 0,
+      (p) => ((((p.y + p.x) % 2) + (p.y * p.x) % 3) % 2) === 0,
+  ];
+  function buildFunctionPatternMask(version) {
+      const dimension = 17 + 4 * version.versionNumber;
+      const matrix = BitMatrix.createEmpty(dimension, dimension);
+      matrix.setRegion(0, 0, 9, 9, true); // Top left finder pattern + separator + format
+      matrix.setRegion(dimension - 8, 0, 8, 9, true); // Top right finder pattern + separator + format
+      matrix.setRegion(0, dimension - 8, 9, 8, true); // Bottom left finder pattern + separator + format
+      // Alignment patterns
+      for (const x of version.alignmentPatternCenters) {
+          for (const y of version.alignmentPatternCenters) {
+              if (!(x === 6 && y === 6 || x === 6 && y === dimension - 7 || x === dimension - 7 && y === 6)) {
+                  matrix.setRegion(x - 2, y - 2, 5, 5, true);
+              }
+          }
+      }
+      matrix.setRegion(6, 9, 1, dimension - 17, true); // Vertical timing pattern
+      matrix.setRegion(9, 6, dimension - 17, 1, true); // Horizontal timing pattern
+      if (version.versionNumber > 6) {
+          matrix.setRegion(dimension - 11, 0, 3, 6, true); // Version info, top right
+          matrix.setRegion(0, dimension - 11, 6, 3, true); // Version info, bottom left
+      }
+      return matrix;
+  }
+  function readCodewords(matrix, version, formatInfo) {
+      const dataMask = DATA_MASKS[formatInfo.dataMask];
+      const dimension = matrix.height;
+      const functionPatternMask = buildFunctionPatternMask(version);
+      const codewords = [];
+      let currentByte = 0;
+      let bitsRead = 0;
+      // Read columns in pairs, from right to left
+      let readingUp = true;
+      for (let columnIndex = dimension - 1; columnIndex > 0; columnIndex -= 2) {
+          if (columnIndex === 6) { // Skip whole column with vertical alignment pattern;
+              columnIndex--;
+          }
+          for (let i = 0; i < dimension; i++) {
+              const y = readingUp ? dimension - 1 - i : i;
+              for (let columnOffset = 0; columnOffset < 2; columnOffset++) {
+                  const x = columnIndex - columnOffset;
+                  if (!functionPatternMask.get(x, y)) {
+                      bitsRead++;
+                      let bit = matrix.get(x, y);
+                      if (dataMask({ y, x })) {
+                          bit = !bit;
+                      }
+                      currentByte = pushBit(bit, currentByte);
+                      if (bitsRead === 8) { // Whole bytes
+                          codewords.push(currentByte);
+                          bitsRead = 0;
+                          currentByte = 0;
+                      }
+                  }
+              }
+          }
+          readingUp = !readingUp;
+      }
+      return codewords;
+  }
+  function readVersion(matrix) {
+      const dimension = matrix.height;
+      const provisionalVersion = Math.floor((dimension - 17) / 4);
+      if (provisionalVersion <= 6) { // 6 and under dont have version info in the QR code
+          return VERSIONS[provisionalVersion - 1];
+      }
+      let topRightVersionBits = 0;
+      for (let y = 5; y >= 0; y--) {
+          for (let x = dimension - 9; x >= dimension - 11; x--) {
+              topRightVersionBits = pushBit(matrix.get(x, y), topRightVersionBits);
+          }
+      }
+      let bottomLeftVersionBits = 0;
+      for (let x = 5; x >= 0; x--) {
+          for (let y = dimension - 9; y >= dimension - 11; y--) {
+              bottomLeftVersionBits = pushBit(matrix.get(x, y), bottomLeftVersionBits);
+          }
+      }
+      let bestDifference = Infinity;
+      let bestVersion;
+      for (const version of VERSIONS) {
+          if (version.infoBits === topRightVersionBits || version.infoBits === bottomLeftVersionBits) {
+              return version;
+          }
+          let difference = numBitsDiffering(topRightVersionBits, version.infoBits);
+          if (difference < bestDifference) {
+              bestVersion = version;
+              bestDifference = difference;
+          }
+          difference = numBitsDiffering(bottomLeftVersionBits, version.infoBits);
+          if (difference < bestDifference) {
+              bestVersion = version;
+              bestDifference = difference;
+          }
+      }
+      // We can tolerate up to 3 bits of error since no two version info codewords will
+      // differ in less than 8 bits.
+      if (bestDifference <= 3) {
+          return bestVersion;
+      }
+  }
+  function readFormatInformation(matrix) {
+      let topLeftFormatInfoBits = 0;
+      for (let x = 0; x <= 8; x++) {
+          if (x !== 6) { // Skip timing pattern bit
+              topLeftFormatInfoBits = pushBit(matrix.get(x, 8), topLeftFormatInfoBits);
+          }
+      }
+      for (let y = 7; y >= 0; y--) {
+          if (y !== 6) { // Skip timing pattern bit
+              topLeftFormatInfoBits = pushBit(matrix.get(8, y), topLeftFormatInfoBits);
+          }
+      }
+      const dimension = matrix.height;
+      let topRightBottomRightFormatInfoBits = 0;
+      for (let y = dimension - 1; y >= dimension - 7; y--) { // bottom left
+          topRightBottomRightFormatInfoBits = pushBit(matrix.get(8, y), topRightBottomRightFormatInfoBits);
+      }
+      for (let x = dimension - 8; x < dimension; x++) { // top right
+          topRightBottomRightFormatInfoBits = pushBit(matrix.get(x, 8), topRightBottomRightFormatInfoBits);
+      }
+      let bestDifference = Infinity;
+      let bestFormatInfo = null;
+      for (const { bits, formatInfo } of FORMAT_INFO_TABLE) {
+          if (bits === topLeftFormatInfoBits || bits === topRightBottomRightFormatInfoBits) {
+              return formatInfo;
+          }
+          let difference = numBitsDiffering(topLeftFormatInfoBits, bits);
+          if (difference < bestDifference) {
+              bestFormatInfo = formatInfo;
+              bestDifference = difference;
+          }
+          if (topLeftFormatInfoBits !== topRightBottomRightFormatInfoBits) { // also try the other option
+              difference = numBitsDiffering(topRightBottomRightFormatInfoBits, bits);
+              if (difference < bestDifference) {
+                  bestFormatInfo = formatInfo;
+                  bestDifference = difference;
+              }
+          }
+      }
+      // Hamming distance of the 32 masked codes is 7, by construction, so <= 3 bits differing means we found a match
+      if (bestDifference <= 3) {
+          return bestFormatInfo;
+      }
+      return null;
+  }
+  function getDataBlocks(codewords, version, ecLevel) {
+      const ecInfo = version.errorCorrectionLevels[ecLevel];
+      const dataBlocks = [];
+      let totalCodewords = 0;
+      ecInfo.ecBlocks.forEach(block => {
+          for (let i = 0; i < block.numBlocks; i++) {
+              dataBlocks.push({ numDataCodewords: block.dataCodewordsPerBlock, codewords: [] });
+              totalCodewords += block.dataCodewordsPerBlock + ecInfo.ecCodewordsPerBlock;
+          }
+      });
+      // In some cases the QR code will be malformed enough that we pull off more or less than we should.
+      // If we pull off less there's nothing we can do.
+      // If we pull off more we can safely truncate
+      if (codewords.length < totalCodewords) {
+          return null;
+      }
+      codewords = codewords.slice(0, totalCodewords);
+      const shortBlockSize = ecInfo.ecBlocks[0].dataCodewordsPerBlock;
+      // Pull codewords to fill the blocks up to the minimum size
+      for (let i = 0; i < shortBlockSize; i++) {
+          for (const dataBlock of dataBlocks) {
+              dataBlock.codewords.push(codewords.shift());
+          }
+      }
+      // If there are any large blocks, pull codewords to fill the last element of those
+      if (ecInfo.ecBlocks.length > 1) {
+          const smallBlockCount = ecInfo.ecBlocks[0].numBlocks;
+          const largeBlockCount = ecInfo.ecBlocks[1].numBlocks;
+          for (let i = 0; i < largeBlockCount; i++) {
+              dataBlocks[smallBlockCount + i].codewords.push(codewords.shift());
+          }
+      }
+      // Add the rest of the codewords to the blocks. These are the error correction codewords.
+      while (codewords.length > 0) {
+          for (const dataBlock of dataBlocks) {
+              dataBlock.codewords.push(codewords.shift());
+          }
+      }
+      return dataBlocks;
+  }
+  function decodeMatrix(matrix) {
+      const version = readVersion(matrix);
+      if (!version) {
+          return null;
+      }
+      const formatInfo = readFormatInformation(matrix);
+      if (!formatInfo) {
+          return null;
+      }
+      const codewords = readCodewords(matrix, version, formatInfo);
+      const dataBlocks = getDataBlocks(codewords, version, formatInfo.errorCorrectionLevel);
+      if (!dataBlocks) {
+          return null;
+      }
+      // Count total number of data bytes
+      const totalBytes = dataBlocks.reduce((a, b) => a + b.numDataCodewords, 0);
+      const resultBytes = new Uint8ClampedArray(totalBytes);
+      let resultIndex = 0;
+      for (const dataBlock of dataBlocks) {
+          const correctedBytes = decode$1(dataBlock.codewords, dataBlock.codewords.length - dataBlock.numDataCodewords);
+          if (!correctedBytes) {
+              return null;
+          }
+          for (let i = 0; i < dataBlock.numDataCodewords; i++) {
+              resultBytes[resultIndex++] = correctedBytes[i];
+          }
+      }
+      try {
+          return decode(resultBytes, version.versionNumber);
+      }
+      catch (_a) {
+          return null;
+      }
+  }
+  function decode$2(matrix) {
+      if (matrix == null) {
+          return null;
+      }
+      const result = decodeMatrix(matrix);
+      if (result) {
+          return result;
+      }
+      // Decoding didn't work, try mirroring the QR across the topLeft -> bottomRight line.
+      for (let x = 0; x < matrix.width; x++) {
+          for (let y = x + 1; y < matrix.height; y++) {
+              if (matrix.get(x, y) !== matrix.get(y, x)) {
+                  matrix.set(x, y, !matrix.get(x, y));
+                  matrix.set(y, x, !matrix.get(y, x));
+              }
+          }
+      }
+      return decodeMatrix(matrix);
+  }
+
+  function squareToQuadrilateral(p1, p2, p3, p4) {
+      const dx3 = p1.x - p2.x + p3.x - p4.x;
+      const dy3 = p1.y - p2.y + p3.y - p4.y;
+      if (dx3 === 0 && dy3 === 0) { // Affine
+          return {
+              a11: p2.x - p1.x,
+              a12: p2.y - p1.y,
+              a13: 0,
+              a21: p3.x - p2.x,
+              a22: p3.y - p2.y,
+              a23: 0,
+              a31: p1.x,
+              a32: p1.y,
+              a33: 1,
+          };
+      }
+      else {
+          const dx1 = p2.x - p3.x;
+          const dx2 = p4.x - p3.x;
+          const dy1 = p2.y - p3.y;
+          const dy2 = p4.y - p3.y;
+          const denominator = dx1 * dy2 - dx2 * dy1;
+          const a13 = (dx3 * dy2 - dx2 * dy3) / denominator;
+          const a23 = (dx1 * dy3 - dx3 * dy1) / denominator;
+          return {
+              a11: p2.x - p1.x + a13 * p2.x,
+              a12: p2.y - p1.y + a13 * p2.y,
+              a13,
+              a21: p4.x - p1.x + a23 * p4.x,
+              a22: p4.y - p1.y + a23 * p4.y,
+              a23,
+              a31: p1.x,
+              a32: p1.y,
+              a33: 1,
+          };
+      }
+  }
+  function quadrilateralToSquare(p1, p2, p3, p4) {
+      // Here, the adjoint serves as the inverse:
+      const sToQ = squareToQuadrilateral(p1, p2, p3, p4);
+      return {
+          a11: sToQ.a22 * sToQ.a33 - sToQ.a23 * sToQ.a32,
+          a12: sToQ.a13 * sToQ.a32 - sToQ.a12 * sToQ.a33,
+          a13: sToQ.a12 * sToQ.a23 - sToQ.a13 * sToQ.a22,
+          a21: sToQ.a23 * sToQ.a31 - sToQ.a21 * sToQ.a33,
+          a22: sToQ.a11 * sToQ.a33 - sToQ.a13 * sToQ.a31,
+          a23: sToQ.a13 * sToQ.a21 - sToQ.a11 * sToQ.a23,
+          a31: sToQ.a21 * sToQ.a32 - sToQ.a22 * sToQ.a31,
+          a32: sToQ.a12 * sToQ.a31 - sToQ.a11 * sToQ.a32,
+          a33: sToQ.a11 * sToQ.a22 - sToQ.a12 * sToQ.a21,
+      };
+  }
+  function times(a, b) {
+      return {
+          a11: a.a11 * b.a11 + a.a21 * b.a12 + a.a31 * b.a13,
+          a12: a.a12 * b.a11 + a.a22 * b.a12 + a.a32 * b.a13,
+          a13: a.a13 * b.a11 + a.a23 * b.a12 + a.a33 * b.a13,
+          a21: a.a11 * b.a21 + a.a21 * b.a22 + a.a31 * b.a23,
+          a22: a.a12 * b.a21 + a.a22 * b.a22 + a.a32 * b.a23,
+          a23: a.a13 * b.a21 + a.a23 * b.a22 + a.a33 * b.a23,
+          a31: a.a11 * b.a31 + a.a21 * b.a32 + a.a31 * b.a33,
+          a32: a.a12 * b.a31 + a.a22 * b.a32 + a.a32 * b.a33,
+          a33: a.a13 * b.a31 + a.a23 * b.a32 + a.a33 * b.a33,
+      };
+  }
+  function extract(image, location) {
+      const qToS = quadrilateralToSquare({ x: 3.5, y: 3.5 }, { x: location.dimension - 3.5, y: 3.5 }, { x: location.dimension - 6.5, y: location.dimension - 6.5 }, { x: 3.5, y: location.dimension - 3.5 });
+      const sToQ = squareToQuadrilateral(location.topLeft, location.topRight, location.alignmentPattern, location.bottomLeft);
+      const transform = times(sToQ, qToS);
+      const matrix = BitMatrix.createEmpty(location.dimension, location.dimension);
+      const mappingFunction = (x, y) => {
+          const denominator = transform.a13 * x + transform.a23 * y + transform.a33;
+          return {
+              x: (transform.a11 * x + transform.a21 * y + transform.a31) / denominator,
+              y: (transform.a12 * x + transform.a22 * y + transform.a32) / denominator,
+          };
+      };
+      for (let y = 0; y < location.dimension; y++) {
+          for (let x = 0; x < location.dimension; x++) {
+              const xValue = x + 0.5;
+              const yValue = y + 0.5;
+              const sourcePixel = mappingFunction(xValue, yValue);
+              matrix.set(x, y, image.get(Math.floor(sourcePixel.x), Math.floor(sourcePixel.y)));
+          }
+      }
+      return {
+          matrix,
+          mappingFunction,
+      };
+  }
+
+  const MAX_FINDERPATTERNS_TO_SEARCH = 4;
+  const MIN_QUAD_RATIO = 0.5;
+  const MAX_QUAD_RATIO = 1.5;
+  const distance = (a, b) => Math.sqrt(Math.pow((b.x - a.x), 2) + Math.pow((b.y - a.y), 2));
+  function sum(values) {
+      return values.reduce((a, b) => a + b);
+  }
+  // Takes three finder patterns and organizes them into topLeft, topRight, etc
+  function reorderFinderPatterns(pattern1, pattern2, pattern3) {
+      // Find distances between pattern centers
+      const oneTwoDistance = distance(pattern1, pattern2);
+      const twoThreeDistance = distance(pattern2, pattern3);
+      const oneThreeDistance = distance(pattern1, pattern3);
+      let bottomLeft;
+      let topLeft;
+      let topRight;
+      // Assume one closest to other two is B; A and C will just be guesses at first
+      if (twoThreeDistance >= oneTwoDistance && twoThreeDistance >= oneThreeDistance) {
+          [bottomLeft, topLeft, topRight] = [pattern2, pattern1, pattern3];
+      }
+      else if (oneThreeDistance >= twoThreeDistance && oneThreeDistance >= oneTwoDistance) {
+          [bottomLeft, topLeft, topRight] = [pattern1, pattern2, pattern3];
+      }
+      else {
+          [bottomLeft, topLeft, topRight] = [pattern1, pattern3, pattern2];
+      }
+      // Use cross product to figure out whether bottomLeft (A) and topRight (C) are correct or flipped in relation to topLeft (B)
+      // This asks whether BC x BA has a positive z component, which is the arrangement we want. If it's negative, then
+      // we've got it flipped around and should swap topRight and bottomLeft.
+      if (((topRight.x - topLeft.x) * (bottomLeft.y - topLeft.y)) - ((topRight.y - topLeft.y) * (bottomLeft.x - topLeft.x)) < 0) {
+          [bottomLeft, topRight] = [topRight, bottomLeft];
+      }
+      return { bottomLeft, topLeft, topRight };
+  }
+  // Computes the dimension (number of modules on a side) of the QR Code based on the position of the finder patterns
+  function computeDimension(topLeft, topRight, bottomLeft, matrix) {
+      const moduleSize = (sum(countBlackWhiteRun(topLeft, bottomLeft, matrix, 5)) / 7 + // Divide by 7 since the ratio is 1:1:3:1:1
+          sum(countBlackWhiteRun(topLeft, topRight, matrix, 5)) / 7 +
+          sum(countBlackWhiteRun(bottomLeft, topLeft, matrix, 5)) / 7 +
+          sum(countBlackWhiteRun(topRight, topLeft, matrix, 5)) / 7) / 4;
+      if (moduleSize < 1) {
+          throw new Error("Invalid module size");
+      }
+      const topDimension = Math.round(distance(topLeft, topRight) / moduleSize);
+      const sideDimension = Math.round(distance(topLeft, bottomLeft) / moduleSize);
+      let dimension = Math.floor((topDimension + sideDimension) / 2) + 7;
+      switch (dimension % 4) {
+          case 0:
+              dimension++;
+              break;
+          case 2:
+              dimension--;
+              break;
+      }
+      return { dimension, moduleSize };
+  }
+  // Takes an origin point and an end point and counts the sizes of the black white run from the origin towards the end point.
+  // Returns an array of elements, representing the pixel size of the black white run.
+  // Uses a variant of http://en.wikipedia.org/wiki/Bresenham's_line_algorithm
+  function countBlackWhiteRunTowardsPoint(origin, end, matrix, length) {
+      const switchPoints = [{ x: Math.floor(origin.x), y: Math.floor(origin.y) }];
+      const steep = Math.abs(end.y - origin.y) > Math.abs(end.x - origin.x);
+      let fromX;
+      let fromY;
+      let toX;
+      let toY;
+      if (steep) {
+          fromX = Math.floor(origin.y);
+          fromY = Math.floor(origin.x);
+          toX = Math.floor(end.y);
+          toY = Math.floor(end.x);
+      }
+      else {
+          fromX = Math.floor(origin.x);
+          fromY = Math.floor(origin.y);
+          toX = Math.floor(end.x);
+          toY = Math.floor(end.y);
+      }
+      const dx = Math.abs(toX - fromX);
+      const dy = Math.abs(toY - fromY);
+      let error = Math.floor(-dx / 2);
+      const xStep = fromX < toX ? 1 : -1;
+      const yStep = fromY < toY ? 1 : -1;
+      let currentPixel = true;
+      // Loop up until x == toX, but not beyond
+      for (let x = fromX, y = fromY; x !== toX + xStep; x += xStep) {
+          // Does current pixel mean we have moved white to black or vice versa?
+          // Scanning black in state 0,2 and white in state 1, so if we find the wrong
+          // color, advance to next state or end if we are in state 2 already
+          const realX = steep ? y : x;
+          const realY = steep ? x : y;
+          if (matrix.get(realX, realY) !== currentPixel) {
+              currentPixel = !currentPixel;
+              switchPoints.push({ x: realX, y: realY });
+              if (switchPoints.length === length + 1) {
+                  break;
+              }
+          }
+          error += dy;
+          if (error > 0) {
+              if (y === toY) {
+                  break;
+              }
+              y += yStep;
+              error -= dx;
+          }
+      }
+      const distances = [];
+      for (let i = 0; i < length; i++) {
+          if (switchPoints[i] && switchPoints[i + 1]) {
+              distances.push(distance(switchPoints[i], switchPoints[i + 1]));
+          }
+          else {
+              distances.push(0);
+          }
+      }
+      return distances;
+  }
+  // Takes an origin point and an end point and counts the sizes of the black white run in the origin point
+  // along the line that intersects with the end point. Returns an array of elements, representing the pixel sizes
+  // of the black white run. Takes a length which represents the number of switches from black to white to look for.
+  function countBlackWhiteRun(origin, end, matrix, length) {
+      const rise = end.y - origin.y;
+      const run = end.x - origin.x;
+      const towardsEnd = countBlackWhiteRunTowardsPoint(origin, end, matrix, Math.ceil(length / 2));
+      const awayFromEnd = countBlackWhiteRunTowardsPoint(origin, { x: origin.x - run, y: origin.y - rise }, matrix, Math.ceil(length / 2));
+      const middleValue = towardsEnd.shift() + awayFromEnd.shift() - 1; // Substract one so we don't double count a pixel
+      return awayFromEnd.concat(middleValue).concat(...towardsEnd);
+  }
+  // Takes in a black white run and an array of expected ratios. Returns the average size of the run as well as the "error" -
+  // that is the amount the run diverges from the expected ratio
+  function scoreBlackWhiteRun(sequence, ratios) {
+      const averageSize = sum(sequence) / sum(ratios);
+      let error = 0;
+      ratios.forEach((ratio, i) => {
+          error += Math.pow((sequence[i] - ratio * averageSize), 2);
+      });
+      return { averageSize, error };
+  }
+  // Takes an X,Y point and an array of sizes and scores the point against those ratios.
+  // For example for a finder pattern takes the ratio list of 1:1:3:1:1 and checks horizontal, vertical and diagonal ratios
+  // against that.
+  function scorePattern(point, ratios, matrix) {
+      try {
+          const horizontalRun = countBlackWhiteRun(point, { x: -1, y: point.y }, matrix, ratios.length);
+          const verticalRun = countBlackWhiteRun(point, { x: point.x, y: -1 }, matrix, ratios.length);
+          const topLeftPoint = {
+              x: Math.max(0, point.x - point.y) - 1,
+              y: Math.max(0, point.y - point.x) - 1,
+          };
+          const topLeftBottomRightRun = countBlackWhiteRun(point, topLeftPoint, matrix, ratios.length);
+          const bottomLeftPoint = {
+              x: Math.min(matrix.width, point.x + point.y) + 1,
+              y: Math.min(matrix.height, point.y + point.x) + 1,
+          };
+          const bottomLeftTopRightRun = countBlackWhiteRun(point, bottomLeftPoint, matrix, ratios.length);
+          const horzError = scoreBlackWhiteRun(horizontalRun, ratios);
+          const vertError = scoreBlackWhiteRun(verticalRun, ratios);
+          const diagDownError = scoreBlackWhiteRun(topLeftBottomRightRun, ratios);
+          const diagUpError = scoreBlackWhiteRun(bottomLeftTopRightRun, ratios);
+          const ratioError = Math.sqrt(horzError.error * horzError.error +
+              vertError.error * vertError.error +
+              diagDownError.error * diagDownError.error +
+              diagUpError.error * diagUpError.error);
+          const avgSize = (horzError.averageSize + vertError.averageSize + diagDownError.averageSize + diagUpError.averageSize) / 4;
+          const sizeError = (Math.pow((horzError.averageSize - avgSize), 2) +
+              Math.pow((vertError.averageSize - avgSize), 2) +
+              Math.pow((diagDownError.averageSize - avgSize), 2) +
+              Math.pow((diagUpError.averageSize - avgSize), 2)) / avgSize;
+          return ratioError + sizeError;
+      }
+      catch (_a) {
+          return Infinity;
+      }
+  }
+  function locate(matrix) {
+      const finderPatternQuads = [];
+      let activeFinderPatternQuads = [];
+      const alignmentPatternQuads = [];
+      let activeAlignmentPatternQuads = [];
+      for (let y = 0; y <= matrix.height; y++) {
+          let length = 0;
+          let lastBit = false;
+          let scans = [0, 0, 0, 0, 0];
+          for (let x = -1; x <= matrix.width; x++) {
+              const v = matrix.get(x, y);
+              if (v === lastBit) {
+                  length++;
+              }
+              else {
+                  scans = [scans[1], scans[2], scans[3], scans[4], length];
+                  length = 1;
+                  lastBit = v;
+                  // Do the last 5 color changes ~ match the expected ratio for a finder pattern? 1:1:3:1:1 of b:w:b:w:b
+                  const averageFinderPatternBlocksize = sum(scans) / 7;
+                  const validFinderPattern = Math.abs(scans[0] - averageFinderPatternBlocksize) < averageFinderPatternBlocksize &&
+                      Math.abs(scans[1] - averageFinderPatternBlocksize) < averageFinderPatternBlocksize &&
+                      Math.abs(scans[2] - 3 * averageFinderPatternBlocksize) < 3 * averageFinderPatternBlocksize &&
+                      Math.abs(scans[3] - averageFinderPatternBlocksize) < averageFinderPatternBlocksize &&
+                      Math.abs(scans[4] - averageFinderPatternBlocksize) < averageFinderPatternBlocksize &&
+                      !v; // And make sure the current pixel is white since finder patterns are bordered in white
+                  // Do the last 3 color changes ~ match the expected ratio for an alignment pattern? 1:1:1 of w:b:w
+                  const averageAlignmentPatternBlocksize = sum(scans.slice(-3)) / 3;
+                  const validAlignmentPattern = Math.abs(scans[2] - averageAlignmentPatternBlocksize) < averageAlignmentPatternBlocksize &&
+                      Math.abs(scans[3] - averageAlignmentPatternBlocksize) < averageAlignmentPatternBlocksize &&
+                      Math.abs(scans[4] - averageAlignmentPatternBlocksize) < averageAlignmentPatternBlocksize &&
+                      v; // Is the current pixel black since alignment patterns are bordered in black
+                  if (validFinderPattern) {
+                      // Compute the start and end x values of the large center black square
+                      const endX = x - scans[3] - scans[4];
+                      const startX = endX - scans[2];
+                      const line = { startX, endX, y };
+                      // Is there a quad directly above the current spot? If so, extend it with the new line. Otherwise, create a new quad with
+                      // that line as the starting point.
+                      const matchingQuads = activeFinderPatternQuads.filter(q => (startX >= q.bottom.startX && startX <= q.bottom.endX) ||
+                          (endX >= q.bottom.startX && startX <= q.bottom.endX) ||
+                          (startX <= q.bottom.startX && endX >= q.bottom.endX && ((scans[2] / (q.bottom.endX - q.bottom.startX)) < MAX_QUAD_RATIO &&
+                              (scans[2] / (q.bottom.endX - q.bottom.startX)) > MIN_QUAD_RATIO)));
+                      if (matchingQuads.length > 0) {
+                          matchingQuads[0].bottom = line;
+                      }
+                      else {
+                          activeFinderPatternQuads.push({ top: line, bottom: line });
+                      }
+                  }
+                  if (validAlignmentPattern) {
+                      // Compute the start and end x values of the center black square
+                      const endX = x - scans[4];
+                      const startX = endX - scans[3];
+                      const line = { startX, y, endX };
+                      // Is there a quad directly above the current spot? If so, extend it with the new line. Otherwise, create a new quad with
+                      // that line as the starting point.
+                      const matchingQuads = activeAlignmentPatternQuads.filter(q => (startX >= q.bottom.startX && startX <= q.bottom.endX) ||
+                          (endX >= q.bottom.startX && startX <= q.bottom.endX) ||
+                          (startX <= q.bottom.startX && endX >= q.bottom.endX && ((scans[2] / (q.bottom.endX - q.bottom.startX)) < MAX_QUAD_RATIO &&
+                              (scans[2] / (q.bottom.endX - q.bottom.startX)) > MIN_QUAD_RATIO)));
+                      if (matchingQuads.length > 0) {
+                          matchingQuads[0].bottom = line;
+                      }
+                      else {
+                          activeAlignmentPatternQuads.push({ top: line, bottom: line });
+                      }
+                  }
+              }
+          }
+          finderPatternQuads.push(...activeFinderPatternQuads.filter(q => q.bottom.y !== y && q.bottom.y - q.top.y >= 2));
+          activeFinderPatternQuads = activeFinderPatternQuads.filter(q => q.bottom.y === y);
+          alignmentPatternQuads.push(...activeAlignmentPatternQuads.filter(q => q.bottom.y !== y));
+          activeAlignmentPatternQuads = activeAlignmentPatternQuads.filter(q => q.bottom.y === y);
+      }
+      finderPatternQuads.push(...activeFinderPatternQuads.filter(q => q.bottom.y - q.top.y >= 2));
+      alignmentPatternQuads.push(...activeAlignmentPatternQuads);
+      const finderPatternGroups = finderPatternQuads
+          .filter(q => q.bottom.y - q.top.y >= 2) // All quads must be at least 2px tall since the center square is larger than a block
+          .map(q => {
+          const x = (q.top.startX + q.top.endX + q.bottom.startX + q.bottom.endX) / 4;
+          const y = (q.top.y + q.bottom.y + 1) / 2;
+          if (!matrix.get(Math.round(x), Math.round(y))) {
+              return;
+          }
+          const lengths = [q.top.endX - q.top.startX, q.bottom.endX - q.bottom.startX, q.bottom.y - q.top.y + 1];
+          const size = sum(lengths) / lengths.length;
+          const score = scorePattern({ x: Math.round(x), y: Math.round(y) }, [1, 1, 3, 1, 1], matrix);
+          return { score, x, y, size };
+      })
+          .filter(q => !!q) // Filter out any rejected quads from above
+          .sort((a, b) => a.score - b.score)
+          // Now take the top finder pattern options and try to find 2 other options with a similar size.
+          .map((point, i, finderPatterns) => {
+          if (i > MAX_FINDERPATTERNS_TO_SEARCH) {
+              return null;
+          }
+          const otherPoints = finderPatterns
+              .filter((p, ii) => i !== ii)
+              .map(p => ({ x: p.x, y: p.y, score: p.score + (Math.pow((p.size - point.size), 2)) / point.size, size: p.size }))
+              .sort((a, b) => a.score - b.score);
+          if (otherPoints.length < 2) {
+              return null;
+          }
+          const score = point.score + otherPoints[0].score + otherPoints[1].score;
+          return { points: [point].concat(otherPoints.slice(0, 2)), score };
+      })
+          .filter(q => !!q) // Filter out any rejected finder patterns from above
+          .sort((a, b) => a.score - b.score);
+      if (finderPatternGroups.length === 0) {
+          return null;
+      }
+      const { topRight, topLeft, bottomLeft } = reorderFinderPatterns(finderPatternGroups[0].points[0], finderPatternGroups[0].points[1], finderPatternGroups[0].points[2]);
+      // Now that we've found the three finder patterns we can determine the blockSize and the size of the QR code.
+      // We'll use these to help find the alignment pattern but also later when we do the extraction.
+      let dimension;
+      let moduleSize;
+      try {
+          ({ dimension, moduleSize } = computeDimension(topLeft, topRight, bottomLeft, matrix));
+      }
+      catch (e) {
+          return null;
+      }
+      // Now find the alignment pattern
+      const bottomRightFinderPattern = {
+          x: topRight.x - topLeft.x + bottomLeft.x,
+          y: topRight.y - topLeft.y + bottomLeft.y,
+      };
+      const modulesBetweenFinderPatterns = ((distance(topLeft, bottomLeft) + distance(topLeft, topRight)) / 2 / moduleSize);
+      const correctionToTopLeft = 1 - (3 / modulesBetweenFinderPatterns);
+      const expectedAlignmentPattern = {
+          x: topLeft.x + correctionToTopLeft * (bottomRightFinderPattern.x - topLeft.x),
+          y: topLeft.y + correctionToTopLeft * (bottomRightFinderPattern.y - topLeft.y),
+      };
+      const alignmentPatterns = alignmentPatternQuads
+          .map(q => {
+          const x = (q.top.startX + q.top.endX + q.bottom.startX + q.bottom.endX) / 4;
+          const y = (q.top.y + q.bottom.y + 1) / 2;
+          if (!matrix.get(Math.floor(x), Math.floor(y))) {
+              return;
+          }
+          const lengths = [q.top.endX - q.top.startX, q.bottom.endX - q.bottom.startX, (q.bottom.y - q.top.y + 1)];
+          const size = sum(lengths) / lengths.length;
+          const sizeScore = scorePattern({ x: Math.floor(x), y: Math.floor(y) }, [1, 1, 1], matrix);
+          const score = sizeScore + distance({ x, y }, expectedAlignmentPattern);
+          return { x, y, score };
+      })
+          .filter(v => !!v)
+          .sort((a, b) => a.score - b.score);
+      // If there are less than 15 modules between finder patterns it's a version 1 QR code and as such has no alignmemnt pattern
+      // so we can only use our best guess.
+      const alignmentPattern = modulesBetweenFinderPatterns >= 15 && alignmentPatterns.length ? alignmentPatterns[0] : expectedAlignmentPattern;
+      return {
+          alignmentPattern: { x: alignmentPattern.x, y: alignmentPattern.y },
+          bottomLeft: { x: bottomLeft.x, y: bottomLeft.y },
+          dimension,
+          topLeft: { x: topLeft.x, y: topLeft.y },
+          topRight: { x: topRight.x, y: topRight.y },
+      };
+  }
+
+  function scan(matrix) {
+      const location = locate(matrix);
+      if (!location) {
+          return null;
+      }
+      const extracted = extract(matrix, location);
+      const decoded = decode$2(extracted.matrix);
+      if (!decoded) {
+          return null;
+      }
+      return {
+          binaryData: decoded.bytes,
+          data: decoded.text,
+          chunks: decoded.chunks,
+          location: {
+              topRightCorner: extracted.mappingFunction(location.dimension, 0),
+              topLeftCorner: extracted.mappingFunction(0, 0),
+              bottomRightCorner: extracted.mappingFunction(location.dimension, location.dimension),
+              bottomLeftCorner: extracted.mappingFunction(0, location.dimension),
+              topRightFinderPattern: location.topRight,
+              topLeftFinderPattern: location.topLeft,
+              bottomLeftFinderPattern: location.bottomLeft,
+              bottomRightAlignmentPattern: location.alignmentPattern,
+          },
+      };
+  }
+  const defaultOptions = {
+      inversionAttempts: "attemptBoth",
+      greyScaleWeights: {
+          red: 0.2126,
+          green: 0.7152,
+          blue: 0.0722,
+          useIntegerApproximation: false,
+      },
+      canOverwriteImage: true,
+  };
+  function mergeObject(target, src) {
+      Object.keys(src).forEach(opt => {
+          target[opt] = src[opt];
+      });
+  }
+  function jsQR(data, width, height, providedOptions = {}) {
+      const options = Object.create(null);
+      mergeObject(options, defaultOptions);
+      mergeObject(options, providedOptions);
+      const shouldInvert = options.inversionAttempts === "attemptBoth" || options.inversionAttempts === "invertFirst";
+      const tryInvertedFirst = options.inversionAttempts === "onlyInvert" || options.inversionAttempts === "invertFirst";
+      const { binarized, inverted } = binarize(data, width, height, shouldInvert, options.greyScaleWeights, options.canOverwriteImage);
+      let result = scan(tryInvertedFirst ? inverted : binarized);
+      if (!result && (options.inversionAttempts === "attemptBoth" || options.inversionAttempts === "invertFirst")) {
+          result = scan(tryInvertedFirst ? binarized : inverted);
+      }
+      return result;
+  }
+  jsQR.default = jsQR;
+  //# sourceMappingURL=jsQR.js.map
+
+  // Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE
+
+  function string_of_invertOptions(param) {
+    switch (param) {
+      case 0 : 
+          return "attemptBoth";
+      case 1 : 
+          return "dontInvert";
+      case 2 : 
+          return "onlyInvert";
+      case 3 : 
+          return "invertFirst";
+      
+    }
+  }
+
+  function jsQR$1(d, w, h, invertOptions) {
+    var optString = string_of_invertOptions(invertOptions);
+    return nullable_to_opt(jsQR(d, w, h, {
+                    inversionAttempts: optString,
+                    canOverwriteImage: true
+                  }));
+  }
+  /* jsqr-es6 Not a pure module */
+
+  /* No side effect */
+
+  /* No side effect */
+
+  function keepU(a, f) {
+    var l = a.length;
+    var r = new Array(l);
+    var j = 0;
+    for(var i = 0 ,i_finish = l - 1 | 0; i <= i_finish; ++i){
+      var v = a[i];
+      if (f(v)) {
+        r[j] = v;
+        j = j + 1 | 0;
+      }
+      
+    }
+    r.length = j;
+    return r;
+  }
+
+  function keep(a, f) {
+    return keepU(a, __1(f));
+  }
+  /* No side effect */
+
+  // Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE
+
+  function getCameras(param) {
+    return window.navigator.mediaDevices.enumerateDevices().then((function (devices) {
+                  return Promise.resolve(keep(devices, (function (x) {
+                                    return x.kind === "videoinput";
+                                  })));
+                }));
+  }
+
+  function initStreamByDeviceId(videoEl, deviceId) {
+    return window.navigator.mediaDevices.getUserMedia({
+                  video: {
+                    deviceId: deviceId
+                  }
+                }).then((function (stream) {
+                  videoEl.srcObject = stream;
+                  var match = asHtmlElement$1(videoEl);
+                  if (match !== undefined) {
+                    valFromOption(match).setAttribute("playsinline", "true");
+                  }
+                  videoEl.play();
+                  return Promise.resolve(videoEl);
+                }));
+  }
+  /* ElementRe Not a pure module */
+
+  // Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE
+
+  function syncScan(scanCallback, imageData) {
+    var match = jsQR$1(imageData.data, imageData.width, imageData.height, /* DontInvert */1);
+    if (match !== undefined) {
+      return _1(scanCallback, valFromOption(match).data);
+    } else {
+      return /* () */0;
+    }
+  }
+
+  function scanUsingDeviceId(videoEl, deviceId, scanCallback) {
+    return initStreamByDeviceId(videoEl, deviceId).then((function (video) {
+                  var canvas = document.createElementNS(htmlNs, "canvas");
+                  withQuerySelectorDom("#htmlContainer", (function (body) {
+                          body.appendChild(canvas);
+                          return /* () */0;
+                        }));
+                  var maybeWorker;
+                  var exit = 0;
+                  var worker;
+                  try {
+                    worker = new Worker("worker.js");
+                    exit = 1;
+                  }
+                  catch (raw_e){
+                    var e = internalToOCamlException(raw_e);
+                    console.log("Could not initialize worker, falling back to synchronous scan.");
+                    console.log(e);
+                    maybeWorker = undefined;
+                  }
+                  if (exit === 1) {
+                    maybeWorker = some(worker);
+                  }
+                  if (maybeWorker !== undefined) {
+                    var msgBackHandler = function (e) {
+                      var maybeCode = e.data;
+                      if (maybeCode !== undefined) {
+                        return _1(scanCallback, valFromOption(maybeCode).data);
+                      } else {
+                        return /* () */0;
+                      }
+                    };
+                    valFromOption(maybeWorker).onmessage = msgBackHandler;
+                  }
+                  var frameCount = /* record */[/* contents */0];
+                  var onTick = function (param) {
+                    if (video.readyState === 4) {
+                      var width = video.videoWidth;
+                      var height = video.videoHeight;
+                      if (canvas.width !== width) {
+                        canvas.width = width;
+                        canvas.height = height;
+                      }
+                      if (frameCount[0] % 5 === 0) {
+                        var ctx = canvas.getContext("2d");
+                        ctx.drawImage(video, 0, 0);
+                        var imageData = ctx.getImageData(0, 0, width, height);
+                        if (maybeWorker !== undefined) {
+                          valFromOption(maybeWorker).postMessage(/* tuple */[
+                                imageData.data,
+                                width,
+                                height
+                              ]);
+                        } else {
+                          syncScan(scanCallback, imageData);
+                        }
+                      }
+                      
+                    }
+                    frameCount[0] = frameCount[0] + 1 | 0;
+                    requestAnimationFrame(onTick);
+                    return /* () */0;
+                  };
+                  requestAnimationFrame(onTick);
+                  return Promise.resolve(canvas);
+                }));
+  }
+  /* JsQr-QueerLoop Not a pure module */
+
+  /*
+   * QR Code generator library (JavaScript)
+   * 
+   * Copyright (c) Project Nayuki. (MIT License)
+   * https://www.nayuki.io/page/qr-code-generator-library
+   * 
+   * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   * this software and associated documentation files (the "Software"), to deal in
+   * the Software without restriction, including without limitation the rights to
+   * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   * the Software, and to permit persons to whom the Software is furnished to do so,
+   * subject to the following conditions:
+   * - The above copyright notice and this permission notice shall be included in
+   *   all copies or substantial portions of the Software.
+   * - The Software is provided "as is", without warranty of any kind, express or
+   *   implied, including but not limited to the warranties of merchantability,
+   *   fitness for a particular purpose and noninfringement. In no event shall the
+   *   authors or copyright holders be liable for any claim, damages or other
+   *   liability, whether in an action of contract, tort or otherwise, arising from,
+   *   out of or in connection with the Software or the use or other dealings in the
+   *   Software.
+   */
+
+
+
+  /* 
+   * Module "qrcodegen", public members:
+   * - Class QrCode:
+   *   - Function encodeText(str text, QrCode.Ecc ecl) -> QrCode
+   *   - Function encodeBinary(list<byte> data, QrCode.Ecc ecl) -> QrCode
+   *   - Function encodeSegments(list<QrSegment> segs, QrCode.Ecc ecl,
+   *         int minVersion=1, int maxVersion=40, mask=-1, boostEcl=true) -> QrCode
+   *   - Constants int MIN_VERSION, MAX_VERSION
+   *   - Constructor QrCode(int version, QrCode.Ecc ecl, list<byte> dataCodewords, int mask)
+   *   - Fields int version, size, mask
+   *   - Field QrCode.Ecc errorCorrectionLevel
+   *   - Method getModule(int x, int y) -> bool
+   *   - Method drawCanvas(int scale, int border, HTMLCanvasElement canvas) -> void
+   *   - Method toSvgString(int border) -> str
+   *   - Enum Ecc:
+   *     - Constants LOW, MEDIUM, QUARTILE, HIGH
+   *     - Field int ordinal
+   * - Class QrSegment:
+   *   - Function makeBytes(list<byte> data) -> QrSegment
+   *   - Function makeNumeric(str data) -> QrSegment
+   *   - Function makeAlphanumeric(str data) -> QrSegment
+   *   - Function makeSegments(str text) -> list<QrSegment>
+   *   - Function makeEci(int assignVal) -> QrSegment
+   *   - Constructor QrSegment(QrSegment.Mode mode, int numChars, list<int> bitData)
+   *   - Field QrSegment.Mode mode
+   *   - Field int numChars
+   *   - Method getData() -> list<int>
+   *   - Constants RegExp NUMERIC_REGEX, ALPHANUMERIC_REGEX
+   *   - Enum Mode:
+   *     - Constants NUMERIC, ALPHANUMERIC, BYTE, KANJI, ECI
+   */
+  var qrcodegen = new function() {
+  	
+  	/*---- QR Code symbol class ----*/
+  	
+  	/* 
+  	 * A class that represents a QR Code symbol, which is a type of two-dimension barcode.
+  	 * Invented by Denso Wave and described in the ISO/IEC 18004 standard.
+  	 * Instances of this class represent an immutable square grid of black and white cells.
+  	 * The class provides static factory functions to create a QR Code from text or binary data.
+  	 * The class covers the QR Code Model 2 specification, supporting all versions (sizes)
+  	 * from 1 to 40, all 4 error correction levels, and 4 character encoding modes.
+  	 * 
+  	 * Ways to create a QR Code object:
+  	 * - High level: Take the payload data and call QrCode.encodeText() or QrCode.encodeBinary().
+  	 * - Mid level: Custom-make the list of segments and call QrCode.encodeSegments().
+  	 * - Low level: Custom-make the array of data codeword bytes (including
+  	 *   segment headers and final padding, excluding error correction codewords),
+  	 *   supply the appropriate version number, and call the QrCode() constructor.
+  	 * (Note that all ways require supplying the desired error correction level.)
+  	 * 
+  	 * This constructor creates a new QR Code with the given version number,
+  	 * error correction level, data codeword bytes, and mask number.
+  	 * This is a low-level API that most users should not use directly.
+  	 * A mid-level API is the encodeSegments() function.
+  	 */
+  	this.QrCode = function(version, errCorLvl, dataCodewords, mask) {
+  		
+  		/*---- Constructor (low level) ----*/
+  		
+  		// Check scalar arguments
+  		if (version < MIN_VERSION || version > MAX_VERSION)
+  			throw "Version value out of range";
+  		if (mask < -1 || mask > 7)
+  			throw "Mask value out of range";
+  		if (!(errCorLvl instanceof Ecc))
+  			throw "QrCode.Ecc expected";
+  		var size = version * 4 + 17;
+  		
+  		// Initialize both grids to be size*size arrays of Boolean false
+  		var row = [];
+  		for (var i = 0; i < size; i++)
+  			row.push(false);
+  		var modules    = [];  // Initially all white
+  		var isFunction = [];
+  		for (var i = 0; i < size; i++) {
+  			modules   .push(row.slice());
+  			isFunction.push(row.slice());
+  		}
+  		
+  		// Compute ECC, draw modules
+  		drawFunctionPatterns();
+  		var allCodewords = addEccAndInterleave(dataCodewords);
+  		drawCodewords(allCodewords);
+  		
+  		// Do masking
+  		if (mask == -1) {  // Automatically choose best mask
+  			var minPenalty = Infinity;
+  			for (var i = 0; i < 8; i++) {
+  				applyMask(i);
+  				drawFormatBits(i);
+  				var penalty = getPenaltyScore();
+  				if (penalty < minPenalty) {
+  					mask = i;
+  					minPenalty = penalty;
+  				}
+  				applyMask(i);  // Undoes the mask due to XOR
+  			}
+  		}
+  		if (mask < 0 || mask > 7)
+  			throw "Assertion error";
+  		applyMask(mask);  // Apply the final choice of mask
+  		drawFormatBits(mask);  // Overwrite old format bits
+  		
+  		isFunction = null;
+  		
+  		
+  		/*---- Read-only instance properties ----*/
+  		
+  		// The version number of this QR Code, which is between 1 and 40 (inclusive).
+  		// This determines the size of this barcode.
+  		Object.defineProperty(this, "version", {value:version});
+  		
+  		// The width and height of this QR Code, measured in modules, between
+  		// 21 and 177 (inclusive). This is equal to version * 4 + 17.
+  		Object.defineProperty(this, "size", {value:size});
+  		
+  		// The error correction level used in this QR Code.
+  		Object.defineProperty(this, "errorCorrectionLevel", {value:errCorLvl});
+  		
+  		// The index of the mask pattern used in this QR Code, which is between 0 and 7 (inclusive).
+  		// Even if a QR Code is created with automatic masking requested (mask = -1),
+  		// the resulting object still has a mask value between 0 and 7.
+  		Object.defineProperty(this, "mask", {value:mask});
+  		
+  		
+  		/*---- Accessor methods ----*/
+  		
+  		// Returns the color of the module (pixel) at the given coordinates, which is false
+  		// for white or true for black. The top left corner has the coordinates (x=0, y=0).
+  		// If the given coordinates are out of bounds, then false (white) is returned.
+  		this.getModule = function(x, y) {
+  			return 0 <= x && x < size && 0 <= y && y < size && modules[y][x];
+  		};
+
+      this.getModules = function () { return modules; };
+  		
+  		
+  		/*---- Public instance methods ----*/
+  		
+  		// Draws this QR Code, with the given module scale and border modules, onto the given HTML
+  		// canvas element. The canvas's width and height is resized to (this.size + border * 2) * scale.
+  		// The drawn image is be purely black and white, and fully opaque.
+  		// The scale must be a positive integer and the border must be a non-negative integer.
+  		this.drawCanvas = function(scale, border, canvas) {
+  			if (scale <= 0 || border < 0)
+  				throw "Value out of range";
+  			var width = (size + border * 2) * scale;
+        if (canvas.width != width) {
+            canvas.width = width;
+            canvas.height = width;
+        }      var ctx = canvas.getContext("2d");
+  			for (var y = -border; y < size + border; y++) {
+  				for (var x = -border; x < size + border; x++) {
+  					ctx.fillStyle = this.getModule(x, y) ? "#000000" : "#FFFFFF";
+  					ctx.fillRect((x + border) * scale, (y + border) * scale, scale, scale);
+  				}
+  			}
+  		};
+  		
+  		// Returns a string of SVG code for an image depicting this QR Code, with the given number
+  		// of border modules. The string always uses Unix newlines (\n), regardless of the platform.
+  		this.toSvgString = function(border) {
+  			if (border < 0)
+  				throw "Border must be non-negative";
+  			var parts = [];
+  			for (var y = 0; y < size; y++) {
+  				for (var x = 0; x < size; x++) {
+  					if (this.getModule(x, y))
+  						parts.push("M" + (x + border) + "," + (y + border) + "h1v1h-1z");
+  				}
+  			}
+  			return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+  				'<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n' +
+  				'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ' +
+  					(size + border * 2) + ' ' + (size + border * 2) + '" stroke="none">\n' +
+  				'\t<rect width="100%" height="100%" fill="#FFFFFF"/>\n' +
+  				'\t<path d="' + parts.join(" ") + '" fill="#000000"/>\n' +
+  				'</svg>\n';
+  		};
+  		
+  		
+  		/*---- Private helper methods for constructor: Drawing function modules ----*/
+  		
+  		// Reads this object's version field, and draws and marks all function modules.
+  		function drawFunctionPatterns() {
+  			// Draw horizontal and vertical timing patterns
+  			for (var i = 0; i < size; i++) {
+  				setFunctionModule(6, i, i % 2 == 0);
+  				setFunctionModule(i, 6, i % 2 == 0);
+  			}
+  			
+  			// Draw 3 finder patterns (all corners except bottom right; overwrites some timing modules)
+  			drawFinderPattern(3, 3);
+  			drawFinderPattern(size - 4, 3);
+  			drawFinderPattern(3, size - 4);
+  			
+  			// Draw numerous alignment patterns
+  			var alignPatPos = getAlignmentPatternPositions();
+  			var numAlign = alignPatPos.length;
+  			for (var i = 0; i < numAlign; i++) {
+  				for (var j = 0; j < numAlign; j++) {
+  					// Don't draw on the three finder corners
+  					if (!(i == 0 && j == 0 || i == 0 && j == numAlign - 1 || i == numAlign - 1 && j == 0))
+  						drawAlignmentPattern(alignPatPos[i], alignPatPos[j]);
+  				}
+  			}
+  			
+  			// Draw configuration data
+  			drawFormatBits(0);  // Dummy mask value; overwritten later in the constructor
+  			drawVersion();
+  		}
+  		
+  		
+  		// Draws two copies of the format bits (with its own error correction code)
+  		// based on the given mask and this object's error correction level field.
+  		function drawFormatBits(mask) {
+  			// Calculate error correction code and pack bits
+  			var data = errCorLvl.formatBits << 3 | mask;  // errCorrLvl is uint2, mask is uint3
+  			var rem = data;
+  			for (var i = 0; i < 10; i++)
+  				rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+  			var bits = (data << 10 | rem) ^ 0x5412;  // uint15
+  			if (bits >>> 15 != 0)
+  				throw "Assertion error";
+  			
+  			// Draw first copy
+  			for (var i = 0; i <= 5; i++)
+  				setFunctionModule(8, i, getBit(bits, i));
+  			setFunctionModule(8, 7, getBit(bits, 6));
+  			setFunctionModule(8, 8, getBit(bits, 7));
+  			setFunctionModule(7, 8, getBit(bits, 8));
+  			for (var i = 9; i < 15; i++)
+  				setFunctionModule(14 - i, 8, getBit(bits, i));
+  			
+  			// Draw second copy
+  			for (var i = 0; i < 8; i++)
+  				setFunctionModule(size - 1 - i, 8, getBit(bits, i));
+  			for (var i = 8; i < 15; i++)
+  				setFunctionModule(8, size - 15 + i, getBit(bits, i));
+  			setFunctionModule(8, size - 8, true);  // Always black
+  		}
+  		
+  		
+  		// Draws two copies of the version bits (with its own error correction code),
+  		// based on this object's version field, iff 7 <= version <= 40.
+  		function drawVersion() {
+  			if (version < 7)
+  				return;
+  			
+  			// Calculate error correction code and pack bits
+  			var rem = version;  // version is uint6, in the range [7, 40]
+  			for (var i = 0; i < 12; i++)
+  				rem = (rem << 1) ^ ((rem >>> 11) * 0x1F25);
+  			var bits = version << 12 | rem;  // uint18
+  			if (bits >>> 18 != 0)
+  				throw "Assertion error";
+  			
+  			// Draw two copies
+  			for (var i = 0; i < 18; i++) {
+  				var bit = getBit(bits, i);
+  				var a = size - 11 + i % 3;
+  				var b = Math.floor(i / 3);
+  				setFunctionModule(a, b, bit);
+  				setFunctionModule(b, a, bit);
+  			}
+  		}
+  		
+  		
+  		// Draws a 9*9 finder pattern including the border separator,
+  		// with the center module at (x, y). Modules can be out of bounds.
+  		function drawFinderPattern(x, y) {
+  			for (var dy = -4; dy <= 4; dy++) {
+  				for (var dx = -4; dx <= 4; dx++) {
+  					var dist = Math.max(Math.abs(dx), Math.abs(dy));  // Chebyshev/infinity norm
+  					var xx = x + dx, yy = y + dy;
+  					if (0 <= xx && xx < size && 0 <= yy && yy < size)
+  						setFunctionModule(xx, yy, dist != 2 && dist != 4);
+  				}
+  			}
+  		}
+  		
+  		
+  		// Draws a 5*5 alignment pattern, with the center module
+  		// at (x, y). All modules must be in bounds.
+  		function drawAlignmentPattern(x, y) {
+  			for (var dy = -2; dy <= 2; dy++) {
+  				for (var dx = -2; dx <= 2; dx++)
+  					setFunctionModule(x + dx, y + dy, Math.max(Math.abs(dx), Math.abs(dy)) != 1);
+  			}
+  		}
+  		
+  		
+  		// Sets the color of a module and marks it as a function module.
+  		// Only used by the constructor. Coordinates must be in bounds.
+  		function setFunctionModule(x, y, isBlack) {
+  			modules[y][x] = isBlack;
+  			isFunction[y][x] = true;
+  		}
+  		
+  		
+  		/*---- Private helper methods for constructor: Codewords and masking ----*/
+  		
+  		// Returns a new byte string representing the given data with the appropriate error correction
+  		// codewords appended to it, based on this object's version and error correction level.
+  		function addEccAndInterleave(data) {
+  			if (data.length != QrCode.getNumDataCodewords(version, errCorLvl))
+  				throw "Invalid argument";
+  			
+  			// Calculate parameter numbers
+  			var numBlocks = QrCode.NUM_ERROR_CORRECTION_BLOCKS[errCorLvl.ordinal][version];
+  			var blockEccLen = QrCode.ECC_CODEWORDS_PER_BLOCK  [errCorLvl.ordinal][version];
+  			var rawCodewords = Math.floor(QrCode.getNumRawDataModules(version) / 8);
+  			var numShortBlocks = numBlocks - rawCodewords % numBlocks;
+  			var shortBlockLen = Math.floor(rawCodewords / numBlocks);
+  			
+  			// Split data into blocks and append ECC to each block
+  			var blocks = [];
+  			var rs = new ReedSolomonGenerator(blockEccLen);
+  			for (var i = 0, k = 0; i < numBlocks; i++) {
+  				var dat = data.slice(k, k + shortBlockLen - blockEccLen + (i < numShortBlocks ? 0 : 1));
+  				k += dat.length;
+  				var ecc = rs.getRemainder(dat);
+  				if (i < numShortBlocks)
+  					dat.push(0);
+  				blocks.push(dat.concat(ecc));
+  			}
+  			
+  			// Interleave (not concatenate) the bytes from every block into a single sequence
+  			var result = [];
+  			for (var i = 0; i < blocks[0].length; i++) {
+  				for (var j = 0; j < blocks.length; j++) {
+  					// Skip the padding byte in short blocks
+  					if (i != shortBlockLen - blockEccLen || j >= numShortBlocks)
+  						result.push(blocks[j][i]);
+  				}
+  			}
+  			if (result.length != rawCodewords)
+  				throw "Assertion error";
+  			return result;
+  		}
+  		
+  		
+  		// Draws the given sequence of 8-bit codewords (data and error correction) onto the entire
+  		// data area of this QR Code. Function modules need to be marked off before this is called.
+  		function drawCodewords(data) {
+  			if (data.length != Math.floor(QrCode.getNumRawDataModules(version) / 8))
+  				throw "Invalid argument";
+  			var i = 0;  // Bit index into the data
+  			// Do the funny zigzag scan
+  			for (var right = size - 1; right >= 1; right -= 2) {  // Index of right column in each column pair
+  				if (right == 6)
+  					right = 5;
+  				for (var vert = 0; vert < size; vert++) {  // Vertical counter
+  					for (var j = 0; j < 2; j++) {
+  						var x = right - j;  // Actual x coordinate
+  						var upward = ((right + 1) & 2) == 0;
+  						var y = upward ? size - 1 - vert : vert;  // Actual y coordinate
+  						if (!isFunction[y][x] && i < data.length * 8) {
+  							modules[y][x] = getBit(data[i >>> 3], 7 - (i & 7));
+  							i++;
+  						}
+  						// If this QR Code has any remainder bits (0 to 7), they were assigned as
+  						// 0/false/white by the constructor and are left unchanged by this method
+  					}
+  				}
+  			}
+  			if (i != data.length * 8)
+  				throw "Assertion error";
+  		}
+  		
+  		
+  		// XORs the codeword modules in this QR Code with the given mask pattern.
+  		// The function modules must be marked and the codeword bits must be drawn
+  		// before masking. Due to the arithmetic of XOR, calling applyMask() with
+  		// the same mask value a second time will undo the mask. A final well-formed
+  		// QR Code needs exactly one (not zero, two, etc.) mask applied.
+  		function applyMask(mask) {
+  			if (mask < 0 || mask > 7)
+  				throw "Mask value out of range";
+  			for (var y = 0; y < size; y++) {
+  				for (var x = 0; x < size; x++) {
+  					var invert;
+  					switch (mask) {
+  						case 0:  invert = (x + y) % 2 == 0;                                  break;
+  						case 1:  invert = y % 2 == 0;                                        break;
+  						case 2:  invert = x % 3 == 0;                                        break;
+  						case 3:  invert = (x + y) % 3 == 0;                                  break;
+  						case 4:  invert = (Math.floor(x / 3) + Math.floor(y / 2)) % 2 == 0;  break;
+  						case 5:  invert = x * y % 2 + x * y % 3 == 0;                        break;
+  						case 6:  invert = (x * y % 2 + x * y % 3) % 2 == 0;                  break;
+  						case 7:  invert = ((x + y) % 2 + x * y % 3) % 2 == 0;                break;
+  						default:  throw "Assertion error";
+  					}
+  					if (!isFunction[y][x] && invert)
+  						modules[y][x] = !modules[y][x];
+  				}
+  			}
+  		}
+  		
+  		
+  		// Calculates and returns the penalty score based on state of this QR Code's current modules.
+  		// This is used by the automatic mask choice algorithm to find the mask pattern that yields the lowest score.
+  		function getPenaltyScore() {
+  			var result = 0;
+  			
+  			// Adjacent modules in row having same color, and finder-like patterns
+  			for (var y = 0; y < size; y++) {
+  				var runHistory = [0,0,0,0,0,0,0];
+  				var color = false;
+  				var runX = 0;
+  				for (var x = 0; x < size; x++) {
+  					if (modules[y][x] == color) {
+  						runX++;
+  						if (runX == 5)
+  							result += QrCode.PENALTY_N1;
+  						else if (runX > 5)
+  							result++;
+  					} else {
+  						QrCode.addRunToHistory(runX, runHistory);
+  						if (!color && QrCode.hasFinderLikePattern(runHistory))
+  							result += QrCode.PENALTY_N3;
+  						color = modules[y][x];
+  						runX = 1;
+  					}
+  				}
+  				QrCode.addRunToHistory(runX, runHistory);
+  				if (color)
+  					QrCode.addRunToHistory(0, runHistory);  // Dummy run of white
+  				if (QrCode.hasFinderLikePattern(runHistory))
+  					result += QrCode.PENALTY_N3;
+  			}
+  			// Adjacent modules in column having same color, and finder-like patterns
+  			for (var x = 0; x < size; x++) {
+  				var runHistory = [0,0,0,0,0,0,0];
+  				var color = false;
+  				var runY = 0;
+  				for (var y = 0; y < size; y++) {
+  					if (modules[y][x] == color) {
+  						runY++;
+  						if (runY == 5)
+  							result += QrCode.PENALTY_N1;
+  						else if (runY > 5)
+  							result++;
+  					} else {
+  						QrCode.addRunToHistory(runY, runHistory);
+  						if (!color && QrCode.hasFinderLikePattern(runHistory))
+  							result += QrCode.PENALTY_N3;
+  						color = modules[y][x];
+  						runY = 1;
+  					}
+  				}
+  				QrCode.addRunToHistory(runY, runHistory);
+  				if (color)
+  					QrCode.addRunToHistory(0, runHistory);  // Dummy run of white
+  				if (QrCode.hasFinderLikePattern(runHistory))
+  					result += QrCode.PENALTY_N3;
+  			}
+  			
+  			// 2*2 blocks of modules having same color
+  			for (var y = 0; y < size - 1; y++) {
+  				for (var x = 0; x < size - 1; x++) {
+  					var   color = modules[y][x];
+  					if (  color == modules[y][x + 1] &&
+  					      color == modules[y + 1][x] &&
+  					      color == modules[y + 1][x + 1])
+  						result += QrCode.PENALTY_N2;
+  				}
+  			}
+  			
+  			// Balance of black and white modules
+  			var black = 0;
+  			modules.forEach(function(row) {
+  				row.forEach(function(color) {
+  					if (color)
+  						black++;
+  				});
+  			});
+  			var total = size * size;  // Note that size is odd, so black/total != 1/2
+  			// Compute the smallest integer k >= 0 such that (45-5k)% <= black/total <= (55+5k)%
+  			var k = Math.ceil(Math.abs(black * 20 - total * 10) / total) - 1;
+  			result += k * QrCode.PENALTY_N4;
+  			return result;
+  		}
+  		
+  		
+  		// Returns an ascending list of positions of alignment patterns for this version number.
+  		// Each position is in the range [0,177), and are used on both the x and y axes.
+  		// This could be implemented as lookup table of 40 variable-length lists of integers.
+  		function getAlignmentPatternPositions() {
+  			if (version == 1)
+  				return [];
+  			else {
+  				var numAlign = Math.floor(version / 7) + 2;
+  				var step = (version == 32) ? 26 :
+  					Math.ceil((size - 13) / (numAlign*2 - 2)) * 2;
+  				var result = [6];
+  				for (var pos = size - 7; result.length < numAlign; pos -= step)
+  					result.splice(1, 0, pos);
+  				return result;
+  			}
+  		}
+  		
+  		
+  		// Returns true iff the i'th bit of x is set to 1.
+  		function getBit(x, i) {
+  			return ((x >>> i) & 1) != 0;
+  		}
+  	};
+  	
+  	
+  	/*---- Static factory functions (high level) for QrCode ----*/
+  	
+  	/* 
+  	 * Returns a QR Code representing the given Unicode text string at the given error correction level.
+  	 * As a conservative upper bound, this function is guaranteed to succeed for strings that have 738 or fewer
+  	 * Unicode code points (not UTF-16 code units) if the low error correction level is used. The smallest possible
+  	 * QR Code version is automatically chosen for the output. The ECC level of the result may be higher than the
+  	 * ecl argument if it can be done without increasing the version.
+  	 */
+  	this.QrCode.encodeText = function(text, ecl) {
+  		var segs = qrcodegen.QrSegment.makeSegments(text);
+  		return this.encodeSegments(segs, ecl);
+  	};
+  	
+  	
+  	/* 
+  	 * Returns a QR Code representing the given binary data at the given error correction level.
+  	 * This function always encodes using the binary segment mode, not any text mode. The maximum number of
+  	 * bytes allowed is 2953. The smallest possible QR Code version is automatically chosen for the output.
+  	 * The ECC level of the result may be higher than the ecl argument if it can be done without increasing the version.
+  	 */
+  	this.QrCode.encodeBinary = function(data, ecl) {
+  		var seg = qrcodegen.QrSegment.makeBytes(data);
+  		return this.encodeSegments([seg], ecl);
+  	};
+  	
+  	
+  	/*---- Static factory functions (mid level) for QrCode ----*/
+  	
+  	/* 
+  	 * Returns a QR Code representing the given segments with the given encoding parameters.
+  	 * The smallest possible QR Code version within the given range is automatically
+  	 * chosen for the output. Iff boostEcl is true, then the ECC level of the result
+  	 * may be higher than the ecl argument if it can be done without increasing the
+  	 * version. The mask number is either between 0 to 7 (inclusive) to force that
+  	 * mask, or -1 to automatically choose an appropriate mask (which may be slow).
+  	 * This function allows the user to create a custom sequence of segments that switches
+  	 * between modes (such as alphanumeric and byte) to encode text in less space.
+  	 * This is a mid-level API; the high-level API is encodeText() and encodeBinary().
+  	 */
+  	this.QrCode.encodeSegments = function(segs, ecl, minVersion, maxVersion, mask, boostEcl) {
+  		if (minVersion == undefined) minVersion = MIN_VERSION;
+  		if (maxVersion == undefined) maxVersion = MAX_VERSION;
+  		if (mask == undefined) mask = -1;
+  		if (boostEcl == undefined) boostEcl = true;
+  		if (!(MIN_VERSION <= minVersion && minVersion <= maxVersion && maxVersion <= MAX_VERSION) || mask < -1 || mask > 7)
+  			throw "Invalid value";
+  		
+  		// Find the minimal version number to use
+  		var version, dataUsedBits;
+  		for (version = minVersion; ; version++) {
+  			var dataCapacityBits = QrCode.getNumDataCodewords(version, ecl) * 8;  // Number of data bits available
+  			dataUsedBits = qrcodegen.QrSegment.getTotalBits(segs, version);
+  			if (dataUsedBits <= dataCapacityBits)
+  				break;  // This version number is found to be suitable
+  			if (version >= maxVersion)  // All versions in the range could not fit the given data
+  				throw "Data too long";
+  		}
+  		
+  		// Increase the error correction level while the data still fits in the current version number
+  		[this.Ecc.MEDIUM, this.Ecc.QUARTILE, this.Ecc.HIGH].forEach(function(newEcl) {  // From low to high
+  			if (boostEcl && dataUsedBits <= QrCode.getNumDataCodewords(version, newEcl) * 8)
+  				ecl = newEcl;
+  		});
+  		
+  		// Concatenate all segments to create the data bit string
+  		var bb = new BitBuffer();
+  		segs.forEach(function(seg) {
+  			bb.appendBits(seg.mode.modeBits, 4);
+  			bb.appendBits(seg.numChars, seg.mode.numCharCountBits(version));
+  			seg.getData().forEach(function(bit) {
+  				bb.push(bit);
+  			});
+  		});
+  		if (bb.length != dataUsedBits)
+  			throw "Assertion error";
+  		
+  		// Add terminator and pad up to a byte if applicable
+  		var dataCapacityBits = QrCode.getNumDataCodewords(version, ecl) * 8;
+  		if (bb.length > dataCapacityBits)
+  			throw "Assertion error";
+  		bb.appendBits(0, Math.min(4, dataCapacityBits - bb.length));
+  		bb.appendBits(0, (8 - bb.length % 8) % 8);
+  		if (bb.length % 8 != 0)
+  			throw "Assertion error";
+  		
+  		// Pad with alternating bytes until data capacity is reached
+  		for (var padByte = 0xEC; bb.length < dataCapacityBits; padByte ^= 0xEC ^ 0x11)
+  			bb.appendBits(padByte, 8);
+  		
+  		// Pack bits into bytes in big endian
+  		var dataCodewords = [];
+  		while (dataCodewords.length * 8 < bb.length)
+  			dataCodewords.push(0);
+  		bb.forEach(function(bit, i) {
+  			dataCodewords[i >>> 3] |= bit << (7 - (i & 7));
+  		});
+  		
+  		// Create the QR Code object
+  		return new this(version, ecl, dataCodewords, mask);
+  	};
+  	
+  	
+  	/*---- Private static helper functions for QrCode ----*/
+  	
+  	var QrCode = {};  // Private object to assign properties to. Not the same object as 'this.QrCode'.
+  	
+  	
+  	// Returns the number of data bits that can be stored in a QR Code of the given version number, after
+  	// all function modules are excluded. This includes remainder bits, so it might not be a multiple of 8.
+  	// The result is in the range [208, 29648]. This could be implemented as a 40-entry lookup table.
+  	QrCode.getNumRawDataModules = function(ver) {
+  		if (ver < MIN_VERSION || ver > MAX_VERSION)
+  			throw "Version number out of range";
+  		var result = (16 * ver + 128) * ver + 64;
+  		if (ver >= 2) {
+  			var numAlign = Math.floor(ver / 7) + 2;
+  			result -= (25 * numAlign - 10) * numAlign - 55;
+  			if (ver >= 7)
+  				result -= 36;
+  		}
+  		return result;
+  	};
+  	
+  	
+  	// Returns the number of 8-bit data (i.e. not error correction) codewords contained in any
+  	// QR Code of the given version number and error correction level, with remainder bits discarded.
+  	// This stateless pure function could be implemented as a (40*4)-cell lookup table.
+  	QrCode.getNumDataCodewords = function(ver, ecl) {
+  		return Math.floor(QrCode.getNumRawDataModules(ver) / 8) -
+  			QrCode.ECC_CODEWORDS_PER_BLOCK    [ecl.ordinal][ver] *
+  			QrCode.NUM_ERROR_CORRECTION_BLOCKS[ecl.ordinal][ver];
+  	};
+  	
+  	
+  	// Inserts the given value to the front of the given array, which shifts over the
+  	// existing values and deletes the last value. A helper function for getPenaltyScore().
+  	QrCode.addRunToHistory = function(run, history) {
+  		history.pop();
+  		history.unshift(run);
+  	};
+  	
+  	
+  	// Tests whether the given run history has the pattern of ratio 1:1:3:1:1 in the middle, and
+  	// surrounded by at least 4 on either or both ends. A helper function for getPenaltyScore().
+  	// Must only be called immediately after a run of white modules has ended.
+  	QrCode.hasFinderLikePattern = function(runHistory) {
+  		var n = runHistory[1];
+  		return n > 0 && runHistory[2] == n && runHistory[4] == n && runHistory[5] == n
+  			&& runHistory[3] == n * 3 && Math.max(runHistory[0], runHistory[6]) >= n * 4;
+  	};
+  	
+  	
+  	/*---- Constants and tables for QrCode ----*/
+  	
+  	var MIN_VERSION =  1;  // The minimum version number supported in the QR Code Model 2 standard
+  	var MAX_VERSION = 40;  // The maximum version number supported in the QR Code Model 2 standard
+  	Object.defineProperty(this.QrCode, "MIN_VERSION", {value:MIN_VERSION});
+  	Object.defineProperty(this.QrCode, "MAX_VERSION", {value:MAX_VERSION});
+  	
+  	// For use in getPenaltyScore(), when evaluating which mask is best.
+  	QrCode.PENALTY_N1 =  3;
+  	QrCode.PENALTY_N2 =  3;
+  	QrCode.PENALTY_N3 = 40;
+  	QrCode.PENALTY_N4 = 10;
+  	
+  	QrCode.ECC_CODEWORDS_PER_BLOCK = [
+  		// Version: (note that index 0 is for padding, and is set to an illegal value)
+  		//  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40    Error correction level
+  		[null,  7, 10, 15, 20, 26, 18, 20, 24, 30, 18, 20, 24, 26, 30, 22, 24, 28, 30, 28, 28, 28, 28, 30, 30, 26, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],  // Low
+  		[null, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26, 30, 22, 22, 24, 24, 28, 28, 26, 26, 26, 26, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28],  // Medium
+  		[null, 13, 22, 18, 26, 18, 24, 18, 22, 20, 24, 28, 26, 24, 20, 30, 24, 28, 28, 26, 30, 28, 30, 30, 30, 30, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],  // Quartile
+  		[null, 17, 28, 22, 16, 22, 28, 26, 26, 24, 28, 24, 28, 22, 24, 24, 30, 28, 28, 26, 28, 30, 24, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],  // High
+  	];
+  	
+  	QrCode.NUM_ERROR_CORRECTION_BLOCKS = [
+  		// Version: (note that index 0 is for padding, and is set to an illegal value)
+  		//  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40    Error correction level
+  		[null, 1, 1, 1, 1, 1, 2, 2, 2, 2, 4,  4,  4,  4,  4,  6,  6,  6,  6,  7,  8,  8,  9,  9, 10, 12, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 20, 21, 22, 24, 25],  // Low
+  		[null, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5,  5,  8,  9,  9, 10, 10, 11, 13, 14, 16, 17, 17, 18, 20, 21, 23, 25, 26, 28, 29, 31, 33, 35, 37, 38, 40, 43, 45, 47, 49],  // Medium
+  		[null, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8,  8, 10, 12, 16, 12, 17, 16, 18, 21, 20, 23, 23, 25, 27, 29, 34, 34, 35, 38, 40, 43, 45, 48, 51, 53, 56, 59, 62, 65, 68],  // Quartile
+  		[null, 1, 1, 2, 4, 4, 4, 5, 6, 8, 8, 11, 11, 16, 16, 18, 16, 19, 21, 25, 25, 25, 34, 30, 32, 35, 37, 40, 42, 45, 48, 51, 54, 57, 60, 63, 66, 70, 74, 77, 81],  // High
+  	];
+  	
+  	
+  	/*---- Public helper enumeration ----*/
+  	
+  	/* 
+  	 * The error correction level in a QR Code symbol. Immutable.
+  	 */
+  	this.QrCode.Ecc = {
+  		LOW     : new Ecc(0, 1),  // The QR Code can tolerate about  7% erroneous codewords
+  		MEDIUM  : new Ecc(1, 0),  // The QR Code can tolerate about 15% erroneous codewords
+  		QUARTILE: new Ecc(2, 3),  // The QR Code can tolerate about 25% erroneous codewords
+  		HIGH    : new Ecc(3, 2),  // The QR Code can tolerate about 30% erroneous codewords
+  	};
+  	
+  	
+  	// Private constructor.
+  	function Ecc(ord, fb) {
+  		// (Public) In the range 0 to 3 (unsigned 2-bit integer)
+  		Object.defineProperty(this, "ordinal", {value:ord});
+  		
+  		// (Package-private) In the range 0 to 3 (unsigned 2-bit integer)
+  		Object.defineProperty(this, "formatBits", {value:fb});
+  	}
+  	
+  	
+  	
+  	/*---- Data segment class ----*/
+  	
+  	/* 
+  	 * A segment of character/binary/control data in a QR Code symbol.
+  	 * Instances of this class are immutable.
+  	 * The mid-level way to create a segment is to take the payload data
+  	 * and call a static factory function such as QrSegment.makeNumeric().
+  	 * The low-level way to create a segment is to custom-make the bit buffer
+  	 * and call the QrSegment() constructor with appropriate values.
+  	 * This segment class imposes no length restrictions, but QR Codes have restrictions.
+  	 * Even in the most favorable conditions, a QR Code can only hold 7089 characters of data.
+  	 * Any segment longer than this is meaningless for the purpose of generating QR Codes.
+  	 * This constructor creates a QR Code segment with the given attributes and data.
+  	 * The character count (numChars) must agree with the mode and the bit buffer length,
+  	 * but the constraint isn't checked. The given bit buffer is cloned and stored.
+  	 */
+  	this.QrSegment = function(mode, numChars, bitData) {
+  		/*---- Constructor (low level) ----*/
+  		if (numChars < 0 || !(mode instanceof Mode))
+  			throw "Invalid argument";
+  		
+  		// The data bits of this segment. Accessed through getData().
+  		bitData = bitData.slice();  // Make defensive copy
+  		
+  		// The mode indicator of this segment.
+  		Object.defineProperty(this, "mode", {value:mode});
+  		
+  		// The length of this segment's unencoded data. Measured in characters for
+  		// numeric/alphanumeric/kanji mode, bytes for byte mode, and 0 for ECI mode.
+  		// Always zero or positive. Not the same as the data's bit length.
+  		Object.defineProperty(this, "numChars", {value:numChars});
+  		
+  		// Returns a new copy of the data bits of this segment.
+  		this.getData = function() {
+  			return bitData.slice();  // Make defensive copy
+  		};
+  	};
+  	
+  	
+  	/*---- Static factory functions (mid level) for QrSegment ----*/
+  	
+  	/* 
+  	 * Returns a segment representing the given binary data encoded in
+  	 * byte mode. All input byte arrays are acceptable. Any text string
+  	 * can be converted to UTF-8 bytes and encoded as a byte mode segment.
+  	 */
+  	this.QrSegment.makeBytes = function(data) {
+  		var bb = new BitBuffer();
+  		data.forEach(function(b) {
+  			bb.appendBits(b, 8);
+  		});
+  		return new this(this.Mode.BYTE, data.length, bb);
+  	};
+  	
+  	
+  	/* 
+  	 * Returns a segment representing the given string of decimal digits encoded in numeric mode.
+  	 */
+  	this.QrSegment.makeNumeric = function(digits) {
+  		if (!this.NUMERIC_REGEX.test(digits))
+  			throw "String contains non-numeric characters";
+  		var bb = new BitBuffer();
+  		for (var i = 0; i < digits.length; ) {  // Consume up to 3 digits per iteration
+  			var n = Math.min(digits.length - i, 3);
+  			bb.appendBits(parseInt(digits.substring(i, i + n), 10), n * 3 + 1);
+  			i += n;
+  		}
+  		return new this(this.Mode.NUMERIC, digits.length, bb);
+  	};
+  	
+  	
+  	/* 
+  	 * Returns a segment representing the given text string encoded in alphanumeric mode.
+  	 * The characters allowed are: 0 to 9, A to Z (uppercase only), space,
+  	 * dollar, percent, asterisk, plus, hyphen, period, slash, colon.
+  	 */
+  	this.QrSegment.makeAlphanumeric = function(text) {
+  		if (!this.ALPHANUMERIC_REGEX.test(text))
+  			throw "String contains unencodable characters in alphanumeric mode";
+  		var bb = new BitBuffer();
+  		var i;
+  		for (i = 0; i + 2 <= text.length; i += 2) {  // Process groups of 2
+  			var temp = QrSegment.ALPHANUMERIC_CHARSET.indexOf(text.charAt(i)) * 45;
+  			temp += QrSegment.ALPHANUMERIC_CHARSET.indexOf(text.charAt(i + 1));
+  			bb.appendBits(temp, 11);
+  		}
+  		if (i < text.length)  // 1 character remaining
+  			bb.appendBits(QrSegment.ALPHANUMERIC_CHARSET.indexOf(text.charAt(i)), 6);
+  		return new this(this.Mode.ALPHANUMERIC, text.length, bb);
+  	};
+  	
+  	
+  	/* 
+  	 * Returns a new mutable list of zero or more segments to represent the given Unicode text string.
+  	 * The result may use various segment modes and switch modes to optimize the length of the bit stream.
+  	 */
+  	this.QrSegment.makeSegments = function(text) {
+  		// Select the most efficient segment encoding automatically
+  		if (text == "")
+  			return [];
+  		else if (this.NUMERIC_REGEX.test(text))
+  			return [this.makeNumeric(text)];
+  		else if (this.ALPHANUMERIC_REGEX.test(text))
+  			return [this.makeAlphanumeric(text)];
+  		else
+  			return [this.makeBytes(toUtf8ByteArray(text))];
+  	};
+  	
+  	
+  	/* 
+  	 * Returns a segment representing an Extended Channel Interpretation
+  	 * (ECI) designator with the given assignment value.
+  	 */
+  	this.QrSegment.makeEci = function(assignVal) {
+  		var bb = new BitBuffer();
+  		if (assignVal < 0)
+  			throw "ECI assignment value out of range";
+  		else if (assignVal < (1 << 7))
+  			bb.appendBits(assignVal, 8);
+  		else if (assignVal < (1 << 14)) {
+  			bb.appendBits(2, 2);
+  			bb.appendBits(assignVal, 14);
+  		} else if (assignVal < 1000000) {
+  			bb.appendBits(6, 3);
+  			bb.appendBits(assignVal, 21);
+  		} else
+  			throw "ECI assignment value out of range";
+  		return new this(this.Mode.ECI, 0, bb);
+  	};
+  	
+  	
+  	// (Package-private) Calculates and returns the number of bits needed to encode the given segments at the
+  	// given version. The result is infinity if a segment has too many characters to fit its length field.
+  	this.QrSegment.getTotalBits = function(segs, version) {
+  		var result = 0;
+  		for (var i = 0; i < segs.length; i++) {
+  			var seg = segs[i];
+  			var ccbits = seg.mode.numCharCountBits(version);
+  			if (seg.numChars >= (1 << ccbits))
+  				return Infinity;  // The segment's length doesn't fit the field's bit width
+  			result += 4 + ccbits + seg.getData().length;
+  		}
+  		return result;
+  	};
+  	
+  	
+  	/*---- Constants for QrSegment ----*/
+  	
+  	var QrSegment = {};  // Private object to assign properties to. Not the same object as 'this.QrSegment'.
+  	
+  	// (Public) Describes precisely all strings that are encodable in numeric mode.
+  	// To test whether a string s is encodable: var ok = NUMERIC_REGEX.test(s);
+  	// A string is encodable iff each character is in the range 0 to 9.
+  	this.QrSegment.NUMERIC_REGEX = /^[0-9]*$/;
+  	
+  	// (Public) Describes precisely all strings that are encodable in alphanumeric mode.
+  	// To test whether a string s is encodable: var ok = ALPHANUMERIC_REGEX.test(s);
+  	// A string is encodable iff each character is in the following set: 0 to 9, A to Z
+  	// (uppercase only), space, dollar, percent, asterisk, plus, hyphen, period, slash, colon.
+  	this.QrSegment.ALPHANUMERIC_REGEX = /^[A-Z0-9 $%*+.\/:-]*$/;
+  	
+  	// (Private) The set of all legal characters in alphanumeric mode,
+  	// where each character value maps to the index in the string.
+  	QrSegment.ALPHANUMERIC_CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
+  	
+  	
+  	/*---- Public helper enumeration ----*/
+  	
+  	/* 
+  	 * Describes how a segment's data bits are interpreted. Immutable.
+  	 */
+  	this.QrSegment.Mode = {  // Constants
+  		NUMERIC     : new Mode(0x1, [10, 12, 14]),
+  		ALPHANUMERIC: new Mode(0x2, [ 9, 11, 13]),
+  		BYTE        : new Mode(0x4, [ 8, 16, 16]),
+  		KANJI       : new Mode(0x8, [ 8, 10, 12]),
+  		ECI         : new Mode(0x7, [ 0,  0,  0]),
+  	};
+  	
+  	
+  	// Private constructor.
+  	function Mode(mode, ccbits) {
+  		// (Package-private) The mode indicator bits, which is a uint4 value (range 0 to 15).
+  		Object.defineProperty(this, "modeBits", {value:mode});
+  		
+  		// (Package-private) Returns the bit width of the character count field for a segment in
+  		// this mode in a QR Code at the given version number. The result is in the range [0, 16].
+  		this.numCharCountBits = function(ver) {
+  			return ccbits[Math.floor((ver + 7) / 17)];
+  		};
+  	}
+  	
+  	
+  	
+  	/*---- Private helper functions and classes ----*/
+  	
+  	// Returns a new array of bytes representing the given string encoded in UTF-8.
+  	function toUtf8ByteArray(str) {
+  		str = encodeURI(str);
+  		var result = [];
+  		for (var i = 0; i < str.length; i++) {
+  			if (str.charAt(i) != "%")
+  				result.push(str.charCodeAt(i));
+  			else {
+  				result.push(parseInt(str.substring(i + 1, i + 3), 16));
+  				i += 2;
+  			}
+  		}
+  		return result;
+  	}
+  	
+  	
+  	
+  	/* 
+  	 * A private helper class that computes the Reed-Solomon error correction codewords for a sequence of
+  	 * data codewords at a given degree. Objects are immutable, and the state only depends on the degree.
+  	 * This class exists because each data block in a QR Code shares the same the divisor polynomial.
+  	 * This constructor creates a Reed-Solomon ECC generator for the given degree. This could be implemented
+  	 * as a lookup table over all possible parameter values, instead of as an algorithm.
+  	 */
+  	function ReedSolomonGenerator(degree) {
+  		if (degree < 1 || degree > 255)
+  			throw "Degree out of range";
+  		
+  		// Coefficients of the divisor polynomial, stored from highest to lowest power, excluding the leading term which
+  		// is always 1. For example the polynomial x^3 + 255x^2 + 8x + 93 is stored as the uint8 array {255, 8, 93}.
+  		var coefficients = [];
+  		
+  		// Start with the monomial x^0
+  		for (var i = 0; i < degree - 1; i++)
+  			coefficients.push(0);
+  		coefficients.push(1);
+  		
+  		// Compute the product polynomial (x - r^0) * (x - r^1) * (x - r^2) * ... * (x - r^{degree-1}),
+  		// drop the highest term, and store the rest of the coefficients in order of descending powers.
+  		// Note that r = 0x02, which is a generator element of this field GF(2^8/0x11D).
+  		var root = 1;
+  		for (var i = 0; i < degree; i++) {
+  			// Multiply the current product by (x - r^i)
+  			for (var j = 0; j < coefficients.length; j++) {
+  				coefficients[j] = ReedSolomonGenerator.multiply(coefficients[j], root);
+  				if (j + 1 < coefficients.length)
+  					coefficients[j] ^= coefficients[j + 1];
+  			}
+  			root = ReedSolomonGenerator.multiply(root, 0x02);
+  		}
+  		
+  		// Computes and returns the Reed-Solomon error correction codewords for the given
+  		// sequence of data codewords. The returned object is always a new byte array.
+  		// This method does not alter this object's state (because it is immutable).
+  		this.getRemainder = function(data) {
+  			// Compute the remainder by performing polynomial division
+  			var result = coefficients.map(function() { return 0; });
+  			data.forEach(function(b) {
+  				var factor = b ^ result.shift();
+  				result.push(0);
+  				coefficients.forEach(function(coef, i) {
+  					result[i] ^= ReedSolomonGenerator.multiply(coef, factor);
+  				});
+  			});
+  			return result;
+  		};
+  	}
+  	
+  	// This static function returns the product of the two given field elements modulo GF(2^8/0x11D). The arguments and
+  	// result are unsigned 8-bit integers. This could be implemented as a lookup table of 256*256 entries of uint8.
+  	ReedSolomonGenerator.multiply = function(x, y) {
+  		if (x >>> 8 != 0 || y >>> 8 != 0)
+  			throw "Byte out of range";
+  		// Russian peasant multiplication
+  		var z = 0;
+  		for (var i = 7; i >= 0; i--) {
+  			z = (z << 1) ^ ((z >>> 7) * 0x11D);
+  			z ^= ((y >>> i) & 1) * x;
+  		}
+  		if (z >>> 8 != 0)
+  			throw "Assertion error";
+  		return z;
+  	};
+  	
+  	
+  	
+  	/* 
+  	 * A private helper class that represents an appendable sequence of bits (0s and 1s).
+  	 * Mainly used by QrSegment. This constructor creates an empty bit buffer (length 0).
+  	 */
+  	function BitBuffer() {
+  		Array.call(this);
+  		
+  		// Appends the given number of low-order bits of the given value
+  		// to this buffer. Requires 0 <= len <= 31 and 0 <= val < 2^len.
+  		this.appendBits = function(val, len) {
+  			if (len < 0 || len > 31 || val >>> len != 0)
+  				throw "Value out of range";
+  		for (var i = len - 1; i >= 0; i--)  // Append bit by bit
+  				this.push((val >>> i) & 1);
+  		};
+  	}
+  	
+  	BitBuffer.prototype = Object.create(Array.prototype);
+  	BitBuffer.prototype.constructor = BitBuffer;
+  	
+  };
+
+  function encodeText() {
+      return qrcodegen.QrCode.encodeText.apply(qrcodegen.QrCode, arguments);
+  }const Ecc = qrcodegen.QrCode.Ecc;
+
+  // Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE
+
+  var low = Ecc.LOW;
+
+  var medium = Ecc.MEDIUM;
+
+  var quartile = Ecc.QUARTILE;
+
+  var high = Ecc.HIGH;
+
+  var Ecc$1 = /* module */[
+    /* low */low,
+    /* medium */medium,
+    /* quartile */quartile,
+    /* high */high
+  ];
+
+  function _encodeText(prim, prim$1) {
+    return encodeText(prim, prim$1);
+  }
+
+  function encodeText$1(text, ecc) {
+    var exit = 0;
+    var code;
+    try {
+      code = encodeText(text, ecc);
+      exit = 1;
+    }
+    catch (exn){
+      return undefined;
+    }
+    if (exit === 1) {
+      return some(code);
+    }
+    
+  }
+
+  var QrCode = /* module */[
+    /* _encodeText */_encodeText,
+    /* encodeText */encodeText$1
+  ];
+  /* low Not a pure module */
+
+  // Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE
+
+  function getPathString(code, border) {
+    var size = code.size;
+    var modules = code.getModules();
+    var parts = /* array */[];
+    for(var y = 0 ,y_finish = size - 1 | 0; y <= y_finish; ++y){
+      for(var x = 0 ,x_finish = size - 1 | 0; x <= x_finish; ++x){
+        if (caml_array_get(caml_array_get(modules, y), x)) {
+          parts.push("M" + (String(x + border | 0) + ("," + (String(y + border | 0) + "h1v1h-1z"))));
+        }
+        
+      }
+    }
+    return parts.join(" ");
+  }
+
+  var svgNs = "http://www.w3.org/2000/svg";
+
+  function createQrCodePathElement(code, border) {
+    var path = document.createElementNS(svgNs, "path");
+    path.setAttribute("d", getPathString(code, border));
+    return path;
+  }
+
+  function createRainbowGradient(param) {
+    var gradient = document.createElementNS(svgNs, "linearGradient");
+    gradient.id = "rainbow";
+    for(var i = 0; i <= 7; ++i){
+      var stop = document.createElementNS(svgNs, "stop");
+      stop.setAttribute("offset", (100.0 * i / 7.0).toString() + "%");
+      stop.setAttribute("stop-color", "hsl(" + ((i / 8.0).toString() + "turn,100%,85%)"));
+      gradient.appendChild(stop);
+    }
+    return gradient;
+  }
+
+  function createSimpleSvg(code, border, maybeDataURL) {
+    var size = code.size;
+    var sizeWithBorder = size + (border << 1) | 0;
+    var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
+    var svg = document.createElementNS(svgNs, "svg");
+    svg.setAttribute("viewBox", viewBox);
+    var defs = document.createElementNS(svgNs, "defs");
+    var rainbowGradient = createRainbowGradient(/* () */0);
+    defs.appendChild(rainbowGradient);
+    svg.appendChild(defs);
+    if (maybeDataURL !== undefined) {
+      var background = document.createElementNS(svgNs, "image");
+      background.setAttribute("x", "0");
+      background.setAttribute("y", "0");
+      background.setAttribute("width", "100%");
+      background.setAttribute("height", "100%");
+      background.setAttribute("href", maybeDataURL);
+      svg.appendChild(background);
+    }
+    var rainbow = document.createElementNS(svgNs, "rect");
+    rainbow.setAttribute("width", "100%");
+    rainbow.setAttribute("height", "100%");
+    rainbow.setAttribute("fill", "url(#rainbow)");
+    rainbow.setAttribute("fill-opacity", "0.5");
+    svg.appendChild(rainbow);
+    var path = createQrCodePathElement(code, border);
+    svg.appendChild(path);
+    return svg;
+  }
+
+  function svgToDataURL(svg) {
+    var xmlSerializer = new XMLSerializer();
+    var str = xmlSerializer.serializeToString(svg);
+    return "data:image/svg+xml;utf8," + encodeURIComponent(str);
+  }
+  /* No side effect */
+
+  // Generated by BUCKLESCRIPT VERSION 5.0.2, PLEASE EDIT WITH CARE
+
+  var domain = "qqq.lu";
+
+  function setBackground(selector, bgCss) {
+    return withQuerySelector(selector, (function (el) {
+                  el.style.setProperty("background", bgCss, "");
+                  return /* () */0;
+                }));
+  }
+
+  var codeRegex = new RegExp("https:\\/\\/qqq.lu\\/#(.+)");
+
+  var defaultCode = QrCode[/* _encodeText */0]("https://qqq.lu", Ecc$1[/* low */0]);
+
+  var initialHash = /* record */[/* contents */""];
+
+  var camerasRef = /* record */[/* contents : array */[]];
+
+  var cameraIndex = /* record */[/* contents */0];
+
+  function cycleCameras(scanner) {
+    var n = camerasRef[0].length;
+    cameraIndex[0] = mod_(cameraIndex[0] + 1 | 0, n);
+    return /* () */0;
+  }
+
+  function setSrc (img,src){
+       img.src = src;}
+  var dataSeen = { };
+
+  var currentSignature = /* record */[/* contents */""];
+
+  var canvasesRef = /* record */[/* contents : array */[]];
+
+  function copyVideoToSnapshotCanvas(param) {
+    return withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
+                  var snapshotCtx = snapshotCanvas.getContext("2d");
+                  snapshotCtx.globalAlpha = 0.1;
+                  return mapi((function (i, canvas) {
+                                var h = canvas.height;
+                                var x = (canvas.width - h | 0) / 2 | 0;
+                                snapshotCtx.drawImage(canvas, x, 0, h, h, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+                                return /* () */0;
+                              }), canvasesRef[0]);
+                }));
+  }
+
+  function takeSnapshot(param) {
+    return withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
+                  snapshotCanvas.getContext("2d");
+                  return snapshotCanvas.toDataURL("image/jpeg", 0.9);
+                }));
+  }
+
+  function getTimestamp(param) {
+    return new Date().toISOString();
+  }
+
+  function setHashToNow(param) {
+    return setHash(new Date().toISOString());
+  }
+
+  function onClick(maybeHash, param) {
+    if (maybeHash !== undefined) {
+      var hash = maybeHash;
+      setBackground("body", "#" + hash.slice(0, 6));
+      var match = get(dataSeen, hash);
+      if (match !== undefined) {
+        var data = match;
+        console.log(data.slice(16));
+        return setHash(data.slice(16));
+      } else {
+        return /* () */0;
+      }
+    } else {
+      return setHash(new Date().toISOString());
+    }
+  }
+
+  function addToPast(hash, dataUrl) {
+    var img = document.createElement("img");
+    setSrc(img, dataUrl);
+    img.id = "x" + hash;
+    var partial_arg = hash;
+    img.addEventListener("click", (function (param) {
+            return onClick(partial_arg, param);
+          }));
+    withQuerySelectorDom("#codes", (function (past) {
+            past.appendChild(img);
+            return /* () */0;
+          }));
+    return /* () */0;
+  }
+
+  function setCode(input) {
+    var text = "https://" + (domain + ("/#" + input));
+    hexDigest("SHA-1", text).then((function (hash) {
+            var alreadySeen = isSome(get(dataSeen, hash));
+            if (!alreadySeen) {
+              dataSeen[hash] = text;
+              setBackground("body", "#" + hash.slice(0, 6));
+              var code = getWithDefault(QrCode[/* encodeText */1](text, Ecc$1[/* medium */1]), defaultCode);
+              withQuerySelectorDom("svg", (function (root) {
+                      return withQuerySelectorDom("#localGroup", (function (loopContainer) {
+                                    var match = takeSnapshot(/* () */0);
+                                    if (match !== undefined) {
+                                      var maybePrevious = loopContainer.querySelector("svg");
+                                      if (!(maybePrevious == null)) {
+                                        loopContainer.removeChild(maybePrevious);
+                                      }
+                                      var match$1 = input !== initialHash[0];
+                                      var svg = createSimpleSvg(code, 4, match$1 ? match : undefined);
+                                      loopContainer.appendChild(svg);
+                                      var url = svgToDataURL(svg);
+                                      withQuerySelectorDom("#codes", (function (container) {
+                                              var img = document.createElementNS(htmlNs, "img");
+                                              img.setAttribute("src", url);
+                                              container.appendChild(img);
+                                              return /* () */0;
+                                            }));
+                                      currentSignature[0] = hash;
+                                      return /* () */0;
+                                    } else {
+                                      return /* () */0;
+                                    }
+                                  }));
+                    }));
+            }
+            return Promise.resolve(/* () */0);
+          }));
+    return /* () */0;
+  }
+
+  var setText = make(200, (function (hash) {
+          withQuerySelectorDom("#codeContents", (function (el) {
+                  el.innerText = decodeURIComponent(hash);
+                  return /* () */0;
+                }));
+          return /* () */0;
+        }));
+
+  function onHashChange(param) {
+    var hash = getHash(/* () */0).slice(1);
+    setCode(hash);
+    return _1(setText, hash);
+  }
+
+  function setOpacity(elQuery, opacity) {
+    return map$1(flatMap(nullable_to_opt(document.querySelector(elQuery)), asHtmlElement$1), (function (body) {
+                  body.style.setProperty("opacity", string_of_float(opacity), "");
+                  return /* () */0;
+                }));
+  }
+
+  var frameCount = /* record */[/* contents */0];
+
+  function onTick(ts) {
+    frameCount[0] = frameCount[0] + 1 | 0;
+    if (frameCount[0] % 5 === 1) {
+      copyVideoToSnapshotCanvas(/* () */0);
+    }
+    requestAnimationFrame(onTick);
+    return /* () */0;
+  }
+
+  function _onInput(param) {
+    withQuerySelectorDom("#codeContents", (function (el) {
+            var text = el.innerText;
+            return setHash(encodeURIComponent(text));
+          }));
+    return /* () */0;
+  }
+
+  var onInput = make(200, _onInput);
+
+  function init(param) {
+    withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
+            canvas.width = 480;
+            canvas.height = 480;
+            return /* () */0;
+          }));
+    withQuerySelectorDom(".codes", (function (img) {
+            img.addEventListener("click", (function (param) {
+                    return onClick(undefined, param);
+                  }));
+            return /* () */0;
+          }));
+    initialHash[0] = getHash(/* () */0).slice(1);
+    if (initialHash[0] === "") {
+      initialHash[0] = new Date().toISOString();
+      setHash(initialHash[0]);
+    } else {
+      onHashChange(/* () */0);
+    }
+    withQuerySelectorDom("#codeContents", (function (el) {
+            el.addEventListener("input", (function (_evt) {
+                    return _1(onInput, /* () */0);
+                  }));
+            return /* () */0;
+          }));
+    var response = function (input) {
+      if (input !== "") {
+        hexDigest("SHA-1", input).then((function (hexHash) {
+                var alreadySeen = isSome(get(dataSeen, hexHash));
+                if (hexHash === currentSignature[0] || !alreadySeen) {
+                  setHash(new Date().toISOString());
+                }
+                return Promise.resolve(/* () */0);
+              }));
+        return /* () */0;
+      } else {
+        return 0;
+      }
+    };
+    getCameras(/* () */0).then((function (cameras) {
+                camerasRef[0] = cameras;
+                return Promise.all(map((function (camera) {
+                                  var videoEl = document.createElementNS(htmlNs, "video");
+                                  withQuerySelectorDom("#htmlContainer", (function (body) {
+                                          body.appendChild(videoEl);
+                                          return /* () */0;
+                                        }));
+                                  return scanUsingDeviceId(videoEl, camera.deviceId, response);
+                                }), cameras.slice(0, 1)));
+              })).then((function (canvases) {
+              canvasesRef[0] = canvases;
+              requestAnimationFrame(onTick);
+              return Promise.resolve(/* () */0);
+            })).catch((function (err) {
+            console.error("getCameras failed", err);
+            return Promise.resolve(/* () */0);
+          }));
+    return /* () */0;
+  }
+
+  window.addEventListener("load", (function (param) {
+          return init(/* () */0);
+        }));
+
+  window.addEventListener("hashchange", (function (param) {
+          return onHashChange(/* () */0);
+        }));
+
+  var defaultHash = "fff";
+  /* codeRegex Not a pure module */
+
+  exports._onInput = _onInput;
+  exports.addToPast = addToPast;
+  exports.cameraIndex = cameraIndex;
+  exports.camerasRef = camerasRef;
+  exports.canvasesRef = canvasesRef;
+  exports.codeRegex = codeRegex;
+  exports.copyVideoToSnapshotCanvas = copyVideoToSnapshotCanvas;
+  exports.currentSignature = currentSignature;
+  exports.cycleCameras = cycleCameras;
+  exports.dataSeen = dataSeen;
+  exports.defaultCode = defaultCode;
+  exports.defaultHash = defaultHash;
+  exports.domain = domain;
+  exports.frameCount = frameCount;
+  exports.getTimestamp = getTimestamp;
+  exports.init = init;
+  exports.initialHash = initialHash;
+  exports.onClick = onClick;
+  exports.onHashChange = onHashChange;
+  exports.onInput = onInput;
+  exports.onTick = onTick;
+  exports.setBackground = setBackground;
+  exports.setCode = setCode;
+  exports.setHashToNow = setHashToNow;
+  exports.setOpacity = setOpacity;
+  exports.setSrc = setSrc;
+  exports.setText = setText;
+  exports.takeSnapshot = takeSnapshot;
+
+  return exports;
+
+}({}));

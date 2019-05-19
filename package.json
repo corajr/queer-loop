@@ -17,13 +17,14 @@
   "devDependencies": {
     "@glennsl/bs-jest": "^0.4.8",
     "bs-platform": "^5.0.2",
-    "webpack": "^4.30.0",
-    "webpack-cli": "^3.3.2"
+    "inline-require": "^0.1.5",
+    "rollup": "^1.12.3",
+    "rollup-plugin-node-resolve": "^5.0.0"
   },
   "dependencies": {
     "bs-webapi": "^0.13.6",
     "bs-webworkers": "^0.2.4",
-    "jsqr": "^1.2.0",
+    "jsqr-es6": "^1.2.0-3",
     "re-debouncer": "^2.0.0"
   }
 }

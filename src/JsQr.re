@@ -5,7 +5,10 @@ type code = {
 };
 
 [@bs.deriving abstract]
-type options = {inversionAttempts: string};
+type options = {
+  inversionAttempts: string,
+  canOverwriteImage: bool,
+};
 
 type invertOptions =
   | AttemptBoth
@@ -20,11 +23,11 @@ let string_of_invertOptions =
   | OnlyInvert => "onlyInvert"
   | InvertFirst => "invertFirst";
 
-[@bs.module]
+[@bs.module "jsqr-es6"]
 external _jsQR :
   (Js.Typed_array.Uint8ClampedArray.t, int, int, options) =>
   Js.Nullable.t(code) =
-  "jsqr";
+  "default";
 
 let jsQR:
   (Js.Typed_array.Uint8ClampedArray.t, int, int, invertOptions) =>
@@ -32,6 +35,11 @@ let jsQR:
   (d, w, h, invertOptions) => {
     let optString = string_of_invertOptions(invertOptions);
     Js.Nullable.toOption(
-      _jsQR(d, w, h, options(~inversionAttempts=optString)),
+      _jsQR(
+        d,
+        w,
+        h,
+        options(~inversionAttempts=optString, ~canOverwriteImage=true),
+      ),
     );
   };

@@ -4,27 +4,55 @@ open UserMedia;
 open Util;
 open Webapi.Dom;
 
+let syncScan = (scanCallback, imageData) =>
+  switch (
+    jsQR(
+      dataGet(imageData),
+      widthGet(imageData),
+      heightGet(imageData),
+      DontInvert,
+    )
+  ) {
+  | Some(code) => scanCallback(textDataGet(code))
+  | None => ()
+  };
+
 let scanUsingDeviceId:
   (Dom.element, string, string => unit) => Js.Promise.t(Dom.element) =
   (videoEl, deviceId, scanCallback) =>
     initStreamByDeviceId(videoEl, deviceId)
     |> Js.Promise.then_(video => {
-         let canvas = DocumentRe.createElement("canvas", document);
-         withQuerySelector("body", body =>
-           HtmlElementRe.appendChild(canvas, body)
+         let canvas = DocumentRe.createElementNS(htmlNs, "canvas", document);
+         withQuerySelectorDom("#htmlContainer", body =>
+           ElementRe.appendChild(canvas, body)
          );
 
-         let worker = WebWorkers.create_webworker("worker.js");
-         let msgBackHandler: WebWorkers.MessageEvent.t => unit =
-           e => {
-             let maybeCode: option(code) = WebWorkers.MessageEvent.data(e);
-             switch (maybeCode) {
-             | Some(qrCode) => scanCallback(textDataGet(qrCode))
-             | None => ()
-             };
-             ();
+         let maybeWorker =
+           switch (WebWorkers.create_webworker("worker.js")) {
+           | worker => Some(worker)
+           | exception e =>
+             Js.log(
+               "Could not initialize worker, falling back to synchronous scan.",
+             );
+             Js.log(e);
+             None;
            };
-         WebWorkers.onMessage(worker, msgBackHandler);
+
+         switch (maybeWorker) {
+         | Some(worker) =>
+           let msgBackHandler: WebWorkers.MessageEvent.t => unit = (
+             e => {
+               let maybeCode: option(code) = WebWorkers.MessageEvent.data(e);
+               switch (maybeCode) {
+               | Some(qrCode) => scanCallback(textDataGet(qrCode))
+               | None => ()
+               };
+             }
+           );
+           WebWorkers.onMessage(worker, msgBackHandler);
+
+         | None => ()
+         };
 
          let frameCount = ref(0);
 
@@ -43,10 +71,15 @@ let scanUsingDeviceId:
 
                let imageData =
                  Ctx.getImageData(ctx, ~sx=0, ~sy=0, ~sw=width, ~sh=height);
-               WebWorkers.postMessage(
-                 worker,
-                 (dataGet(imageData), width, height),
-               );
+
+               switch (maybeWorker) {
+               | Some(worker) =>
+                 WebWorkers.postMessage(
+                   worker,
+                   (dataGet(imageData), width, height),
+                 )
+               | None => syncScan(scanCallback, imageData)
+               };
              };
            };
 
