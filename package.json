@@ -17,9 +17,9 @@
   "devDependencies": {
     "@glennsl/bs-jest": "^0.4.8",
     "bs-platform": "^5.0.2",
-    "inline-require": "^0.1.5",
     "rollup": "^1.12.3",
-    "rollup-plugin-node-resolve": "^5.0.0"
+    "rollup-plugin-node-resolve": "^5.0.0",
+    "rollup-plugin-terser": "^4.0.4"
   },
   "dependencies": {
     "bs-webapi": "^0.13.6",

@@ -152,6 +152,7 @@ let setCode = input => {
                    4,
                    input !== initialHash^ ? Some(snapshotUrl) : None,
                  );
+
                ElementRe.appendChild(svg, loopContainer);
                let url = QueerCode.svgToDataURL(svg);
 
@@ -215,11 +216,19 @@ let setOpacity = (elQuery, opacity) =>
 
 let frameCount = ref(0);
 
+let lastUpdated = ref(0.0);
+
 let rec onTick = ts => {
   frameCount := frameCount^ + 1;
   if (frameCount^ mod 5 == 1) {
     copyVideoToSnapshotCanvas() |> ignore;
   };
+
+  /* if (ts -. lastUpdated^ >= 1000.0) { */
+  /* setHashToNow(); */
+  /* }; */
+
+  lastUpdated := ts;
   Webapi.requestAnimationFrame(onTick);
 };
 

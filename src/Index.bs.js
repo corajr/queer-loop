@@ -173,11 +173,14 @@ function setOpacity(elQuery, opacity) {
 
 var frameCount = /* record */[/* contents */0];
 
+var lastUpdated = /* record */[/* contents */0.0];
+
 function onTick(ts) {
   frameCount[0] = frameCount[0] + 1 | 0;
   if (frameCount[0] % 5 === 1) {
     copyVideoToSnapshotCanvas(/* () */0);
   }
+  lastUpdated[0] = ts;
   requestAnimationFrame(onTick);
   return /* () */0;
 }
@@ -287,6 +290,7 @@ export {
   onHashChange ,
   setOpacity ,
   frameCount ,
+  lastUpdated ,
   onTick ,
   _onInput ,
   onInput ,

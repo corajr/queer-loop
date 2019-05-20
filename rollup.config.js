@@ -1,4 +1,8 @@
 import resolve from 'rollup-plugin-node-resolve';
+import { terser } from 'rollup-plugin-terser';
+
+
+const production = !process.env.ROLLUP_WATCH;
 
 export default [{
     input: 'src/Index.bs.js',
@@ -10,6 +14,7 @@ export default [{
     },
     plugins: [
         resolve(),
+        production && terser()
     ],
 },
 {
@@ -22,5 +27,6 @@ export default [{
     },
     plugins: [
         resolve(),
+        production && terser()
     ],
 }];
