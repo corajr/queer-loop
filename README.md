@@ -1,5 +1,7 @@
 # <a href="https://qqq.lu"><img width="64" height="64" src="queer-loop.svg" alt="a QR code for queer-loop"/> queer-loop</a>
 
+# <a href="https://qqq.lu/#2019-05-20T16:00:22.283Z"><img width="256" height="256" src="queer-loop-animated.svg" alt="an example Q(uee)r code"/> </a>
+
 [queer-loop](https://qqq.lu) is a simple [ReasonML](https://reasonml.github.io/)
 app that generates and reads Q(uee)R codes. Q(uee)R codes are QR codes that
 attempt to encapsulate a particular moment in time.
