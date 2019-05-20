@@ -1,5 +1,6 @@
 import resolve from 'rollup-plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
+import serve from 'rollup-plugin-serve';
 
 
 const production = !process.env.ROLLUP_WATCH;
@@ -14,6 +15,7 @@ export default [{
     },
     plugins: [
         resolve(),
+        serve(),
         production && terser()
     ],
 },
