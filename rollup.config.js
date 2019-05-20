@@ -15,7 +15,7 @@ export default [{
     },
     plugins: [
         resolve(),
-        serve(),
+        !production && serve(),
         production && terser()
     ],
 },

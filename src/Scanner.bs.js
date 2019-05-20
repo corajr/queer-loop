@@ -8,7 +8,7 @@ import * as Caml_js_exceptions from "../node_modules/bs-platform/lib/es6/caml_js
 import * as UserMedia$QueerLoop from "./UserMedia.bs.js";
 
 function syncScan(scanCallback, imageData) {
-  var match = JsQr$QueerLoop.jsQR(imageData.data, imageData.width, imageData.height, /* DontInvert */1);
+  var match = JsQr$QueerLoop.jsQR(imageData.data, imageData.width, imageData.height, JsQr$QueerLoop.defaultInversion);
   if (match !== undefined) {
     return Curry._1(scanCallback, Caml_option.valFromOption(match).data);
   } else {

@@ -10,7 +10,7 @@ let syncScan = (scanCallback, imageData) =>
       dataGet(imageData),
       widthGet(imageData),
       heightGet(imageData),
-      DontInvert,
+      defaultInversion,
     )
   ) {
   | Some(code) => scanCallback(textDataGet(code))

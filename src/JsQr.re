@@ -29,6 +29,8 @@ external _jsQR :
   Js.Nullable.t(code) =
   "default";
 
+let defaultInversion = InvertFirst;
+
 let jsQR:
   (Js.Typed_array.Uint8ClampedArray.t, int, int, invertOptions) =>
   option(code) =
