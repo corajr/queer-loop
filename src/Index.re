@@ -91,7 +91,12 @@ let asOfNow = f => Js.Date.make() |> f;
 
 let setHashToNow = _ => setHash(getTimestamp());
 
-let onClick = (maybeHash, _) =>
+let hasChanged = ref(false);
+
+let onClick = (maybeHash, _) => {
+  if (! hasChanged^) {
+    hasChanged := true;
+  };
   switch (maybeHash) {
   | Some(hash) =>
     switch (Js.Dict.get(dataSeen, hash)) {
@@ -102,6 +107,7 @@ let onClick = (maybeHash, _) =>
     }
   | None => setHashToNow()
   };
+};
 
 let addToPast: (string, string) => unit =
   (hash, dataUrl) => {
@@ -114,9 +120,7 @@ let addToPast: (string, string) => unit =
     ();
   };
 
-let setCode = input => {
-  let text = "https://" ++ domain ++ "/#" ++ input;
-
+let setCode = text =>
   Hash.hexDigest("SHA-1", text)
   |> Js.Promise.then_(hash => {
        let alreadySeen = Belt.Option.isSome(Js.Dict.get(dataSeen, hash));
@@ -156,10 +160,10 @@ let setCode = input => {
                let svg =
                  QueerCode.createSimpleSvg(
                    code,
-                   4,
+                   6,
                    timestamp,
                    localeString,
-                   input !== initialHash^ ? Some(snapshotUrl) : None,
+                   hasChanged^ ? Some(snapshotUrl) : None,
                  );
 
                ElementRe.appendChild(svg, loopContainer);
@@ -183,7 +187,6 @@ let setCode = input => {
        Js.Promise.resolve();
      })
   |> ignore;
-};
 
 let setText =
   Debouncer.make(~wait=200, hash =>
@@ -196,7 +199,9 @@ let setText =
 let onHashChange: unit => unit =
   _ => {
     let url = DomRe.Location.href(WindowRe.location(window));
+    let search = DomRe.Location.search(WindowRe.location(window));
     let hash = DomRe.Location.hash(WindowRe.location(window));
+
     let (timestamp, localeString) = getTimestampAndLocaleString();
     withQuerySelectorDom("title", title =>
       ElementRe.setInnerText(title, localeString)
@@ -236,7 +241,7 @@ let rec onTick = ts => {
     copyVideoToSnapshotCanvas() |> ignore;
   };
 
-  if (ts -. lastUpdated^ >= 1000.0) {
+  if (ts -. lastUpdated^ >= 10000.0) {
     setHashToNow();
   };
 
@@ -244,35 +249,41 @@ let rec onTick = ts => {
   Webapi.requestAnimationFrame(onTick);
 };
 
-module Url = {
-  type t;
-  [@bs.new] external _make : string => Js.Nullable.t(t) = "URL";
-
-  let make: string => option(t) = x => Js.Nullable.toOption(_make(x));
-  [@bs.get] external hash : t => string = "";
-  [@bs.get] external search : t => string = "";
-
-  [@bs.set] external setHash : (t, string) => string = "";
-  [@bs.set] external setSearch : (t, string) => string = "";
-
-  [@bs.send] external toString : t => string = "";
-};
+let maybeUrl: string => option(UrlRe.t) =
+  s =>
+    switch (UrlRe.make(s)) {
+    | url => Some(url)
+    | exception e =>
+      Js_console.error2("Could not parse URL", e);
+      None;
+    };
 
 let _onInput = _ =>
   withQuerySelectorDom("#codeContents", el => {
     let text = ElementRe.innerText(el);
-    Url.make(text)
+    maybeUrl(text)
     |. Belt.Option.map(url => {
-         DomRe.Location.setSearch(
-           WindowRe.location(window),
-           Url.search(url),
-         );
-         DomRe.Location.setHash(WindowRe.location(window), Url.hash(url));
+         DomRe.Location.setSearch(WindowRe.location(window));
+         DomRe.Location.setHash(WindowRe.location(window), UrlRe.hash(url));
        });
   })
   |> ignore;
 
-let onInput = Debouncer.make(~wait=1000, _onInput);
+let onInput = Debouncer.make(~wait=100, _onInput);
+
+type options = {
+  mutable background: string,
+  mutable domain: bool,
+  mutable qs: bool,
+  mutable cameraMax: int,
+};
+
+let defaultOptions = {background: "", domain: true, qs: true, cameraMax: 1};
+
+let boolParam: option(string) => bool =
+  fun
+  | None => false
+  | Some(s) => s === "true" || s === "1" || s === "y" || s === "";
 
 let init: unit => unit =
   _ => {
@@ -281,13 +292,19 @@ let init: unit => unit =
       setHeight(canvas, 480);
     });
 
+    let options = defaultOptions;
+
     let queryString = getQueryString();
     if (queryString !== "") {
-      setBackground(
-        "body",
-        decodeURIComponent(Js.String.sliceToEnd(~from=1, queryString)),
-      )
-      |> ignore;
+      let params = URLSearchParamsRe.make(queryString);
+      options.domain = boolParam(URLSearchParamsRe.get("d", params));
+      options.qs = boolParam(URLSearchParamsRe.get("q", params));
+      options.background =
+        Belt.Option.getWithDefault(URLSearchParamsRe.get("bg", params), "");
+    };
+
+    if (options.background != "") {
+      setBackground("body", decodeURIComponent(options.background)) |> ignore;
     };
 
     initialHash := Js.String.sliceToEnd(~from=1, getHash());
@@ -303,13 +320,16 @@ let init: unit => unit =
     );
 
     withQuerySelectorDom("#codeContents", el =>
-      ElementRe.addEventListener("input", _evt => onInput(), el)
+      ElementRe.addEventListener("blur", _evt => onInput(), el)
     );
 
     let response = input =>
       if (input !== "") {
         Hash.hexDigest("SHA-1", input)
         |> Js.Promise.then_(hexHash => {
+             if (! hasChanged^) {
+               hasChanged := true;
+             };
              let alreadySeen =
                Belt.Option.isSome(Js.Dict.get(dataSeen, hexHash));
 
@@ -340,7 +360,7 @@ let init: unit => unit =
                  response,
                );
              },
-             Js.Array.slice(~start=0, ~end_=1, cameras),
+             Js.Array.slice(~start=0, ~end_=options.cameraMax, cameras),
            ),
          );
        })

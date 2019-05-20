@@ -4,13 +4,7 @@
         <title><time></time></title>
         <script type="text/javascript" src="index.js"></script>
         <style type="text/css">
-         h1, #codeContents {
-             text-align: center;
-             color: #FFF;
-             mix-blend-mode: difference;
-             z-index: 1000;
-             vertical-align: center;
-         }
+         h1 { display: none; }
 
          body { margin: 0; font-family: "Courier New", monospace; }
          canvas, video {
@@ -50,14 +44,16 @@
          #codes {
              display: flex;
              flex-wrap: wrap;
-             justify-content: center;
+             justify-content: flex-start;
+             align-items: top;
          }
          #codes img {
-             mix-blend-mode: multiply;
+             width: 12.5%;
          }
+
          .queer-loop {
              z-index: 100;
-             opacity: 0.9;
+             opacity: 0.75;
          }
 
          #codeContents {
@@ -68,14 +64,9 @@
              z-index: 101;
              color: white;
          }
-         #hashColor {
-             background: rgba(0,0,0,0.5);
-         }
         </style>
     </head>
     <body>
-        <div class="centeredSquare" id="hashColor" ></div>
-
         <div id="welcome">
             queer-loop requests camera access to be able to see itself-- in the mirror or on the device of a friend. If you want to see what will happen if you agree, click or tap on the central icon (this simulates 1 look in the mirror).
         </div>

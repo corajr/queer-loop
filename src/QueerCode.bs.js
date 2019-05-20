@@ -35,7 +35,22 @@ function createRainbowGradient(lightness) {
     stop.setAttribute("stop-color", "hsl(" + ((i / 8.0).toString() + ("turn,100%," + ((lightness * 100.0).toString() + "%)"))));
     gradient.appendChild(stop);
   }
+  gradient.setAttribute("gradientTransform", "rotate(45)");
   return gradient;
+}
+
+function makeAnimate(values, duration) {
+  var animate = document.createElementNS(svgNs, "animate");
+  animate.setAttribute("attributeName", "opacity");
+  animate.setAttribute("values", values);
+  animate.setAttribute("dur", duration);
+  animate.setAttribute("begin", "+0s");
+  animate.setAttribute("fill", "freeze");
+  animate.setAttribute("calcMode", "spline");
+  animate.setAttribute("keyTimes", "0;0.5;1");
+  animate.setAttribute("keySplines", Caml_array.caml_make_vect(2, ".5 0 .5 1").join(";"));
+  animate.setAttribute("repeatCount", "indefinite");
+  return animate;
 }
 
 function createSimpleSvg(code, border, timestamp, localeString, maybeDataURL) {
@@ -55,25 +70,36 @@ function createSimpleSvg(code, border, timestamp, localeString, maybeDataURL) {
     background.setAttribute("width", "100%");
     background.setAttribute("height", "100%");
     background.setAttribute("href", maybeDataURL);
+    background.setAttribute("style", "opacity: 0.5");
+    var bgAnimate = makeAnimate("0;1;0", "6s");
+    background.appendChild(bgAnimate);
     svg.appendChild(background);
   }
+  var codeGroup = document.createElementNS(svgNs, "g");
+  codeGroup.id = "codeGroup";
   var rainbow = document.createElementNS(svgNs, "rect");
+  rainbow.id = "rainbowMask";
   rainbow.setAttribute("width", "100%");
   rainbow.setAttribute("height", "100%");
   rainbow.setAttribute("fill", "url(#rainbow)");
-  rainbow.setAttribute("fill-opacity", "0.8");
-  svg.appendChild(rainbow);
+  codeGroup.appendChild(rainbow);
+  var path = createQrCodePathElement(code, border);
+  codeGroup.appendChild(path);
+  svg.appendChild(codeGroup);
+  var codeGroupAnimate = makeAnimate("1;0;1", "6s");
+  codeGroup.appendChild(codeGroupAnimate);
   var timeText = document.createElementNS(svgNs, "text");
-  timeText.setAttribute("x", "1");
-  timeText.setAttribute("y", "3");
-  timeText.setAttribute("font-size", "3px");
+  timeText.setAttribute("x", (sizeWithBorder / 2.0).toString());
+  timeText.setAttribute("y", (border / 2.0).toString());
+  timeText.setAttribute("font-size", (border / 2.0).toString() + "px");
+  timeText.setAttribute("text-anchor", "middle");
+  timeText.setAttribute("alignment-baseline", "middle");
   timeText.setAttribute("style", "text-align: center; font-family: \"Courier New\", monospace;");
-  timeText.setAttribute("textLength", "100%");
+  timeText.setAttribute("textLength", "90%");
+  timeText.setAttribute("fill", "#FFFFFF");
+  timeText.setAttribute("style", "mix-blend-mode: difference");
   timeText.textContent = localeString;
   svg.appendChild(timeText);
-  var path = createQrCodePathElement(code, border);
-  path.setAttribute("fill", "#000000");
-  svg.appendChild(path);
   return svg;
 }
 
@@ -169,6 +195,7 @@ export {
   svgNs ,
   createQrCodePathElement ,
   createRainbowGradient ,
+  makeAnimate ,
   createSimpleSvg ,
   createSvg ,
   $$XMLSerializer ,

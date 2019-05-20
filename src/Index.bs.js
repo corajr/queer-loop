@@ -12,6 +12,7 @@ import * as Caml_option from "../node_modules/bs-platform/lib/es6/caml_option.js
 import * as Hash$QueerLoop from "./Hash.bs.js";
 import * as Util$QueerLoop from "./Util.bs.js";
 import * as Scanner$QueerLoop from "./Scanner.bs.js";
+import * as Caml_js_exceptions from "../node_modules/bs-platform/lib/es6/caml_js_exceptions.js";
 import * as QrCodeGen$QueerLoop from "./QrCodeGen.bs.js";
 import * as QueerCode$QueerLoop from "./QueerCode.bs.js";
 import * as UserMedia$QueerLoop from "./UserMedia.bs.js";
@@ -91,7 +92,12 @@ function setHashToNow(param) {
   return Util$QueerLoop.setHash(new Date().toISOString());
 }
 
+var hasChanged = /* record */[/* contents */false];
+
 function onClick(maybeHash, param) {
+  if (!hasChanged[0]) {
+    hasChanged[0] = true;
+  }
   if (maybeHash !== undefined) {
     var match = Js_dict.get(dataSeen, maybeHash);
     if (match !== undefined) {
@@ -121,8 +127,7 @@ function addToPast(hash, dataUrl) {
   return /* () */0;
 }
 
-function setCode(input) {
-  var text = "https://" + (domain + ("/#" + input));
+function setCode(text) {
   Hash$QueerLoop.hexDigest("SHA-1", text).then((function (hash) {
           var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hash));
           if (!alreadySeen) {
@@ -137,8 +142,8 @@ function setCode(input) {
                                       loopContainer.removeChild(maybePrevious);
                                     }
                                     var match$1 = getTimestampAndLocaleString(/* () */0);
-                                    var match$2 = input !== initialHash[0];
-                                    var svg = QueerCode$QueerLoop.createSimpleSvg(code, 4, match$1[0], match$1[1], match$2 ? match : undefined);
+                                    var match$2 = hasChanged[0];
+                                    var svg = QueerCode$QueerLoop.createSimpleSvg(code, 6, match$1[0], match$1[1], match$2 ? match : undefined);
                                     loopContainer.appendChild(svg);
                                     var url = QueerCode$QueerLoop.svgToDataURL(svg);
                                     Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
@@ -170,6 +175,7 @@ var setText = Debouncer.make(200, (function (hash) {
 
 function onHashChange(param) {
   var url = window.location.href;
+  window.location.search;
   window.location.hash;
   var match = getTimestampAndLocaleString(/* () */0);
   var localeString = match[1];
@@ -203,7 +209,7 @@ function onTick(ts) {
   if (frameCount[0] % 5 === 1) {
     copyVideoToSnapshotCanvas(/* () */0);
   }
-  if (ts - lastUpdated[0] >= 1000.0) {
+  if (ts - lastUpdated[0] >= 10000.0) {
     Util$QueerLoop.setHash(new Date().toISOString());
   }
   lastUpdated[0] = ts;
@@ -211,17 +217,29 @@ function onTick(ts) {
   return /* () */0;
 }
 
-function make(x) {
-  return Caml_option.nullable_to_opt(new URL(x));
+function maybeUrl(s) {
+  var exit = 0;
+  var url;
+  try {
+    url = new URL(s);
+    exit = 1;
+  }
+  catch (raw_e){
+    var e = Caml_js_exceptions.internalToOCamlException(raw_e);
+    console.error("Could not parse URL", e);
+    return undefined;
+  }
+  if (exit === 1) {
+    return Caml_option.some(url);
+  }
+  
 }
-
-var Url = /* module */[/* make */make];
 
 function _onInput(param) {
   Util$QueerLoop.withQuerySelectorDom("#codeContents", (function (el) {
           var text = el.innerText;
-          return Belt_Option.map(Caml_option.nullable_to_opt(new URL(text)), (function (url) {
-                        window.location.search = url.search;
+          return Belt_Option.map(maybeUrl(text), (function (url) {
+                        window.location;
                         window.location.hash = url.hash;
                         return /* () */0;
                       }));
@@ -229,7 +247,27 @@ function _onInput(param) {
   return /* () */0;
 }
 
-var onInput = Debouncer.make(1000, _onInput);
+var onInput = Debouncer.make(100, _onInput);
+
+var defaultOptions = /* record */[
+  /* background */"",
+  /* domain */true,
+  /* qs */true,
+  /* cameraMax */1
+];
+
+function boolParam(param) {
+  if (param !== undefined) {
+    var s = param;
+    if (s === "true" || s === "1" || s === "y") {
+      return true;
+    } else {
+      return s === "";
+    }
+  } else {
+    return false;
+  }
+}
 
 function init(param) {
   Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
@@ -239,7 +277,13 @@ function init(param) {
         }));
   var queryString = Util$QueerLoop.getQueryString(/* () */0);
   if (queryString !== "") {
-    setBackground("body", decodeURIComponent(queryString.slice(1)));
+    var params = new URLSearchParams(queryString);
+    defaultOptions[/* domain */1] = boolParam(Caml_option.nullable_to_opt(params.get("d")));
+    defaultOptions[/* qs */2] = boolParam(Caml_option.nullable_to_opt(params.get("q")));
+    defaultOptions[/* background */0] = Belt_Option.getWithDefault(Caml_option.nullable_to_opt(params.get("bg")), "");
+  }
+  if (defaultOptions[/* background */0] !== "") {
+    setBackground("body", decodeURIComponent(defaultOptions[/* background */0]));
   }
   initialHash[0] = Util$QueerLoop.getHash(/* () */0).slice(1);
   if (initialHash[0] === "") {
@@ -255,7 +299,7 @@ function init(param) {
           return /* () */0;
         }));
   Util$QueerLoop.withQuerySelectorDom("#codeContents", (function (el) {
-          el.addEventListener("input", (function (_evt) {
+          el.addEventListener("blur", (function (_evt) {
                   return Curry._1(onInput, /* () */0);
                 }));
           return /* () */0;
@@ -263,6 +307,9 @@ function init(param) {
   var response = function (input) {
     if (input !== "") {
       Hash$QueerLoop.hexDigest("SHA-1", input).then((function (hexHash) {
+              if (!hasChanged[0]) {
+                hasChanged[0] = true;
+              }
               var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hexHash));
               if (hexHash === currentSignature[0] || !alreadySeen) {
                 Util$QueerLoop.setHash(new Date().toISOString());
@@ -283,7 +330,7 @@ function init(param) {
                                         return /* () */0;
                                       }));
                                 return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, response);
-                              }), cameras.slice(0, 1)));
+                              }), cameras.slice(0, defaultOptions[/* cameraMax */3])));
             })).then((function (canvases) {
             canvasesRef[0] = canvases;
             requestAnimationFrame(onTick);
@@ -329,6 +376,7 @@ export {
   getTimestampAndLocaleString ,
   asOfNow ,
   setHashToNow ,
+  hasChanged ,
   onClick ,
   addToPast ,
   setCode ,
@@ -338,9 +386,11 @@ export {
   frameCount ,
   lastUpdated ,
   onTick ,
-  Url ,
+  maybeUrl ,
   _onInput ,
   onInput ,
+  defaultOptions ,
+  boolParam ,
   init ,
   
 }

@@ -60,8 +60,31 @@ let createRainbowGradient: float => Dom.element =
       ElementRe.appendChild(stop, gradient);
     };
 
+    ElementRe.setAttribute("gradientTransform", "rotate(45)", gradient);
+
     gradient;
   };
+
+let makeAnimate = (values, duration) => {
+  let animBegin = "+0s";
+  let animate = DocumentRe.createElementNS(svgNs, "animate", document);
+  ElementRe.setAttribute("attributeName", "opacity", animate);
+  ElementRe.setAttribute("values", values, animate);
+  ElementRe.setAttribute("dur", duration, animate);
+  ElementRe.setAttribute("begin", animBegin, animate);
+  ElementRe.setAttribute("fill", "freeze", animate);
+  ElementRe.setAttribute("calcMode", "spline", animate);
+  ElementRe.setAttribute("keyTimes", "0;0.5;1", animate);
+  let spline = ".5 0 .5 1";
+  ElementRe.setAttribute(
+    "keySplines",
+    Js.Array.joinWith(";", Array.make(2, spline)),
+    animate,
+  );
+  ElementRe.setAttribute("repeatCount", "indefinite", animate);
+
+  animate;
+};
 
 let createSimpleSvg:
   (QrCode.t, int, string, string, option(string)) => Dom.element =
@@ -86,34 +109,60 @@ let createSimpleSvg:
       ElementRe.setAttribute("width", "100%", background);
       ElementRe.setAttribute("height", "100%", background);
       ElementRe.setAttribute("href", url, background);
+      ElementRe.setAttribute("style", "opacity: 0.5", background);
+      let bgAnimate = makeAnimate("0;1;0", "6s");
+      ElementRe.appendChild(bgAnimate, background);
       ElementRe.appendChild(background, svg);
     | None => ()
     };
 
+    let codeGroup = DocumentRe.createElementNS(svgNs, "g", document);
+    ElementRe.setId(codeGroup, "codeGroup");
+
     let rainbow = DocumentRe.createElementNS(svgNs, "rect", document);
+    ElementRe.setId(rainbow, "rainbowMask");
     ElementRe.setAttribute("width", "100%", rainbow);
     ElementRe.setAttribute("height", "100%", rainbow);
     ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
-    ElementRe.setAttribute("fill-opacity", "0.8", rainbow);
-    ElementRe.appendChild(rainbow, svg);
+    ElementRe.appendChild(rainbow, codeGroup);
+
+    let path = createQrCodePathElement(code, border);
+    ElementRe.appendChild(path, codeGroup);
+
+    ElementRe.appendChild(codeGroup, svg);
+
+    let codeGroupAnimate = makeAnimate("1;0;1", "6s");
+    ElementRe.appendChild(codeGroupAnimate, codeGroup);
 
     let timeText = DocumentRe.createElementNS(svgNs, "text", document);
-    ElementRe.setAttribute("x", "1", timeText);
-    ElementRe.setAttribute("y", "3", timeText);
-    ElementRe.setAttribute("font-size", "3px", timeText);
+    ElementRe.setAttribute(
+      "x",
+      Js.Float.toString(float_of_int(sizeWithBorder) /. 2.0),
+      timeText,
+    );
+    ElementRe.setAttribute(
+      "y",
+      Js.Float.toString(float_of_int(border) /. 2.0),
+      timeText,
+    );
+    ElementRe.setAttribute(
+      "font-size",
+      Js.Float.toString(float_of_int(border) /. 2.0) ++ "px",
+      timeText,
+    );
+    ElementRe.setAttribute("text-anchor", "middle", timeText);
+    ElementRe.setAttribute("alignment-baseline", "middle", timeText);
     ElementRe.setAttribute(
       "style",
       "text-align: center; font-family: \"Courier New\", monospace;",
       timeText,
     );
-    ElementRe.setAttribute("textLength", "100%", timeText);
+    ElementRe.setAttribute("textLength", "90%", timeText);
+    ElementRe.setAttribute("fill", "#FFFFFF", timeText);
+    ElementRe.setAttribute("style", "mix-blend-mode: difference", timeText);
     ElementRe.setTextContent(timeText, localeString);
 
     ElementRe.appendChild(timeText, svg);
-
-    let path = createQrCodePathElement(code, border);
-    ElementRe.setAttribute("fill", "#000000", path);
-    ElementRe.appendChild(path, svg);
 
     svg;
   };
