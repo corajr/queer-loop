@@ -34,3 +34,8 @@ let getHash = _ => DomRe.Location.hash(WindowRe.location(window));
 
 let setHash = hash =>
   DomRe.Location.setHash(WindowRe.location(window), hash);
+
+let getQueryString = _ => DomRe.Location.search(WindowRe.location(window));
+
+let setQueryString = search =>
+  DomRe.Location.setSearch(WindowRe.location(window), search);

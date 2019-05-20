@@ -4,10 +4,22 @@
         <title><time></time></title>
         <script type="text/javascript" src="index.js"></script>
         <style type="text/css">
-         body { margin: 0; }
+         h1, #codeContents {
+             text-align: center;
+             color: #FFF;
+             mix-blend-mode: difference;
+             z-index: 1000;
+             vertical-align: center;
+         }
+
+         body { margin: 0; font-family: "Courier New", monospace; }
          canvas, video {
              display: none;
              pointer-events: none;
+         }
+
+         #welcome {
+             display: none;
          }
 
          #snapshotCanvas {
@@ -22,13 +34,17 @@
              transform: translate(-50%, -50%);
          }
 
-         .centeredSquare {
+         .centeredSquare, .centeredSquareInset {
              position: fixed;
-             width: 75vmin;
-             height: 75vmin;
+             width: 100vmin;
+             height: 100vmin;
              left: 50%;
              top: 50%;
              transform: translate(-50%, -50%);
+         }
+         .centeredSquareInset {
+             width: 75vmin;
+             height: 75vmin;
          }
 
          #codes {
@@ -37,7 +53,7 @@
              justify-content: center;
          }
          #codes img {
-             mix-blend-mode: overlay;
+             mix-blend-mode: multiply;
          }
          .queer-loop {
              z-index: 100;
@@ -46,32 +62,32 @@
 
          #codeContents {
              position: fixed;
-             left: 0;
              bottom: 0;
-             z-index: 101
+             left: 50%;
+             transform: translate(-50%, 0%);
+             z-index: 101;
              color: white;
-             font-size: 12pt;
-             font-family: "Courier New", monospace;
          }
-
-         time {
-             text-align: center;
-             mix-blend-mode: overlay;
+         #hashColor {
+             background: rgba(0,0,0,0.5);
          }
         </style>
     </head>
     <body>
-        <div id="codes"></div>
+        <div class="centeredSquare" id="hashColor" ></div>
+
+        <div id="welcome">
+            queer-loop requests camera access to be able to see itself-- in the mirror or on the device of a friend. If you want to see what will happen if you agree, click or tap on the central icon (this simulates 1 look in the mirror).
+        </div>
 
         <canvas id="snapshotCanvas">
-            <div class="centeredSquare">
-                <h1><time id="lastUpdated"></time></h1>
-            </div>
         </canvas>
-        <div class="centeredSquare queer-loop"></div>
         <div id="codeText">
             <span id="codeContents" contenteditable="true"></span>
         </div>
 
+        <h1><time id="lastUpdated"></time></h1>
+        <div id="codes"></div>
+        <div class="centeredSquareInset queer-loop"></div>
     </body>
 </html>

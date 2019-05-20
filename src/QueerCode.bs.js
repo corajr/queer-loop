@@ -18,14 +18,6 @@ function getPathString(code, border) {
   return parts.join(" ");
 }
 
-function getSvgDataUri(code, data, maybePastUrl) {
-  var pathString = getPathString(code, 4);
-  var sizeWithBorder = code.size + 8 | 0;
-  var pastData = maybePastUrl !== undefined ? "<image href=\"" + (String(maybePastUrl) + ("\" x=\"0\" y=\"0\" width=\"" + (String(sizeWithBorder) + ("\" height=\"" + (String(sizeWithBorder) + "\" />"))))) : "";
-  var svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + ("\" stroke=\"none\">\n     <defs>\n     <linearGradient id=\"rainbow\">\n     <stop offset=\"0.000%\" stop-color=\"#ffb5b5\" />\n     <stop offset=\"14.286%\" stop-color=\"#fcdc85\" />\n     <stop offset=\"28.571%\" stop-color=\"#caf79c\" />\n     <stop offset=\"42.857%\" stop-color=\"#a8fdbf\" />\n     <stop offset=\"57.143%\" stop-color=\"#70feff\" />\n     <stop offset=\"71.429%\" stop-color=\"#a8bffd\" />\n     <stop offset=\"85.714%\" stop-color=\"#ca9cf7\" />\n     <stop offset=\"100.000%\" stop-color=\"#fc85dc\" />\n     </linearGradient></defs>\n     " + (String(pastData) + ("\n     <rect width=\"100%\" height=\"100%\" fill=\"url(#rainbow)\" fill-opacity=\"0.4\" />\n     <path d=\"" + (String(pathString) + "\" fill=\"black\" />\n     </svg>")))))));
-  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
-}
-
 var svgNs = "http://www.w3.org/2000/svg";
 
 function createQrCodePathElement(code, border) {
@@ -34,26 +26,26 @@ function createQrCodePathElement(code, border) {
   return path;
 }
 
-function createRainbowGradient(param) {
+function createRainbowGradient(lightness) {
   var gradient = document.createElementNS(svgNs, "linearGradient");
   gradient.id = "rainbow";
   for(var i = 0; i <= 7; ++i){
     var stop = document.createElementNS(svgNs, "stop");
     stop.setAttribute("offset", (100.0 * i / 7.0).toString() + "%");
-    stop.setAttribute("stop-color", "hsl(" + ((i / 8.0).toString() + "turn,100%,85%)"));
+    stop.setAttribute("stop-color", "hsl(" + ((i / 8.0).toString() + ("turn,100%," + ((lightness * 100.0).toString() + "%)"))));
     gradient.appendChild(stop);
   }
   return gradient;
 }
 
-function createSimpleSvg(code, border, maybeDataURL) {
+function createSimpleSvg(code, border, timestamp, localeString, maybeDataURL) {
   var size = code.size;
   var sizeWithBorder = size + (border << 1) | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
   var svg = document.createElementNS(svgNs, "svg");
   svg.setAttribute("viewBox", viewBox);
   var defs = document.createElementNS(svgNs, "defs");
-  var rainbowGradient = createRainbowGradient(/* () */0);
+  var rainbowGradient = createRainbowGradient(0.85);
   defs.appendChild(rainbowGradient);
   svg.appendChild(defs);
   if (maybeDataURL !== undefined) {
@@ -69,9 +61,18 @@ function createSimpleSvg(code, border, maybeDataURL) {
   rainbow.setAttribute("width", "100%");
   rainbow.setAttribute("height", "100%");
   rainbow.setAttribute("fill", "url(#rainbow)");
-  rainbow.setAttribute("fill-opacity", "0.5");
+  rainbow.setAttribute("fill-opacity", "0.8");
   svg.appendChild(rainbow);
+  var timeText = document.createElementNS(svgNs, "text");
+  timeText.setAttribute("x", "1");
+  timeText.setAttribute("y", "3");
+  timeText.setAttribute("font-size", "3px");
+  timeText.setAttribute("style", "text-align: center; font-family: \"Courier New\", monospace;");
+  timeText.setAttribute("textLength", "100%");
+  timeText.textContent = localeString;
+  svg.appendChild(timeText);
   var path = createQrCodePathElement(code, border);
+  path.setAttribute("fill", "#000000");
   svg.appendChild(path);
   return svg;
 }
@@ -165,7 +166,6 @@ function drawCanvas(canvas, code) {
 
 export {
   getPathString ,
-  getSvgDataUri ,
   svgNs ,
   createQrCodePathElement ,
   createRainbowGradient ,

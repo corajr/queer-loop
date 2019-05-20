@@ -21,6 +21,7 @@ var domain = "qqq.lu";
 function setBackground(selector, bgCss) {
   return Util$QueerLoop.withQuerySelector(selector, (function (el) {
                 el.style.setProperty("background", bgCss, "");
+                console.log(bgCss);
                 return /* () */0;
               }));
 }
@@ -74,15 +75,25 @@ function getTimestamp(param) {
   return new Date().toISOString();
 }
 
+function getTimestampAndLocaleString(param) {
+  var date = new Date();
+  return /* tuple */[
+          date.toISOString(),
+          date.toLocaleString()
+        ];
+}
+
+function asOfNow(f) {
+  return Curry._1(f, new Date());
+}
+
 function setHashToNow(param) {
   return Util$QueerLoop.setHash(new Date().toISOString());
 }
 
 function onClick(maybeHash, param) {
   if (maybeHash !== undefined) {
-    var hash = maybeHash;
-    setBackground("body", "#" + hash.slice(0, 6));
-    var match = Js_dict.get(dataSeen, hash);
+    var match = Js_dict.get(dataSeen, maybeHash);
     if (match !== undefined) {
       var data = match;
       console.log(data.slice(16));
@@ -116,19 +127,18 @@ function setCode(input) {
           var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hash));
           if (!alreadySeen) {
             dataSeen[hash] = text;
-            setBackground("body", "#" + hash.slice(0, 6));
             var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
             Util$QueerLoop.withQuerySelectorDom("body", (function (root) {
                     return Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (loopContainer) {
                                   var match = takeSnapshot(/* () */0);
                                   if (match !== undefined) {
                                     var maybePrevious = loopContainer.querySelector("svg");
-                                    console.log("hey");
                                     if (!(maybePrevious == null)) {
                                       loopContainer.removeChild(maybePrevious);
                                     }
-                                    var match$1 = input !== initialHash[0];
-                                    var svg = QueerCode$QueerLoop.createSimpleSvg(code, 4, match$1 ? match : undefined);
+                                    var match$1 = getTimestampAndLocaleString(/* () */0);
+                                    var match$2 = input !== initialHash[0];
+                                    var svg = QueerCode$QueerLoop.createSimpleSvg(code, 4, match$1[0], match$1[1], match$2 ? match : undefined);
                                     loopContainer.appendChild(svg);
                                     var url = QueerCode$QueerLoop.svgToDataURL(svg);
                                     Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
@@ -159,9 +169,22 @@ var setText = Debouncer.make(200, (function (hash) {
       }));
 
 function onHashChange(param) {
-  var hash = Util$QueerLoop.getHash(/* () */0).slice(1);
-  setCode(hash);
-  return Curry._1(setText, hash);
+  var url = window.location.href;
+  window.location.hash;
+  var match = getTimestampAndLocaleString(/* () */0);
+  var localeString = match[1];
+  var timestamp = match[0];
+  Util$QueerLoop.withQuerySelectorDom("title", (function (title) {
+          title.innerText = localeString;
+          return /* () */0;
+        }));
+  Util$QueerLoop.withQuerySelectorDom("time", (function (time) {
+          time.setAttribute("datetime", timestamp);
+          time.innerText = localeString;
+          return /* () */0;
+        }));
+  setCode(url);
+  return Curry._1(setText, url);
 }
 
 function setOpacity(elQuery, opacity) {
@@ -180,20 +203,33 @@ function onTick(ts) {
   if (frameCount[0] % 5 === 1) {
     copyVideoToSnapshotCanvas(/* () */0);
   }
+  if (ts - lastUpdated[0] >= 1000.0) {
+    Util$QueerLoop.setHash(new Date().toISOString());
+  }
   lastUpdated[0] = ts;
   requestAnimationFrame(onTick);
   return /* () */0;
 }
 
+function make(x) {
+  return Caml_option.nullable_to_opt(new URL(x));
+}
+
+var Url = /* module */[/* make */make];
+
 function _onInput(param) {
   Util$QueerLoop.withQuerySelectorDom("#codeContents", (function (el) {
           var text = el.innerText;
-          return Util$QueerLoop.setHash(encodeURIComponent(text));
+          return Belt_Option.map(Caml_option.nullable_to_opt(new URL(text)), (function (url) {
+                        window.location.search = url.search;
+                        window.location.hash = url.hash;
+                        return /* () */0;
+                      }));
         }));
   return /* () */0;
 }
 
-var onInput = Debouncer.make(200, _onInput);
+var onInput = Debouncer.make(1000, _onInput);
 
 function init(param) {
   Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
@@ -201,12 +237,10 @@ function init(param) {
           canvas.height = 480;
           return /* () */0;
         }));
-  Util$QueerLoop.withQuerySelectorDom(".codes", (function (img) {
-          img.addEventListener("click", (function (param) {
-                  return onClick(undefined, param);
-                }));
-          return /* () */0;
-        }));
+  var queryString = Util$QueerLoop.getQueryString(/* () */0);
+  if (queryString !== "") {
+    setBackground("body", decodeURIComponent(queryString.slice(1)));
+  }
   initialHash[0] = Util$QueerLoop.getHash(/* () */0).slice(1);
   if (initialHash[0] === "") {
     initialHash[0] = new Date().toISOString();
@@ -214,6 +248,12 @@ function init(param) {
   } else {
     onHashChange(/* () */0);
   }
+  Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (el) {
+          el.addEventListener("click", (function (param) {
+                  return onClick(undefined, param);
+                }));
+          return /* () */0;
+        }));
   Util$QueerLoop.withQuerySelectorDom("#codeContents", (function (el) {
           el.addEventListener("input", (function (_evt) {
                   return Curry._1(onInput, /* () */0);
@@ -243,13 +283,17 @@ function init(param) {
                                         return /* () */0;
                                       }));
                                 return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, response);
-                              }), cameras));
+                              }), cameras.slice(0, 1)));
             })).then((function (canvases) {
             canvasesRef[0] = canvases;
             requestAnimationFrame(onTick);
             return Promise.resolve(/* () */0);
           })).catch((function (err) {
           console.error("getCameras failed", err);
+          Util$QueerLoop.withQuerySelectorDom("#welcome", (function (welcome) {
+                  welcome.setAttribute("style", "display: block;");
+                  return /* () */0;
+                }));
           return Promise.resolve(/* () */0);
         }));
   return /* () */0;
@@ -282,6 +326,8 @@ export {
   copyVideoToSnapshotCanvas ,
   takeSnapshot ,
   getTimestamp ,
+  getTimestampAndLocaleString ,
+  asOfNow ,
   setHashToNow ,
   onClick ,
   addToPast ,
@@ -292,6 +338,7 @@ export {
   frameCount ,
   lastUpdated ,
   onTick ,
+  Url ,
   _onInput ,
   onInput ,
   init ,

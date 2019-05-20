@@ -26,39 +26,6 @@ let getPathString: (QrCode.t, int) => string =
     Js.Array.joinWith(" ", parts);
   };
 
-let getSvgDataUri: (QrCode.t, string, option(string)) => string =
-  (code, data, maybePastUrl) => {
-    let border = 4;
-    let pathString = getPathString(code, border);
-    let sizeWithBorder = QrCode.size(code) + border * 2;
-    let sizeWithBorderMinusOne = sizeWithBorder - 1;
-
-    let pastData =
-      switch (maybePastUrl) {
-      | Some(pastUrl) => {j|<image href="$pastUrl" x="0" y="0" width="$sizeWithBorder" height="$sizeWithBorder" />|j}
-      | None => ""
-      };
-
-    let svg = {j|<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 $sizeWithBorder $sizeWithBorder" stroke="none">
-     <defs>
-     <linearGradient id="rainbow">
-     <stop offset="0.000%" stop-color="#ffb5b5" />
-     <stop offset="14.286%" stop-color="#fcdc85" />
-     <stop offset="28.571%" stop-color="#caf79c" />
-     <stop offset="42.857%" stop-color="#a8fdbf" />
-     <stop offset="57.143%" stop-color="#70feff" />
-     <stop offset="71.429%" stop-color="#a8bffd" />
-     <stop offset="85.714%" stop-color="#ca9cf7" />
-     <stop offset="100.000%" stop-color="#fc85dc" />
-     </linearGradient></defs>
-     $pastData
-     <rect width="100%" height="100%" fill="url(#rainbow)" fill-opacity="0.4" />
-     <path d="$pathString" fill="black" />
-     </svg>|j};
-
-    "data:image/svg+xml;utf8," ++ encodeURIComponent(svg);
-  };
-
 let svgNs = "http://www.w3.org/2000/svg";
 
 let createQrCodePathElement: (QrCode.t, int) => Dom.element =
@@ -68,8 +35,8 @@ let createQrCodePathElement: (QrCode.t, int) => Dom.element =
     path;
   };
 
-let createRainbowGradient: unit => Dom.element =
-  _ => {
+let createRainbowGradient: float => Dom.element =
+  lightness => {
     let gradient =
       DocumentRe.createElementNS(svgNs, "linearGradient", document);
 
@@ -85,7 +52,9 @@ let createRainbowGradient: unit => Dom.element =
         "stop-color",
         "hsl("
         ++ Js.Float.toString(float_of_int(i) /. 8.0)
-        ++ "turn,100%,85%)",
+        ++ "turn,100%,"
+        ++ Js.Float.toString(lightness *. 100.0)
+        ++ "%)",
         stop,
       );
       ElementRe.appendChild(stop, gradient);
@@ -94,8 +63,9 @@ let createRainbowGradient: unit => Dom.element =
     gradient;
   };
 
-let createSimpleSvg: (QrCode.t, int, option(string)) => Dom.element =
-  (code, border, maybeDataURL) => {
+let createSimpleSvg:
+  (QrCode.t, int, string, string, option(string)) => Dom.element =
+  (code, border, timestamp, localeString, maybeDataURL) => {
     let size = QrCode.size(code);
     let sizeWithBorder = size + border * 2;
     let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
@@ -104,7 +74,7 @@ let createSimpleSvg: (QrCode.t, int, option(string)) => Dom.element =
     ElementRe.setAttribute("viewBox", viewBox, svg);
 
     let defs = DocumentRe.createElementNS(svgNs, "defs", document);
-    let rainbowGradient = createRainbowGradient();
+    let rainbowGradient = createRainbowGradient(0.85);
     ElementRe.appendChild(rainbowGradient, defs);
     ElementRe.appendChild(defs, svg);
 
@@ -124,10 +94,25 @@ let createSimpleSvg: (QrCode.t, int, option(string)) => Dom.element =
     ElementRe.setAttribute("width", "100%", rainbow);
     ElementRe.setAttribute("height", "100%", rainbow);
     ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
-    ElementRe.setAttribute("fill-opacity", "0.5", rainbow);
+    ElementRe.setAttribute("fill-opacity", "0.8", rainbow);
     ElementRe.appendChild(rainbow, svg);
 
+    let timeText = DocumentRe.createElementNS(svgNs, "text", document);
+    ElementRe.setAttribute("x", "1", timeText);
+    ElementRe.setAttribute("y", "3", timeText);
+    ElementRe.setAttribute("font-size", "3px", timeText);
+    ElementRe.setAttribute(
+      "style",
+      "text-align: center; font-family: \"Courier New\", monospace;",
+      timeText,
+    );
+    ElementRe.setAttribute("textLength", "100%", timeText);
+    ElementRe.setTextContent(timeText, localeString);
+
+    ElementRe.appendChild(timeText, svg);
+
     let path = createQrCodePathElement(code, border);
+    ElementRe.setAttribute("fill", "#000000", path);
     ElementRe.appendChild(path, svg);
 
     svg;

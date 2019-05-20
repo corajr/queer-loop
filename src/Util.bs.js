@@ -32,6 +32,15 @@ function setHash(hash) {
   return /* () */0;
 }
 
+function getQueryString(param) {
+  return window.location.search;
+}
+
+function setQueryString(search) {
+  window.location.search = search;
+  return /* () */0;
+}
+
 var htmlNs = "http://www.w3.org/1999/xhtml";
 
 var svgNs = "http://www.w3.org/2000/svg";
@@ -45,6 +54,8 @@ export {
   withQuerySelectorSub ,
   getHash ,
   setHash ,
+  getQueryString ,
+  setQueryString ,
   
 }
 /* ElementRe Not a pure module */

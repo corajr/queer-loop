@@ -8,13 +8,17 @@ open Webapi.Dom;
 let domain = "qqq.lu";
 
 let setBackground = (selector, bgCss) =>
-  withQuerySelector(selector, el =>
-    DomRe.CssStyleDeclaration.setProperty(
-      "background",
-      bgCss,
-      "",
-      HtmlElementRe.style(el),
-    )
+  withQuerySelector(
+    selector,
+    el => {
+      DomRe.CssStyleDeclaration.setProperty(
+        "background",
+        bgCss,
+        "",
+        HtmlElementRe.style(el),
+      );
+      Js.log(bgCss);
+    },
   );
 
 let codeRegex = Js.Re.fromString("https:\/\/" ++ domain ++ "\/#(.+)");
@@ -77,18 +81,25 @@ let takeSnapshot = _ =>
   });
 
 let getTimestamp = _ => Js.Date.toISOString(Js.Date.make());
+
+let getTimestampAndLocaleString = _ => {
+  let date = Js.Date.make();
+  (Js.Date.toISOString(date), Js.Date.toLocaleString(date));
+};
+
+let asOfNow = f => Js.Date.make() |> f;
+
 let setHashToNow = _ => setHash(getTimestamp());
 
 let onClick = (maybeHash, _) =>
   switch (maybeHash) {
   | Some(hash) =>
-    setBackground("body", "#" ++ Js.String.slice(~from=0, ~to_=6, hash));
     switch (Js.Dict.get(dataSeen, hash)) {
     | Some(data) =>
       Js.log(Js.String.sliceToEnd(~from=16, data));
       setHash(Js.String.sliceToEnd(~from=16, data));
     | None => ()
-    };
+    }
   | None => setHashToNow()
   };
 
@@ -113,11 +124,6 @@ let setCode = input => {
        if (! alreadySeen) {
          Js.Dict.set(dataSeen, hash, text);
 
-         setBackground(
-           "body",
-           "#" ++ Js.String.slice(~from=0, ~to_=6, hash),
-         );
-
          let code =
            Belt.Option.getWithDefault(
              QrCode.encodeText(text, Ecc.medium),
@@ -130,7 +136,6 @@ let setCode = input => {
              | Some(snapshotUrl) =>
                let maybePrevious =
                  ElementRe.querySelector("svg", loopContainer);
-               Js.log("hey");
                switch (maybePrevious) {
                | Some(previous) =>
                  ElementRe.removeChild(previous, loopContainer) |> ignore
@@ -146,10 +151,14 @@ let setCode = input => {
                /*     code, */
                /*   ); */
 
+               let (timestamp, localeString) = getTimestampAndLocaleString();
+
                let svg =
                  QueerCode.createSimpleSvg(
                    code,
                    4,
+                   timestamp,
+                   localeString,
                    input !== initialHash^ ? Some(snapshotUrl) : None,
                  );
 
@@ -186,17 +195,20 @@ let setText =
 
 let onHashChange: unit => unit =
   _ => {
-    let hash = Js.String.sliceToEnd(~from=1, getHash());
+    let url = DomRe.Location.href(WindowRe.location(window));
+    let hash = DomRe.Location.hash(WindowRe.location(window));
+    let (timestamp, localeString) = getTimestampAndLocaleString();
+    withQuerySelectorDom("title", title =>
+      ElementRe.setInnerText(title, localeString)
+    );
 
-    /* let hexPromise = */
-    /*     Hash.hexDigest(hash) */
-    /*     |> Js.Promise.then_(hexHashOfLocationHash => { */
-    /*          Js.log(hexHashOfLocationHash); */
-    /*          Js.Promise.resolve(); */
-    /*        }); */
+    withQuerySelectorDom("time", time => {
+      ElementRe.setAttribute("datetime", timestamp, time);
+      ElementRe.setInnerText(time, localeString);
+    });
 
-    setCode(hash);
-    setText(hash);
+    setCode(url);
+    setText(url);
   };
 
 let setOpacity = (elQuery, opacity) =>
@@ -224,22 +236,43 @@ let rec onTick = ts => {
     copyVideoToSnapshotCanvas() |> ignore;
   };
 
-  /* if (ts -. lastUpdated^ >= 1000.0) { */
-  /* setHashToNow(); */
-  /* }; */
+  if (ts -. lastUpdated^ >= 1000.0) {
+    setHashToNow();
+  };
 
   lastUpdated := ts;
   Webapi.requestAnimationFrame(onTick);
 };
 
+module Url = {
+  type t;
+  [@bs.new] external _make : string => Js.Nullable.t(t) = "URL";
+
+  let make: string => option(t) = x => Js.Nullable.toOption(_make(x));
+  [@bs.get] external hash : t => string = "";
+  [@bs.get] external search : t => string = "";
+
+  [@bs.set] external setHash : (t, string) => string = "";
+  [@bs.set] external setSearch : (t, string) => string = "";
+
+  [@bs.send] external toString : t => string = "";
+};
+
 let _onInput = _ =>
   withQuerySelectorDom("#codeContents", el => {
     let text = ElementRe.innerText(el);
-    setHash(encodeURIComponent(text));
+    Url.make(text)
+    |. Belt.Option.map(url => {
+         DomRe.Location.setSearch(
+           WindowRe.location(window),
+           Url.search(url),
+         );
+         DomRe.Location.setHash(WindowRe.location(window), Url.hash(url));
+       });
   })
   |> ignore;
 
-let onInput = Debouncer.make(~wait=200, _onInput);
+let onInput = Debouncer.make(~wait=1000, _onInput);
 
 let init: unit => unit =
   _ => {
@@ -248,9 +281,14 @@ let init: unit => unit =
       setHeight(canvas, 480);
     });
 
-    withQuerySelectorDom(".codes", img =>
-      ElementRe.addEventListener("click", onClick(None), img)
-    );
+    let queryString = getQueryString();
+    if (queryString !== "") {
+      setBackground(
+        "body",
+        decodeURIComponent(Js.String.sliceToEnd(~from=1, queryString)),
+      )
+      |> ignore;
+    };
 
     initialHash := Js.String.sliceToEnd(~from=1, getHash());
     if (initialHash^ == "") {
@@ -259,6 +297,10 @@ let init: unit => unit =
     } else {
       onHashChange();
     };
+
+    withQuerySelectorDom(".queer-loop", el =>
+      ElementRe.addEventListener("click", onClick(None), el)
+    );
 
     withQuerySelectorDom("#codeContents", el =>
       ElementRe.addEventListener("input", _evt => onInput(), el)
@@ -298,8 +340,7 @@ let init: unit => unit =
                  response,
                );
              },
-             /* Js.Array.slice(~start=0, ~end_=1, cameras), */
-             cameras,
+             Js.Array.slice(~start=0, ~end_=1, cameras),
            ),
          );
        })
@@ -312,6 +353,9 @@ let init: unit => unit =
        })
     |> Js.Promise.catch(err => {
          Js.Console.error2("getCameras failed", err);
+         withQuerySelectorDom("#welcome", welcome =>
+           ElementRe.setAttribute("style", "display: block;", welcome)
+         );
          Js.Promise.resolve();
        })
     |> ignore;
