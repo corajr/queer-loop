@@ -11,6 +11,8 @@ type options = {
   background: string,
   includeDomain: bool,
   includeQueryString: bool,
+  includeHash: bool,
+  opacity: float,
   cameraIndices: array(int),
 };
 
@@ -18,6 +20,8 @@ let defaultOptions = {
   background: "",
   includeDomain: true,
   includeQueryString: true,
+  includeHash: true,
+  opacity: 0.1,
   cameraIndices: [|0|],
 };
 
@@ -60,7 +64,7 @@ let copyVideoToSnapshotCanvas = _ =>
   withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
     let snapshotCtx = getContext(snapshotCanvas);
 
-    Ctx.setGlobalAlpha(snapshotCtx, 0.1);
+    Ctx.setGlobalAlpha(snapshotCtx, currentOptions^.opacity);
     Array.mapi(
       (i, canvas) => {
         let h = getHeight(canvas);
@@ -225,7 +229,7 @@ let onHashChange: unit => unit =
     let urlText =
       (opts.includeDomain ? UrlRe.origin(url) : "")
       ++ (opts.includeQueryString ? UrlRe.search(url) : "")
-      ++ UrlRe.hash(url);
+      ++ (opts.includeHash ? UrlRe.hash(url) : "");
 
     setCode(urlText);
     setText(urlText);
@@ -315,10 +319,18 @@ let init: unit => unit =
           includeDomain: boolParam(true, URLSearchParamsRe.get("d", params)),
           includeQueryString:
             boolParam(true, URLSearchParamsRe.get("q", params)),
+          includeHash: boolParam(true, URLSearchParamsRe.get("h", params)),
+          opacity:
+            Js.Float.fromString(
+              Belt.Option.getWithDefault(
+                URLSearchParamsRe.get("o", params),
+                "0.1",
+              ),
+            ),
           background:
             decodeURIComponent(
               Belt.Option.getWithDefault(
-                URLSearchParamsRe.get("bg", params),
+                URLSearchParamsRe.get("b", params),
                 "",
               ),
             ),

@@ -29,6 +29,16 @@ There are also some configuration options, which may be set via URL query parame
 
 ### Query Parameters
 
+#### b (background)
+
+`b` sets the "background" CSS property of the document's body.
+
+Examples:
+
+[`https://qqq.lu/?bg=url("queer-loop.svg")`](https://qqq.lu/?bg=url("queer-loop.svg"))
+[`https://qqq.lu/?bg=lightpink`](https://qqq.lu/?bg=lightpink)
+[`https://qqq.lu/?bg=%23faa`](https://qqq.lu/?bg=%23faa) (must use "%23" since `#` is reserved for the timestamp)
+
 #### c (camera)
 
 If you have more than one camera, you can set the camera(s) using e.g. `?c=1` or `?c=0&c=1`.
@@ -38,16 +48,6 @@ Examples:
 [`https://qqq.lu/?c=0&c=1`](https://qqq.lu/?c=0&c=1)
 [`https://qqq.lu/?c=1`](https://qqq.lu/?c=1)
 
-#### bg
-
-`bg` sets the "background" CSS property of the document's body.
-
-Examples:
-
-[`https://qqq.lu/?bg=url("queer-loop.svg")`](https://qqq.lu/?bg=url("queer-loop.svg"))
-[`https://qqq.lu/?bg=lightpink`](https://qqq.lu/?bg=lightpink)
-[`https://qqq.lu/?bg=%23faa`](https://qqq.lu/?bg=%23faa) (must use "%23" since `#` is reserved for the timestamp)
-
 #### d
 
 `d` sets whether to include the domain in the Q(uee)r code.
@@ -55,6 +55,14 @@ Examples:
 Examples:
 
 [`https://qqq.lu/?d=0`](https://qqq.lu/?d=0)
+
+#### o (opacity)
+
+Set the opacity of the camera image (default: 0.1). Smaller values result in a longer exposure (more time is captured).
+
+Examples:
+
+[`https://qqq.lu/?o=0.05`](https://qqq.lu/?o=0.05)
 
 
 ## Development

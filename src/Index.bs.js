@@ -20,13 +20,15 @@ import * as UserMedia$QueerLoop from "./UserMedia.bs.js";
 
 var domain = "qqq.lu";
 
-var defaultOptions_003 = /* cameraIndices : array */[0];
+var defaultOptions_005 = /* cameraIndices : array */[0];
 
 var defaultOptions = /* record */[
   /* background */"",
   /* includeDomain */true,
   /* includeQueryString */true,
-  defaultOptions_003
+  /* includeHash */true,
+  /* opacity */0.1,
+  defaultOptions_005
 ];
 
 var currentOptions = /* record */[/* contents */defaultOptions];
@@ -59,7 +61,7 @@ var canvasesRef = /* record */[/* contents : array */[]];
 function copyVideoToSnapshotCanvas(param) {
   return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
                 var snapshotCtx = snapshotCanvas.getContext("2d");
-                snapshotCtx.globalAlpha = 0.1;
+                snapshotCtx.globalAlpha = currentOptions[0][/* opacity */4];
                 return $$Array.mapi((function (i, canvas) {
                               var h = canvas.height;
                               var x = (canvas.width - h | 0) / 2 | 0;
@@ -196,11 +198,14 @@ function onHashChange(param) {
         }));
   var match$1 = opts[/* includeDomain */1];
   var match$2 = opts[/* includeQueryString */2];
+  var match$3 = opts[/* includeHash */3];
   var urlText = (
     match$1 ? url.origin : ""
   ) + ((
       match$2 ? url.search : ""
-    ) + url.hash);
+    ) + (
+      match$3 ? url.hash : ""
+    ));
   setCode(urlText);
   return Curry._1(setText, urlText);
 }
@@ -292,9 +297,11 @@ function init(param) {
     var cameraIndices = $$Array.map(Caml_format.caml_int_of_string, params.getAll("c"));
     var match = cameraIndices.length === 0;
     currentOptions[0] = /* record */[
-      /* background */decodeURIComponent(Belt_Option.getWithDefault(Caml_option.nullable_to_opt(params.get("bg")), "")),
+      /* background */decodeURIComponent(Belt_Option.getWithDefault(Caml_option.nullable_to_opt(params.get("b")), "")),
       /* includeDomain */boolParam(true, Caml_option.nullable_to_opt(params.get("d"))),
       /* includeQueryString */boolParam(true, Caml_option.nullable_to_opt(params.get("q"))),
+      /* includeHash */boolParam(true, Caml_option.nullable_to_opt(params.get("h"))),
+      /* opacity */Number(Belt_Option.getWithDefault(Caml_option.nullable_to_opt(params.get("o")), "0.1")),
       /* cameraIndices */match ? /* array */[0] : cameraIndices
     ];
   }
@@ -346,7 +353,7 @@ function init(param) {
                                         return /* () */0;
                                       }));
                                 return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, response);
-                              }), pick(cameras, currentOptions[0][/* cameraIndices */3])));
+                              }), pick(cameras, currentOptions[0][/* cameraIndices */5])));
             })).then((function (canvases) {
             canvasesRef[0] = canvases;
             requestAnimationFrame(onTick);
