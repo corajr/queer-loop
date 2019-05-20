@@ -212,13 +212,6 @@ let onHashChange: unit => unit =
     let opts = currentOptions^;
 
     let url = UrlRe.make(DomRe.Location.href(WindowRe.location(window)));
-    if (! opts.includeDomain) {
-      UrlRe.setHost(url, "");
-    };
-
-    if (! opts.includeQueryString) {
-      UrlRe.setSearch(url, "");
-    };
 
     let (timestamp, localeString) = getTimestampAndLocaleString();
     withQuerySelectorDom("title", title =>
@@ -229,7 +222,10 @@ let onHashChange: unit => unit =
       ElementRe.setAttribute("datetime", timestamp, time);
       ElementRe.setInnerText(time, localeString);
     });
-    let urlText = urlToString(url);
+    let urlText =
+      (opts.includeDomain ? UrlRe.origin(url) : "")
+      ++ (opts.includeQueryString ? UrlRe.search(url) : "")
+      ++ UrlRe.hash(url);
 
     setCode(urlText);
     setText(urlText);
@@ -290,10 +286,11 @@ let _onInput = _ =>
 
 let onInput = Debouncer.make(~wait=100, _onInput);
 
-let boolParam: option(string) => bool =
-  fun
-  | None => false
-  | Some(s) => s === "true" || s === "1" || s === "y" || s === "";
+let boolParam: (bool, option(string)) => bool =
+  default =>
+    fun
+    | None => default
+    | Some(s) => s === "true" || s === "1" || s === "y" || s === "";
 
 let pick: (array('a), array(int)) => array('a) =
   (ary, indices) => Array.map(i => ary[i], indices);
@@ -315,8 +312,9 @@ let init: unit => unit =
       currentOptions :=
         {
           ...currentOptions^,
-          includeDomain: boolParam(URLSearchParamsRe.get("d", params)),
-          includeQueryString: boolParam(URLSearchParamsRe.get("q", params)),
+          includeDomain: boolParam(true, URLSearchParamsRe.get("d", params)),
+          includeQueryString:
+            boolParam(true, URLSearchParamsRe.get("q", params)),
           background:
             decodeURIComponent(
               Belt.Option.getWithDefault(

@@ -11,8 +11,10 @@ Tested on:
 
 ## Usage
 
-The prototypical use is to hold queer-loop up to a mirror. Here are a few
-other ways I've found so far to play with queer-loop:
+The prototypical use is to tap on the central Q(uee)r code or hold `queer-loop`
+up to a mirror. The codes added to the background can be opened in a new tab or saved.
+
+Here are a few other ways I've found so far to play with it:
 
 - open two copies of it on different devices and point their screens/cameras at
   each other
@@ -21,7 +23,7 @@ other ways I've found so far to play with queer-loop:
     - a phone camera to it
     - the tab to itself
 
-There are also some configuration options, which may be set by query parameter.
+There are also some configuration options, which may be set via URL query parameters.
 
 ### Query Parameters
 

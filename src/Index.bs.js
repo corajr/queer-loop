@@ -182,12 +182,6 @@ function urlToString (url){return url.toString()};
 function onHashChange(param) {
   var opts = currentOptions[0];
   var url = new URL(window.location.href);
-  if (!opts[/* includeDomain */1]) {
-    url.host = "";
-  }
-  if (!opts[/* includeQueryString */2]) {
-    url.search = "";
-  }
   var match = getTimestampAndLocaleString(/* () */0);
   var localeString = match[1];
   var timestamp = match[0];
@@ -200,7 +194,13 @@ function onHashChange(param) {
           time.innerText = localeString;
           return /* () */0;
         }));
-  var urlText = urlToString(url);
+  var match$1 = opts[/* includeDomain */1];
+  var match$2 = opts[/* includeQueryString */2];
+  var urlText = (
+    match$1 ? url.origin : ""
+  ) + ((
+      match$2 ? url.search : ""
+    ) + url.hash);
   setCode(urlText);
   return Curry._1(setText, urlText);
 }
@@ -261,7 +261,7 @@ function _onInput(param) {
 
 var onInput = Debouncer.make(100, _onInput);
 
-function boolParam(param) {
+function boolParam($$default, param) {
   if (param !== undefined) {
     var s = param;
     if (s === "true" || s === "1" || s === "y") {
@@ -270,7 +270,7 @@ function boolParam(param) {
       return s === "";
     }
   } else {
-    return false;
+    return $$default;
   }
 }
 
@@ -293,8 +293,8 @@ function init(param) {
     var match = cameraIndices.length === 0;
     currentOptions[0] = /* record */[
       /* background */decodeURIComponent(Belt_Option.getWithDefault(Caml_option.nullable_to_opt(params.get("bg")), "")),
-      /* includeDomain */boolParam(Caml_option.nullable_to_opt(params.get("d"))),
-      /* includeQueryString */boolParam(Caml_option.nullable_to_opt(params.get("q"))),
+      /* includeDomain */boolParam(true, Caml_option.nullable_to_opt(params.get("d"))),
+      /* includeQueryString */boolParam(true, Caml_option.nullable_to_opt(params.get("q"))),
       /* cameraIndices */match ? /* array */[0] : cameraIndices
     ];
   }
