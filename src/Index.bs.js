@@ -148,14 +148,19 @@ function setCode(text) {
                                       loopContainer.removeChild(maybePrevious);
                                     }
                                     var match$1 = getTimestampAndLocaleString(/* () */0);
+                                    var timestamp = match$1[0];
                                     var match$2 = hasChanged[0];
-                                    var svg = QueerCode$QueerLoop.createSimpleSvg(text, code, 6, match$1[0], match$1[1], match$2 ? match : undefined);
+                                    var svg = QueerCode$QueerLoop.createSimpleSvg(text, code, 6, timestamp, match$1[1], match$2 ? match : undefined);
                                     loopContainer.appendChild(svg);
                                     var url = QueerCode$QueerLoop.svgToDataURL(svg);
                                     Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
+                                            var a = document.createElementNS(Util$QueerLoop.htmlNs, "a");
+                                            a.setAttribute("download", timestamp + ".svg");
+                                            a.setAttribute("href", url);
                                             var img = document.createElementNS(Util$QueerLoop.htmlNs, "img");
                                             img.setAttribute("src", url);
-                                            container.appendChild(img);
+                                            a.appendChild(img);
+                                            container.appendChild(a);
                                             return /* () */0;
                                           }));
                                     currentSignature[0] = hash;

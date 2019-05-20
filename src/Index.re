@@ -183,10 +183,14 @@ let setCode = text =>
                let url = QueerCode.svgToDataURL(svg);
 
                withQuerySelectorDom("#codes", container => {
+                 let a = DocumentRe.createElementNS(htmlNs, "a", document);
+                 ElementRe.setAttribute("download", timestamp ++ ".svg", a);
+                 ElementRe.setAttribute("href", url, a);
                  let img =
                    DocumentRe.createElementNS(htmlNs, "img", document);
                  ElementRe.setAttribute("src", url, img);
-                 ElementRe.appendChild(img, container);
+                 ElementRe.appendChild(img, a);
+                 ElementRe.appendChild(a, container);
                });
 
                currentSignature := hash;
