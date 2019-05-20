@@ -87,8 +87,8 @@ let makeAnimate = (values, duration) => {
 };
 
 let createSimpleSvg:
-  (QrCode.t, int, string, string, option(string)) => Dom.element =
-  (code, border, timestamp, localeString, maybeDataURL) => {
+  (string, QrCode.t, int, string, string, option(string)) => Dom.element =
+  (href, code, border, timestamp, localeString, maybeDataURL) => {
     let size = QrCode.size(code);
     let sizeWithBorder = size + border * 2;
     let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
@@ -162,7 +162,11 @@ let createSimpleSvg:
     ElementRe.setAttribute("style", "mix-blend-mode: difference", timeText);
     ElementRe.setTextContent(timeText, localeString);
 
-    ElementRe.appendChild(timeText, svg);
+    let timeLink = DocumentRe.createElementNS(svgNs, "a", document);
+    ElementRe.setAttribute("href", href, timeLink);
+    ElementRe.appendChild(timeText, timeLink);
+
+    ElementRe.appendChild(timeLink, svg);
 
     svg;
   };

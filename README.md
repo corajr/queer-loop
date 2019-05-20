@@ -11,13 +11,6 @@ Tested on:
 
 ## Usage
 
-You can set the "background" CSS property of the document's body using query
-parameters, e.g.:
-
-[`https://qqq.lu/?bg=url("queer-loop.svg")`](https://qqq.lu/?bg=url("queer-loop.svg"))
-[`https://qqq.lu/?bg=lightpink`](https://qqq.lu/?bg=lightpink)
-[`https://qqq.lu/?bg=%23faa`](https://qqq.lu/?bg=%23faa) (must use "%23" so that the hash is separate)
-
 The prototypical use is to hold queer-loop up to a mirror. Here are a few
 other ways I've found so far to play with queer-loop:
 
@@ -27,6 +20,38 @@ other ways I've found so far to play with queer-loop:
   and cast...:
     - a phone camera to it
     - the tab to itself
+
+There are also some configuration options, which may be set by query parameter.
+
+### Query Parameters
+
+#### c (camera)
+
+If you have more than one camera, you can set the camera(s) using e.g. `?c=1` or `?c=0&c=1`.
+
+Examples:
+
+[`https://qqq.lu/?c=0&c=1`](https://qqq.lu/?c=0&c=1)
+[`https://qqq.lu/?c=1`](https://qqq.lu/?c=1)
+
+#### bg
+
+`bg` sets the "background" CSS property of the document's body.
+
+Examples:
+
+[`https://qqq.lu/?bg=url("queer-loop.svg")`](https://qqq.lu/?bg=url("queer-loop.svg"))
+[`https://qqq.lu/?bg=lightpink`](https://qqq.lu/?bg=lightpink)
+[`https://qqq.lu/?bg=%23faa`](https://qqq.lu/?bg=%23faa) (must use "%23" since `#` is reserved for the timestamp)
+
+#### d
+
+`d` sets whether to include the domain in the Q(uee)r code.
+
+Examples:
+
+[`https://qqq.lu/?d=0`](https://qqq.lu/?d=0)
+
 
 ## Development
 

@@ -53,7 +53,7 @@ function makeAnimate(values, duration) {
   return animate;
 }
 
-function createSimpleSvg(code, border, timestamp, localeString, maybeDataURL) {
+function createSimpleSvg(href, code, border, timestamp, localeString, maybeDataURL) {
   var size = code.size;
   var sizeWithBorder = size + (border << 1) | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
@@ -99,7 +99,10 @@ function createSimpleSvg(code, border, timestamp, localeString, maybeDataURL) {
   timeText.setAttribute("fill", "#FFFFFF");
   timeText.setAttribute("style", "mix-blend-mode: difference");
   timeText.textContent = localeString;
-  svg.appendChild(timeText);
+  var timeLink = document.createElementNS(svgNs, "a");
+  timeLink.setAttribute("href", href);
+  timeLink.appendChild(timeText);
+  svg.appendChild(timeLink);
   return svg;
 }
 

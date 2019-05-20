@@ -7,6 +7,22 @@ open Webapi.Dom;
 
 let domain = "qqq.lu";
 
+type options = {
+  background: string,
+  includeDomain: bool,
+  includeQueryString: bool,
+  cameraIndices: array(int),
+};
+
+let defaultOptions = {
+  background: "",
+  includeDomain: true,
+  includeQueryString: true,
+  cameraIndices: [|0|],
+};
+
+let currentOptions = ref(defaultOptions);
+
 let setBackground = (selector, bgCss) =>
   withQuerySelector(
     selector,
@@ -30,14 +46,6 @@ let defaultHash = "fff";
 let initialHash: ref(string) = ref("");
 
 let camerasRef: ref(array(UserMedia.mediaDeviceInfo)) = ref([||]);
-let cameraIndex = ref(0);
-
-let cycleCameras = scanner => {
-  let n = Array.length(camerasRef^);
-  cameraIndex := (cameraIndex^ + 1) mod n;
-  let nextCamera = camerasRef^[cameraIndex^];
-  ();
-};
 
 let setSrc = [%bs.raw (img, src) => {|
      img.src = src;|}];
@@ -159,6 +167,7 @@ let setCode = text =>
 
                let svg =
                  QueerCode.createSimpleSvg(
+                   text,
                    code,
                    6,
                    timestamp,
@@ -196,11 +205,20 @@ let setText =
     |> ignore
   );
 
+let urlToString: UrlRe.t => string = [%bs.raw url => "return url.toString()"];
+
 let onHashChange: unit => unit =
   _ => {
-    let url = DomRe.Location.href(WindowRe.location(window));
-    let search = DomRe.Location.search(WindowRe.location(window));
-    let hash = DomRe.Location.hash(WindowRe.location(window));
+    let opts = currentOptions^;
+
+    let url = UrlRe.make(DomRe.Location.href(WindowRe.location(window)));
+    if (! opts.includeDomain) {
+      UrlRe.setHost(url, "");
+    };
+
+    if (! opts.includeQueryString) {
+      UrlRe.setSearch(url, "");
+    };
 
     let (timestamp, localeString) = getTimestampAndLocaleString();
     withQuerySelectorDom("title", title =>
@@ -211,9 +229,10 @@ let onHashChange: unit => unit =
       ElementRe.setAttribute("datetime", timestamp, time);
       ElementRe.setInnerText(time, localeString);
     });
+    let urlText = urlToString(url);
 
-    setCode(url);
-    setText(url);
+    setCode(urlText);
+    setText(urlText);
   };
 
 let setOpacity = (elQuery, opacity) =>
@@ -271,19 +290,13 @@ let _onInput = _ =>
 
 let onInput = Debouncer.make(~wait=100, _onInput);
 
-type options = {
-  mutable background: string,
-  mutable domain: bool,
-  mutable qs: bool,
-  mutable cameraMax: int,
-};
-
-let defaultOptions = {background: "", domain: true, qs: true, cameraMax: 1};
-
 let boolParam: option(string) => bool =
   fun
   | None => false
   | Some(s) => s === "true" || s === "1" || s === "y" || s === "";
+
+let pick: (array('a), array(int)) => array('a) =
+  (ary, indices) => Array.map(i => ary[i], indices);
 
 let init: unit => unit =
   _ => {
@@ -292,19 +305,32 @@ let init: unit => unit =
       setHeight(canvas, 480);
     });
 
-    let options = defaultOptions;
-
     let queryString = getQueryString();
     if (queryString !== "") {
       let params = URLSearchParamsRe.make(queryString);
-      options.domain = boolParam(URLSearchParamsRe.get("d", params));
-      options.qs = boolParam(URLSearchParamsRe.get("q", params));
-      options.background =
-        Belt.Option.getWithDefault(URLSearchParamsRe.get("bg", params), "");
+
+      let cameraIndices =
+        Array.map(int_of_string, URLSearchParamsRe.getAll("c", params));
+
+      currentOptions :=
+        {
+          ...currentOptions^,
+          includeDomain: boolParam(URLSearchParamsRe.get("d", params)),
+          includeQueryString: boolParam(URLSearchParamsRe.get("q", params)),
+          background:
+            decodeURIComponent(
+              Belt.Option.getWithDefault(
+                URLSearchParamsRe.get("bg", params),
+                "",
+              ),
+            ),
+          cameraIndices:
+            Array.length(cameraIndices) == 0 ? [|0|] : cameraIndices,
+        };
     };
 
-    if (options.background != "") {
-      setBackground("body", decodeURIComponent(options.background)) |> ignore;
+    if (currentOptions^.background != "") {
+      setBackground("body", currentOptions^.background) |> ignore;
     };
 
     initialHash := Js.String.sliceToEnd(~from=1, getHash());
@@ -360,7 +386,7 @@ let init: unit => unit =
                  response,
                );
              },
-             Js.Array.slice(~start=0, ~end_=options.cameraMax, cameras),
+             pick(cameras, currentOptions^.cameraIndices),
            ),
          );
        })
