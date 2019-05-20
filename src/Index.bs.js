@@ -340,6 +340,7 @@ function init(param) {
               }
               var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hexHash));
               if (hexHash === currentSignature[0] || !alreadySeen) {
+                dataSeen[hexHash] = input;
                 Util$QueerLoop.setHash(new Date().toISOString());
               }
               return Promise.resolve(/* () */0);

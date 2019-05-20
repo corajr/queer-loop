@@ -374,6 +374,7 @@ let init: unit => unit =
                Belt.Option.isSome(Js.Dict.get(dataSeen, hexHash));
 
              if (hexHash === currentSignature^ || ! alreadySeen) {
+               Js.Dict.set(dataSeen, hexHash, input);
                setHashToNow();
              };
              Js.Promise.resolve();
