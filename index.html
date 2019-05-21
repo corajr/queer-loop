@@ -23,6 +23,7 @@
              min-height: 100vh;
              left: 50%;
              top: 50%;
+             opacity: 0.5;
              pointer-events: none;
              transform: translate(-50%, -50%);
          }
@@ -70,7 +71,8 @@
             queer-loop requests camera access to be able to see itself-- in the mirror or on the device of a friend. If you want to see what will happen if you agree, click or tap on the central icon (this simulates 1 look in the mirror).
         </div>
 
-        <canvas id="snapshotCanvas"></canvas>
+        <canvas id="snapshotCanvas">
+        </canvas>
         <div id="codeText">
             <span id="codeContents" contenteditable="true"></span>
         </div>
