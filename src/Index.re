@@ -179,10 +179,29 @@ let setCode = text =>
              });
 
              let singleSvg = QueerCode.createSvgSkeleton(hash);
-             ElementRe.appendChild(
-               ElementRe.cloneNodeDeep(symbol),
-               singleSvg,
-             );
+             let symbolTrans = ElementRe.cloneNodeDeep(symbol);
+
+             switch (ElementRe.querySelector("path", symbolTrans)) {
+             | Some(code) =>
+               ElementRe.setAttribute("fill", "#FFFFFF", code);
+               ElementRe.setAttribute(
+                 "style",
+                 "mix-blend-mode: overlay",
+                 code,
+               );
+             | None => ()
+             };
+
+             switch (ElementRe.querySelector("#rainbowMask", symbolTrans)) {
+             | Some(mask) =>
+               switch (ElementRe.parentElement(mask)) {
+               | Some(parent) =>
+                 ElementRe.removeChild(mask, parent) |> ignore
+               | None => ()
+               }
+             | None => ()
+             };
+             ElementRe.appendChild(symbolTrans, singleSvg);
              let singleSvgUrl = QueerCode.svgToDataURL(singleSvg);
 
              withQuerySelectorDom("#codes", container => {

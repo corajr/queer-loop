@@ -5529,7 +5529,21 @@ var index = (function (exports) {
                                 return /* () */0;
                               }));
                         var singleSvg = createSvgSkeleton(hash);
-                        singleSvg.appendChild(symbol.cloneNode(true));
+                        var symbolTrans = symbol.cloneNode(true);
+                        var match$4 = symbolTrans.querySelector("path");
+                        if (!(match$4 == null)) {
+                          match$4.setAttribute("fill", "#FFFFFF");
+                          match$4.setAttribute("style", "mix-blend-mode: overlay");
+                        }
+                        var match$5 = symbolTrans.querySelector("#rainbowMask");
+                        if (!(match$5 == null)) {
+                          var match$6 = match$5.parentElement;
+                          if (!(match$6 == null)) {
+                            match$6.removeChild(match$5);
+                          }
+                          
+                        }
+                        singleSvg.appendChild(symbolTrans);
                         var singleSvgUrl = svgToDataURL(singleSvg);
                         withQuerySelectorDom("#codes", (function (container) {
                                 var img = document.createElementNS(htmlNs, "img");
