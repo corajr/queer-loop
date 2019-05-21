@@ -67,8 +67,7 @@ function createSymbol(href, code, hash, maybeDataURL, localeString, border) {
     background.setAttribute("width", String(sizeWithBorder));
     background.setAttribute("height", String(sizeWithBorder));
     background.setAttribute("href", maybeDataURL);
-    var bgAnimate = makeAnimate("0;1;0", "6s", "0s");
-    background.appendChild(bgAnimate);
+    makeAnimate("0;1;0", "6s", "0s");
     symbol.appendChild(background);
   }
   var codeGroup = document.createElementNS(svgNs, "g");
@@ -82,7 +81,6 @@ function createSymbol(href, code, hash, maybeDataURL, localeString, border) {
   codeGroup.appendChild(path);
   var codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
   codeGroupAnimate.id = "clock" + hash;
-  codeGroup.appendChild(codeGroupAnimate);
   symbol.appendChild(codeGroup);
   var timeText = document.createElementNS(svgNs, "text");
   timeText.setAttribute("x", (sizeWithBorder / 2.0).toString());

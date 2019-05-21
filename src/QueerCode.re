@@ -121,7 +121,7 @@ let createSymbol =
     );
     ElementRe.setAttribute("href", url, background);
     let bgAnimate = makeAnimate("0;1;0", "6s", "0s");
-    ElementRe.appendChild(bgAnimate, background);
+    /* ElementRe.appendChild(bgAnimate, background); */
     ElementRe.appendChild(background, symbol);
   | None => ()
   };
@@ -140,7 +140,7 @@ let createSymbol =
 
   let codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
   ElementRe.setId(codeGroupAnimate, "clock" ++ hash);
-  ElementRe.appendChild(codeGroupAnimate, codeGroup);
+  /* ElementRe.appendChild(codeGroupAnimate, codeGroup); */
   ElementRe.appendChild(codeGroup, symbol);
 
   let timeText = DocumentRe.createElementNS(svgNs, "text", document);
