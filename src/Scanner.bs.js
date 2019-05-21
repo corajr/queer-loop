@@ -7,10 +7,10 @@ import * as Util$QueerLoop from "./Util.bs.js";
 import * as Caml_js_exceptions from "../node_modules/bs-platform/lib/es6/caml_js_exceptions.js";
 import * as UserMedia$QueerLoop from "./UserMedia.bs.js";
 
-function syncScan(scanCallback, imageData) {
+function syncScan(scanCallback, canvas, imageData) {
   var match = JsQr$QueerLoop.jsQR(imageData.data, imageData.width, imageData.height, JsQr$QueerLoop.defaultInversion);
   if (match !== undefined) {
-    return Curry._1(scanCallback, Caml_option.valFromOption(match).data);
+    return Curry._2(scanCallback, canvas, Caml_option.valFromOption(match));
   } else {
     return /* () */0;
   }
@@ -43,7 +43,7 @@ function scanUsingDeviceId(videoEl, deviceId, scanCallback) {
                   var msgBackHandler = function (e) {
                     var maybeCode = e.data;
                     if (maybeCode !== undefined) {
-                      return Curry._1(scanCallback, Caml_option.valFromOption(maybeCode).data);
+                      return Curry._2(scanCallback, canvas, Caml_option.valFromOption(maybeCode));
                     } else {
                       return /* () */0;
                     }
@@ -70,7 +70,7 @@ function scanUsingDeviceId(videoEl, deviceId, scanCallback) {
                               height
                             ]);
                       } else {
-                        syncScan(scanCallback, imageData);
+                        syncScan(scanCallback, canvas, imageData);
                       }
                     }
                     

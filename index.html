@@ -18,14 +18,7 @@
 
          #snapshotCanvas {
              display: block;
-             position: fixed;
-             min-width: 100vw;
-             min-height: 100vh;
-             left: 50%;
-             top: 50%;
-             opacity: 0.5;
              pointer-events: none;
-             transform: translate(-50%, -50%);
          }
 
          .centeredSquare, .centeredSquareInset {
@@ -40,20 +33,29 @@
              width: 75vmin;
              height: 75vmin;
          }
-
-         #codes {
+         #inputs, #outputs {
+             width: 25%;
+             position: absolute;
              display: flex;
              flex-wrap: wrap;
              justify-content: flex-start;
-             align-items: top;
+             align-items: flex-start;
          }
-         #codes a {
+
+         #inputs {
+             left: 0;
+         }
+
+         #outputs {
+             right: 0;
+         }
+
+         #inputs *, #outputs * {
              width: 12.5vmin;
          }
 
          .queer-loop {
-             z-index: 100;
-             opacity: 0.75;
+             z-index: 1000;
          }
 
          #codeContents {
@@ -67,18 +69,20 @@
         </style>
     </head>
     <body>
+        <canvas id="inputCanvas"></canvas>
+        <canvas class="centeredSquare" id="snapshotCanvas"></canvas>
+
         <div id="welcome">
             queer-loop requests camera access to be able to see itself-- in the mirror or on the device of a friend. If you want to see what will happen if you agree, click or tap on the central icon (this simulates 1 look in the mirror).
         </div>
 
-        <canvas id="snapshotCanvas">
-        </canvas>
         <div id="codeText">
             <span id="codeContents" contenteditable="true"></span>
         </div>
 
         <h1><time id="lastUpdated"></time></h1>
-        <div id="codes"></div>
+        <div id="inputs"></div>
         <div class="centeredSquareInset queer-loop"></div>
+        <div id="outputs"></div>
     </body>
 </html>

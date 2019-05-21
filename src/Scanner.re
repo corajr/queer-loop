@@ -4,7 +4,7 @@ open UserMedia;
 open Util;
 open Webapi.Dom;
 
-let syncScan = (scanCallback, imageData) =>
+let syncScan = (scanCallback, canvas, imageData) =>
   switch (
     jsQR(
       dataGet(imageData),
@@ -13,12 +13,13 @@ let syncScan = (scanCallback, imageData) =>
       defaultInversion,
     )
   ) {
-  | Some(code) => scanCallback(textDataGet(code))
+  | Some(code) => scanCallback(canvas, code)
   | None => ()
   };
 
 let scanUsingDeviceId:
-  (Dom.element, string, string => unit) => Js.Promise.t(Dom.element) =
+  (Dom.element, string, (Dom.element, code) => unit) =>
+  Js.Promise.t(Dom.element) =
   (videoEl, deviceId, scanCallback) =>
     initStreamByDeviceId(videoEl, deviceId)
     |> Js.Promise.then_(video => {
@@ -44,7 +45,7 @@ let scanUsingDeviceId:
              e => {
                let maybeCode: option(code) = WebWorkers.MessageEvent.data(e);
                switch (maybeCode) {
-               | Some(qrCode) => scanCallback(textDataGet(qrCode))
+               | Some(qrCode) => scanCallback(canvas, qrCode)
                | None => ()
                };
              }
@@ -78,7 +79,7 @@ let scanUsingDeviceId:
                    worker,
                    (dataGet(imageData), width, height),
                  )
-               | None => syncScan(scanCallback, imageData)
+               | None => syncScan(scanCallback, canvas, imageData)
                };
              };
            };

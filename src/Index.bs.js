@@ -11,6 +11,7 @@ import * as Belt_Option from "../node_modules/bs-platform/lib/es6/belt_Option.js
 import * as Caml_format from "../node_modules/bs-platform/lib/es6/caml_format.js";
 import * as Caml_option from "../node_modules/bs-platform/lib/es6/caml_option.js";
 import * as Hash$QueerLoop from "./Hash.bs.js";
+import * as JsQr$QueerLoop from "./JsQr.bs.js";
 import * as Util$QueerLoop from "./Util.bs.js";
 import * as Scanner$QueerLoop from "./Scanner.bs.js";
 import * as Caml_js_exceptions from "../node_modules/bs-platform/lib/es6/caml_js_exceptions.js";
@@ -118,9 +119,14 @@ function onClick(maybeHash, param) {
   }
 }
 
-function addToPast(hash, dataUrl) {
+function createImg(dataURL) {
   var img = document.createElement("img");
-  setSrc(img, dataUrl);
+  setSrc(img, dataURL);
+  return img;
+}
+
+function addToPast(hash, dataUrl) {
+  var img = createImg(dataUrl);
   img.id = "x" + hash;
   var partial_arg = hash;
   img.addEventListener("click", (function (param) {
@@ -153,7 +159,7 @@ function setCode(text) {
                                     var svg = QueerCode$QueerLoop.createSimpleSvg(text, code, 6, timestamp, match$1[1], match$2 ? match : undefined);
                                     loopContainer.appendChild(svg);
                                     var url = QueerCode$QueerLoop.svgToDataURL(svg);
-                                    Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
+                                    Util$QueerLoop.withQuerySelectorDom("#outputs", (function (container) {
                                             var a = document.createElementNS(Util$QueerLoop.htmlNs, "a");
                                             a.setAttribute("download", timestamp + ".svg");
                                             a.setAttribute("href", url);
@@ -332,15 +338,38 @@ function init(param) {
                 }));
           return /* () */0;
         }));
-  var response = function (input) {
-    if (input !== "") {
-      Hash$QueerLoop.hexDigest("SHA-1", input).then((function (hexHash) {
+  var response = function (srcCanvas, inputCode) {
+    var inputText = inputCode.data;
+    if (inputText !== "") {
+      Hash$QueerLoop.hexDigest("SHA-1", inputText).then((function (hexHash) {
               if (!hasChanged[0]) {
                 hasChanged[0] = true;
               }
-              var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hexHash));
-              if (hexHash === currentSignature[0] || !alreadySeen) {
-                dataSeen[hexHash] = input;
+              var maybePreviousData = Js_dict.get(dataSeen, hexHash);
+              var alreadySeen = Belt_Option.isSome(maybePreviousData) && hexHash !== currentSignature[0];
+              if (alreadySeen) {
+                console.log(inputText);
+              } else {
+                Util$QueerLoop.withQuerySelectorDom("#inputCanvas", (function (destCanvas) {
+                        var $$location = inputCode.location;
+                        var rect = JsQr$QueerLoop.extractAABB($$location);
+                        var dw = rect[/* w */2];
+                        var dh = rect[/* h */3];
+                        if (destCanvas.width !== dw) {
+                          destCanvas.width = dw;
+                          destCanvas.height = dh;
+                        }
+                        var ctx = destCanvas.getContext("2d");
+                        ctx.drawImage(srcCanvas, rect[/* x */0], rect[/* y */1], rect[/* w */2], rect[/* h */3], 0, 0, dw, dh);
+                        var url = destCanvas.toDataURL();
+                        var img = createImg(url);
+                        Util$QueerLoop.withQuerySelectorDom("#inputs", (function (inputs) {
+                                inputs.appendChild(img);
+                                return /* () */0;
+                              }));
+                        return /* () */0;
+                      }));
+                dataSeen[hexHash] = inputText;
                 Util$QueerLoop.setHash(new Date().toISOString());
               }
               return Promise.resolve(/* () */0);
@@ -407,6 +436,7 @@ export {
   setHashToNow ,
   hasChanged ,
   onClick ,
+  createImg ,
   addToPast ,
   setCode ,
   setText ,

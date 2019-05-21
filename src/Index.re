@@ -121,10 +121,16 @@ let onClick = (maybeHash, _) => {
   };
 };
 
+let createImg: string => Dom.element =
+  dataURL => {
+    let img = DocumentRe.createElement("img", document);
+    setSrc(img, dataURL);
+    img;
+  };
+
 let addToPast: (string, string) => unit =
   (hash, dataUrl) => {
-    let img = DocumentRe.createElement("img", document);
-    setSrc(img, dataUrl);
+    let img = createImg(dataUrl);
     ElementRe.setId(img, "x" ++ hash);
     ElementRe.addEventListener("click", onClick(Some(hash)), img);
 
@@ -158,15 +164,6 @@ let setCode = text =>
                | None => ()
                };
 
-               /* let svg = */
-               /*   QueerCode.createSvg( */
-               /*     loopContainer, */
-               /*     maybePrevious, */
-               /*     Some(snapshotUrl), */
-               /*     hash, */
-               /*     code, */
-               /*   ); */
-
                let (timestamp, localeString) = getTimestampAndLocaleString();
 
                let svg =
@@ -182,7 +179,7 @@ let setCode = text =>
                ElementRe.appendChild(svg, loopContainer);
                let url = QueerCode.svgToDataURL(svg);
 
-               withQuerySelectorDom("#codes", container => {
+               withQuerySelectorDom("#outputs", container => {
                  let a = DocumentRe.createElementNS(htmlNs, "a", document);
                  ElementRe.setAttribute("download", timestamp ++ ".svg", a);
                  ElementRe.setAttribute("href", url, a);
@@ -363,24 +360,64 @@ let init: unit => unit =
       ElementRe.addEventListener("blur", _evt => onInput(), el)
     );
 
-    let response = input =>
-      if (input !== "") {
-        Hash.hexDigest("SHA-1", input)
+    let response = (srcCanvas, inputCode) => {
+      open JsQr;
+      let inputText = textDataGet(inputCode);
+      if (inputText !== "") {
+        Hash.hexDigest("SHA-1", inputText)
         |> Js.Promise.then_(hexHash => {
              if (! hasChanged^) {
                hasChanged := true;
              };
-             let alreadySeen =
-               Belt.Option.isSome(Js.Dict.get(dataSeen, hexHash));
 
-             if (hexHash === currentSignature^ || ! alreadySeen) {
-               Js.Dict.set(dataSeen, hexHash, input);
+             let maybePreviousData = Js.Dict.get(dataSeen, hexHash);
+             let alreadySeen =
+               Belt.Option.isSome(maybePreviousData)
+               && ! (hexHash === currentSignature^);
+
+             if (alreadySeen) {
+               Js.log(inputText);
+             } else {
+               withQuerySelectorDom("#inputCanvas", destCanvas => {
+                 let location = locationGet(inputCode);
+                 let rect = extractAABB(location);
+                 let dw = rect.w;
+                 let dh = rect.h;
+                 if (getWidth(destCanvas) !== dw) {
+                   setWidth(destCanvas, dw);
+                   setHeight(destCanvas, dh);
+                 };
+                 let ctx = getContext(destCanvas);
+
+                 Ctx.drawImageSourceRectDestRect(
+                   ctx,
+                   ~image=srcCanvas,
+                   ~sx=rect.x,
+                   ~sy=rect.y,
+                   ~sw=rect.w,
+                   ~sh=rect.h,
+                   ~dx=0,
+                   ~dy=0,
+                   ~dw,
+                   ~dh,
+                 );
+                 let url = toDataURL(destCanvas);
+                 let img = createImg(url);
+                 withQuerySelectorDom("#inputs", inputs =>
+                   ElementRe.appendChild(img, inputs)
+                 )
+                 |> ignore;
+               });
+
+               Js.Dict.set(dataSeen, hexHash, inputText);
+
                setHashToNow();
              };
              Js.Promise.resolve();
            })
         |> ignore;
       };
+    };
 
     UserMedia.getCameras()
     |> Js.Promise.then_(cameras => {
