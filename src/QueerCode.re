@@ -65,8 +65,7 @@ let createRainbowGradient: float => Dom.element =
     gradient;
   };
 
-let makeAnimate = (values, duration) => {
-  let animBegin = "+0s";
+let makeAnimate = (values, duration, animBegin) => {
   let animate = DocumentRe.createElementNS(svgNs, "animate", document);
   ElementRe.setAttribute("attributeName", "opacity", animate);
   ElementRe.setAttribute("values", values, animate);
@@ -86,90 +85,147 @@ let makeAnimate = (values, duration) => {
   animate;
 };
 
-let createSimpleSvg:
-  (string, QrCode.t, int, string, string, option(string)) => Dom.element =
-  (href, code, border, timestamp, localeString, maybeDataURL) => {
-    let size = QrCode.size(code);
-    let sizeWithBorder = size + border * 2;
-    let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
+let createSymbol =
+    (
+      ~href: string,
+      ~code: QrCode.t,
+      ~hash: string,
+      ~maybeDataURL: option(string),
+      ~localeString: string,
+      ~border: int,
+    )
+    : Dom.element => {
+  let size = QrCode.size(code);
+  let sizeWithBorder = size + border * 2;
+  let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
 
+  let symbol = DocumentRe.createElementNS(svgNs, "symbol", document);
+
+  ElementRe.setId(symbol, "code" ++ hash);
+  ElementRe.setAttribute("viewBox", viewBox, symbol);
+
+  switch (maybeDataURL) {
+  | Some(url) =>
+    let background = DocumentRe.createElementNS(svgNs, "image", document);
+    ElementRe.setAttribute("x", "0", background);
+    ElementRe.setAttribute("y", "0", background);
+    ElementRe.setAttribute(
+      "width",
+      string_of_int(sizeWithBorder),
+      background,
+    );
+    ElementRe.setAttribute(
+      "height",
+      string_of_int(sizeWithBorder),
+      background,
+    );
+    ElementRe.setAttribute("href", url, background);
+    let bgAnimate = makeAnimate("0;1;0", "6s", "0s");
+    ElementRe.appendChild(bgAnimate, background);
+    ElementRe.appendChild(background, symbol);
+  | None => ()
+  };
+
+  let codeGroup = DocumentRe.createElementNS(svgNs, "g", document);
+
+  let rainbow = DocumentRe.createElementNS(svgNs, "rect", document);
+  ElementRe.setId(rainbow, "rainbowMask");
+  ElementRe.setAttribute("width", "100%", rainbow);
+  ElementRe.setAttribute("height", "100%", rainbow);
+  ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
+  ElementRe.appendChild(rainbow, codeGroup);
+
+  let path = createQrCodePathElement(code, border);
+  ElementRe.appendChild(path, codeGroup);
+
+  let codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
+  ElementRe.setId(codeGroupAnimate, "clock" ++ hash);
+  ElementRe.appendChild(codeGroupAnimate, codeGroup);
+  ElementRe.appendChild(codeGroup, symbol);
+
+  let timeText = DocumentRe.createElementNS(svgNs, "text", document);
+  ElementRe.setAttribute(
+    "x",
+    Js.Float.toString(float_of_int(sizeWithBorder) /. 2.0),
+    timeText,
+  );
+  ElementRe.setAttribute(
+    "y",
+    Js.Float.toString(float_of_int(border) /. 2.0),
+    timeText,
+  );
+  ElementRe.setAttribute(
+    "font-size",
+    Js.Float.toString(float_of_int(border) /. 2.0) ++ "px",
+    timeText,
+  );
+  ElementRe.setAttribute("text-anchor", "middle", timeText);
+  ElementRe.setAttribute("alignment-baseline", "middle", timeText);
+  ElementRe.setAttribute(
+    "style",
+    "text-align: center; font-family: \"Courier New\", monospace;",
+    timeText,
+  );
+  ElementRe.setAttribute("textLength", "90%", timeText);
+  ElementRe.setAttribute("fill", "#FFFFFF", timeText);
+  ElementRe.setAttribute("style", "mix-blend-mode: difference", timeText);
+  ElementRe.setTextContent(timeText, localeString);
+
+  let timeLink = DocumentRe.createElementNS(svgNs, "a", document);
+  ElementRe.setAttribute("href", href, timeLink);
+  ElementRe.appendChild(timeText, timeLink);
+
+  ElementRe.appendChild(timeLink, symbol);
+
+  symbol;
+};
+
+let createSimpleSvg:
+  (string, string, QrCode.t, int, string, string, option(string)) =>
+  Dom.element =
+  (href, hash, code, border, timestamp, localeString, maybeDataURL) => {
     let svg = DocumentRe.createElementNS(svgNs, "svg", document);
-    ElementRe.setAttribute("viewBox", viewBox, svg);
+    ElementRe.setAttribute("viewBox", "0 0 1 1", svg);
 
     let defs = DocumentRe.createElementNS(svgNs, "defs", document);
     let rainbowGradient = createRainbowGradient(0.85);
     ElementRe.appendChild(rainbowGradient, defs);
     ElementRe.appendChild(defs, svg);
 
-    switch (maybeDataURL) {
-    | Some(url) =>
-      let background = DocumentRe.createElementNS(svgNs, "image", document);
-      ElementRe.setAttribute("x", "0", background);
-      ElementRe.setAttribute("y", "0", background);
-      ElementRe.setAttribute("width", "100%", background);
-      ElementRe.setAttribute("height", "100%", background);
-      ElementRe.setAttribute("href", url, background);
-      ElementRe.setAttribute("style", "opacity: 0.5", background);
-      let bgAnimate = makeAnimate("0;1;0", "6s");
-      ElementRe.appendChild(bgAnimate, background);
-      ElementRe.appendChild(background, svg);
-    | None => ()
-    };
+    let symbol =
+      createSymbol(
+        ~code,
+        ~hash,
+        ~localeString,
+        ~maybeDataURL,
+        ~href,
+        ~border,
+      );
 
-    let codeGroup = DocumentRe.createElementNS(svgNs, "g", document);
-    ElementRe.setId(codeGroup, "codeGroup");
+    ElementRe.appendChild(symbol, svg);
 
-    let rainbow = DocumentRe.createElementNS(svgNs, "rect", document);
-    ElementRe.setId(rainbow, "rainbowMask");
-    ElementRe.setAttribute("width", "100%", rainbow);
-    ElementRe.setAttribute("height", "100%", rainbow);
-    ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
-    ElementRe.appendChild(rainbow, codeGroup);
-
-    let path = createQrCodePathElement(code, border);
-    ElementRe.appendChild(path, codeGroup);
-
-    ElementRe.appendChild(codeGroup, svg);
-
-    let codeGroupAnimate = makeAnimate("1;0;1", "6s");
-    ElementRe.appendChild(codeGroupAnimate, codeGroup);
-
-    let timeText = DocumentRe.createElementNS(svgNs, "text", document);
-    ElementRe.setAttribute(
-      "x",
-      Js.Float.toString(float_of_int(sizeWithBorder) /. 2.0),
-      timeText,
-    );
-    ElementRe.setAttribute(
-      "y",
-      Js.Float.toString(float_of_int(border) /. 2.0),
-      timeText,
-    );
-    ElementRe.setAttribute(
-      "font-size",
-      Js.Float.toString(float_of_int(border) /. 2.0) ++ "px",
-      timeText,
-    );
-    ElementRe.setAttribute("text-anchor", "middle", timeText);
-    ElementRe.setAttribute("alignment-baseline", "middle", timeText);
-    ElementRe.setAttribute(
-      "style",
-      "text-align: center; font-family: \"Courier New\", monospace;",
-      timeText,
-    );
-    ElementRe.setAttribute("textLength", "90%", timeText);
-    ElementRe.setAttribute("fill", "#FFFFFF", timeText);
-    ElementRe.setAttribute("style", "mix-blend-mode: difference", timeText);
-    ElementRe.setTextContent(timeText, localeString);
-
-    let timeLink = DocumentRe.createElementNS(svgNs, "a", document);
-    ElementRe.setAttribute("href", href, timeLink);
-    ElementRe.appendChild(timeText, timeLink);
-
-    ElementRe.appendChild(timeLink, svg);
+    let use = DocumentRe.createElementNS(svgNs, "use", document);
+    ElementRe.setAttribute("href", "#code" ++ hash, use);
+    ElementRe.appendChild(use, svg);
 
     svg;
   };
+
+let createSvgSkeleton = hash => {
+  let svg = DocumentRe.createElementNS(svgNs, "svg", document);
+  ElementRe.setAttribute("viewBox", "0 0 1 1", svg);
+
+  let defs = DocumentRe.createElementNS(svgNs, "defs", document);
+  let rainbowGradient = createRainbowGradient(0.85);
+  ElementRe.appendChild(rainbowGradient, defs);
+  ElementRe.appendChild(defs, svg);
+
+  let use = DocumentRe.createElementNS(svgNs, "use", document);
+  ElementRe.setAttribute("href", "#code" ++ hash, use);
+  ElementRe.appendChild(use, svg);
+
+  svg;
+};
 
 let createSvg:
   (Dom.element, option(Dom.element), option(string), string, QrCode.t) =>

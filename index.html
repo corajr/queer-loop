@@ -45,10 +45,24 @@
              display: flex;
              flex-wrap: wrap;
              justify-content: flex-start;
-             align-items: top;
+             align-items: flex-start;
          }
-         #codes a {
+         #codes * {
              width: 12.5vmin;
+         }
+
+         #download {
+             position: absolute;
+             bottom: 0;
+             right: 0;
+             font-size: 12.5vmin;
+             text-decoration: none;
+             color: white;
+             margin-bottom: -3vmin;
+         }
+
+         #download:visited {
+             color: white;
          }
 
          .queer-loop {
@@ -76,9 +90,11 @@
         <div id="codeText">
             <span id="codeContents" contenteditable="true"></span>
         </div>
-
+        
         <h1><time id="lastUpdated"></time></h1>
         <div id="codes"></div>
         <div class="centeredSquareInset queer-loop"></div>
+
+        <a id="download">&#x2b73;</a>
     </body>
 </html>

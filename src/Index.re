@@ -109,12 +109,11 @@ let onClick = (maybeHash, _) => {
   if (! hasChanged^) {
     hasChanged := true;
   };
+
   switch (maybeHash) {
   | Some(hash) =>
     switch (Js.Dict.get(dataSeen, hash)) {
-    | Some(data) =>
-      Js.log(Js.String.sliceToEnd(~from=16, data));
-      setHash(Js.String.sliceToEnd(~from=16, data));
+    | Some(data) => DomRe.Location.setHref(WindowRe.location(window), data)
     | None => ()
     }
   | None => setHashToNow()
@@ -146,60 +145,69 @@ let setCode = text =>
              defaultCode,
            );
 
-         withQuerySelectorDom("body", root =>
-           withQuerySelectorDom(".queer-loop", loopContainer =>
-             switch (takeSnapshot()) {
-             | Some(snapshotUrl) =>
-               let maybePrevious =
-                 ElementRe.querySelector("svg", loopContainer);
-               switch (maybePrevious) {
-               | Some(previous) =>
-                 ElementRe.removeChild(previous, loopContainer) |> ignore
-               | None => ()
+         withQuerySelectorDom(".queer-loop", loopContainer =>
+           switch (takeSnapshot()) {
+           | Some(snapshotUrl) =>
+             let (timestamp, localeString) = getTimestampAndLocaleString();
+
+             let symbol =
+               QueerCode.createSymbol(
+                 ~href=text,
+                 ~hash,
+                 ~code,
+                 ~border=6,
+                 ~localeString,
+                 ~maybeDataURL=hasChanged^ ? Some(snapshotUrl) : None,
+               );
+
+             let svg =
+               switch (ElementRe.querySelector("svg", loopContainer)) {
+               | Some(svg) => svg
+               | None =>
+                 let svg = QueerCode.createSvgSkeleton(hash);
+                 ElementRe.appendChild(svg, loopContainer);
+                 svg;
                };
 
-               /* let svg = */
-               /*   QueerCode.createSvg( */
-               /*     loopContainer, */
-               /*     maybePrevious, */
-               /*     Some(snapshotUrl), */
-               /*     hash, */
-               /*     code, */
-               /*   ); */
+             ElementRe.appendChild(symbol, svg);
 
-               let (timestamp, localeString) = getTimestampAndLocaleString();
+             let url = QueerCode.svgToDataURL(svg);
 
-               let svg =
-                 QueerCode.createSimpleSvg(
-                   text,
-                   code,
-                   6,
-                   timestamp,
-                   localeString,
-                   hasChanged^ ? Some(snapshotUrl) : None,
-                 );
+             withQuerySelectorDom("#download", a => {
+               ElementRe.setAttribute("download", timestamp ++ ".svg", a);
+               ElementRe.setAttribute("href", url, a);
+             });
 
-               ElementRe.appendChild(svg, loopContainer);
-               let url = QueerCode.svgToDataURL(svg);
+             let singleSvg = QueerCode.createSvgSkeleton(hash);
+             ElementRe.appendChild(
+               ElementRe.cloneNodeDeep(symbol),
+               singleSvg,
+             );
+             let singleSvgUrl = QueerCode.svgToDataURL(singleSvg);
 
-               withQuerySelectorDom("#codes", container => {
-                 let a = DocumentRe.createElementNS(htmlNs, "a", document);
-                 ElementRe.setAttribute("download", timestamp ++ ".svg", a);
-                 ElementRe.setAttribute("href", url, a);
-                 let img =
-                   DocumentRe.createElementNS(htmlNs, "img", document);
-                 ElementRe.setAttribute("src", url, img);
-                 ElementRe.appendChild(img, a);
-                 ElementRe.appendChild(a, container);
-               });
+             withQuerySelectorDom("#codes", container => {
+               let img = DocumentRe.createElementNS(htmlNs, "img", document);
+               ElementRe.setAttribute("src", singleSvgUrl, img);
 
-               currentSignature := hash;
-             | None => ()
-             }
-           )
+               ElementRe.addEventListener(
+                 "click",
+                 onClick(Some(hash)),
+                 img,
+               );
+               ElementRe.appendChild(img, container);
+             });
+
+             currentSignature := hash;
+           | None => ()
+           }
          )
          |> ignore;
        };
+
+       withQuerySelectorDom(".queer-loop svg use", use =>
+         ElementRe.setAttribute("href", "#code" ++ hash, use)
+       )
+       |> ignore;
 
        Js.Promise.resolve();
      })
@@ -370,11 +378,15 @@ let init: unit => unit =
              if (! hasChanged^) {
                hasChanged := true;
              };
+
              let alreadySeen =
                Belt.Option.isSome(Js.Dict.get(dataSeen, hexHash));
 
-             if (hexHash === currentSignature^ || ! alreadySeen) {
+             if (! alreadySeen) {
                Js.Dict.set(dataSeen, hexHash, input);
+             };
+
+             if (hexHash === currentSignature^ || ! alreadySeen) {
                setHashToNow();
              };
              Js.Promise.resolve();

@@ -9,7 +9,7 @@ var qrCode = QrCodeGen$QueerLoop.QrCode[/* _encodeText */0]("https://qqq.lu", Qr
 Jest.describe("QueerCode", (function (param) {
         Jest.Only[/* describe */4]("createSimpleSvg", (function (param) {
                 return Jest.test("translates QR code data into QueerCode SVG", (function (param) {
-                              return Jest.Expect[/* toEqual */12]("", Jest.Expect[/* expect */0](QueerCode$QueerLoop.svgToDataURL(QueerCode$QueerLoop.createSimpleSvg("", qrCode, 6, "", "", undefined))));
+                              return Jest.Expect[/* toEqual */12]("", Jest.Expect[/* expect */0](QueerCode$QueerLoop.svgToDataURL(QueerCode$QueerLoop.createSimpleSvg("", "", qrCode, 6, "", "", undefined))));
                             }));
               }));
         return Jest.describe("drawCanvas", (function (param) {

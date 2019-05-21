@@ -107,9 +107,8 @@ function onClick(maybeHash, param) {
   if (maybeHash !== undefined) {
     var match = Js_dict.get(dataSeen, maybeHash);
     if (match !== undefined) {
-      var data = match;
-      console.log(data.slice(16));
-      return Util$QueerLoop.setHash(data.slice(16));
+      window.location.href = match;
+      return /* () */0;
     } else {
       return /* () */0;
     }
@@ -139,38 +138,53 @@ function setCode(text) {
           if (!alreadySeen) {
             dataSeen[hash] = text;
             var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
-            Util$QueerLoop.withQuerySelectorDom("body", (function (root) {
-                    return Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (loopContainer) {
-                                  var match = takeSnapshot(/* () */0);
-                                  if (match !== undefined) {
-                                    var maybePrevious = loopContainer.querySelector("svg");
-                                    if (!(maybePrevious == null)) {
-                                      loopContainer.removeChild(maybePrevious);
-                                    }
-                                    var match$1 = getTimestampAndLocaleString(/* () */0);
-                                    var timestamp = match$1[0];
-                                    var match$2 = hasChanged[0];
-                                    var svg = QueerCode$QueerLoop.createSimpleSvg(text, code, 6, timestamp, match$1[1], match$2 ? match : undefined);
-                                    loopContainer.appendChild(svg);
-                                    var url = QueerCode$QueerLoop.svgToDataURL(svg);
-                                    Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
-                                            var a = document.createElementNS(Util$QueerLoop.htmlNs, "a");
-                                            a.setAttribute("download", timestamp + ".svg");
-                                            a.setAttribute("href", url);
-                                            var img = document.createElementNS(Util$QueerLoop.htmlNs, "img");
-                                            img.setAttribute("src", url);
-                                            a.appendChild(img);
-                                            container.appendChild(a);
-                                            return /* () */0;
-                                          }));
-                                    currentSignature[0] = hash;
-                                    return /* () */0;
-                                  } else {
-                                    return /* () */0;
-                                  }
-                                }));
+            Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (loopContainer) {
+                    var match = takeSnapshot(/* () */0);
+                    if (match !== undefined) {
+                      var match$1 = getTimestampAndLocaleString(/* () */0);
+                      var timestamp = match$1[0];
+                      var match$2 = hasChanged[0];
+                      var symbol = QueerCode$QueerLoop.createSymbol(text, code, hash, match$2 ? match : undefined, match$1[1], 6);
+                      var match$3 = loopContainer.querySelector("svg");
+                      var svg;
+                      if (match$3 == null) {
+                        var svg$1 = QueerCode$QueerLoop.createSvgSkeleton(hash);
+                        loopContainer.appendChild(svg$1);
+                        svg = svg$1;
+                      } else {
+                        svg = match$3;
+                      }
+                      svg.appendChild(symbol);
+                      var url = QueerCode$QueerLoop.svgToDataURL(svg);
+                      Util$QueerLoop.withQuerySelectorDom("#download", (function (a) {
+                              a.setAttribute("download", timestamp + ".svg");
+                              a.setAttribute("href", url);
+                              return /* () */0;
+                            }));
+                      var singleSvg = QueerCode$QueerLoop.createSvgSkeleton(hash);
+                      singleSvg.appendChild(symbol.cloneNode(true));
+                      var singleSvgUrl = QueerCode$QueerLoop.svgToDataURL(singleSvg);
+                      Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
+                              var img = document.createElementNS(Util$QueerLoop.htmlNs, "img");
+                              img.setAttribute("src", singleSvgUrl);
+                              var partial_arg = hash;
+                              img.addEventListener("click", (function (param) {
+                                      return onClick(partial_arg, param);
+                                    }));
+                              container.appendChild(img);
+                              return /* () */0;
+                            }));
+                      currentSignature[0] = hash;
+                      return /* () */0;
+                    } else {
+                      return /* () */0;
+                    }
                   }));
           }
+          Util$QueerLoop.withQuerySelectorDom(".queer-loop svg use", (function (use) {
+                  use.setAttribute("href", "#code" + hash);
+                  return /* () */0;
+                }));
           return Promise.resolve(/* () */0);
         }));
   return /* () */0;
@@ -339,8 +353,10 @@ function init(param) {
                 hasChanged[0] = true;
               }
               var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hexHash));
-              if (hexHash === currentSignature[0] || !alreadySeen) {
+              if (!alreadySeen) {
                 dataSeen[hexHash] = input;
+              }
+              if (hexHash === currentSignature[0] || !alreadySeen) {
                 Util$QueerLoop.setHash(new Date().toISOString());
               }
               return Promise.resolve(/* () */0);

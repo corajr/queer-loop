@@ -39,12 +39,12 @@ function createRainbowGradient(lightness) {
   return gradient;
 }
 
-function makeAnimate(values, duration) {
+function makeAnimate(values, duration, animBegin) {
   var animate = document.createElementNS(svgNs, "animate");
   animate.setAttribute("attributeName", "opacity");
   animate.setAttribute("values", values);
   animate.setAttribute("dur", duration);
-  animate.setAttribute("begin", "+0s");
+  animate.setAttribute("begin", animBegin);
   animate.setAttribute("fill", "freeze");
   animate.setAttribute("calcMode", "spline");
   animate.setAttribute("keyTimes", "0;0.5;1");
@@ -53,30 +53,25 @@ function makeAnimate(values, duration) {
   return animate;
 }
 
-function createSimpleSvg(href, code, border, timestamp, localeString, maybeDataURL) {
+function createSymbol(href, code, hash, maybeDataURL, localeString, border) {
   var size = code.size;
   var sizeWithBorder = size + (border << 1) | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
-  var svg = document.createElementNS(svgNs, "svg");
-  svg.setAttribute("viewBox", viewBox);
-  var defs = document.createElementNS(svgNs, "defs");
-  var rainbowGradient = createRainbowGradient(0.85);
-  defs.appendChild(rainbowGradient);
-  svg.appendChild(defs);
+  var symbol = document.createElementNS(svgNs, "symbol");
+  symbol.id = "code" + hash;
+  symbol.setAttribute("viewBox", viewBox);
   if (maybeDataURL !== undefined) {
     var background = document.createElementNS(svgNs, "image");
     background.setAttribute("x", "0");
     background.setAttribute("y", "0");
-    background.setAttribute("width", "100%");
-    background.setAttribute("height", "100%");
+    background.setAttribute("width", String(sizeWithBorder));
+    background.setAttribute("height", String(sizeWithBorder));
     background.setAttribute("href", maybeDataURL);
-    background.setAttribute("style", "opacity: 0.5");
-    var bgAnimate = makeAnimate("0;1;0", "6s");
+    var bgAnimate = makeAnimate("0;1;0", "6s", "0s");
     background.appendChild(bgAnimate);
-    svg.appendChild(background);
+    symbol.appendChild(background);
   }
   var codeGroup = document.createElementNS(svgNs, "g");
-  codeGroup.id = "codeGroup";
   var rainbow = document.createElementNS(svgNs, "rect");
   rainbow.id = "rainbowMask";
   rainbow.setAttribute("width", "100%");
@@ -85,9 +80,10 @@ function createSimpleSvg(href, code, border, timestamp, localeString, maybeDataU
   codeGroup.appendChild(rainbow);
   var path = createQrCodePathElement(code, border);
   codeGroup.appendChild(path);
-  svg.appendChild(codeGroup);
-  var codeGroupAnimate = makeAnimate("1;0;1", "6s");
+  var codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
+  codeGroupAnimate.id = "clock" + hash;
   codeGroup.appendChild(codeGroupAnimate);
+  symbol.appendChild(codeGroup);
   var timeText = document.createElementNS(svgNs, "text");
   timeText.setAttribute("x", (sizeWithBorder / 2.0).toString());
   timeText.setAttribute("y", (border / 2.0).toString());
@@ -102,7 +98,35 @@ function createSimpleSvg(href, code, border, timestamp, localeString, maybeDataU
   var timeLink = document.createElementNS(svgNs, "a");
   timeLink.setAttribute("href", href);
   timeLink.appendChild(timeText);
-  svg.appendChild(timeLink);
+  symbol.appendChild(timeLink);
+  return symbol;
+}
+
+function createSimpleSvg(href, hash, code, border, timestamp, localeString, maybeDataURL) {
+  var svg = document.createElementNS(svgNs, "svg");
+  svg.setAttribute("viewBox", "0 0 1 1");
+  var defs = document.createElementNS(svgNs, "defs");
+  var rainbowGradient = createRainbowGradient(0.85);
+  defs.appendChild(rainbowGradient);
+  svg.appendChild(defs);
+  var symbol = createSymbol(href, code, hash, maybeDataURL, localeString, border);
+  svg.appendChild(symbol);
+  var use = document.createElementNS(svgNs, "use");
+  use.setAttribute("href", "#code" + hash);
+  svg.appendChild(use);
+  return svg;
+}
+
+function createSvgSkeleton(hash) {
+  var svg = document.createElementNS(svgNs, "svg");
+  svg.setAttribute("viewBox", "0 0 1 1");
+  var defs = document.createElementNS(svgNs, "defs");
+  var rainbowGradient = createRainbowGradient(0.85);
+  defs.appendChild(rainbowGradient);
+  svg.appendChild(defs);
+  var use = document.createElementNS(svgNs, "use");
+  use.setAttribute("href", "#code" + hash);
+  svg.appendChild(use);
   return svg;
 }
 
@@ -199,7 +223,9 @@ export {
   createQrCodePathElement ,
   createRainbowGradient ,
   makeAnimate ,
+  createSymbol ,
   createSimpleSvg ,
+  createSvgSkeleton ,
   createSvg ,
   $$XMLSerializer ,
   svgToDataURL ,
