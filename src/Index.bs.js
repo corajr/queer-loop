@@ -163,18 +163,16 @@ function setCode(text) {
                             }));
                       var singleSvg = QueerCode$QueerLoop.createSvgSkeleton(hash);
                       var symbolTrans = symbol.cloneNode(true);
+                      Util$QueerLoop.withQuerySelectorAllFrom("animate", symbolTrans, (function (param) {
+                              return $$Array.map(Util$QueerLoop.removeFromParentNode, param);
+                            }));
                       var match$4 = symbolTrans.querySelector("path");
                       if (!(match$4 == null)) {
                         match$4.setAttribute("fill", "#FFFFFF");
-                        match$4.setAttribute("style", "mix-blend-mode: overlay");
                       }
                       var match$5 = symbolTrans.querySelector("#rainbowMask");
                       if (!(match$5 == null)) {
-                        var match$6 = match$5.parentElement;
-                        if (!(match$6 == null)) {
-                          match$6.removeChild(match$5);
-                        }
-                        
+                        Util$QueerLoop.removeFromParent(match$5);
                       }
                       singleSvg.appendChild(symbolTrans);
                       var singleSvgUrl = QueerCode$QueerLoop.svgToDataURL(singleSvg);

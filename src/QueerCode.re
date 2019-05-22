@@ -85,6 +85,19 @@ let makeAnimate = (values, duration, animBegin) => {
   animate;
 };
 
+let addAnimation = (background: Dom.element, codeGroup: Dom.element) => {
+  /* withQuerySelectorDom("image", background => { */
+  Js.log(background);
+  /* }); */
+
+  /* withQuerySelectorDom("g", codeGroup => { */
+  let codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
+  ElementRe.appendChild(codeGroupAnimate, codeGroup);
+  /* }); */
+
+  ();
+};
+
 let createSymbol =
     (
       ~href: string,
@@ -100,7 +113,7 @@ let createSymbol =
   let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
 
   let symbol = DocumentRe.createElementNS(svgNs, "symbol", document);
-
+  let animated = true;
   ElementRe.setId(symbol, "code" ++ hash);
   ElementRe.setAttribute("viewBox", viewBox, symbol);
 
@@ -120,8 +133,11 @@ let createSymbol =
       background,
     );
     ElementRe.setAttribute("href", url, background);
-    let bgAnimate = makeAnimate("0;1;0", "6s", "0s");
-    /* ElementRe.appendChild(bgAnimate, background); */
+
+    if (animated) {
+      let bgAnimate = makeAnimate("0;1;0", "6s", "0s");
+      ElementRe.appendChild(bgAnimate, background);
+    };
     ElementRe.appendChild(background, symbol);
   | None => ()
   };
@@ -138,9 +154,10 @@ let createSymbol =
   let path = createQrCodePathElement(code, border);
   ElementRe.appendChild(path, codeGroup);
 
-  let codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
-  ElementRe.setId(codeGroupAnimate, "clock" ++ hash);
-  /* ElementRe.appendChild(codeGroupAnimate, codeGroup); */
+  if (animated) {
+    let codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
+    ElementRe.appendChild(codeGroupAnimate, codeGroup);
+  };
   ElementRe.appendChild(codeGroup, symbol);
 
   let timeText = DocumentRe.createElementNS(svgNs, "text", document);

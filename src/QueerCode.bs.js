@@ -53,6 +53,13 @@ function makeAnimate(values, duration, animBegin) {
   return animate;
 }
 
+function addAnimation(background, codeGroup) {
+  console.log(background);
+  var codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
+  codeGroup.appendChild(codeGroupAnimate);
+  return /* () */0;
+}
+
 function createSymbol(href, code, hash, maybeDataURL, localeString, border) {
   var size = code.size;
   var sizeWithBorder = size + (border << 1) | 0;
@@ -67,7 +74,8 @@ function createSymbol(href, code, hash, maybeDataURL, localeString, border) {
     background.setAttribute("width", String(sizeWithBorder));
     background.setAttribute("height", String(sizeWithBorder));
     background.setAttribute("href", maybeDataURL);
-    makeAnimate("0;1;0", "6s", "0s");
+    var bgAnimate = makeAnimate("0;1;0", "6s", "0s");
+    background.appendChild(bgAnimate);
     symbol.appendChild(background);
   }
   var codeGroup = document.createElementNS(svgNs, "g");
@@ -80,7 +88,7 @@ function createSymbol(href, code, hash, maybeDataURL, localeString, border) {
   var path = createQrCodePathElement(code, border);
   codeGroup.appendChild(path);
   var codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
-  codeGroupAnimate.id = "clock" + hash;
+  codeGroup.appendChild(codeGroupAnimate);
   symbol.appendChild(codeGroup);
   var timeText = document.createElementNS(svgNs, "text");
   timeText.setAttribute("x", (sizeWithBorder / 2.0).toString());
@@ -221,6 +229,7 @@ export {
   createQrCodePathElement ,
   createRainbowGradient ,
   makeAnimate ,
+  addAnimation ,
   createSymbol ,
   createSimpleSvg ,
   createSvgSkeleton ,

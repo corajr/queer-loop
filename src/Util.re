@@ -18,11 +18,26 @@ let withQuerySelectorAll = (query, f) =>
   |> DomRe.NodeList.toArray
   |> Array.map(f);
 
+let withQuerySelectorAllFrom = (query, element, f) =>
+  ElementRe.querySelectorAll(query, element) |> DomRe.NodeList.toArray |> f;
+
 let withQuerySelectorSub = (query, childQuery, f) =>
   document
   |> Document.querySelector(query)
   |. Belt.Option.flatMap(ElementRe.querySelector(childQuery))
   |. Belt.Option.map(f);
+
+let removeFromParentNode = node =>
+  switch (NodeRe.parentNode(node)) {
+  | Some(parent) => NodeRe.removeChild(node, parent) |> ignore
+  | None => ()
+  };
+
+let removeFromParent = element =>
+  switch (ElementRe.parentElement(element)) {
+  | Some(parent) => ElementRe.removeChild(element, parent) |> ignore
+  | None => ()
+  };
 
 [@bs.val]
 external encodeURIComponent : string => string = "encodeURIComponent";

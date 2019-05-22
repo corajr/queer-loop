@@ -1161,6 +1161,30 @@ var index = (function (exports) {
     return map$1(flatMap(nullable_to_opt(document.querySelector(query)), asHtmlElement$1), f);
   }
 
+  function withQuerySelectorAllFrom(query, element, f) {
+    return _1(f, Array.prototype.slice.call(element.querySelectorAll(query)));
+  }
+
+  function removeFromParentNode(node) {
+    var match = node.parentNode;
+    if (match == null) {
+      return /* () */0;
+    } else {
+      match.removeChild(node);
+      return /* () */0;
+    }
+  }
+
+  function removeFromParent(element) {
+    var match = element.parentElement;
+    if (match == null) {
+      return /* () */0;
+    } else {
+      match.removeChild(element);
+      return /* () */0;
+    }
+  }
+
   function getHash(param) {
     return window.location.hash;
   }
@@ -5331,7 +5355,8 @@ var index = (function (exports) {
       background.setAttribute("width", String(sizeWithBorder));
       background.setAttribute("height", String(sizeWithBorder));
       background.setAttribute("href", maybeDataURL);
-      makeAnimate("0;1;0", "6s", "0s");
+      var bgAnimate = makeAnimate("0;1;0", "6s", "0s");
+      background.appendChild(bgAnimate);
       symbol.appendChild(background);
     }
     var codeGroup = document.createElementNS(svgNs, "g");
@@ -5344,7 +5369,7 @@ var index = (function (exports) {
     var path = createQrCodePathElement(code, border);
     codeGroup.appendChild(path);
     var codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
-    codeGroupAnimate.id = "clock" + hash;
+    codeGroup.appendChild(codeGroupAnimate);
     symbol.appendChild(codeGroup);
     var timeText = document.createElementNS(svgNs, "text");
     timeText.setAttribute("x", (sizeWithBorder / 2.0).toString());
@@ -5530,18 +5555,16 @@ var index = (function (exports) {
                               }));
                         var singleSvg = createSvgSkeleton(hash);
                         var symbolTrans = symbol.cloneNode(true);
+                        withQuerySelectorAllFrom("animate", symbolTrans, (function (param) {
+                                return map(removeFromParentNode, param);
+                              }));
                         var match$4 = symbolTrans.querySelector("path");
                         if (!(match$4 == null)) {
                           match$4.setAttribute("fill", "#FFFFFF");
-                          match$4.setAttribute("style", "mix-blend-mode: overlay");
                         }
                         var match$5 = symbolTrans.querySelector("#rainbowMask");
                         if (!(match$5 == null)) {
-                          var match$6 = match$5.parentElement;
-                          if (!(match$6 == null)) {
-                            match$6.removeChild(match$5);
-                          }
-                          
+                          removeFromParent(match$5);
                         }
                         singleSvg.appendChild(symbolTrans);
                         var singleSvgUrl = svgToDataURL(singleSvg);

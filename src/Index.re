@@ -181,26 +181,21 @@ let setCode = text =>
              let singleSvg = QueerCode.createSvgSkeleton(hash);
              let symbolTrans = ElementRe.cloneNodeDeep(symbol);
 
+             withQuerySelectorAllFrom(
+               "animate",
+               symbolTrans,
+               Array.map(removeFromParentNode),
+             );
              switch (ElementRe.querySelector("path", symbolTrans)) {
-             | Some(code) =>
-               ElementRe.setAttribute("fill", "#FFFFFF", code);
-               ElementRe.setAttribute(
-                 "style",
-                 "mix-blend-mode: overlay",
-                 code,
-               );
+             | Some(code) => ElementRe.setAttribute("fill", "#FFFFFF", code)
              | None => ()
              };
 
              switch (ElementRe.querySelector("#rainbowMask", symbolTrans)) {
-             | Some(mask) =>
-               switch (ElementRe.parentElement(mask)) {
-               | Some(parent) =>
-                 ElementRe.removeChild(mask, parent) |> ignore
-               | None => ()
-               }
+             | Some(mask) => removeFromParent(mask)
              | None => ()
              };
+
              ElementRe.appendChild(symbolTrans, singleSvg);
              let singleSvgUrl = QueerCode.svgToDataURL(singleSvg);
 
