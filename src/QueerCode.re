@@ -184,37 +184,6 @@ let createSymbol =
   symbol;
 };
 
-let createSimpleSvg:
-  (string, string, QrCode.t, int, string, string, option(string)) =>
-  Dom.element =
-  (href, hash, code, border, timestamp, localeString, maybeDataURL) => {
-    let svg = DocumentRe.createElementNS(svgNs, "svg", document);
-    ElementRe.setAttribute("viewBox", "0 0 1 1", svg);
-
-    let defs = DocumentRe.createElementNS(svgNs, "defs", document);
-    let rainbowGradient = createRainbowGradient(0.85);
-    ElementRe.appendChild(rainbowGradient, defs);
-    ElementRe.appendChild(defs, svg);
-
-    let symbol =
-      createSymbol(
-        ~code,
-        ~hash,
-        ~localeString,
-        ~maybeDataURL,
-        ~href,
-        ~border,
-      );
-
-    ElementRe.appendChild(symbol, svg);
-
-    let use = DocumentRe.createElementNS(svgNs, "use", document);
-    ElementRe.setAttribute("href", "#code" ++ hash, use);
-    ElementRe.appendChild(use, svg);
-
-    svg;
-  };
-
 let createSvgSkeleton = hash => {
   let svg = DocumentRe.createElementNS(svgNs, "svg", document);
   ElementRe.setAttribute("viewBox", "0 0 1 1", svg);
@@ -228,6 +197,28 @@ let createSvgSkeleton = hash => {
   ElementRe.setAttribute("href", "#code" ++ hash, use);
   ElementRe.appendChild(use, svg);
 
+  svg;
+};
+
+let createInverseSvg =
+    (
+      ~href: string,
+      ~code: QrCode.t,
+      ~hash: string,
+      ~localeString: string,
+      ~border: int,
+    )
+    : Dom.element => {
+  let size = QrCode.size(code);
+  let sizeWithBorder = size + border * 2;
+  let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
+
+  let svg = DocumentRe.createElementNS(svgNs, "svg", document);
+  ElementRe.setAttribute("viewBox", viewBox, svg);
+
+  let path = createQrCodePathElement(code, border);
+  ElementRe.setAttribute("fill", "#FFFFFF", path);
+  ElementRe.appendChild(path, svg);
   svg;
 };
 

@@ -4,9 +4,7 @@ import * as $$Array from "../node_modules/bs-platform/lib/es6/array.js";
 import * as Curry from "../node_modules/bs-platform/lib/es6/curry.js";
 import * as Js_dict from "../node_modules/bs-platform/lib/es6/js_dict.js";
 import * as Debouncer from "../node_modules/re-debouncer/src/Debouncer.bs.js";
-import * as ElementRe from "../node_modules/bs-webapi/src/dom/nodes/ElementRe.js";
 import * as Caml_array from "../node_modules/bs-platform/lib/es6/caml_array.js";
-import * as Pervasives from "../node_modules/bs-platform/lib/es6/pervasives.js";
 import * as Belt_Option from "../node_modules/bs-platform/lib/es6/belt_Option.js";
 import * as Caml_format from "../node_modules/bs-platform/lib/es6/caml_format.js";
 import * as Caml_option from "../node_modules/bs-platform/lib/es6/caml_option.js";
@@ -117,21 +115,6 @@ function onClick(maybeHash, param) {
   }
 }
 
-function addToPast(hash, dataUrl) {
-  var img = document.createElement("img");
-  setSrc(img, dataUrl);
-  img.id = "x" + hash;
-  var partial_arg = hash;
-  img.addEventListener("click", (function (param) {
-          return onClick(partial_arg, param);
-        }));
-  Util$QueerLoop.withQuerySelectorDom("#codes", (function (past) {
-          past.appendChild(img);
-          return /* () */0;
-        }));
-  return /* () */0;
-}
-
 function setCode(text) {
   Hash$QueerLoop.hexDigest("SHA-1", text).then((function (hash) {
           var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hash));
@@ -142,9 +125,10 @@ function setCode(text) {
                     var match = takeSnapshot(/* () */0);
                     if (match !== undefined) {
                       var match$1 = getTimestampAndLocaleString(/* () */0);
+                      var localeString = match$1[1];
                       var timestamp = match$1[0];
                       var match$2 = hasChanged[0];
-                      var symbol = QueerCode$QueerLoop.createSymbol(text, code, hash, match$2 ? match : undefined, match$1[1], 6);
+                      var symbol = QueerCode$QueerLoop.createSymbol(text, code, hash, match$2 ? match : undefined, localeString, 6);
                       var match$3 = loopContainer.querySelector("svg");
                       var svg;
                       if (match$3 == null) {
@@ -161,20 +145,7 @@ function setCode(text) {
                               a.setAttribute("href", url);
                               return /* () */0;
                             }));
-                      var singleSvg = QueerCode$QueerLoop.createSvgSkeleton(hash);
-                      var symbolTrans = symbol.cloneNode(true);
-                      Util$QueerLoop.withQuerySelectorAllFrom("animate", symbolTrans, (function (param) {
-                              return $$Array.map(Util$QueerLoop.removeFromParentNode, param);
-                            }));
-                      var match$4 = symbolTrans.querySelector("path");
-                      if (!(match$4 == null)) {
-                        match$4.setAttribute("fill", "#FFFFFF");
-                      }
-                      var match$5 = symbolTrans.querySelector("#rainbowMask");
-                      if (!(match$5 == null)) {
-                        Util$QueerLoop.removeFromParent(match$5);
-                      }
-                      singleSvg.appendChild(symbolTrans);
+                      var singleSvg = QueerCode$QueerLoop.createInverseSvg(text, code, hash, localeString, 6);
                       var singleSvgUrl = QueerCode$QueerLoop.svgToDataURL(singleSvg);
                       Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
                               var img = document.createElementNS(Util$QueerLoop.htmlNs, "img");
@@ -210,8 +181,6 @@ var setText = Debouncer.make(200, (function (hash) {
         return /* () */0;
       }));
 
-function urlToString (url){return url.toString()};
-
 function onHashChange(param) {
   var opts = currentOptions[0];
   var url = new URL(window.location.href);
@@ -239,13 +208,6 @@ function onHashChange(param) {
     ));
   setCode(urlText);
   return Curry._1(setText, urlText);
-}
-
-function setOpacity(elQuery, opacity) {
-  return Belt_Option.map(Belt_Option.flatMap(Caml_option.nullable_to_opt(document.querySelector(elQuery)), ElementRe.asHtmlElement), (function (body) {
-                body.style.setProperty("opacity", Pervasives.string_of_float(opacity), "");
-                return /* () */0;
-              }));
 }
 
 var frameCount = /* record */[/* contents */0];
@@ -435,12 +397,9 @@ export {
   setHashToNow ,
   hasChanged ,
   onClick ,
-  addToPast ,
   setCode ,
   setText ,
-  urlToString ,
   onHashChange ,
-  setOpacity ,
   frameCount ,
   lastUpdated ,
   onTick ,

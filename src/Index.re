@@ -167,25 +167,15 @@ let setCode = text =>
                ElementRe.setAttribute("href", url, a);
              });
 
-             let singleSvg = QueerCode.createSvgSkeleton(hash);
-             let symbolTrans = ElementRe.cloneNodeDeep(symbol);
+             let singleSvg =
+               QueerCode.createInverseSvg(
+                 ~href=text,
+                 ~hash,
+                 ~code,
+                 ~border=6,
+                 ~localeString,
+               );
 
-             withQuerySelectorAllFrom(
-               "animate",
-               symbolTrans,
-               Array.map(removeFromParentNode),
-             );
-             switch (ElementRe.querySelector("path", symbolTrans)) {
-             | Some(code) => ElementRe.setAttribute("fill", "#FFFFFF", code)
-             | None => ()
-             };
-
-             switch (ElementRe.querySelector("#rainbowMask", symbolTrans)) {
-             | Some(mask) => removeFromParent(mask)
-             | None => ()
-             };
-
-             ElementRe.appendChild(symbolTrans, singleSvg);
              let singleSvgUrl = QueerCode.svgToDataURL(singleSvg);
 
              withQuerySelectorDom("#codes", container => {

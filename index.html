@@ -49,6 +49,7 @@
          }
          #codes * {
              width: 12.5vmin;
+             background: black;
          }
 
          #download {
@@ -68,6 +69,9 @@
          .queer-loop {
              z-index: 100;
              opacity: 0.75;
+         }
+         .queer-loop svg {
+             display: block;
          }
 
          #codeContents {
@@ -90,7 +94,7 @@
         <div id="codeText">
             <span id="codeContents" contenteditable="true"></span>
         </div>
-        
+
         <h1><time id="lastUpdated"></time></h1>
         <div id="codes"></div>
         <div class="centeredSquareInset queer-loop"></div>

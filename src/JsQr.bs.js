@@ -25,7 +25,7 @@ function jsQR(d, w, h, invertOptions) {
                 }));
 }
 
-var defaultInversion = /* InvertFirst */3;
+var defaultInversion = /* DontInvert */1;
 
 export {
   string_of_invertOptions ,
