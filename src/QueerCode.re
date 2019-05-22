@@ -85,19 +85,6 @@ let makeAnimate = (values, duration, animBegin) => {
   animate;
 };
 
-let addAnimation = (background: Dom.element, codeGroup: Dom.element) => {
-  /* withQuerySelectorDom("image", background => { */
-  Js.log(background);
-  /* }); */
-
-  /* withQuerySelectorDom("g", codeGroup => { */
-  let codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
-  ElementRe.appendChild(codeGroupAnimate, codeGroup);
-  /* }); */
-
-  ();
-};
-
 let createSymbol =
     (
       ~href: string,
@@ -243,102 +230,6 @@ let createSvgSkeleton = hash => {
 
   svg;
 };
-
-let createSvg:
-  (Dom.element, option(Dom.element), option(string), string, QrCode.t) =>
-  Dom.element =
-  (parent, maybePrevious, maybeSnapshot, hash, code) => {
-    let size = QrCode.size(code);
-    let border = 4;
-    let sizeWithBorder = size + border * 2;
-    let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
-
-    let childSvg = DocumentRe.createElementNS(svgNs, "svg", document);
-    ElementRe.setAttribute("viewBox", viewBox, childSvg);
-
-    let past = DocumentRe.createElementNS(svgNs, "g", document);
-    let scaleFactor = 1.0 -. 2.0 /. float_of_int(sizeWithBorder);
-    let cornerOffset = 1;
-    /* let scaleFactor = 3.0 /. float_of_int(sizeWithBorder); */
-    /* let cornerOffset = border + 2; */
-    let scaleFactorString = Js.Float.toString(scaleFactor);
-    ElementRe.setAttribute(
-      "transform",
-      {j|translate($cornerOffset,$cornerOffset) scale($scaleFactor)|j},
-      past,
-    );
-
-    switch (maybePrevious) {
-    | Some(previous) => ElementRe.appendChild(previous, past)
-    | None => ()
-    };
-
-    ElementRe.appendChild(past, childSvg);
-
-    switch (maybeSnapshot) {
-    | Some(snapshotURL) =>
-      let snapshotImage =
-        DocumentRe.createElementNS(svgNs, "image", document);
-      ElementRe.setAttribute("href", snapshotURL, snapshotImage);
-      ElementRe.setAttribute("x", "0", snapshotImage);
-      ElementRe.setAttribute("y", "0", snapshotImage);
-      ElementRe.setAttribute(
-        "width",
-        string_of_int(sizeWithBorder),
-        snapshotImage,
-      );
-      ElementRe.setAttribute(
-        "height",
-        string_of_int(sizeWithBorder),
-        snapshotImage,
-      );
-      ElementRe.setAttribute("style", "opacity: 0.5", snapshotImage);
-      ElementRe.appendChild(snapshotImage, childSvg);
-    | None => ()
-    };
-
-    let mask = DocumentRe.createElementNS(svgNs, "mask", document);
-    ElementRe.setId(mask, "m" ++ hash);
-
-    let blank = DocumentRe.createElementNS(svgNs, "rect", document);
-    ElementRe.setAttribute("width", "100%", blank);
-    ElementRe.setAttribute("height", "100%", blank);
-    ElementRe.setAttribute("fill", "#FFFFFF", blank);
-    ElementRe.appendChild(blank, mask);
-
-    let symbol = DocumentRe.createElementNS(svgNs, "symbol", document);
-    ElementRe.setId(symbol, "s" ++ hash);
-
-    let path = createQrCodePathElement(code, border);
-    ElementRe.appendChild(path, symbol);
-    ElementRe.appendChild(symbol, childSvg);
-
-    let use = DocumentRe.createElementNS(svgNs, "use", document);
-    ElementRe.setAttribute("href", "#s" ++ hash, use);
-    ElementRe.setAttribute("fill", "#000000", use);
-    ElementRe.appendChild(use, mask);
-
-    ElementRe.appendChild(mask, childSvg);
-
-    let rainbow = DocumentRe.createElementNS(svgNs, "rect", document);
-    ElementRe.setAttribute("width", "100%", rainbow);
-    ElementRe.setAttribute("height", "100%", rainbow);
-    ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
-    ElementRe.setAttribute("fill-opacity", "0.5", rainbow);
-    ElementRe.setAttribute("mask", "url(#m" ++ hash ++ ")", rainbow);
-
-    ElementRe.appendChild(rainbow, childSvg);
-
-    let use2 = DocumentRe.createElementNS(svgNs, "use", document);
-    ElementRe.setAttribute("href", "#s" ++ hash, use2);
-    ElementRe.setAttribute("stroke-width", "0.01", use2);
-    ElementRe.setAttribute("fill", "#000000", use2);
-    ElementRe.setAttribute("fill-opacity", "0.5", use2);
-    ElementRe.appendChild(use2, childSvg);
-
-    ElementRe.appendChild(childSvg, parent);
-    childSvg;
-  };
 
 module XMLSerializer = {
   type t;

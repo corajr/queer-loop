@@ -120,17 +120,6 @@ let onClick = (maybeHash, _) => {
   };
 };
 
-let addToPast: (string, string) => unit =
-  (hash, dataUrl) => {
-    let img = DocumentRe.createElement("img", document);
-    setSrc(img, dataUrl);
-    ElementRe.setId(img, "x" ++ hash);
-    ElementRe.addEventListener("click", onClick(Some(hash)), img);
-
-    withQuerySelectorDom("#codes", past => ElementRe.appendChild(img, past));
-    ();
-  };
-
 let setCode = text =>
   Hash.hexDigest("SHA-1", text)
   |> Js.Promise.then_(hash => {
@@ -235,8 +224,6 @@ let setText =
     |> ignore
   );
 
-let urlToString: UrlRe.t => string = [%bs.raw url => "return url.toString()"];
-
 let onHashChange: unit => unit =
   _ => {
     let opts = currentOptions^;
@@ -260,21 +247,6 @@ let onHashChange: unit => unit =
     setCode(urlText);
     setText(urlText);
   };
-
-let setOpacity = (elQuery, opacity) =>
-  Belt.Option.(
-    document
-    |> Document.querySelector(elQuery)
-    |. flatMap(DomRe.Element.asHtmlElement)
-    |. map(body =>
-         DomRe.CssStyleDeclaration.setProperty(
-           "opacity",
-           string_of_float(opacity),
-           "",
-           HtmlElementRe.style(body),
-         )
-       )
-  );
 
 let frameCount = ref(0);
 
