@@ -200,15 +200,7 @@ let createSvgSkeleton = hash => {
   svg;
 };
 
-let createInverseSvg =
-    (
-      ~href: string,
-      ~code: QrCode.t,
-      ~hash: string,
-      ~localeString: string,
-      ~border: int,
-    )
-    : Dom.element => {
+let createInverseSvg = (~code: QrCode.t, ~border: int) : (Dom.element, int) => {
   let size = QrCode.size(code);
   let sizeWithBorder = size + border * 2;
   let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
@@ -219,7 +211,7 @@ let createInverseSvg =
   let path = createQrCodePathElement(code, border);
   ElementRe.setAttribute("fill", "#FFFFFF", path);
   ElementRe.appendChild(path, svg);
-  svg;
+  (svg, sizeWithBorder);
 };
 
 module XMLSerializer = {
@@ -227,6 +219,7 @@ module XMLSerializer = {
   [@bs.new] external make : unit => t = "XMLSerializer";
   [@bs.send] external serializeToString : (t, Dom.element) => string = "";
 };
+
 let svgToDataURL: Dom.element => string =
   svg => {
     let xmlSerializer = XMLSerializer.make();
@@ -234,25 +227,44 @@ let svgToDataURL: Dom.element => string =
     "data:image/svg+xml;utf8," ++ encodeURIComponent(str);
   };
 
+let codeToImage = (~code: QrCode.t, ~border: int=6) : Dom.element => {
+  let img = DocumentRe.createElementNS(htmlNs, "img", document);
+  let (svg, sizeWithBorder) = createInverseSvg(~code, ~border);
+  let size = string_of_int(sizeWithBorder);
+  let svgUrl = svgToDataURL(svg);
+  ElementRe.setAttribute("src", svgUrl, img);
+  ElementRe.setAttribute("width", size, img);
+  ElementRe.setAttribute("height", size, img);
+  img;
+};
+
 let drawCanvas: (Dom.element, QrCode.t) => unit =
   (canvas, code) => {
     open Canvas;
     let size = QrCode.size(code);
-    let border = 2;
-    let width = size + border * 2;
+    let border = 6;
+    let sizeWithBorder = size + border * 2;
+    let scale = getWidth(canvas) / sizeWithBorder;
 
-    if (getWidth(canvas) !== width) {
-      setWidth(canvas, width);
-      setHeight(canvas, width);
-    };
+    /* if (getWidth(canvas) !== width) { */
+    /*   setWidth(canvas, width); */
+    /*   setHeight(canvas, width); */
+    /* }; */
 
     let ctx = getContext(canvas);
+    Ctx.setGlobalAlpha(ctx, 1.0);
     Ctx.setGlobalCompositeOperation(ctx, "difference");
     Ctx.setFillStyle(ctx, "#FFFFFF");
     for (y in - border to size + border) {
       for (x in - border to size + border) {
         if (QrCode.getModule(code, x, y)) {
-          Ctx.fillRect(ctx, x + border, y + border, 1, 1);
+          Ctx.fillRect(
+            ctx,
+            (x + border) * scale,
+            (y + border) * scale,
+            scale,
+            scale,
+          );
         };
       };
     };

@@ -86,9 +86,37 @@ let copyVideoToSnapshotCanvas = _ =>
     );
   });
 
-let takeSnapshot = _ =>
+let takeSnapshot = code =>
   withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
+    open QueerCode;
     let snapshotCtx = getContext(snapshotCanvas);
+    let codeImage = codeToImage(~code, ~border=6);
+    withQuerySelectorDom("body", body =>
+      ElementRe.appendChild(codeImage, body)
+    );
+
+    Ctx.setGlobalAlpha(snapshotCtx, 1.0);
+    Ctx.setGlobalCompositeOperation(snapshotCtx, "difference");
+    Ctx.setFillStyle(snapshotCtx, "#FFFFFF");
+    Ctx.fillRect(
+      snapshotCtx,
+      0,
+      0,
+      getWidth(snapshotCanvas),
+      getHeight(snapshotCanvas),
+    );
+    Ctx.drawImageDestRect(
+      snapshotCtx,
+      ~image=codeImage,
+      ~dx=0,
+      ~dy=0,
+      ~dw=getWidth(snapshotCanvas),
+      ~dh=getHeight(snapshotCanvas),
+    );
+    removeFromParent(codeImage);
+
+    /* QueerCode.drawCanvas(snapshotCanvas, code); */
+
     toDataURLjpg(snapshotCanvas, 0.9);
   });
 
@@ -135,7 +163,7 @@ let setCode = text =>
            );
 
          withQuerySelectorDom(".queer-loop", loopContainer =>
-           switch (takeSnapshot()) {
+           switch (takeSnapshot(code)) {
            | Some(snapshotUrl) =>
              let (timestamp, localeString) = getTimestampAndLocaleString();
 
@@ -167,20 +195,21 @@ let setCode = text =>
                ElementRe.setAttribute("href", url, a);
              });
 
-             let singleSvg =
-               QueerCode.createInverseSvg(
-                 ~href=text,
-                 ~hash,
-                 ~code,
-                 ~border=6,
-                 ~localeString,
-               );
+             /* let singleSvg = */
+             /*   QueerCode.createInverseSvg( */
+             /*     ~href=text, */
+             /*     ~hash, */
+             /*     ~code, */
+             /*     ~border=6, */
+             /*     ~localeString, */
+             /*     ~maybeDataURL=None, */
+             /*   ); */
 
-             let singleSvgUrl = QueerCode.svgToDataURL(singleSvg);
+             /* let singleSvgUrl = QueerCode.svgToDataURL(singleSvg); */
 
              withQuerySelectorDom("#codes", container => {
                let img = DocumentRe.createElementNS(htmlNs, "img", document);
-               ElementRe.setAttribute("src", singleSvgUrl, img);
+               ElementRe.setAttribute("src", snapshotUrl, img);
 
                ElementRe.addEventListener(
                  "click",

@@ -69,9 +69,20 @@ function copyVideoToSnapshotCanvas(param) {
               }));
 }
 
-function takeSnapshot(param) {
+function takeSnapshot(code) {
   return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
-                snapshotCanvas.getContext("2d");
+                var snapshotCtx = snapshotCanvas.getContext("2d");
+                var codeImage = QueerCode$QueerLoop.codeToImage(code, 6);
+                Util$QueerLoop.withQuerySelectorDom("body", (function (body) {
+                        body.appendChild(codeImage);
+                        return /* () */0;
+                      }));
+                snapshotCtx.globalAlpha = 1.0;
+                snapshotCtx.globalCompositeOperation = "difference";
+                snapshotCtx.fillStyle = "#FFFFFF";
+                snapshotCtx.fillRect(0, 0, snapshotCanvas.width, snapshotCanvas.height);
+                snapshotCtx.drawImage(codeImage, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+                Util$QueerLoop.removeFromParent(codeImage);
                 return snapshotCanvas.toDataURL("image/jpeg", 0.9);
               }));
 }
@@ -122,13 +133,13 @@ function setCode(text) {
             dataSeen[hash] = text;
             var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
             Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (loopContainer) {
-                    var match = takeSnapshot(/* () */0);
+                    var match = takeSnapshot(code);
                     if (match !== undefined) {
+                      var snapshotUrl = match;
                       var match$1 = getTimestampAndLocaleString(/* () */0);
-                      var localeString = match$1[1];
                       var timestamp = match$1[0];
                       var match$2 = hasChanged[0];
-                      var symbol = QueerCode$QueerLoop.createSymbol(text, code, hash, match$2 ? match : undefined, localeString, 6);
+                      var symbol = QueerCode$QueerLoop.createSymbol(text, code, hash, match$2 ? snapshotUrl : undefined, match$1[1], 6);
                       var match$3 = loopContainer.querySelector("svg");
                       var svg;
                       if (match$3 == null) {
@@ -145,11 +156,9 @@ function setCode(text) {
                               a.setAttribute("href", url);
                               return /* () */0;
                             }));
-                      var singleSvg = QueerCode$QueerLoop.createInverseSvg(text, code, hash, localeString, 6);
-                      var singleSvgUrl = QueerCode$QueerLoop.svgToDataURL(singleSvg);
                       Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
                               var img = document.createElementNS(Util$QueerLoop.htmlNs, "img");
-                              img.setAttribute("src", singleSvgUrl);
+                              img.setAttribute("src", snapshotUrl);
                               var partial_arg = hash;
                               img.addEventListener("click", (function (param) {
                                       return onClick(partial_arg, param);
