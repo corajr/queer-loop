@@ -50,7 +50,15 @@ function makeAnimate(values, duration, animBegin) {
   return animate;
 }
 
-function createSymbol(href, code, hash, maybeDataURL, localeString, border) {
+var scriptText = "\n   function init() {\n     if (!document.body) {\n       const ids = Array.prototype.slice.call(document.querySelectorAll(\"symbol\"), null).map(function(x) { return x.id; });\n       var i = 0;\n       var frameCount = 0;\n       var use = document.querySelector(\"use\");\n       console.log(use);\n       function tick(timestamp) {\n          if (frameCount % 60 == 0) {\n               use.setAttribute(\"href\", href = \"#\" + ids[i]);\n               i = (i + 1) % ids.length;\n          }\n          frameCount++;\n          window.requestAnimationFrame(tick);\n       }\n       window.requestAnimationFrame(tick);\n   }\n   }\n\n   window.addEventListener(\"load\", init, false);\n";
+
+function createScript(param) {
+  var script = document.createElementNS(svgNs, "script");
+  script.textContent = scriptText;
+  return script;
+}
+
+function createSymbol(href, code, hash, maybeDataURL, localeString, border, inverse, animated) {
   var size = code.size;
   var sizeWithBorder = size + (border << 1) | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
@@ -64,21 +72,37 @@ function createSymbol(href, code, hash, maybeDataURL, localeString, border) {
     background.setAttribute("width", String(sizeWithBorder));
     background.setAttribute("height", String(sizeWithBorder));
     background.setAttribute("href", maybeDataURL);
-    var bgAnimate = makeAnimate("0;1;0", "6s", "0s");
-    background.appendChild(bgAnimate);
+    if (animated) {
+      var bgAnimate = makeAnimate("0;1;0", "6s", "0s");
+      background.appendChild(bgAnimate);
+    }
     symbol.appendChild(background);
   }
   var codeGroup = document.createElementNS(svgNs, "g");
-  var rainbow = document.createElementNS(svgNs, "rect");
-  rainbow.id = "rainbowMask";
-  rainbow.setAttribute("width", "100%");
-  rainbow.setAttribute("height", "100%");
-  rainbow.setAttribute("fill", "url(#rainbow)");
-  codeGroup.appendChild(rainbow);
+  if (inverse) {
+    var overlay = document.createElementNS(svgNs, "rect");
+    overlay.setAttribute("width", "100%");
+    overlay.setAttribute("height", "100%");
+    overlay.setAttribute("fill", "#000000");
+    overlay.setAttribute("fill-opacity", "0.5");
+    codeGroup.appendChild(overlay);
+  } else {
+    var rainbow = document.createElementNS(svgNs, "rect");
+    rainbow.id = "rainbowMask";
+    rainbow.setAttribute("width", "100%");
+    rainbow.setAttribute("height", "100%");
+    rainbow.setAttribute("fill", "url(#rainbow)");
+    codeGroup.appendChild(rainbow);
+  }
   var path = createQrCodePathElement(code, border);
   codeGroup.appendChild(path);
-  var codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
-  codeGroup.appendChild(codeGroupAnimate);
+  if (inverse) {
+    path.setAttribute("fill", "#FFFFFF");
+  }
+  if (animated) {
+    var codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
+    codeGroup.appendChild(codeGroupAnimate);
+  }
   symbol.appendChild(codeGroup);
   var timeText = document.createElementNS(svgNs, "text");
   timeText.setAttribute("x", (sizeWithBorder / 2.0).toString());
@@ -105,6 +129,8 @@ function createSvgSkeleton(hash) {
   var rainbowGradient = createRainbowGradient(0.85);
   defs.appendChild(rainbowGradient);
   svg.appendChild(defs);
+  var script = createScript(/* () */0);
+  svg.appendChild(script);
   var use = document.createElementNS(svgNs, "use");
   use.setAttribute("href", "#code" + hash);
   svg.appendChild(use);
@@ -158,6 +184,8 @@ export {
   createQrCodePathElement ,
   createRainbowGradient ,
   makeAnimate ,
+  scriptText ,
+  createScript ,
   createSymbol ,
   createSvgSkeleton ,
   createInverseSvg ,

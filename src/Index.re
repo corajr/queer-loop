@@ -147,6 +147,8 @@ let setCode = text =>
                  ~border=6,
                  ~localeString,
                  ~maybeDataURL=hasChanged^ ? Some(snapshotUrl) : None,
+                 ~inverse=true,
+                 ~animated=false,
                );
 
              let svg =

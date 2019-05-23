@@ -128,7 +128,7 @@ function setCode(text) {
                       var localeString = match$1[1];
                       var timestamp = match$1[0];
                       var match$2 = hasChanged[0];
-                      var symbol = QueerCode$QueerLoop.createSymbol(text, code, hash, match$2 ? match : undefined, localeString, 6);
+                      var symbol = QueerCode$QueerLoop.createSymbol(text, code, hash, match$2 ? match : undefined, localeString, 6, true, false);
                       var match$3 = loopContainer.querySelector("svg");
                       var svg;
                       if (match$3 == null) {

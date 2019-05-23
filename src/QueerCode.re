@@ -78,6 +78,38 @@ let makeAnimate = (values, duration, animBegin) => {
   animate;
 };
 
+let scriptText = {|
+   function init() {
+     if (!document.body) {
+       const ids = Array.prototype.slice.call(document.querySelectorAll("symbol"), null).map(function(x) { return x.id; });
+       var i = 0;
+       var frameCount = 0;
+       var use = document.querySelector("use");
+       console.log(use);
+       function tick(timestamp) {
+          if (frameCount % 60 == 0) {
+               use.setAttribute("href", href = "#" + ids[i]);
+               i = (i + 1) % ids.length;
+          }
+          frameCount++;
+          window.requestAnimationFrame(tick);
+       }
+       window.requestAnimationFrame(tick);
+   }
+   }
+
+   window.addEventListener("load", init, false);
+|};
+
+[@bs.set] external setText : (Dom.element, string) => unit = "text";
+
+let createScript = () : Dom.element => {
+  let script = DocumentRe.createElementNS(svgNs, "script", document);
+
+  ElementRe.setTextContent(script, scriptText);
+  script;
+};
+
 let createSymbol =
     (
       ~href: string,
@@ -86,6 +118,8 @@ let createSymbol =
       ~maybeDataURL: option(string),
       ~localeString: string,
       ~border: int,
+      ~inverse: bool,
+      ~animated: bool,
     )
     : Dom.element => {
   let size = QrCode.size(code);
@@ -93,7 +127,6 @@ let createSymbol =
   let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
 
   let symbol = DocumentRe.createElementNS(svgNs, "symbol", document);
-  let animated = true;
   ElementRe.setId(symbol, "code" ++ hash);
   ElementRe.setAttribute("viewBox", viewBox, symbol);
 
@@ -124,15 +157,29 @@ let createSymbol =
 
   let codeGroup = DocumentRe.createElementNS(svgNs, "g", document);
 
-  let rainbow = DocumentRe.createElementNS(svgNs, "rect", document);
-  ElementRe.setId(rainbow, "rainbowMask");
-  ElementRe.setAttribute("width", "100%", rainbow);
-  ElementRe.setAttribute("height", "100%", rainbow);
-  ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
-  ElementRe.appendChild(rainbow, codeGroup);
+  if (! inverse) {
+    let rainbow = DocumentRe.createElementNS(svgNs, "rect", document);
+    ElementRe.setId(rainbow, "rainbowMask");
+    ElementRe.setAttribute("width", "100%", rainbow);
+    ElementRe.setAttribute("height", "100%", rainbow);
+    ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
+    ElementRe.appendChild(rainbow, codeGroup);
+  } else {
+    let overlay = DocumentRe.createElementNS(svgNs, "rect", document);
+
+    ElementRe.setAttribute("width", "100%", overlay);
+    ElementRe.setAttribute("height", "100%", overlay);
+    ElementRe.setAttribute("fill", "#000000", overlay);
+    ElementRe.setAttribute("fill-opacity", "0.5", overlay);
+    ElementRe.appendChild(overlay, codeGroup);
+  };
 
   let path = createQrCodePathElement(code, border);
   ElementRe.appendChild(path, codeGroup);
+
+  if (inverse) {
+    ElementRe.setAttribute("fill", "#FFFFFF", path);
+  };
 
   if (animated) {
     let codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
@@ -185,6 +232,9 @@ let createSvgSkeleton = hash => {
   let rainbowGradient = createRainbowGradient(0.85);
   ElementRe.appendChild(rainbowGradient, defs);
   ElementRe.appendChild(defs, svg);
+
+  let script = createScript();
+  ElementRe.appendChild(script, svg);
 
   let use = DocumentRe.createElementNS(svgNs, "use", document);
   ElementRe.setAttribute("href", "#code" ++ hash, use);
