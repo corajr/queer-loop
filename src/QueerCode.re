@@ -118,7 +118,7 @@ let createSymbol =
       ~maybeDataURL: option(string),
       ~localeString: string,
       ~border: int,
-      ~inverse: bool,
+      ~invert: bool,
       ~animated: bool,
     )
     : Dom.element => {
@@ -157,7 +157,7 @@ let createSymbol =
 
   let codeGroup = DocumentRe.createElementNS(svgNs, "g", document);
 
-  if (! inverse) {
+  if (! invert) {
     let rainbow = DocumentRe.createElementNS(svgNs, "rect", document);
     ElementRe.setId(rainbow, "rainbowMask");
     ElementRe.setAttribute("width", "100%", rainbow);
@@ -177,7 +177,7 @@ let createSymbol =
   let path = createQrCodePathElement(code, border);
   ElementRe.appendChild(path, codeGroup);
 
-  if (inverse) {
+  if (invert) {
     ElementRe.setAttribute("fill", "#FFFFFF", path);
   };
 

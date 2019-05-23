@@ -58,7 +58,7 @@ function createScript(param) {
   return script;
 }
 
-function createSymbol(href, code, hash, maybeDataURL, localeString, border, inverse, animated) {
+function createSymbol(href, code, hash, maybeDataURL, localeString, border, invert, animated) {
   var size = code.size;
   var sizeWithBorder = size + (border << 1) | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
@@ -79,7 +79,7 @@ function createSymbol(href, code, hash, maybeDataURL, localeString, border, inve
     symbol.appendChild(background);
   }
   var codeGroup = document.createElementNS(svgNs, "g");
-  if (inverse) {
+  if (invert) {
     var overlay = document.createElementNS(svgNs, "rect");
     overlay.setAttribute("width", "100%");
     overlay.setAttribute("height", "100%");
@@ -96,7 +96,7 @@ function createSymbol(href, code, hash, maybeDataURL, localeString, border, inve
   }
   var path = createQrCodePathElement(code, border);
   codeGroup.appendChild(path);
-  if (inverse) {
+  if (invert) {
     path.setAttribute("fill", "#FFFFFF");
   }
   if (animated) {

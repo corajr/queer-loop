@@ -56,6 +56,15 @@ Examples:
 
 [`https://qqq.lu/?d=0`](https://qqq.lu/?d=0)
 
+#### i (invert)
+
+`i` renders the code as white on a dark background.
+
+Examples:
+
+[`https://qqq.lu/?i=1`](https://qqq.lu/?i=1)
+
+
 #### o (opacity)
 
 Set the opacity of the camera image (default: 0.1). Smaller values result in a longer exposure (more time is captured).

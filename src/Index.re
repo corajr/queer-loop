@@ -12,6 +12,7 @@ type options = {
   includeDomain: bool,
   includeQueryString: bool,
   includeHash: bool,
+  invert: bool,
   opacity: float,
   cameraIndices: array(int),
 };
@@ -21,6 +22,7 @@ let defaultOptions = {
   includeDomain: true,
   includeQueryString: true,
   includeHash: true,
+  invert: true,
   opacity: 0.1,
   cameraIndices: [|0|],
 };
@@ -147,7 +149,7 @@ let setCode = text =>
                  ~border=6,
                  ~localeString,
                  ~maybeDataURL=hasChanged^ ? Some(snapshotUrl) : None,
-                 ~inverse=true,
+                 ~invert=currentOptions^.invert,
                  ~animated=false,
                );
 
@@ -310,6 +312,7 @@ let init: unit => unit =
           includeQueryString:
             boolParam(true, URLSearchParamsRe.get("q", params)),
           includeHash: boolParam(true, URLSearchParamsRe.get("h", params)),
+          invert: boolParam(true, URLSearchParamsRe.get("i", params)),
           opacity:
             Js.Float.fromString(
               Belt.Option.getWithDefault(
