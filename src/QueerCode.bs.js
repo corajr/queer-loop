@@ -45,9 +45,7 @@ function makeAnimate(values, duration, animBegin) {
   animate.setAttribute("dur", duration);
   animate.setAttribute("begin", animBegin);
   animate.setAttribute("fill", "freeze");
-  animate.setAttribute("calcMode", "spline");
   animate.setAttribute("keyTimes", "0;0.5;1");
-  animate.setAttribute("keySplines", Caml_array.caml_make_vect(2, ".5 0 .5 1").join(";"));
   animate.setAttribute("repeatCount", "indefinite");
   return animate;
 }

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "build": "bsb -make-world",
+    "build:production": "bsb -make-world && rollup -c",
     "start": "bsb -make-world -w",
     "clean": "bsb -clean-world"
   },
@@ -18,6 +19,7 @@
     "@glennsl/bs-jest": "^0.4.8",
     "bs-platform": "^5.0.2",
     "rollup": "^1.12.3",
+    "rollup-plugin-livereload": "^1.0.0",
     "rollup-plugin-node-resolve": "^5.0.0",
     "rollup-plugin-serve": "^1.0.1",
     "rollup-plugin-terser": "^4.0.4"

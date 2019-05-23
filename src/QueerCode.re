@@ -72,14 +72,7 @@ let makeAnimate = (values, duration, animBegin) => {
   ElementRe.setAttribute("dur", duration, animate);
   ElementRe.setAttribute("begin", animBegin, animate);
   ElementRe.setAttribute("fill", "freeze", animate);
-  ElementRe.setAttribute("calcMode", "spline", animate);
   ElementRe.setAttribute("keyTimes", "0;0.5;1", animate);
-  let spline = ".5 0 .5 1";
-  ElementRe.setAttribute(
-    "keySplines",
-    Js.Array.joinWith(";", Array.make(2, spline)),
-    animate,
-  );
   ElementRe.setAttribute("repeatCount", "indefinite", animate);
 
   animate;
