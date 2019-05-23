@@ -9,8 +9,10 @@ module Ctx = {
   type t;
   type imageSource = Dom.element;
 
+  [@bs.get] external globalAlpha : t => float = "";
   [@bs.set] external setGlobalAlpha : (t, float) => unit = "globalAlpha";
 
+  [@bs.get] external globalCompositeOperation : t => string = "";
   [@bs.set]
   external setGlobalCompositeOperation : (t, string) => unit =
     "globalCompositeOperation";
@@ -66,3 +68,16 @@ external toDataURLjpg : (Dom.element, [@bs.as "image/jpeg"] _, float) => string 
 
 [@bs.set] external setHeight : (Dom.element, int) => unit = "height";
 [@bs.set] external setWidth : (Dom.element, int) => unit = "width";
+
+let invert: Dom.element => unit =
+  canvas => {
+    let ctx = getContext(canvas);
+    let w = getWidth(canvas);
+    let h = getHeight(canvas);
+    let originalCompositeOperation = Ctx.globalCompositeOperation(ctx);
+    Ctx.setGlobalCompositeOperation(ctx, "difference");
+    Ctx.setFillStyle(ctx, "#FFFFFF");
+    Ctx.fillRect(ctx, 0, 0, w, h);
+
+    Ctx.setGlobalCompositeOperation(ctx, originalCompositeOperation);
+  };

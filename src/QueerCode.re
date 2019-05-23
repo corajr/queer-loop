@@ -157,22 +157,21 @@ let createSymbol =
 
   let codeGroup = DocumentRe.createElementNS(svgNs, "g", document);
 
-  if (! invert) {
-    let rainbow = DocumentRe.createElementNS(svgNs, "rect", document);
-    ElementRe.setId(rainbow, "rainbowMask");
-    ElementRe.setAttribute("width", "100%", rainbow);
-    ElementRe.setAttribute("height", "100%", rainbow);
-    ElementRe.setAttribute("fill", "url(#rainbow)", rainbow);
-    ElementRe.appendChild(rainbow, codeGroup);
-  } else {
-    let overlay = DocumentRe.createElementNS(svgNs, "rect", document);
+  let rect = DocumentRe.createElementNS(svgNs, "rect", document);
+  ElementRe.setAttribute("width", "100%", rect);
+  ElementRe.setAttribute("height", "100%", rect);
 
-    ElementRe.setAttribute("width", "100%", overlay);
-    ElementRe.setAttribute("height", "100%", overlay);
-    ElementRe.setAttribute("fill", "#000000", overlay);
-    ElementRe.setAttribute("fill-opacity", "0.5", overlay);
-    ElementRe.appendChild(overlay, codeGroup);
+  if (! invert) {
+    ElementRe.setAttribute("fill", "url(#rainbow)", rect);
+  } else {
+    ElementRe.setAttribute("fill", "#000000", rect);
   };
+
+  if (! animated) {
+    ElementRe.setAttribute("fill-opacity", "0.5", rect);
+  };
+
+  ElementRe.appendChild(rect, codeGroup);
 
   let path = createQrCodePathElement(code, border);
   ElementRe.appendChild(path, codeGroup);
@@ -244,15 +243,8 @@ let createSvgSkeleton = hash => {
 };
 
 let createIconSvg =
-    (
-      ~href: string,
-      ~code: QrCode.t,
-      ~hash: string,
-      ~localeString: string,
-      ~border: int,
-      ~invert: bool,
-    )
-    : Dom.element => {
+    (~code: QrCode.t, ~border: int, ~bg: bool, ~invert: bool)
+    : (Dom.element, int) => {
   let size = QrCode.size(code);
   let sizeWithBorder = size + border * 2;
   let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
@@ -260,24 +252,26 @@ let createIconSvg =
   let svg = DocumentRe.createElementNS(svgNs, "svg", document);
   ElementRe.setAttribute("viewBox", viewBox, svg);
 
-  if (! invert) {
-    let defs = DocumentRe.createElementNS(svgNs, "defs", document);
-    let rainbowGradient = createRainbowGradient(0.85);
-    ElementRe.appendChild(rainbowGradient, defs);
-    ElementRe.appendChild(defs, svg);
-  };
+  if (bg) {
+    if (! invert) {
+      let defs = DocumentRe.createElementNS(svgNs, "defs", document);
+      let rainbowGradient = createRainbowGradient(0.85);
+      ElementRe.appendChild(rainbowGradient, defs);
+      ElementRe.appendChild(defs, svg);
+    };
 
-  let rect = DocumentRe.createElementNS(svgNs, "rect", document);
-  ElementRe.setAttribute("width", "100%", rect);
-  ElementRe.setAttribute("height", "100%", rect);
+    let rect = DocumentRe.createElementNS(svgNs, "rect", document);
+    ElementRe.setAttribute("width", "100%", rect);
+    ElementRe.setAttribute("height", "100%", rect);
 
-  if (! invert) {
-    ElementRe.setAttribute("fill", "url(#rainbow)", rect);
-  } else {
-    ElementRe.setAttribute("fill", "#000000", rect);
-    ElementRe.setAttribute("fill-opacity", "0.8", rect);
+    if (! invert) {
+      ElementRe.setAttribute("fill", "url(#rainbow)", rect);
+    } else {
+      ElementRe.setAttribute("fill", "#000000", rect);
+      ElementRe.setAttribute("fill-opacity", "0.8", rect);
+    };
+    ElementRe.appendChild(rect, svg);
   };
-  ElementRe.appendChild(rect, svg);
 
   let path = createQrCodePathElement(code, border);
   if (invert) {
@@ -286,7 +280,7 @@ let createIconSvg =
     ElementRe.setAttribute("fill", "#000000", path);
   };
   ElementRe.appendChild(path, svg);
-  svg;
+  (svg, sizeWithBorder);
 };
 
 module XMLSerializer = {
@@ -300,6 +294,21 @@ let svgToDataURL: Dom.element => string =
     let str = XMLSerializer.serializeToString(xmlSerializer, svg);
     "data:image/svg+xml;utf8," ++ encodeURIComponent(str);
   };
+
+let codeToImage = (~code: QrCode.t, ~border: int) : Dom.element => {
+  let (iconSvg, sizeWithBorder) =
+    createIconSvg(~code, ~border=6, ~invert=true, ~bg=false);
+  let sizeStr = string_of_int(sizeWithBorder);
+
+  let iconSvgUrl = svgToDataURL(iconSvg);
+  let iconSvgImg = DocumentRe.createElementNS(htmlNs, "img", document);
+
+  ElementRe.setAttribute("src", iconSvgUrl, iconSvgImg);
+  ElementRe.setAttribute("width", sizeStr, iconSvgImg);
+  ElementRe.setAttribute("height", sizeStr, iconSvgImg);
+
+  iconSvgImg;
+};
 
 let drawCanvas: (Dom.element, QrCode.t) => unit =
   (canvas, code) => {

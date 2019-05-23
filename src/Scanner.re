@@ -4,13 +4,13 @@ open UserMedia;
 open Util;
 open Webapi.Dom;
 
-let syncScan = (scanCallback, imageData) =>
+let syncScan = (scanCallback, invertOptions, imageData) =>
   switch (
     jsQR(
       dataGet(imageData),
       widthGet(imageData),
       heightGet(imageData),
-      defaultInversion,
+      invertOptions,
     )
   ) {
   | Some(code) => scanCallback(textDataGet(code))
@@ -18,12 +18,13 @@ let syncScan = (scanCallback, imageData) =>
   };
 
 let scanUsingDeviceId:
-  (Dom.element, string, string => unit) => Js.Promise.t(Dom.element) =
-  (videoEl, deviceId, scanCallback) =>
+  (Dom.element, string, invertOptions, string => unit) =>
+  Js.Promise.t(Dom.element) =
+  (videoEl, deviceId, invert, scanCallback) =>
     initStreamByDeviceId(videoEl, deviceId)
     |> Js.Promise.then_(video => {
          let canvas = DocumentRe.createElementNS(htmlNs, "canvas", document);
-         withQuerySelectorDom("#htmlContainer", body =>
+         withQuerySelectorDom("body", body =>
            ElementRe.appendChild(canvas, body)
          );
 
@@ -69,6 +70,13 @@ let scanUsingDeviceId:
                let ctx = getContext(canvas);
                Ctx.drawImage(ctx, ~image=video, ~dx=0, ~dy=0);
 
+               switch (invert) {
+               | DontInvert => ()
+               | OnlyInvert
+               | AttemptBoth
+               | InvertFirst => Canvas.invert(canvas)
+               };
+
                let imageData =
                  Ctx.getImageData(ctx, ~sx=0, ~sy=0, ~sw=width, ~sh=height);
 
@@ -76,9 +84,9 @@ let scanUsingDeviceId:
                | Some(worker) =>
                  WebWorkers.postMessage(
                    worker,
-                   (dataGet(imageData), width, height),
+                   (dataGet(imageData), width, height, DontInvert),
                  )
-               | None => syncScan(scanCallback, imageData)
+               | None => syncScan(scanCallback, DontInvert, imageData)
                };
              };
            };

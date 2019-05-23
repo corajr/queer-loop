@@ -18,16 +18,17 @@ import * as UserMedia$QueerLoop from "./UserMedia.bs.js";
 
 var domain = "qqq.lu";
 
-var defaultOptions_006 = /* cameraIndices : array */[0];
+var defaultOptions_007 = /* cameraIndices : array */[0];
 
 var defaultOptions = /* record */[
   /* background */"",
   /* includeDomain */true,
   /* includeQueryString */true,
   /* includeHash */true,
-  /* invert */true,
+  /* invert */false,
+  /* animate */true,
   /* opacity */0.1,
-  defaultOptions_006
+  defaultOptions_007
 ];
 
 var currentOptions = /* record */[/* contents */defaultOptions];
@@ -60,7 +61,7 @@ var canvasesRef = /* record */[/* contents : array */[]];
 function copyVideoToSnapshotCanvas(param) {
   return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
                 var snapshotCtx = snapshotCanvas.getContext("2d");
-                snapshotCtx.globalAlpha = currentOptions[0][/* opacity */5];
+                snapshotCtx.globalAlpha = currentOptions[0][/* opacity */6];
                 return $$Array.mapi((function (i, canvas) {
                               var h = canvas.height;
                               var x = (canvas.width - h | 0) / 2 | 0;
@@ -74,6 +75,16 @@ function takeSnapshot(param) {
   return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
                 snapshotCanvas.getContext("2d");
                 return snapshotCanvas.toDataURL("image/jpeg", 0.9);
+              }));
+}
+
+function copySnapshotToIcon(param) {
+  return Util$QueerLoop.withQuerySelectorDom("#iconCanvas", (function (iconCanvas) {
+                return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
+                              var iconCtx = iconCanvas.getContext("2d");
+                              iconCtx.drawImage(snapshotCanvas, 0, 0, snapshotCanvas.width, snapshotCanvas.height, 0, 0, iconCanvas.width, iconCanvas.height);
+                              return /* () */0;
+                            }));
               }));
 }
 
@@ -122,14 +133,14 @@ function setCode(text) {
           if (!alreadySeen) {
             dataSeen[hash] = text;
             var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
+            var sizeWithBorder = code.size + 12 | 0;
             Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (loopContainer) {
                     var match = takeSnapshot(/* () */0);
                     if (match !== undefined) {
                       var match$1 = getTimestampAndLocaleString(/* () */0);
-                      var localeString = match$1[1];
                       var timestamp = match$1[0];
                       var match$2 = hasChanged[0];
-                      var symbol = QueerCode$QueerLoop.createSymbol(text, code, hash, match$2 ? match : undefined, localeString, 6, currentOptions[0][/* invert */4], false);
+                      var symbol = QueerCode$QueerLoop.createSymbol(text, code, hash, match$2 ? match : undefined, match$1[1], 6, currentOptions[0][/* invert */4], currentOptions[0][/* animate */5]);
                       var match$3 = loopContainer.querySelector("svg");
                       var svg;
                       if (match$3 == null) {
@@ -146,17 +157,32 @@ function setCode(text) {
                               a.setAttribute("href", url);
                               return /* () */0;
                             }));
-                      var singleSvg = QueerCode$QueerLoop.createIconSvg(text, code, hash, localeString, 6, !currentOptions[0][/* invert */4]);
-                      var singleSvgUrl = QueerCode$QueerLoop.svgToDataURL(singleSvg);
-                      Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
-                              var img = document.createElementNS(Util$QueerLoop.htmlNs, "img");
-                              img.setAttribute("src", singleSvgUrl);
-                              var partial_arg = hash;
-                              img.addEventListener("click", (function (param) {
-                                      return onClick(partial_arg, param);
+                      var iconCodeImg = QueerCode$QueerLoop.codeToImage(code, 6);
+                      iconCodeImg.addEventListener("load", (function (_evt) {
+                              var match = Util$QueerLoop.withQuerySelectorDom("#iconCanvas", (function (iconCanvas) {
+                                      iconCanvas.width = sizeWithBorder;
+                                      iconCanvas.height = sizeWithBorder;
+                                      var ctx = iconCanvas.getContext("2d");
+                                      copySnapshotToIcon(/* () */0);
+                                      ctx.drawImage(iconCodeImg, 0, 0);
+                                      return iconCanvas.toDataURL();
                                     }));
-                              container.appendChild(img);
-                              return /* () */0;
+                              if (match !== undefined) {
+                                var iconUrl = match;
+                                Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
+                                        var img = document.createElementNS(Util$QueerLoop.htmlNs, "img");
+                                        img.setAttribute("src", iconUrl);
+                                        var partial_arg = hash;
+                                        img.addEventListener("click", (function (param) {
+                                                return onClick(partial_arg, param);
+                                              }));
+                                        container.appendChild(img);
+                                        return /* () */0;
+                                      }));
+                                return /* () */0;
+                              } else {
+                                return /* () */0;
+                              }
                             }));
                       currentSignature[0] = hash;
                       return /* () */0;
@@ -291,12 +317,17 @@ function init(param) {
     var cameraIndices = $$Array.map(Caml_format.caml_int_of_string, params.getAll("c"));
     var match = cameraIndices.length === 0;
     currentOptions[0] = /* record */[
-      /* background */decodeURIComponent(Belt_Option.getWithDefault(Caml_option.nullable_to_opt(params.get("b")), "")),
-      /* includeDomain */boolParam(true, Caml_option.nullable_to_opt(params.get("d"))),
-      /* includeQueryString */boolParam(true, Caml_option.nullable_to_opt(params.get("q"))),
-      /* includeHash */boolParam(true, Caml_option.nullable_to_opt(params.get("h"))),
-      /* invert */boolParam(true, Caml_option.nullable_to_opt(params.get("i"))),
-      /* opacity */Number(Belt_Option.getWithDefault(Caml_option.nullable_to_opt(params.get("o")), "0.1")),
+      /* background */Belt_Option.getWithDefault(Belt_Option.map(Caml_option.nullable_to_opt(params.get("b")), (function (prim) {
+                  return decodeURIComponent(prim);
+                })), currentOptions[0][/* background */0]),
+      /* includeDomain */boolParam(currentOptions[0][/* includeDomain */1], Caml_option.nullable_to_opt(params.get("d"))),
+      /* includeQueryString */boolParam(currentOptions[0][/* includeQueryString */2], Caml_option.nullable_to_opt(params.get("q"))),
+      /* includeHash */boolParam(currentOptions[0][/* includeHash */3], Caml_option.nullable_to_opt(params.get("h"))),
+      /* invert */boolParam(currentOptions[0][/* invert */4], Caml_option.nullable_to_opt(params.get("i"))),
+      /* animate */boolParam(currentOptions[0][/* invert */4], Caml_option.nullable_to_opt(params.get("a"))),
+      /* opacity */Belt_Option.getWithDefault(Belt_Option.map(Caml_option.nullable_to_opt(params.get("o")), (function (prim) {
+                  return Number(prim);
+                })), currentOptions[0][/* opacity */6]),
       /* cameraIndices */match ? /* array */[0] : cameraIndices
     ];
   }
@@ -350,8 +381,9 @@ function init(param) {
                                         body.appendChild(videoEl);
                                         return /* () */0;
                                       }));
-                                return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, response);
-                              }), pick(cameras, currentOptions[0][/* cameraIndices */6])));
+                                var match = currentOptions[0][/* invert */4];
+                                return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, match ? /* OnlyInvert */2 : /* DontInvert */1, response);
+                              }), pick(cameras, currentOptions[0][/* cameraIndices */7])));
             })).then((function (canvases) {
             canvasesRef[0] = canvases;
             requestAnimationFrame(onTick);
@@ -393,6 +425,7 @@ export {
   canvasesRef ,
   copyVideoToSnapshotCanvas ,
   takeSnapshot ,
+  copySnapshotToIcon ,
   getTimestamp ,
   getTimestampAndLocaleString ,
   asOfNow ,

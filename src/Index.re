@@ -13,6 +13,7 @@ type options = {
   includeQueryString: bool,
   includeHash: bool,
   invert: bool,
+  animate: bool,
   opacity: float,
   cameraIndices: array(int),
 };
@@ -22,7 +23,8 @@ let defaultOptions = {
   includeDomain: true,
   includeQueryString: true,
   includeHash: true,
-  invert: true,
+  invert: false,
+  animate: true,
   opacity: 0.1,
   cameraIndices: [|0|],
 };
@@ -94,6 +96,25 @@ let takeSnapshot = _ =>
     toDataURLjpg(snapshotCanvas, 0.9);
   });
 
+let copySnapshotToIcon = _ =>
+  withQuerySelectorDom("#iconCanvas", iconCanvas =>
+    withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
+      let iconCtx = getContext(iconCanvas);
+      Ctx.drawImageSourceRectDestRect(
+        iconCtx,
+        ~image=snapshotCanvas,
+        ~sx=0,
+        ~sy=0,
+        ~sw=getWidth(snapshotCanvas),
+        ~sh=getHeight(snapshotCanvas),
+        ~dx=0,
+        ~dy=0,
+        ~dw=getWidth(iconCanvas),
+        ~dh=getHeight(iconCanvas),
+      );
+    })
+  );
+
 let getTimestamp = _ => Js.Date.toISOString(Js.Date.make());
 
 let getTimestampAndLocaleString = _ => {
@@ -135,6 +156,8 @@ let setCode = text =>
              QrCode.encodeText(text, Ecc.medium),
              defaultCode,
            );
+         let border = 6;
+         let sizeWithBorder = QrCode.size(code) + border * 2;
 
          withQuerySelectorDom(".queer-loop", loopContainer =>
            switch (takeSnapshot()) {
@@ -146,11 +169,11 @@ let setCode = text =>
                  ~href=text,
                  ~hash,
                  ~code,
-                 ~border=6,
+                 ~border,
                  ~localeString,
                  ~maybeDataURL=hasChanged^ ? Some(snapshotUrl) : None,
                  ~invert=currentOptions^.invert,
-                 ~animated=false,
+                 ~animated=currentOptions^.animate,
                );
 
              let svg =
@@ -171,29 +194,38 @@ let setCode = text =>
                ElementRe.setAttribute("href", url, a);
              });
 
-             let singleSvg =
-               QueerCode.createIconSvg(
-                 ~href=text,
-                 ~hash,
-                 ~code,
-                 ~border=6,
-                 ~localeString,
-                 ~invert=! currentOptions^.invert,
-               );
+             let iconCodeImg = QueerCode.codeToImage(~code, ~border);
+             ElementRe.addEventListener(
+               "load",
+               _evt =>
+                 switch (
+                   withQuerySelectorDom("#iconCanvas", iconCanvas => {
+                     setWidth(iconCanvas, sizeWithBorder);
+                     setHeight(iconCanvas, sizeWithBorder);
+                     let ctx = getContext(iconCanvas);
+                     copySnapshotToIcon();
+                     Ctx.drawImage(ctx, ~image=iconCodeImg, ~dx=0, ~dy=0);
+                     toDataURL(iconCanvas);
+                   })
+                 ) {
+                 | Some(iconUrl) =>
+                   withQuerySelectorDom("#codes", container => {
+                     let img =
+                       DocumentRe.createElementNS(htmlNs, "img", document);
+                     ElementRe.setAttribute("src", iconUrl, img);
 
-             let singleSvgUrl = QueerCode.svgToDataURL(singleSvg);
-
-             withQuerySelectorDom("#codes", container => {
-               let img = DocumentRe.createElementNS(htmlNs, "img", document);
-               ElementRe.setAttribute("src", singleSvgUrl, img);
-
-               ElementRe.addEventListener(
-                 "click",
-                 onClick(Some(hash)),
-                 img,
-               );
-               ElementRe.appendChild(img, container);
-             });
+                     ElementRe.addEventListener(
+                       "click",
+                       onClick(Some(hash)),
+                       img,
+                     );
+                     ElementRe.appendChild(img, container);
+                   })
+                   |> ignore
+                 | None => ()
+                 },
+               iconCodeImg,
+             );
 
              currentSignature := hash;
            | None => ()
@@ -308,25 +340,46 @@ let init: unit => unit =
 
       currentOptions :=
         {
-          ...currentOptions^,
-          includeDomain: boolParam(true, URLSearchParamsRe.get("d", params)),
+          includeDomain:
+            boolParam(
+              currentOptions^.includeDomain,
+              URLSearchParamsRe.get("d", params),
+            ),
           includeQueryString:
-            boolParam(true, URLSearchParamsRe.get("q", params)),
-          includeHash: boolParam(true, URLSearchParamsRe.get("h", params)),
-          invert: boolParam(true, URLSearchParamsRe.get("i", params)),
+            boolParam(
+              currentOptions^.includeQueryString,
+              URLSearchParamsRe.get("q", params),
+            ),
+          includeHash:
+            boolParam(
+              currentOptions^.includeHash,
+              URLSearchParamsRe.get("h", params),
+            ),
+          invert:
+            boolParam(
+              currentOptions^.invert,
+              URLSearchParamsRe.get("i", params),
+            ),
+          animate:
+            boolParam(
+              currentOptions^.invert,
+              URLSearchParamsRe.get("a", params),
+            ),
           opacity:
-            Js.Float.fromString(
-              Belt.Option.getWithDefault(
+            Belt.Option.getWithDefault(
+              Belt.Option.map(
                 URLSearchParamsRe.get("o", params),
-                "0.1",
+                Js.Float.fromString,
               ),
+              currentOptions^.opacity,
             ),
           background:
-            decodeURIComponent(
-              Belt.Option.getWithDefault(
+            Belt.Option.getWithDefault(
+              Belt.Option.map(
                 URLSearchParamsRe.get("b", params),
-                "",
+                decodeURIComponent,
               ),
+              currentOptions^.background,
             ),
           cameraIndices:
             Array.length(cameraIndices) == 0 ? [|0|] : cameraIndices,
@@ -392,6 +445,7 @@ let init: unit => unit =
                Scanner.scanUsingDeviceId(
                  videoEl,
                  UserMedia.deviceIdGet(camera),
+                 currentOptions^.invert ? OnlyInvert : DontInvert,
                  response,
                );
              },

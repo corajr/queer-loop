@@ -4,7 +4,7 @@ import * as JsQr$QueerLoop from "./JsQr.bs.js";
 
 self.onmessage = (function (e) {
     var match = e.data;
-    var maybeCode = JsQr$QueerLoop.jsQR(match[0], match[1], match[2], JsQr$QueerLoop.defaultInversion);
+    var maybeCode = JsQr$QueerLoop.jsQR(match[0], match[1], match[2], match[3]);
     postMessage(maybeCode);
     return /* () */0;
   });

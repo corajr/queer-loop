@@ -3,8 +3,21 @@
 
 var Ctx = /* module */[];
 
+function invert(canvas) {
+  var ctx = canvas.getContext("2d");
+  var w = canvas.width;
+  var h = canvas.height;
+  var originalCompositeOperation = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = "difference";
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, w, h);
+  ctx.globalCompositeOperation = originalCompositeOperation;
+  return /* () */0;
+}
+
 export {
   Ctx ,
+  invert ,
   
 }
 /* No side effect */

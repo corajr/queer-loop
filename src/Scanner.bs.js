@@ -4,11 +4,12 @@ import * as Curry from "../node_modules/bs-platform/lib/es6/curry.js";
 import * as Caml_option from "../node_modules/bs-platform/lib/es6/caml_option.js";
 import * as JsQr$QueerLoop from "./JsQr.bs.js";
 import * as Util$QueerLoop from "./Util.bs.js";
+import * as Canvas$QueerLoop from "./Canvas.bs.js";
 import * as Caml_js_exceptions from "../node_modules/bs-platform/lib/es6/caml_js_exceptions.js";
 import * as UserMedia$QueerLoop from "./UserMedia.bs.js";
 
-function syncScan(scanCallback, imageData) {
-  var match = JsQr$QueerLoop.jsQR(imageData.data, imageData.width, imageData.height, JsQr$QueerLoop.defaultInversion);
+function syncScan(scanCallback, invertOptions, imageData) {
+  var match = JsQr$QueerLoop.jsQR(imageData.data, imageData.width, imageData.height, invertOptions);
   if (match !== undefined) {
     return Curry._1(scanCallback, Caml_option.valFromOption(match).data);
   } else {
@@ -16,10 +17,10 @@ function syncScan(scanCallback, imageData) {
   }
 }
 
-function scanUsingDeviceId(videoEl, deviceId, scanCallback) {
+function scanUsingDeviceId(videoEl, deviceId, invert, scanCallback) {
   return UserMedia$QueerLoop.initStreamByDeviceId(videoEl, deviceId).then((function (video) {
                 var canvas = document.createElementNS(Util$QueerLoop.htmlNs, "canvas");
-                Util$QueerLoop.withQuerySelectorDom("#htmlContainer", (function (body) {
+                Util$QueerLoop.withQuerySelectorDom("body", (function (body) {
                         body.appendChild(canvas);
                         return /* () */0;
                       }));
@@ -62,15 +63,19 @@ function scanUsingDeviceId(videoEl, deviceId, scanCallback) {
                     if (frameCount[0] % 5 === 0) {
                       var ctx = canvas.getContext("2d");
                       ctx.drawImage(video, 0, 0);
+                      if (invert !== 1) {
+                        Canvas$QueerLoop.invert(canvas);
+                      }
                       var imageData = ctx.getImageData(0, 0, width, height);
                       if (maybeWorker !== undefined) {
                         Caml_option.valFromOption(maybeWorker).postMessage(/* tuple */[
                               imageData.data,
                               width,
-                              height
+                              height,
+                              /* DontInvert */1
                             ]);
                       } else {
-                        syncScan(scanCallback, imageData);
+                        syncScan(scanCallback, /* DontInvert */1, imageData);
                       }
                     }
                     

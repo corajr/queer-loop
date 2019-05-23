@@ -25,11 +25,8 @@ function jsQR(d, w, h, invertOptions) {
                 }));
 }
 
-var defaultInversion = /* InvertFirst */3;
-
 export {
   string_of_invertOptions ,
-  defaultInversion ,
   jsQR ,
   
 }

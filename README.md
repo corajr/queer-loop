@@ -29,9 +29,18 @@ There are also some configuration options, which may be set via URL query parame
 
 ### Query Parameters
 
+#### a (animation)
+
+`a` controls SVG animation, which may be slow on some devices. Default is 1 (on).
+
+Examples:
+
+[`https://qqq.lu/?a=0`](https://qqq.lu/?a=0)
+[`https://qqq.lu/?a=1`](https://qqq.lu/?a=1)
+
 #### b (background)
 
-`b` sets the "background" CSS property of the document's body.
+`b` sets the "background" CSS property of the document's body. Default is none.
 
 Examples:
 
