@@ -243,13 +243,14 @@ let createSvgSkeleton = hash => {
   svg;
 };
 
-let createInverseSvg =
+let createIconSvg =
     (
       ~href: string,
       ~code: QrCode.t,
       ~hash: string,
       ~localeString: string,
       ~border: int,
+      ~invert: bool,
     )
     : Dom.element => {
   let size = QrCode.size(code);
@@ -259,8 +260,31 @@ let createInverseSvg =
   let svg = DocumentRe.createElementNS(svgNs, "svg", document);
   ElementRe.setAttribute("viewBox", viewBox, svg);
 
+  if (! invert) {
+    let defs = DocumentRe.createElementNS(svgNs, "defs", document);
+    let rainbowGradient = createRainbowGradient(0.85);
+    ElementRe.appendChild(rainbowGradient, defs);
+    ElementRe.appendChild(defs, svg);
+  };
+
+  let rect = DocumentRe.createElementNS(svgNs, "rect", document);
+  ElementRe.setAttribute("width", "100%", rect);
+  ElementRe.setAttribute("height", "100%", rect);
+
+  if (! invert) {
+    ElementRe.setAttribute("fill", "url(#rainbow)", rect);
+  } else {
+    ElementRe.setAttribute("fill", "#000000", rect);
+    ElementRe.setAttribute("fill-opacity", "0.8", rect);
+  };
+  ElementRe.appendChild(rect, svg);
+
   let path = createQrCodePathElement(code, border);
-  ElementRe.setAttribute("fill", "#FFFFFF", path);
+  if (invert) {
+    ElementRe.setAttribute("fill", "#FFFFFF", path);
+  } else {
+    ElementRe.setAttribute("fill", "#000000", path);
+  };
   ElementRe.appendChild(path, svg);
   svg;
 };

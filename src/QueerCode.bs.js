@@ -137,14 +137,34 @@ function createSvgSkeleton(hash) {
   return svg;
 }
 
-function createInverseSvg(href, code, hash, localeString, border) {
+function createIconSvg(href, code, hash, localeString, border, invert) {
   var size = code.size;
   var sizeWithBorder = size + (border << 1) | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
   var svg = document.createElementNS(svgNs, "svg");
   svg.setAttribute("viewBox", viewBox);
+  if (!invert) {
+    var defs = document.createElementNS(svgNs, "defs");
+    var rainbowGradient = createRainbowGradient(0.85);
+    defs.appendChild(rainbowGradient);
+    svg.appendChild(defs);
+  }
+  var rect = document.createElementNS(svgNs, "rect");
+  rect.setAttribute("width", "100%");
+  rect.setAttribute("height", "100%");
+  if (invert) {
+    rect.setAttribute("fill", "#000000");
+    rect.setAttribute("fill-opacity", "0.8");
+  } else {
+    rect.setAttribute("fill", "url(#rainbow)");
+  }
+  svg.appendChild(rect);
   var path = createQrCodePathElement(code, border);
-  path.setAttribute("fill", "#FFFFFF");
+  if (invert) {
+    path.setAttribute("fill", "#FFFFFF");
+  } else {
+    path.setAttribute("fill", "#000000");
+  }
   svg.appendChild(path);
   return svg;
 }
@@ -188,7 +208,7 @@ export {
   createScript ,
   createSymbol ,
   createSvgSkeleton ,
-  createInverseSvg ,
+  createIconSvg ,
   $$XMLSerializer ,
   svgToDataURL ,
   drawCanvas ,

@@ -172,12 +172,13 @@ let setCode = text =>
              });
 
              let singleSvg =
-               QueerCode.createInverseSvg(
+               QueerCode.createIconSvg(
                  ~href=text,
                  ~hash,
                  ~code,
                  ~border=6,
                  ~localeString,
+                 ~invert=! currentOptions^.invert,
                );
 
              let singleSvgUrl = QueerCode.svgToDataURL(singleSvg);

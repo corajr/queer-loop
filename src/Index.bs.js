@@ -146,7 +146,7 @@ function setCode(text) {
                               a.setAttribute("href", url);
                               return /* () */0;
                             }));
-                      var singleSvg = QueerCode$QueerLoop.createInverseSvg(text, code, hash, localeString, 6);
+                      var singleSvg = QueerCode$QueerLoop.createIconSvg(text, code, hash, localeString, 6, !currentOptions[0][/* invert */4]);
                       var singleSvgUrl = QueerCode$QueerLoop.svgToDataURL(singleSvg);
                       Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
                               var img = document.createElementNS(Util$QueerLoop.htmlNs, "img");
