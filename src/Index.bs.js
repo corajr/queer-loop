@@ -47,6 +47,7 @@ var canvasesRef = /* record */[/* contents : array */[]];
 function copyVideoToSnapshotCanvas(param) {
   return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
                 var snapshotCtx = snapshotCanvas.getContext("2d");
+                snapshotCtx.globalCompositeOperation = "source-over";
                 snapshotCtx.globalAlpha = Options$QueerLoop.currentOptions[0][/* opacity */6];
                 return $$Array.mapi((function (i, canvas) {
                               var h = canvas.height;
@@ -57,25 +58,29 @@ function copyVideoToSnapshotCanvas(param) {
               }));
 }
 
-function _writeText(param) {
-  var hash = param[1];
-  var text = param[0];
+function _writeLogEntry(param) {
+  var hash = param[2];
+  var text = param[1];
   Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
           return Util$QueerLoop.withQuerySelectorDom("#log", (function (log) {
-                        var textChild = document.createElement("div");
+                        var entry = document.createElement("div");
+                        var time = document.createElement("time");
+                        var textChild = document.createElement("span");
                         textChild.innerText = text;
                         var hashColor = hash.slice(0, 6);
-                        textChild.setAttribute("style", "color: #" + (String(hashColor) + ";"));
-                        log.appendChild(textChild);
+                        entry.setAttribute("style", "color: #" + (String(hashColor) + ";"));
+                        entry.appendChild(time);
+                        entry.appendChild(textChild);
+                        log.appendChild(entry);
                         return /* () */0;
                       }));
         }));
   return /* () */0;
 }
 
-var writeText = Debouncer.make(100, _writeText);
+var writeLogEntry = Debouncer.make(100, _writeLogEntry);
 
-function takeSnapshot(param) {
+function takeSnapshot(codeImg) {
   return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
                 snapshotCanvas.getContext("2d");
                 return snapshotCanvas.toDataURL("image/jpeg", 0.9);
@@ -114,14 +119,67 @@ function setHashToNow(param) {
 
 var hasChanged = /* record */[/* contents */false];
 
+function setAnimacy(svg, hash) {
+  Util$QueerLoop.withQuerySelectorAllFrom(".animate", svg, (function (param) {
+          return $$Array.map((function (animated) {
+                        animated.setAttribute("class", "code previous");
+                        return /* () */0;
+                      }), param);
+        }));
+  Util$QueerLoop.withQuerySelectorAllFrom(".previous", svg, (function (param) {
+          return $$Array.map((function (animated) {
+                        animated.setAttribute("class", "code");
+                        return /* () */0;
+                      }), param);
+        }));
+  Util$QueerLoop.withQuerySelectorAllFrom(".selected", svg, (function (param) {
+          return $$Array.map((function (animated) {
+                        animated.setAttribute("class", "code");
+                        return /* () */0;
+                      }), param);
+        }));
+  return Belt_Option.map(Caml_option.nullable_to_opt(svg.querySelector("#code" + hash)), (function (toAnimate) {
+                toAnimate.setAttribute("class", "code animate");
+                return /* () */0;
+              }));
+}
+
+function setSelection(svg, hash) {
+  Util$QueerLoop.withQuerySelectorAllFrom(".animate", svg, (function (param) {
+          return $$Array.map((function (animated) {
+                        animated.setAttribute("class", "code");
+                        return /* () */0;
+                      }), param);
+        }));
+  Util$QueerLoop.withQuerySelectorAllFrom(".previous", svg, (function (param) {
+          return $$Array.map((function (animated) {
+                        animated.setAttribute("class", "code");
+                        return /* () */0;
+                      }), param);
+        }));
+  Util$QueerLoop.withQuerySelectorAllFrom(".selected", svg, (function (param) {
+          return $$Array.map((function (animated) {
+                        animated.setAttribute("class", "code");
+                        return /* () */0;
+                      }), param);
+        }));
+  return Belt_Option.map(Caml_option.nullable_to_opt(svg.querySelector("#code" + hash)), (function (toAnimate) {
+                toAnimate.setAttribute("class", "code selected");
+                return /* () */0;
+              }));
+}
+
 function onClick(maybeHash, param) {
   if (!hasChanged[0]) {
     hasChanged[0] = true;
   }
   if (maybeHash !== undefined) {
-    var match = Js_dict.get(dataSeen, maybeHash);
+    var hash = maybeHash;
+    var match = Js_dict.get(dataSeen, hash);
     if (match !== undefined) {
-      window.location.href = match;
+      Util$QueerLoop.withQuerySelectorDom("#queer-loop svg", (function (svg) {
+              return setSelection(svg, hash);
+            }));
       return /* () */0;
     } else {
       return /* () */0;
@@ -138,67 +196,67 @@ function setCode(text) {
             dataSeen[hash] = text;
             var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
             var sizeWithBorder = code.size + 12 | 0;
-            Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (loopContainer) {
-                    var match = takeSnapshot(/* () */0);
-                    if (match !== undefined) {
-                      var match$1 = getTimestampAndLocaleString(/* () */0);
-                      var timestamp = match$1[0];
-                      var match$2 = hasChanged[0];
-                      var symbol = QueerCode$QueerLoop.createSymbol(text, code, hash, match$2 ? match : undefined, match$1[1], 6, Options$QueerLoop.currentOptions[0][/* invert */4], Options$QueerLoop.currentOptions[0][/* animate */5]);
-                      var match$3 = loopContainer.querySelector("svg");
-                      var svg;
-                      if (match$3 == null) {
-                        var svg$1 = QueerCode$QueerLoop.createSvgSkeleton(hash);
-                        loopContainer.appendChild(svg$1);
-                        svg = svg$1;
-                      } else {
-                        svg = match$3;
-                      }
-                      svg.appendChild(symbol);
-                      var url = QueerCode$QueerLoop.svgToDataURL(svg);
-                      Util$QueerLoop.withQuerySelectorDom("#download", (function (a) {
-                              a.setAttribute("download", timestamp + ".svg");
-                              a.setAttribute("href", url);
-                              return /* () */0;
-                            }));
-                      var iconCodeImg = QueerCode$QueerLoop.codeToImage(code, 6);
-                      iconCodeImg.addEventListener("load", (function (_evt) {
-                              var match = Util$QueerLoop.withQuerySelectorDom("#iconCanvas", (function (iconCanvas) {
-                                      iconCanvas.width = sizeWithBorder;
-                                      iconCanvas.height = sizeWithBorder;
-                                      var ctx = iconCanvas.getContext("2d");
-                                      copySnapshotToIcon(/* () */0);
-                                      ctx.drawImage(iconCodeImg, 0, 0);
-                                      return iconCanvas.toDataURL();
-                                    }));
-                              if (match !== undefined) {
-                                var iconUrl = match;
-                                Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
-                                        var img = document.createElementNS(Util$QueerLoop.htmlNs, "img");
-                                        img.setAttribute("src", iconUrl);
-                                        var partial_arg = hash;
-                                        img.addEventListener("click", (function (param) {
-                                                return onClick(partial_arg, param);
-                                              }));
-                                        container.appendChild(img);
-                                        return /* () */0;
-                                      }));
-                                return /* () */0;
+            var match = getTimestampAndLocaleString(/* () */0);
+            var timestamp = match[0];
+            var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, match[1], timestamp, 6, Options$QueerLoop.currentOptions[0][/* invert */4]);
+            var codeImg = QueerCode$QueerLoop.svgToImg(codeSvg);
+            codeImg.addEventListener("load", (function (param) {
+                    Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (loopContainer) {
+                            var match = takeSnapshot(/* () */0);
+                            if (match !== undefined) {
+                              QueerCode$QueerLoop.addBackground(codeSvg, sizeWithBorder, match);
+                              var match$1 = loopContainer.querySelector("svg");
+                              var rootSvg;
+                              if (match$1 == null) {
+                                var svg = QueerCode$QueerLoop.createSvgSkeleton(hash);
+                                loopContainer.appendChild(svg);
+                                rootSvg = svg;
                               } else {
-                                return /* () */0;
+                                rootSvg = match$1;
                               }
-                            }));
-                      currentSignature[0] = hash;
-                      return /* () */0;
-                    } else {
-                      return /* () */0;
-                    }
+                              rootSvg.appendChild(codeSvg);
+                              setAnimacy(rootSvg, hash);
+                              var url = QueerCode$QueerLoop.svgToDataURL(rootSvg);
+                              Util$QueerLoop.withQuerySelectorDom("#download", (function (a) {
+                                      a.setAttribute("download", timestamp + ".svg");
+                                      a.setAttribute("href", url);
+                                      return /* () */0;
+                                    }));
+                              var iconCodeImg = QueerCode$QueerLoop.codeToImage(code, 6);
+                              iconCodeImg.addEventListener("load", (function (_evt) {
+                                      var match = Util$QueerLoop.withQuerySelectorDom("#iconCanvas", (function (iconCanvas) {
+                                              iconCanvas.width = sizeWithBorder;
+                                              iconCanvas.height = sizeWithBorder;
+                                              iconCanvas.getContext("2d");
+                                              copySnapshotToIcon(/* () */0);
+                                              return iconCanvas.toDataURL();
+                                            }));
+                                      if (match !== undefined) {
+                                        var iconUrl = match;
+                                        Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
+                                                var img = document.createElementNS(Util$QueerLoop.htmlNs, "img");
+                                                img.setAttribute("src", iconUrl);
+                                                var partial_arg = hash;
+                                                img.addEventListener("click", (function (param) {
+                                                        return onClick(partial_arg, param);
+                                                      }));
+                                                container.appendChild(img);
+                                                return /* () */0;
+                                              }));
+                                        return /* () */0;
+                                      } else {
+                                        return /* () */0;
+                                      }
+                                    }));
+                              currentSignature[0] = hash;
+                              return /* () */0;
+                            } else {
+                              return /* () */0;
+                            }
+                          }));
+                    return /* () */0;
                   }));
           }
-          Util$QueerLoop.withQuerySelectorDom("#queer-loop svg use", (function (use) {
-                  use.setAttribute("href", "#code" + hash);
-                  return /* () */0;
-                }));
           return Promise.resolve(/* () */0);
         }));
   return /* () */0;
@@ -254,8 +312,8 @@ function onTick(ts) {
   }
   if (ts - lastUpdated[0] >= 10000.0) {
     Util$QueerLoop.setHash(new Date().toISOString());
-    lastUpdated[0] = ts;
   }
+  lastUpdated[0] = ts;
   requestAnimationFrame(onTick);
   return /* () */0;
 }
@@ -362,25 +420,29 @@ function init(param) {
   var response = function (input) {
     if (input !== "") {
       Hash$QueerLoop.hexDigest("SHA-1", input).then((function (hexHash) {
+              var timestamp = new Date().toISOString();
               if (!hasChanged[0]) {
                 hasChanged[0] = true;
               }
               var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hexHash));
-              if (!alreadySeen) {
-                dataSeen[hexHash] = input;
-              }
-              if (hexHash === currentSignature[0]) {
-                var timestamp = new Date().toISOString();
-                Curry._1(writeText, /* tuple */[
-                      "queer-loop detected at " + (String(timestamp) + "."),
+              var isSelf = hexHash === currentSignature[0];
+              if (isSelf) {
+                Curry._1(writeLogEntry, /* tuple */[
+                      timestamp,
+                      "queer-loop detected",
                       hexHash
                     ]);
-              }
-              if (!alreadySeen) {
-                Curry._1(writeText, /* tuple */[
+              } else if (alreadySeen) {
+                
+              } else {
+                Curry._1(writeLogEntry, /* tuple */[
+                      timestamp,
                       input,
                       hexHash
                     ]);
+              }
+              if (isSelf || !alreadySeen) {
+                dataSeen[hexHash] = input;
                 Util$QueerLoop.setHash(new Date().toISOString());
               }
               return Promise.resolve(/* () */0);
@@ -438,8 +500,8 @@ export {
   currentSignature ,
   canvasesRef ,
   copyVideoToSnapshotCanvas ,
-  _writeText ,
-  writeText ,
+  _writeLogEntry ,
+  writeLogEntry ,
   takeSnapshot ,
   copySnapshotToIcon ,
   getTimestamp ,
@@ -447,6 +509,8 @@ export {
   asOfNow ,
   setHashToNow ,
   hasChanged ,
+  setAnimacy ,
+  setSelection ,
   onClick ,
   setCode ,
   setText ,

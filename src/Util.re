@@ -18,8 +18,26 @@ let withQuerySelectorAll = (query, f) =>
   |> DomRe.NodeList.toArray
   |> Array.map(f);
 
+let catMaybes: array(option('a)) => array('a) =
+  ary => {
+    let newArray = [||];
+    Array.iter(
+      fun
+      | Some(a) => Js.Array.push(a, newArray) |> ignore
+      | None => (),
+      ary,
+    );
+    newArray;
+  };
+
+let mapMaybe: ('a => option('b), array('a)) => array('b) =
+  (f, arrayA) => catMaybes(Array.map(f, arrayA));
+
 let withQuerySelectorAllFrom = (query, element, f) =>
-  ElementRe.querySelectorAll(query, element) |> DomRe.NodeList.toArray |> f;
+  ElementRe.querySelectorAll(query, element)
+  |> DomRe.NodeList.toArray
+  |> mapMaybe(ElementRe.ofNode)
+  |> f;
 
 let withQuerySelectorSub = (query, childQuery, f) =>
   document

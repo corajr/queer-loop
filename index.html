@@ -27,6 +27,7 @@
              pointer-events: none;
              transform: translate(-50%, -50%);
          }
+
          #codes {
              display: flex;
              flex-wrap: wrap;
@@ -58,30 +59,40 @@
              width: 100vw;
              height: 100vh;
          }
+         @media (orientation: landscape) {
+            #htmlContainer {
+                flex-direction: row;
+            }
+         }
+
+         @media (orientation: portrait) {
+             #htmlContainer {
+                 flex-direction: column;
+             }
+         }
 
          #codes {
-             width: 25%;
+             flex-basis: 25%;
          }
 
          #focus {
-             width: 75vmin:
+             flex-basis: 50%;
          }
 
          #queer-loop {
              z-index: 100;
-             flex-grow: 1;
-             flex-shrink: 0;
-             width: 75%;
+             width: 480px;
+             margin: auto;
          }
-         #queer-loop svg {
-             display: block;
+
+         #log {
+             flex-basis: 25%;
+             margin: 8px;
          }
 
          #codeText {
-             z-index: 99;
              color: white;
-             width: 25%;
-             flex-grow: 0;
+             mix-blend-mode: difference;
          }
         </style>
     </head>
@@ -97,9 +108,10 @@
         <div id="htmlContainer">
             <div id="codes"></div>
             <div id="focus">
-                <div id="queer-loop"></div>
-                <div id="codeText">
-                    <span id="codeContents" contenteditable="true"></span>
+                <div id="queer-loop">
+                    <div id="codeText">
+                        <span id="codeContents" contenteditable="true"></span>
+                    </div>
                 </div>
             </div>
             <div id="log"></div>

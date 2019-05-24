@@ -79,6 +79,7 @@ let makeAnimate = (values, duration, animBegin) => {
 };
 
 let scriptText = {|
+   /* <![CDATA[ */
 function clearAnimacy() {
    document.querySelectorAll("svg.animate").forEach(function(x) { x.setAttribute("class", "code previous"); });
    document.querySelectorAll("svg.previous").forEach(function(x) { x.setAttribute("class", "code"); });
@@ -109,38 +110,34 @@ function init() {
 }
 
 window.addEventListener("load", init, false);
+   /* ]]> */
 |};
 
-[@bs.set] external setText : (Dom.element, string) => unit = "text";
-
 let styleText = {|
-   /* <![CDATA[ */
    @namespace svg "http://www.w3.org/2000/svg";
 
-   @keyframes fadeOut {
-   from { opacity: 1; }
+   @keyframes fadeIn {
+   from { opacity: 0.0; }
    }
 
    svg|svg svg|svg {
      display: none;
    }
 
-   svg|svg.animate, svg|svg.previous {
+   svg|svg.animate, svg|svg.previous, svg|svg.selected {
       display: block;
    }
 
-   image, g.codeGroup {
-       mix-blend-mode: difference;
-   }
-
-   svg|svg.animate g.codeGroup {
+   svg|svg.animate {
       animation: fadeIn 2s infinite alternate;
    }
-   svg|svg.previous g.codeGroup {
-      animation: fadeIn 4s infinite alternate;
-   }
-   /* ]]> */
 
+   svg|svg.previous {
+       animation: fadeIn 1s infinite alternate;
+   }
+   svg|svg.selected g.codeGroup {
+       opacity: 0.1;
+   }
 |};
 
 let createScript = () : Dom.element => {
@@ -149,89 +146,35 @@ let createScript = () : Dom.element => {
   ElementRe.setTextContent(script, scriptText);
   script;
 };
+
 let createStyle = () : Dom.element => {
   let style = DocumentRe.createElementNS(svgNs, "style", document);
+  ElementRe.setAttribute("type", "text/css", style);
 
   ElementRe.setTextContent(style, styleText);
   style;
 };
 
-let createSymbol =
-    (
-      ~href: string,
-      ~code: QrCode.t,
-      ~hash: string,
-      ~maybeDataURL: option(string),
-      ~localeString: string,
-      ~border: int,
-      ~invert: bool,
-      ~animated: bool,
-    )
-    : Dom.element => {
-  let size = QrCode.size(code);
-  let sizeWithBorder = size + border * 2;
-  let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
+let addBackground =
+    (~codeSvg: Dom.element, ~sizeWithBorder: int, ~dataURL: string) => {
+  let background = DocumentRe.createElementNS(svgNs, "image", document);
+  ElementRe.setAttribute("x", "0", background);
+  ElementRe.setAttribute("y", "0", background);
+  ElementRe.setAttribute("width", string_of_int(sizeWithBorder), background);
+  ElementRe.setAttribute(
+    "height",
+    string_of_int(sizeWithBorder),
+    background,
+  );
+  ElementRe.setAttribute("href", dataURL, background);
+  ElementRe.querySelector(".codeGroup", codeSvg)
+  |. Belt.Option.map(codeGroup =>
+       ElementRe.insertBefore(background, codeGroup, codeSvg)
+     );
+};
 
-  let symbol = DocumentRe.createElementNS(svgNs, "symbol", document);
-  ElementRe.setId(symbol, "code" ++ hash);
-  ElementRe.setAttribute("viewBox", viewBox, symbol);
-
-  switch (maybeDataURL) {
-  | Some(url) =>
-    let background = DocumentRe.createElementNS(svgNs, "image", document);
-    ElementRe.setAttribute("x", "0", background);
-    ElementRe.setAttribute("y", "0", background);
-    ElementRe.setAttribute(
-      "width",
-      string_of_int(sizeWithBorder),
-      background,
-    );
-    ElementRe.setAttribute(
-      "height",
-      string_of_int(sizeWithBorder),
-      background,
-    );
-    ElementRe.setAttribute("href", url, background);
-
-    if (animated) {
-      let bgAnimate = makeAnimate("0;1;0", "6s", "0s");
-      ElementRe.appendChild(bgAnimate, background);
-    };
-    ElementRe.appendChild(background, symbol);
-  | None => ()
-  };
-
-  let codeGroup = DocumentRe.createElementNS(svgNs, "g", document);
-
-  let rect = DocumentRe.createElementNS(svgNs, "rect", document);
-  ElementRe.setAttribute("width", "100%", rect);
-  ElementRe.setAttribute("height", "100%", rect);
-
-  if (! invert) {
-    ElementRe.setAttribute("fill", "url(#rainbow)", rect);
-  } else {
-    ElementRe.setAttribute("fill", "#000000", rect);
-  };
-
-  if (! animated) {
-    ElementRe.setAttribute("fill-opacity", "0.9", rect);
-  };
-
-  ElementRe.appendChild(rect, codeGroup);
-
-  let path = createQrCodePathElement(code, border);
-  ElementRe.appendChild(path, codeGroup);
-
-  if (invert) {
-    ElementRe.setAttribute("fill", "#FFFFFF", path);
-  };
-
-  if (animated) {
-    let codeGroupAnimate = makeAnimate("1;0;1", "6s", "0s");
-    ElementRe.appendChild(codeGroupAnimate, codeGroup);
-  };
-  ElementRe.appendChild(codeGroup, symbol);
-
+let createTimeLink =
+    (~href, ~timestamp, ~localeString, ~sizeWithBorder, ~border) => {
   let timeText = DocumentRe.createElementNS(svgNs, "text", document);
   ElementRe.setAttribute(
     "x",
@@ -263,10 +206,63 @@ let createSymbol =
   let timeLink = DocumentRe.createElementNS(svgNs, "a", document);
   ElementRe.setAttribute("href", href, timeLink);
   ElementRe.appendChild(timeText, timeLink);
+  timeLink;
+};
 
-  ElementRe.appendChild(timeLink, symbol);
+let createCodeSvg =
+    (
+      ~href: string,
+      ~code: QrCode.t,
+      ~hash: string,
+      ~localeString: string,
+      ~timestamp: string,
+      ~border: int,
+      ~invert: bool,
+    )
+    : Dom.element => {
+  let size = QrCode.size(code);
+  let sizeWithBorder = size + border * 2;
+  let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
 
-  symbol;
+  let codeSvg = DocumentRe.createElementNS(svgNs, "svg", document);
+  ElementRe.setId(codeSvg, "code" ++ hash);
+  ElementRe.setAttribute("viewBox", viewBox, codeSvg);
+
+  let codeGroup = DocumentRe.createElementNS(svgNs, "g", document);
+
+  let rect = DocumentRe.createElementNS(svgNs, "rect", document);
+  ElementRe.setAttribute("width", "100%", rect);
+  ElementRe.setAttribute("height", "100%", rect);
+
+  if (! invert) {
+    ElementRe.setAttribute("fill", "url(#rainbow)", rect);
+  } else {
+    ElementRe.setAttribute("fill", "#000000", rect);
+  };
+
+  ElementRe.appendChild(rect, codeGroup);
+
+  let path = createQrCodePathElement(code, border);
+  ElementRe.appendChild(path, codeGroup);
+
+  if (invert) {
+    ElementRe.setAttribute("fill", "#FFFFFF", path);
+  };
+  ElementRe.setAttribute("class", "codeGroup", codeGroup);
+
+  ElementRe.appendChild(codeGroup, codeSvg);
+  ElementRe.appendChild(
+    createTimeLink(
+      ~href,
+      ~timestamp,
+      ~localeString,
+      ~border,
+      ~sizeWithBorder,
+    ),
+    codeSvg,
+  );
+
+  codeSvg;
 };
 
 let createSvgSkeleton = hash => {
@@ -274,16 +270,15 @@ let createSvgSkeleton = hash => {
   ElementRe.setAttribute("viewBox", "0 0 1 1", svg);
 
   let defs = DocumentRe.createElementNS(svgNs, "defs", document);
-  let rainbowGradient = createRainbowGradient(0.95);
+  let rainbowGradient = createRainbowGradient(0.85);
   ElementRe.appendChild(rainbowGradient, defs);
   ElementRe.appendChild(defs, svg);
 
   let script = createScript();
   ElementRe.appendChild(script, svg);
 
-  let use = DocumentRe.createElementNS(svgNs, "use", document);
-  ElementRe.setAttribute("href", "#code" ++ hash, use);
-  ElementRe.appendChild(use, svg);
+  let style = createStyle();
+  ElementRe.appendChild(style, svg);
 
   svg;
 };
@@ -314,6 +309,7 @@ let createIconSvg =
       ElementRe.setAttribute("fill", "url(#rainbow)", rect);
     } else {
       ElementRe.setAttribute("fill", "#000000", rect);
+      ElementRe.setAttribute("fill-opacity", "0.8", rect);
     };
     ElementRe.appendChild(rect, svg);
   };
@@ -339,6 +335,17 @@ let svgToDataURL: Dom.element => string =
     let str = XMLSerializer.serializeToString(xmlSerializer, svg);
     "data:image/svg+xml;utf8," ++ encodeURIComponent(str);
   };
+
+let svgToImg = (~svg: Dom.element) : Dom.element => {
+  let svgUrl = svgToDataURL(svg);
+  let svgImg = DocumentRe.createElementNS(htmlNs, "img", document);
+
+  ElementRe.setAttribute("src", svgUrl, svgImg);
+  ElementRe.setAttribute("width", "480", svgImg);
+  ElementRe.setAttribute("height", "480", svgImg);
+
+  svgImg;
+};
 
 let codeToImage = (~code: QrCode.t, ~border: int) : Dom.element => {
   let (iconSvg, sizeWithBorder) =

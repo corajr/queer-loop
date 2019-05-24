@@ -18,8 +18,26 @@ function withQuerySelectorAll(query, f) {
   return $$Array.map(f, Array.prototype.slice.call(document.querySelectorAll(query)));
 }
 
+function catMaybes(ary) {
+  var newArray = /* array */[];
+  $$Array.iter((function (param) {
+          if (param !== undefined) {
+            newArray.push(Caml_option.valFromOption(param));
+            return /* () */0;
+          } else {
+            return /* () */0;
+          }
+        }), ary);
+  return newArray;
+}
+
+function mapMaybe(f, arrayA) {
+  return catMaybes($$Array.map(f, arrayA));
+}
+
 function withQuerySelectorAllFrom(query, element, f) {
-  return Curry._1(f, Array.prototype.slice.call(element.querySelectorAll(query)));
+  var arrayA = Array.prototype.slice.call(element.querySelectorAll(query));
+  return Curry._1(f, catMaybes($$Array.map(ElementRe.ofNode, arrayA)));
 }
 
 function withQuerySelectorSub(query, childQuery, f) {
@@ -76,6 +94,8 @@ export {
   withQuerySelectorDom ,
   withQuerySelector ,
   withQuerySelectorAll ,
+  catMaybes ,
+  mapMaybe ,
   withQuerySelectorAllFrom ,
   withQuerySelectorSub ,
   removeFromParentNode ,

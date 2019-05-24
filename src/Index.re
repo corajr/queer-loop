@@ -45,6 +45,7 @@ let copyVideoToSnapshotCanvas = _ =>
   withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
     let snapshotCtx = getContext(snapshotCanvas);
 
+    Ctx.setGlobalCompositeOperation(snapshotCtx, "source-over");
     Ctx.setGlobalAlpha(snapshotCtx, currentOptions^.opacity);
     Array.mapi(
       (i, canvas) => {
@@ -67,35 +68,28 @@ let copyVideoToSnapshotCanvas = _ =>
     );
   });
 
-let _writeText = ((text, hash)) =>
+let _writeLogEntry = ((timestamp, text, hash)) =>
   withQuerySelectorDom("#snapshotCanvas", snapshotCanvas =>
     withQuerySelectorDom("#log", log => {
-      let textChild = DocumentRe.createElement("div", document);
+      let entry = DocumentRe.createElement("div", document);
+
+      let time = DocumentRe.createElement("time", document);
+      let textChild = DocumentRe.createElement("span", document);
       ElementRe.setInnerText(textChild, text);
+
       let hashColor = Js.String.slice(~from=0, ~to_=6, hash);
 
-      ElementRe.setAttribute("style", {j|color: #$hashColor;|j}, textChild);
-      ElementRe.appendChild(textChild, log);
+      ElementRe.setAttribute("style", {j|color: #$hashColor;|j}, entry);
+      ElementRe.appendChild(time, entry);
+      ElementRe.appendChild(textChild, entry);
+      ElementRe.appendChild(entry, log);
     })
   )
-  /* let snapshotCtx = getContext(snapshotCanvas); */
-  /* Ctx.setGlobalAlpha(snapshotCtx, 1.0); */
-  /* Ctx.setGlobalCompositeOperation(snapshotCtx, "difference"); */
-  /* Ctx.setFillStyle(snapshotCtx, "#FFFFFF"); */
-  /* Ctx.setFont(snapshotCtx, "bold 48px monospace"); */
-  /* Ctx.fillText(snapshotCtx, text, 0, 0); */
-  /* Ctx.fillRect( */
-  /*   snapshotCtx, */
-  /*   0, */
-  /*   0, */
-  /*   getWidth(snapshotCanvas), */
-  /*   getHeight(snapshotCanvas), */
-  /* ); */
   |> ignore;
 
-let writeText = Debouncer.make(~wait=100, _writeText);
+let writeLogEntry = Debouncer.make(~wait=100, _writeLogEntry);
 
-let takeSnapshot = _ =>
+let takeSnapshot = codeImg =>
   withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
     let snapshotCtx = getContext(snapshotCanvas);
     toDataURLjpg(snapshotCanvas, 0.9);
@@ -133,6 +127,54 @@ let setHashToNow = _ => setHash(getTimestamp());
 
 let hasChanged = ref(false);
 
+let setAnimacy = (svg, hash) => {
+  withQuerySelectorAllFrom(
+    ".animate",
+    svg,
+    Array.map(animated =>
+      ElementRe.setAttribute("class", "code previous", animated)
+    ),
+  );
+  withQuerySelectorAllFrom(
+    ".previous",
+    svg,
+    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
+  );
+  withQuerySelectorAllFrom(
+    ".selected",
+    svg,
+    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
+  );
+
+  ElementRe.querySelector("#code" ++ hash, svg)
+  |. Belt.Option.map(toAnimate =>
+       ElementRe.setAttribute("class", "code animate", toAnimate)
+     );
+};
+let setSelection = (svg, hash) => {
+  withQuerySelectorAllFrom(
+    ".animate",
+    svg,
+    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
+  );
+
+  withQuerySelectorAllFrom(
+    ".previous",
+    svg,
+    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
+  );
+  withQuerySelectorAllFrom(
+    ".selected",
+    svg,
+    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
+  );
+
+  ElementRe.querySelector("#code" ++ hash, svg)
+  |. Belt.Option.map(toAnimate =>
+       ElementRe.setAttribute("class", "code selected", toAnimate)
+     );
+};
+
 let onClick = (maybeHash, _) => {
   if (! hasChanged^) {
     hasChanged := true;
@@ -141,7 +183,9 @@ let onClick = (maybeHash, _) => {
   switch (maybeHash) {
   | Some(hash) =>
     switch (Js.Dict.get(dataSeen, hash)) {
-    | Some(data) => DomRe.Location.setHref(WindowRe.location(window), data)
+    | Some(_) =>
+      withQuerySelectorDom("#queer-loop svg", svg => setSelection(svg, hash))
+      |> ignore
     | None => ()
     }
   | None => setHashToNow()
@@ -164,85 +208,98 @@ let setCode = text =>
          let border = 6;
          let sizeWithBorder = QrCode.size(code) + border * 2;
 
-         withQuerySelectorDom("#queer-loop", loopContainer =>
-           switch (takeSnapshot()) {
-           | Some(snapshotUrl) =>
-             let (timestamp, localeString) = getTimestampAndLocaleString();
+         let (timestamp, localeString) = getTimestampAndLocaleString();
 
-             let symbol =
-               QueerCode.createSymbol(
-                 ~href=text,
-                 ~hash,
-                 ~code,
-                 ~border,
-                 ~localeString,
-                 ~maybeDataURL=hasChanged^ ? Some(snapshotUrl) : None,
-                 ~invert=currentOptions^.invert,
-                 ~animated=currentOptions^.animate,
-               );
+         let codeSvg =
+           QueerCode.createCodeSvg(
+             ~href=text,
+             ~hash,
+             ~code,
+             ~border,
+             ~localeString,
+             ~timestamp,
+             ~invert=currentOptions^.invert,
+           );
 
-             let svg =
-               switch (ElementRe.querySelector("svg", loopContainer)) {
-               | Some(svg) => svg
-               | None =>
-                 let svg = QueerCode.createSvgSkeleton(hash);
-                 ElementRe.appendChild(svg, loopContainer);
-                 svg;
-               };
+         let codeImg = QueerCode.svgToImg(codeSvg);
 
-             ElementRe.appendChild(symbol, svg);
+         ElementRe.addEventListener(
+           "load",
+           _ =>
+             withQuerySelectorDom("#queer-loop", loopContainer =>
+               switch (takeSnapshot()) {
+               | Some(snapshotUrl) =>
+                 QueerCode.addBackground(
+                   ~codeSvg,
+                   ~dataURL=snapshotUrl,
+                   ~sizeWithBorder,
+                 );
 
-             let url = QueerCode.svgToDataURL(svg);
+                 let rootSvg =
+                   switch (ElementRe.querySelector("svg", loopContainer)) {
+                   | Some(svg) => svg
+                   | None =>
+                     let svg = QueerCode.createSvgSkeleton(hash);
+                     ElementRe.appendChild(svg, loopContainer);
+                     svg;
+                   };
 
-             withQuerySelectorDom("#download", a => {
-               ElementRe.setAttribute("download", timestamp ++ ".svg", a);
-               ElementRe.setAttribute("href", url, a);
-             });
+                 ElementRe.appendChild(codeSvg, rootSvg);
 
-             let iconCodeImg = QueerCode.codeToImage(~code, ~border);
-             ElementRe.addEventListener(
-               "load",
-               _evt =>
-                 switch (
-                   withQuerySelectorDom("#iconCanvas", iconCanvas => {
-                     setWidth(iconCanvas, sizeWithBorder);
-                     setHeight(iconCanvas, sizeWithBorder);
-                     let ctx = getContext(iconCanvas);
-                     copySnapshotToIcon();
-                     Ctx.drawImage(ctx, ~image=iconCodeImg, ~dx=0, ~dy=0);
-                     toDataURL(iconCanvas);
-                   })
-                 ) {
-                 | Some(iconUrl) =>
-                   withQuerySelectorDom("#codes", container => {
-                     let img =
-                       DocumentRe.createElementNS(htmlNs, "img", document);
-                     ElementRe.setAttribute("src", iconUrl, img);
+                 setAnimacy(rootSvg, hash);
 
-                     ElementRe.addEventListener(
-                       "click",
-                       onClick(Some(hash)),
-                       img,
-                     );
-                     ElementRe.appendChild(img, container);
-                   })
-                   |> ignore
-                 | None => ()
-                 },
-               iconCodeImg,
-             );
+                 let url = QueerCode.svgToDataURL(rootSvg);
 
-             currentSignature := hash;
-           | None => ()
-           }
+                 withQuerySelectorDom("#download", a => {
+                   ElementRe.setAttribute("download", timestamp ++ ".svg", a);
+                   ElementRe.setAttribute("href", url, a);
+                 });
+
+                 let iconCodeImg = QueerCode.codeToImage(~code, ~border);
+                 ElementRe.addEventListener(
+                   "load",
+                   _evt =>
+                     switch (
+                       withQuerySelectorDom("#iconCanvas", iconCanvas => {
+                         setWidth(iconCanvas, sizeWithBorder);
+                         setHeight(iconCanvas, sizeWithBorder);
+                         let ctx = getContext(iconCanvas);
+                         copySnapshotToIcon();
+                         toDataURL(iconCanvas);
+                       })
+                     ) {
+                     | Some(iconUrl) =>
+                       withQuerySelectorDom("#codes", container => {
+                         let img =
+                           DocumentRe.createElementNS(
+                             htmlNs,
+                             "img",
+                             document,
+                           );
+                         ElementRe.setAttribute("src", iconUrl, img);
+
+                         ElementRe.addEventListener(
+                           "click",
+                           onClick(Some(hash)),
+                           img,
+                         );
+                         ElementRe.appendChild(img, container);
+                       })
+                       |> ignore
+                     | None => ()
+                     },
+                   iconCodeImg,
+                 );
+
+                 currentSignature := hash;
+               | None => ()
+               }
+             )
+             |> ignore,
+           codeImg,
          )
          |> ignore;
        };
-
-       withQuerySelectorDom("#queer-loop svg use", use =>
-         ElementRe.setAttribute("href", "#code" ++ hash, use)
-       )
-       |> ignore;
 
        Js.Promise.resolve();
      })
@@ -297,8 +354,9 @@ let rec onTick = ts => {
     /*   ElementRe.setAttributeNS(svgNs, "width", {j|0 0 $newSize $newSize|j}); */
     /* }); */
     setHashToNow();
-    lastUpdated := ts;
   };
+
+  lastUpdated := ts;
 
   Webapi.requestAnimationFrame(onTick);
 };
@@ -420,26 +478,23 @@ let init: unit => unit =
       if (input !== "") {
         Hash.hexDigest("SHA-1", input)
         |> Js.Promise.then_(hexHash => {
+             let timestamp = getTimestamp();
              if (! hasChanged^) {
                hasChanged := true;
              };
 
              let alreadySeen =
                Belt.Option.isSome(Js.Dict.get(dataSeen, hexHash));
+             let isSelf = hexHash === currentSignature^;
 
-             if (! alreadySeen) {
+             if (isSelf) {
+               writeLogEntry((timestamp, {j|queer-loop detected|j}, hexHash));
+             } else if (! alreadySeen) {
+               writeLogEntry((timestamp, input, hexHash));
+             };
+
+             if (isSelf || ! alreadySeen) {
                Js.Dict.set(dataSeen, hexHash, input);
-             };
-
-             if (hexHash === currentSignature^) {
-               let timestamp = getTimestamp();
-               writeText(({j|queer-loop detected at $timestamp.|j}, hexHash));
-               /* currentOptions := */
-               /* {...currentOptions^, invert: ! currentOptions^.invert}; */
-             };
-
-             if (! alreadySeen) {
-               writeText((input, hexHash));
 
                setHashToNow();
              };
