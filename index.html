@@ -50,7 +50,7 @@
              color: white;
          }
 
-         #focus {
+         #htmlContainer {
              position: fixed;
              display: flex;
              justify-content: space-evenly;
@@ -59,10 +59,19 @@
              height: 100vh;
          }
 
+         #codes {
+             width: 25%;
+         }
+
+         #focus {
+             width: 75vmin:
+         }
+
          #queer-loop {
              z-index: 100;
              flex-grow: 1;
              flex-shrink: 0;
+             width: 75%;
          }
          #queer-loop svg {
              display: block;
@@ -71,6 +80,7 @@
          #codeText {
              z-index: 99;
              color: white;
+             width: 25%;
              flex-grow: 0;
          }
         </style>
@@ -84,9 +94,9 @@
         <canvas id="iconCanvas"></canvas>
 
         <h1><time id="lastUpdated"></time></h1>
-        <div id="focus">
+        <div id="htmlContainer">
             <div id="codes"></div>
-            <div>
+            <div id="focus">
                 <div id="queer-loop"></div>
                 <div id="codeText">
                     <span id="codeContents" contenteditable="true"></span>

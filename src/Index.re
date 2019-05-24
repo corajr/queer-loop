@@ -67,27 +67,30 @@ let copyVideoToSnapshotCanvas = _ =>
     );
   });
 
-let _writeText = text =>
-  withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
+let _writeText = ((text, hash)) =>
+  withQuerySelectorDom("#snapshotCanvas", snapshotCanvas =>
     withQuerySelectorDom("#log", log => {
       let textChild = DocumentRe.createElement("div", document);
       ElementRe.setInnerText(textChild, text);
+      let hashColor = Js.String.slice(~from=0, ~to_=6, hash);
+
+      ElementRe.setAttribute("style", {j|color: #$hashColor;|j}, textChild);
       ElementRe.appendChild(textChild, log);
-    });
-    let snapshotCtx = getContext(snapshotCanvas);
-    Ctx.setGlobalAlpha(snapshotCtx, 1.0);
-    Ctx.setGlobalCompositeOperation(snapshotCtx, "difference");
-    Ctx.setFillStyle(snapshotCtx, "#FFFFFF");
-    Ctx.setFont(snapshotCtx, "bold 48px monospace");
-    Ctx.fillText(snapshotCtx, text, 0, 0);
-    /* Ctx.fillRect( */
-    /*   snapshotCtx, */
-    /*   0, */
-    /*   0, */
-    /*   getWidth(snapshotCanvas), */
-    /*   getHeight(snapshotCanvas), */
-    /* ); */
-  })
+    })
+  )
+  /* let snapshotCtx = getContext(snapshotCanvas); */
+  /* Ctx.setGlobalAlpha(snapshotCtx, 1.0); */
+  /* Ctx.setGlobalCompositeOperation(snapshotCtx, "difference"); */
+  /* Ctx.setFillStyle(snapshotCtx, "#FFFFFF"); */
+  /* Ctx.setFont(snapshotCtx, "bold 48px monospace"); */
+  /* Ctx.fillText(snapshotCtx, text, 0, 0); */
+  /* Ctx.fillRect( */
+  /*   snapshotCtx, */
+  /*   0, */
+  /*   0, */
+  /*   getWidth(snapshotCanvas), */
+  /*   getHeight(snapshotCanvas), */
+  /* ); */
   |> ignore;
 
 let writeText = Debouncer.make(~wait=100, _writeText);
@@ -289,11 +292,10 @@ let rec onTick = ts => {
   };
 
   if (ts -. lastUpdated^ >= 10000.0) {
-    withQuerySelectorDom("svg", svg => {
-      let newSize = Js.Float.toString(sin(ts) ** 2.0);
-      ();
-      /* ElementRe.setAttributeNS(svgNs, "viewBox", {j|0 0 $newSize $newSize|j}); */
-    });
+    /* withQuerySelectorDom("svg", svg => { */
+    /*   let newSize = Js.Float.toString(sin(ts) ** 2.0); */
+    /*   ElementRe.setAttributeNS(svgNs, "width", {j|0 0 $newSize $newSize|j}); */
+    /* }); */
     setHashToNow();
     lastUpdated := ts;
   };
@@ -431,13 +433,13 @@ let init: unit => unit =
 
              if (hexHash === currentSignature^) {
                let timestamp = getTimestamp();
-               writeText({j|queer-loop detected at $timestamp|j});
+               writeText(({j|queer-loop detected at $timestamp.|j}, hexHash));
                /* currentOptions := */
                /* {...currentOptions^, invert: ! currentOptions^.invert}; */
              };
 
              if (! alreadySeen) {
-               writeText(input);
+               writeText((input, hexHash));
 
                setHashToNow();
              };

@@ -57,21 +57,18 @@ function copyVideoToSnapshotCanvas(param) {
               }));
 }
 
-function _writeText(text) {
+function _writeText(param) {
+  var hash = param[1];
+  var text = param[0];
   Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
-          Util$QueerLoop.withQuerySelectorDom("#log", (function (log) {
-                  var textChild = document.createElement("div");
-                  textChild.innerText = text;
-                  log.appendChild(textChild);
-                  return /* () */0;
-                }));
-          var snapshotCtx = snapshotCanvas.getContext("2d");
-          snapshotCtx.globalAlpha = 1.0;
-          snapshotCtx.globalCompositeOperation = "difference";
-          snapshotCtx.fillStyle = "#FFFFFF";
-          snapshotCtx.font = "bold 48px monospace";
-          snapshotCtx.fillText(text, 0, 0);
-          return /* () */0;
+          return Util$QueerLoop.withQuerySelectorDom("#log", (function (log) {
+                        var textChild = document.createElement("div");
+                        textChild.innerText = text;
+                        var hashColor = hash.slice(0, 6);
+                        textChild.setAttribute("style", "color: #" + (String(hashColor) + ";"));
+                        log.appendChild(textChild);
+                        return /* () */0;
+                      }));
         }));
   return /* () */0;
 }
@@ -256,10 +253,6 @@ function onTick(ts) {
     copyVideoToSnapshotCanvas(/* () */0);
   }
   if (ts - lastUpdated[0] >= 10000.0) {
-    Util$QueerLoop.withQuerySelectorDom("svg", (function (svg) {
-            Math.pow(Math.sin(ts), 2.0).toString();
-            return /* () */0;
-          }));
     Util$QueerLoop.setHash(new Date().toISOString());
     lastUpdated[0] = ts;
   }
@@ -378,10 +371,16 @@ function init(param) {
               }
               if (hexHash === currentSignature[0]) {
                 var timestamp = new Date().toISOString();
-                Curry._1(writeText, "queer-loop detected at " + (String(timestamp) + ""));
+                Curry._1(writeText, /* tuple */[
+                      "queer-loop detected at " + (String(timestamp) + "."),
+                      hexHash
+                    ]);
               }
               if (!alreadySeen) {
-                Curry._1(writeText, input);
+                Curry._1(writeText, /* tuple */[
+                      input,
+                      hexHash
+                    ]);
                 Util$QueerLoop.setHash(new Date().toISOString());
               }
               return Promise.resolve(/* () */0);
