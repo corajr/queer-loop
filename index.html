@@ -27,29 +27,13 @@
              pointer-events: none;
              transform: translate(-50%, -50%);
          }
-
-         .centeredSquare, .centeredSquareInset {
-             position: fixed;
-             width: 100vmin;
-             height: 100vmin;
-             left: 50%;
-             top: 50%;
-             transform: translate(-50%, -50%);
-         }
-         .centeredSquareInset {
-             width: 75vmin;
-             height: 75vmin;
-         }
-
          #codes {
              display: flex;
              flex-wrap: wrap;
+             flex-direcition: column;
              justify-content: flex-start;
              align-items: flex-start;
              z-index: 100;
-         }
-         #codes * {
-             width: 12.5vmin;
          }
 
          #download {
@@ -66,21 +50,28 @@
              color: white;
          }
 
-         .queer-loop {
-             z-index: 100;
-             opacity: 0.75;
+         #focus {
+             position: fixed;
+             display: flex;
+             justify-content: space-evenly;
+             align-items: center;
+             width: 100vw;
+             height: 100vh;
          }
-         .queer-loop svg {
+
+         #queer-loop {
+             z-index: 100;
+             flex-grow: 1;
+             flex-shrink: 0;
+         }
+         #queer-loop svg {
              display: block;
          }
 
-         #codeContents {
-             position: fixed;
-             bottom: 0;
-             left: 50%;
-             transform: translate(-50%, 0%);
-             z-index: 101;
+         #codeText {
+             z-index: 99;
              color: white;
+             flex-grow: 0;
          }
         </style>
     </head>
@@ -91,13 +82,18 @@
 
         <canvas id="snapshotCanvas"></canvas>
         <canvas id="iconCanvas"></canvas>
-        <div id="codeText">
-            <span id="codeContents" contenteditable="true"></span>
-        </div>
 
         <h1><time id="lastUpdated"></time></h1>
-        <div id="codes"></div>
-        <div class="centeredSquareInset queer-loop"></div>
+        <div id="focus">
+            <div id="codes"></div>
+            <div>
+                <div id="queer-loop"></div>
+                <div id="codeText">
+                    <span id="codeContents" contenteditable="true"></span>
+                </div>
+            </div>
+            <div id="log"></div>
+        </div>
 
         <a id="download">&#x2b73;</a>
     </body>

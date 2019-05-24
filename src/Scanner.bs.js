@@ -17,7 +17,7 @@ function syncScan(scanCallback, invertOptions, imageData) {
   }
 }
 
-function scanUsingDeviceId(videoEl, deviceId, invert, scanCallback) {
+function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
   return UserMedia$QueerLoop.initStreamByDeviceId(videoEl, deviceId).then((function (video) {
                 var canvas = document.createElementNS(Util$QueerLoop.htmlNs, "canvas");
                 Util$QueerLoop.withQuerySelectorDom("body", (function (body) {
@@ -63,6 +63,8 @@ function scanUsingDeviceId(videoEl, deviceId, invert, scanCallback) {
                     if (frameCount[0] % 5 === 0) {
                       var ctx = canvas.getContext("2d");
                       ctx.drawImage(video, 0, 0);
+                      var match = currentOptions[0][/* invert */4];
+                      var invert = match ? /* OnlyInvert */2 : /* DontInvert */1;
                       if (invert !== 1) {
                         Canvas$QueerLoop.invert(canvas);
                       }

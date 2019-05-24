@@ -10,6 +10,7 @@ import * as Caml_format from "../node_modules/bs-platform/lib/es6/caml_format.js
 import * as Caml_option from "../node_modules/bs-platform/lib/es6/caml_option.js";
 import * as Hash$QueerLoop from "./Hash.bs.js";
 import * as Util$QueerLoop from "./Util.bs.js";
+import * as Options$QueerLoop from "./Options.bs.js";
 import * as Scanner$QueerLoop from "./Scanner.bs.js";
 import * as Caml_js_exceptions from "../node_modules/bs-platform/lib/es6/caml_js_exceptions.js";
 import * as QrCodeGen$QueerLoop from "./QrCodeGen.bs.js";
@@ -17,21 +18,6 @@ import * as QueerCode$QueerLoop from "./QueerCode.bs.js";
 import * as UserMedia$QueerLoop from "./UserMedia.bs.js";
 
 var domain = "qqq.lu";
-
-var defaultOptions_007 = /* cameraIndices : array */[0];
-
-var defaultOptions = /* record */[
-  /* background */"",
-  /* includeDomain */true,
-  /* includeQueryString */true,
-  /* includeHash */true,
-  /* invert */false,
-  /* animate */true,
-  /* opacity */0.1,
-  defaultOptions_007
-];
-
-var currentOptions = /* record */[/* contents */defaultOptions];
 
 function setBackground(selector, bgCss) {
   return Util$QueerLoop.withQuerySelector(selector, (function (el) {
@@ -61,7 +47,7 @@ var canvasesRef = /* record */[/* contents : array */[]];
 function copyVideoToSnapshotCanvas(param) {
   return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
                 var snapshotCtx = snapshotCanvas.getContext("2d");
-                snapshotCtx.globalAlpha = currentOptions[0][/* opacity */6];
+                snapshotCtx.globalAlpha = Options$QueerLoop.currentOptions[0][/* opacity */6];
                 return $$Array.mapi((function (i, canvas) {
                               var h = canvas.height;
                               var x = (canvas.width - h | 0) / 2 | 0;
@@ -70,6 +56,27 @@ function copyVideoToSnapshotCanvas(param) {
                             }), canvasesRef[0]);
               }));
 }
+
+function _writeText(text) {
+  Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
+          Util$QueerLoop.withQuerySelectorDom("#log", (function (log) {
+                  var textChild = document.createElement("div");
+                  textChild.innerText = text;
+                  log.appendChild(textChild);
+                  return /* () */0;
+                }));
+          var snapshotCtx = snapshotCanvas.getContext("2d");
+          snapshotCtx.globalAlpha = 1.0;
+          snapshotCtx.globalCompositeOperation = "difference";
+          snapshotCtx.fillStyle = "#FFFFFF";
+          snapshotCtx.font = "bold 48px monospace";
+          snapshotCtx.fillText(text, 0, 0);
+          return /* () */0;
+        }));
+  return /* () */0;
+}
+
+var writeText = Debouncer.make(100, _writeText);
 
 function takeSnapshot(param) {
   return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
@@ -134,13 +141,13 @@ function setCode(text) {
             dataSeen[hash] = text;
             var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
             var sizeWithBorder = code.size + 12 | 0;
-            Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (loopContainer) {
+            Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (loopContainer) {
                     var match = takeSnapshot(/* () */0);
                     if (match !== undefined) {
                       var match$1 = getTimestampAndLocaleString(/* () */0);
                       var timestamp = match$1[0];
                       var match$2 = hasChanged[0];
-                      var symbol = QueerCode$QueerLoop.createSymbol(text, code, hash, match$2 ? match : undefined, match$1[1], 6, currentOptions[0][/* invert */4], currentOptions[0][/* animate */5]);
+                      var symbol = QueerCode$QueerLoop.createSymbol(text, code, hash, match$2 ? match : undefined, match$1[1], 6, Options$QueerLoop.currentOptions[0][/* invert */4], Options$QueerLoop.currentOptions[0][/* animate */5]);
                       var match$3 = loopContainer.querySelector("svg");
                       var svg;
                       if (match$3 == null) {
@@ -191,7 +198,7 @@ function setCode(text) {
                     }
                   }));
           }
-          Util$QueerLoop.withQuerySelectorDom(".queer-loop svg use", (function (use) {
+          Util$QueerLoop.withQuerySelectorDom("#queer-loop svg use", (function (use) {
                   use.setAttribute("href", "#code" + hash);
                   return /* () */0;
                 }));
@@ -209,7 +216,7 @@ var setText = Debouncer.make(200, (function (hash) {
       }));
 
 function onHashChange(param) {
-  var opts = currentOptions[0];
+  var opts = Options$QueerLoop.currentOptions[0];
   var url = new URL(window.location.href);
   var match = getTimestampAndLocaleString(/* () */0);
   var localeString = match[1];
@@ -239,6 +246,8 @@ function onHashChange(param) {
 
 var frameCount = /* record */[/* contents */0];
 
+var lastFrame = /* record */[/* contents */0.0];
+
 var lastUpdated = /* record */[/* contents */0.0];
 
 function onTick(ts) {
@@ -247,9 +256,13 @@ function onTick(ts) {
     copyVideoToSnapshotCanvas(/* () */0);
   }
   if (ts - lastUpdated[0] >= 10000.0) {
+    Util$QueerLoop.withQuerySelectorDom("svg", (function (svg) {
+            Math.pow(Math.sin(ts), 2.0).toString();
+            return /* () */0;
+          }));
     Util$QueerLoop.setHash(new Date().toISOString());
+    lastUpdated[0] = ts;
   }
-  lastUpdated[0] = ts;
   requestAnimationFrame(onTick);
   return /* () */0;
 }
@@ -316,23 +329,23 @@ function init(param) {
     var params = new URLSearchParams(queryString);
     var cameraIndices = $$Array.map(Caml_format.caml_int_of_string, params.getAll("c"));
     var match = cameraIndices.length === 0;
-    currentOptions[0] = /* record */[
+    Options$QueerLoop.currentOptions[0] = /* record */[
       /* background */Belt_Option.getWithDefault(Belt_Option.map(Caml_option.nullable_to_opt(params.get("b")), (function (prim) {
                   return decodeURIComponent(prim);
-                })), currentOptions[0][/* background */0]),
-      /* includeDomain */boolParam(currentOptions[0][/* includeDomain */1], Caml_option.nullable_to_opt(params.get("d"))),
-      /* includeQueryString */boolParam(currentOptions[0][/* includeQueryString */2], Caml_option.nullable_to_opt(params.get("q"))),
-      /* includeHash */boolParam(currentOptions[0][/* includeHash */3], Caml_option.nullable_to_opt(params.get("h"))),
-      /* invert */boolParam(currentOptions[0][/* invert */4], Caml_option.nullable_to_opt(params.get("i"))),
-      /* animate */boolParam(currentOptions[0][/* invert */4], Caml_option.nullable_to_opt(params.get("a"))),
+                })), Options$QueerLoop.currentOptions[0][/* background */0]),
+      /* includeDomain */boolParam(Options$QueerLoop.currentOptions[0][/* includeDomain */1], Caml_option.nullable_to_opt(params.get("d"))),
+      /* includeQueryString */boolParam(Options$QueerLoop.currentOptions[0][/* includeQueryString */2], Caml_option.nullable_to_opt(params.get("q"))),
+      /* includeHash */boolParam(Options$QueerLoop.currentOptions[0][/* includeHash */3], Caml_option.nullable_to_opt(params.get("h"))),
+      /* invert */boolParam(Options$QueerLoop.currentOptions[0][/* invert */4], Caml_option.nullable_to_opt(params.get("i"))),
+      /* animate */boolParam(Options$QueerLoop.currentOptions[0][/* invert */4], Caml_option.nullable_to_opt(params.get("a"))),
       /* opacity */Belt_Option.getWithDefault(Belt_Option.map(Caml_option.nullable_to_opt(params.get("o")), (function (prim) {
                   return Number(prim);
-                })), currentOptions[0][/* opacity */6]),
+                })), Options$QueerLoop.currentOptions[0][/* opacity */6]),
       /* cameraIndices */match ? /* array */[0] : cameraIndices
     ];
   }
-  if (currentOptions[0][/* background */0] !== "") {
-    setBackground("body", currentOptions[0][/* background */0]);
+  if (Options$QueerLoop.currentOptions[0][/* background */0] !== "") {
+    setBackground("body", Options$QueerLoop.currentOptions[0][/* background */0]);
   }
   initialHash[0] = Util$QueerLoop.getHash(/* () */0).slice(1);
   if (initialHash[0] === "") {
@@ -341,7 +354,7 @@ function init(param) {
   } else {
     onHashChange(/* () */0);
   }
-  Util$QueerLoop.withQuerySelectorDom(".queer-loop", (function (el) {
+  Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (el) {
           el.addEventListener("click", (function (param) {
                   return onClick(undefined, param);
                 }));
@@ -363,7 +376,12 @@ function init(param) {
               if (!alreadySeen) {
                 dataSeen[hexHash] = input;
               }
-              if (hexHash === currentSignature[0] || !alreadySeen) {
+              if (hexHash === currentSignature[0]) {
+                var timestamp = new Date().toISOString();
+                Curry._1(writeText, "queer-loop detected at " + (String(timestamp) + ""));
+              }
+              if (!alreadySeen) {
+                Curry._1(writeText, input);
                 Util$QueerLoop.setHash(new Date().toISOString());
               }
               return Promise.resolve(/* () */0);
@@ -381,9 +399,8 @@ function init(param) {
                                         body.appendChild(videoEl);
                                         return /* () */0;
                                       }));
-                                var match = currentOptions[0][/* invert */4];
-                                return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, match ? /* OnlyInvert */2 : /* DontInvert */1, response);
-                              }), pick(cameras, currentOptions[0][/* cameraIndices */7])));
+                                return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, Options$QueerLoop.currentOptions, response);
+                              }), pick(cameras, Options$QueerLoop.currentOptions[0][/* cameraIndices */7])));
             })).then((function (canvases) {
             canvasesRef[0] = canvases;
             requestAnimationFrame(onTick);
@@ -411,8 +428,6 @@ var defaultHash = "fff";
 
 export {
   domain ,
-  defaultOptions ,
-  currentOptions ,
   setBackground ,
   codeRegex ,
   defaultCode ,
@@ -424,6 +439,8 @@ export {
   currentSignature ,
   canvasesRef ,
   copyVideoToSnapshotCanvas ,
+  _writeText ,
+  writeText ,
   takeSnapshot ,
   copySnapshotToIcon ,
   getTimestamp ,
@@ -436,6 +453,7 @@ export {
   setText ,
   onHashChange ,
   frameCount ,
+  lastFrame ,
   lastUpdated ,
   onTick ,
   maybeUrl ,

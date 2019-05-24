@@ -20,6 +20,8 @@ module Ctx = {
   [@bs.set] external setFillStyle : (t, string) => unit = "fillStyle";
 
   [@bs.send] external fillRect : (t, int, int, int, int) => unit = "";
+  [@bs.send] external fillText : (t, string, int, int) => unit = "";
+  [@bs.set] external setFont : (t, string) => unit = "font";
 
   [@bs.send] external clearRect : (t, int, int, int, int) => unit = "";
 

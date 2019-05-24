@@ -168,7 +168,7 @@ let createSymbol =
   };
 
   if (! animated) {
-    ElementRe.setAttribute("fill-opacity", "0.5", rect);
+    ElementRe.setAttribute("fill-opacity", "0.9", rect);
   };
 
   ElementRe.appendChild(rect, codeGroup);
@@ -228,7 +228,7 @@ let createSvgSkeleton = hash => {
   ElementRe.setAttribute("viewBox", "0 0 1 1", svg);
 
   let defs = DocumentRe.createElementNS(svgNs, "defs", document);
-  let rainbowGradient = createRainbowGradient(0.85);
+  let rainbowGradient = createRainbowGradient(0.95);
   ElementRe.appendChild(rainbowGradient, defs);
   ElementRe.appendChild(defs, svg);
 
@@ -268,7 +268,6 @@ let createIconSvg =
       ElementRe.setAttribute("fill", "url(#rainbow)", rect);
     } else {
       ElementRe.setAttribute("fill", "#000000", rect);
-      ElementRe.setAttribute("fill-opacity", "0.8", rect);
     };
     ElementRe.appendChild(rect, svg);
   };

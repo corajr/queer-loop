@@ -1,5 +1,6 @@
 open Canvas;
 open JsQr;
+open Options;
 open UserMedia;
 open Util;
 open Webapi.Dom;
@@ -17,83 +18,83 @@ let syncScan = (scanCallback, invertOptions, imageData) =>
   | None => ()
   };
 
-let scanUsingDeviceId:
-  (Dom.element, string, invertOptions, string => unit) =>
-  Js.Promise.t(Dom.element) =
-  (videoEl, deviceId, invert, scanCallback) =>
-    initStreamByDeviceId(videoEl, deviceId)
-    |> Js.Promise.then_(video => {
-         let canvas = DocumentRe.createElementNS(htmlNs, "canvas", document);
-         withQuerySelectorDom("body", body =>
-           ElementRe.appendChild(canvas, body)
-         );
+let scanUsingDeviceId =
+    (videoEl, deviceId, currentOptions, scanCallback)
+    : Js.Promise.t(Dom.element) =>
+  initStreamByDeviceId(videoEl, deviceId)
+  |> Js.Promise.then_(video => {
+       let canvas = DocumentRe.createElementNS(htmlNs, "canvas", document);
+       withQuerySelectorDom("body", body =>
+         ElementRe.appendChild(canvas, body)
+       );
 
-         let maybeWorker =
-           switch (WebWorkers.create_webworker("worker.js")) {
-           | worker => Some(worker)
-           | exception e =>
-             Js.log(
-               "Could not initialize worker, falling back to synchronous scan.",
-             );
-             Js.log(e);
-             None;
-           };
-
-         switch (maybeWorker) {
-         | Some(worker) =>
-           let msgBackHandler: WebWorkers.MessageEvent.t => unit = (
-             e => {
-               let maybeCode: option(code) = WebWorkers.MessageEvent.data(e);
-               switch (maybeCode) {
-               | Some(qrCode) => scanCallback(textDataGet(qrCode))
-               | None => ()
-               };
-             }
+       let maybeWorker =
+         switch (WebWorkers.create_webworker("worker.js")) {
+         | worker => Some(worker)
+         | exception e =>
+           Js.log(
+             "Could not initialize worker, falling back to synchronous scan.",
            );
-           WebWorkers.onMessage(worker, msgBackHandler);
-
-         | None => ()
+           Js.log(e);
+           None;
          };
 
-         let frameCount = ref(0);
-
-         let rec onTick = _ => {
-           if (readyState(video) == 4) {
-             let width = videoWidth(video);
-             let height = videoHeight(video);
-             if (getWidth(canvas) !== width) {
-               setWidth(canvas, width);
-               setHeight(canvas, height);
+       switch (maybeWorker) {
+       | Some(worker) =>
+         let msgBackHandler: WebWorkers.MessageEvent.t => unit = (
+           e => {
+             let maybeCode: option(code) = WebWorkers.MessageEvent.data(e);
+             switch (maybeCode) {
+             | Some(qrCode) => scanCallback(textDataGet(qrCode))
+             | None => ()
              };
+           }
+         );
+         WebWorkers.onMessage(worker, msgBackHandler);
 
-             if (frameCount^ mod 5 == 0) {
-               let ctx = getContext(canvas);
-               Ctx.drawImage(ctx, ~image=video, ~dx=0, ~dy=0);
+       | None => ()
+       };
 
-               switch (invert) {
-               | DontInvert => ()
-               | OnlyInvert
-               | AttemptBoth
-               | InvertFirst => Canvas.invert(canvas)
-               };
+       let frameCount = ref(0);
 
-               let imageData =
-                 Ctx.getImageData(ctx, ~sx=0, ~sy=0, ~sw=width, ~sh=height);
-
-               switch (maybeWorker) {
-               | Some(worker) =>
-                 WebWorkers.postMessage(
-                   worker,
-                   (dataGet(imageData), width, height, DontInvert),
-                 )
-               | None => syncScan(scanCallback, DontInvert, imageData)
-               };
-             };
+       let rec onTick = _ => {
+         if (readyState(video) == 4) {
+           let width = videoWidth(video);
+           let height = videoHeight(video);
+           if (getWidth(canvas) !== width) {
+             setWidth(canvas, width);
+             setHeight(canvas, height);
            };
 
-           frameCount := frameCount^ + 1;
-           Webapi.requestAnimationFrame(onTick);
+           if (frameCount^ mod 5 == 0) {
+             let ctx = getContext(canvas);
+             Ctx.drawImage(ctx, ~image=video, ~dx=0, ~dy=0);
+
+             let invert = currentOptions^.invert ? OnlyInvert : DontInvert;
+             switch (invert) {
+             | DontInvert => ()
+             | OnlyInvert
+             | AttemptBoth
+             | InvertFirst => Canvas.invert(canvas)
+             };
+
+             let imageData =
+               Ctx.getImageData(ctx, ~sx=0, ~sy=0, ~sw=width, ~sh=height);
+
+             switch (maybeWorker) {
+             | Some(worker) =>
+               WebWorkers.postMessage(
+                 worker,
+                 (dataGet(imageData), width, height, DontInvert),
+               )
+             | None => syncScan(scanCallback, DontInvert, imageData)
+             };
+           };
          };
+
+         frameCount := frameCount^ + 1;
          Webapi.requestAnimationFrame(onTick);
-         Js.Promise.resolve(canvas);
-       });
+       };
+       Webapi.requestAnimationFrame(onTick);
+       Js.Promise.resolve(canvas);
+     });

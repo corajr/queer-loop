@@ -89,7 +89,7 @@ function createSymbol(href, code, hash, maybeDataURL, localeString, border, inve
     rect.setAttribute("fill", "url(#rainbow)");
   }
   if (!animated) {
-    rect.setAttribute("fill-opacity", "0.5");
+    rect.setAttribute("fill-opacity", "0.9");
   }
   codeGroup.appendChild(rect);
   var path = createQrCodePathElement(code, border);
@@ -124,7 +124,7 @@ function createSvgSkeleton(hash) {
   var svg = document.createElementNS(svgNs, "svg");
   svg.setAttribute("viewBox", "0 0 1 1");
   var defs = document.createElementNS(svgNs, "defs");
-  var rainbowGradient = createRainbowGradient(0.85);
+  var rainbowGradient = createRainbowGradient(0.95);
   defs.appendChild(rainbowGradient);
   svg.appendChild(defs);
   var script = createScript(/* () */0);
@@ -153,7 +153,6 @@ function createIconSvg(code, border, bg, invert) {
     rect.setAttribute("height", "100%");
     if (invert) {
       rect.setAttribute("fill", "#000000");
-      rect.setAttribute("fill-opacity", "0.8");
     } else {
       rect.setAttribute("fill", "url(#rainbow)");
     }

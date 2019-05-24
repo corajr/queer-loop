@@ -2,34 +2,11 @@ open Canvas;
 open Color;
 open Hash;
 open QrCodeGen;
+open Options;
 open Util;
 open Webapi.Dom;
 
 let domain = "qqq.lu";
-
-type options = {
-  background: string,
-  includeDomain: bool,
-  includeQueryString: bool,
-  includeHash: bool,
-  invert: bool,
-  animate: bool,
-  opacity: float,
-  cameraIndices: array(int),
-};
-
-let defaultOptions = {
-  background: "",
-  includeDomain: true,
-  includeQueryString: true,
-  includeHash: true,
-  invert: false,
-  animate: true,
-  opacity: 0.1,
-  cameraIndices: [|0|],
-};
-
-let currentOptions = ref(defaultOptions);
 
 let setBackground = (selector, bgCss) =>
   withQuerySelector(
@@ -89,6 +66,31 @@ let copyVideoToSnapshotCanvas = _ =>
       canvasesRef^,
     );
   });
+
+let _writeText = text =>
+  withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
+    withQuerySelectorDom("#log", log => {
+      let textChild = DocumentRe.createElement("div", document);
+      ElementRe.setInnerText(textChild, text);
+      ElementRe.appendChild(textChild, log);
+    });
+    let snapshotCtx = getContext(snapshotCanvas);
+    Ctx.setGlobalAlpha(snapshotCtx, 1.0);
+    Ctx.setGlobalCompositeOperation(snapshotCtx, "difference");
+    Ctx.setFillStyle(snapshotCtx, "#FFFFFF");
+    Ctx.setFont(snapshotCtx, "bold 48px monospace");
+    Ctx.fillText(snapshotCtx, text, 0, 0);
+    /* Ctx.fillRect( */
+    /*   snapshotCtx, */
+    /*   0, */
+    /*   0, */
+    /*   getWidth(snapshotCanvas), */
+    /*   getHeight(snapshotCanvas), */
+    /* ); */
+  })
+  |> ignore;
+
+let writeText = Debouncer.make(~wait=100, _writeText);
 
 let takeSnapshot = _ =>
   withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
@@ -159,7 +161,7 @@ let setCode = text =>
          let border = 6;
          let sizeWithBorder = QrCode.size(code) + border * 2;
 
-         withQuerySelectorDom(".queer-loop", loopContainer =>
+         withQuerySelectorDom("#queer-loop", loopContainer =>
            switch (takeSnapshot()) {
            | Some(snapshotUrl) =>
              let (timestamp, localeString) = getTimestampAndLocaleString();
@@ -234,7 +236,7 @@ let setCode = text =>
          |> ignore;
        };
 
-       withQuerySelectorDom(".queer-loop svg use", use =>
+       withQuerySelectorDom("#queer-loop svg use", use =>
          ElementRe.setAttribute("href", "#code" ++ hash, use)
        )
        |> ignore;
@@ -277,6 +279,7 @@ let onHashChange: unit => unit =
 
 let frameCount = ref(0);
 
+let lastFrame = ref(0.0);
 let lastUpdated = ref(0.0);
 
 let rec onTick = ts => {
@@ -286,10 +289,15 @@ let rec onTick = ts => {
   };
 
   if (ts -. lastUpdated^ >= 10000.0) {
+    withQuerySelectorDom("svg", svg => {
+      let newSize = Js.Float.toString(sin(ts) ** 2.0);
+      ();
+      /* ElementRe.setAttributeNS(svgNs, "viewBox", {j|0 0 $newSize $newSize|j}); */
+    });
     setHashToNow();
+    lastUpdated := ts;
   };
 
-  lastUpdated := ts;
   Webapi.requestAnimationFrame(onTick);
 };
 
@@ -398,7 +406,7 @@ let init: unit => unit =
       onHashChange();
     };
 
-    withQuerySelectorDom(".queer-loop", el =>
+    withQuerySelectorDom("#queer-loop", el =>
       ElementRe.addEventListener("click", onClick(None), el)
     );
 
@@ -421,7 +429,16 @@ let init: unit => unit =
                Js.Dict.set(dataSeen, hexHash, input);
              };
 
-             if (hexHash === currentSignature^ || ! alreadySeen) {
+             if (hexHash === currentSignature^) {
+               let timestamp = getTimestamp();
+               writeText({j|queer-loop detected at $timestamp|j});
+               /* currentOptions := */
+               /* {...currentOptions^, invert: ! currentOptions^.invert}; */
+             };
+
+             if (! alreadySeen) {
+               writeText(input);
+
                setHashToNow();
              };
              Js.Promise.resolve();
@@ -445,7 +462,7 @@ let init: unit => unit =
                Scanner.scanUsingDeviceId(
                  videoEl,
                  UserMedia.deviceIdGet(camera),
-                 currentOptions^.invert ? OnlyInvert : DontInvert,
+                 currentOptions,
                  response,
                );
              },
