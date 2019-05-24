@@ -41,21 +41,9 @@ function createRainbowGradient(lightness) {
   return gradient;
 }
 
-function makeAnimate(values, duration, animBegin) {
-  var animate = document.createElementNS(svgNs, "animate");
-  animate.setAttribute("attributeName", "opacity");
-  animate.setAttribute("values", values);
-  animate.setAttribute("dur", duration);
-  animate.setAttribute("begin", animBegin);
-  animate.setAttribute("fill", "freeze");
-  animate.setAttribute("keyTimes", "0;0.5;1");
-  animate.setAttribute("repeatCount", "indefinite");
-  return animate;
-}
+var scriptText = "\n   /* <![CDATA[ */\nfunction clearSelection() {\n   document.querySelectorAll(\"svg.code\").forEach(function(x) { x.setAttribute(\"class\", \"code\"); });\n}\n\nfunction stepAnimacy() {\n   document.querySelectorAll(\"svg.selected\").forEach(function(x) { x.setAttribute(\"class\", \"code\"); });\n   document.querySelectorAll(\"svg.animate\").forEach(function(x) { x.setAttribute(\"class\", \"code previous\"); });\n   document.querySelectorAll(\"svg.previous\").forEach(function(x) { x.setAttribute(\"class\", \"code\"); });\n}\n\nfunction init() {\n    if (!document.body) {\n        var nowShowing = 0;\n        const ids = Array.prototype.slice.call(document.querySelectorAll(\"svg.code\"), null).map(function(x, i) {\n            if (/animate|selected/.test(x.className.animVal)) {\n                nowShowing = i;\n            }\n            return x.id;\n         });\n         var lastChanged = 0.0;\n         function tick(timestamp) {\n             if (timestamp - lastChanged >= 1000.0) {\n                 clearSelection();\n                 nowShowing = (nowShowing + 1) % ids.length;\n                 var id = \"#\" + ids[nowShowing];\n                 document.querySelector(id).setAttribute(\"class\", \" code selected\");\n                 lastChanged = timestamp;\n             }\n             window.requestAnimationFrame(tick);\n         }\n         window.requestAnimationFrame(tick);\n    }\n}\n\nwindow.addEventListener(\"load\", init, false);\n   /* ]]> */\n";
 
-var scriptText = "\n   /* <![CDATA[ */\nfunction clearAnimacy() {\n   document.querySelectorAll(\"svg.animate\").forEach(function(x) { x.setAttribute(\"class\", \"code previous\"); });\n   document.querySelectorAll(\"svg.previous\").forEach(function(x) { x.setAttribute(\"class\", \"code\"); });\n}\n\nfunction init() {\n    if (!document.body) {\n        var nowShowing = 0;\n        const ids = Array.prototype.slice.call(document.querySelectorAll(\"svg.code\"), null).map(function(x, i) {\n            if (x.className.animVal.indexOf(\"animate\") !== -1) {\n                nowShowing = i;\n            }\n            return x.id;\n         });\n         var lastChanged = 0.0;\n         function tick(timestamp) {\n             if (timestamp - lastChanged > 4000.0) {\n                 var id = \"#\" + ids[nowShowing];\n                 clearAnimacy();\n                 document.querySelector(id).setAttribute(\"class\", \" code animate\");\n                 nowShowing = (nowShowing + 1) % ids.length;\n                 lastChanged = timestamp;\n             }\n             window.requestAnimationFrame(tick);\n         }\n         window.requestAnimationFrame(tick);\n    }\n}\n\nwindow.addEventListener(\"load\", init, false);\n   /* ]]> */\n";
-
-var styleText = "\n   @namespace svg \"http://www.w3.org/2000/svg\";\n\n   @keyframes fadeIn {\n   from { opacity: 0.0; }\n   }\n\n   svg|svg svg|svg {\n     display: none;\n   }\n\n   svg|svg.animate, svg|svg.previous, svg|svg.selected {\n      display: block;\n   }\n\n   svg|svg.animate {\n      animation: fadeIn 2s infinite alternate;\n   }\n\n   svg|svg.previous {\n       animation: fadeIn 1s infinite alternate;\n   }\n   svg|svg.selected g.codeGroup {\n       opacity: 0.1;\n   }\n";
+var styleText = "\n   @namespace svg \"http://www.w3.org/2000/svg\";\n\n   @keyframes fadeIn {\n   from { opacity: 0.0; }\n   }\n\n   svg|svg svg|svg {\n     display: none;\n   }\n\n   svg|svg.animate, svg|svg.previous, svg|svg.selected {\n      display: block;\n   }\n\n   svg|svg.animate {\n      animation: fadeIn 2s infinite alternate;\n   }\n\n   svg|svg.previous g.codeGroup, svg|svg.selected g.codeGroup {\n       opacity: 0.1;\n   }\n";
 
 function createScript(param) {
   var script = document.createElementNS(svgNs, "script");
@@ -132,7 +120,7 @@ function createSvgSkeleton(hash) {
   var svg = document.createElementNS(svgNs, "svg");
   svg.setAttribute("viewBox", "0 0 1 1");
   var defs = document.createElementNS(svgNs, "defs");
-  var rainbowGradient = createRainbowGradient(0.85);
+  var rainbowGradient = createRainbowGradient(0.9);
   defs.appendChild(rainbowGradient);
   svg.appendChild(defs);
   var script = createScript(/* () */0);
@@ -142,7 +130,7 @@ function createSvgSkeleton(hash) {
   return svg;
 }
 
-function createIconSvg(code, border, bg, invert) {
+function createIconSvg(code, border, bg, hash, invert) {
   var size = code.size;
   var sizeWithBorder = size + (border << 1) | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
@@ -151,7 +139,7 @@ function createIconSvg(code, border, bg, invert) {
   if (bg) {
     if (!invert) {
       var defs = document.createElementNS(svgNs, "defs");
-      var rainbowGradient = createRainbowGradient(0.85);
+      var rainbowGradient = createRainbowGradient(0.9);
       defs.appendChild(rainbowGradient);
       svg.appendChild(defs);
     }
@@ -160,12 +148,16 @@ function createIconSvg(code, border, bg, invert) {
     rect.setAttribute("height", "100%");
     if (invert) {
       rect.setAttribute("fill", "#000000");
-      rect.setAttribute("fill-opacity", "0.8");
     } else {
       rect.setAttribute("fill", "url(#rainbow)");
     }
     svg.appendChild(rect);
   }
+  var rect$1 = document.createElementNS(svgNs, "rect");
+  rect$1.setAttribute("width", "100%");
+  rect$1.setAttribute("height", "100%");
+  rect$1.setAttribute("fill", "#" + hash.slice(0, 6));
+  svg.appendChild(rect$1);
   var path = createQrCodePathElement(code, border);
   if (invert) {
     path.setAttribute("fill", "#FFFFFF");
@@ -196,8 +188,8 @@ function svgToImg(svg) {
   return svgImg;
 }
 
-function codeToImage(code, border) {
-  var match = createIconSvg(code, 6, false, true);
+function codeToImage(code, border, hash) {
+  var match = createIconSvg(code, 6, false, hash, true);
   var sizeStr = String(match[1]);
   var iconSvgUrl = svgToDataURL(match[0]);
   var iconSvgImg = document.createElementNS(Util$QueerLoop.htmlNs, "img");
@@ -233,7 +225,6 @@ export {
   svgNs ,
   createQrCodePathElement ,
   createRainbowGradient ,
-  makeAnimate ,
   scriptText ,
   styleText ,
   createScript ,

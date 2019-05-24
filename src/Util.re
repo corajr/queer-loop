@@ -12,12 +12,6 @@ let withQuerySelector = (query, f) =>
   |. Belt.Option.flatMap(DomRe.Element.asHtmlElement)
   |. Belt.Option.map(f);
 
-let withQuerySelectorAll = (query, f) =>
-  document
-  |> Document.querySelectorAll(query)
-  |> DomRe.NodeList.toArray
-  |> Array.map(f);
-
 let catMaybes: array(option('a)) => array('a) =
   ary => {
     let newArray = [||];
@@ -35,6 +29,13 @@ let mapMaybe: ('a => option('b), array('a)) => array('b) =
 
 let withQuerySelectorAllFrom = (query, element, f) =>
   ElementRe.querySelectorAll(query, element)
+  |> DomRe.NodeList.toArray
+  |> mapMaybe(ElementRe.ofNode)
+  |> f;
+
+let withQuerySelectorAll = (query, f) =>
+  document
+  |> Document.querySelectorAll(query)
   |> DomRe.NodeList.toArray
   |> mapMaybe(ElementRe.ofNode)
   |> f;

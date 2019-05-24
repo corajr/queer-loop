@@ -65,22 +65,14 @@ let createRainbowGradient: float => Dom.element =
     gradient;
   };
 
-let makeAnimate = (values, duration, animBegin) => {
-  let animate = DocumentRe.createElementNS(svgNs, "animate", document);
-  ElementRe.setAttribute("attributeName", "opacity", animate);
-  ElementRe.setAttribute("values", values, animate);
-  ElementRe.setAttribute("dur", duration, animate);
-  ElementRe.setAttribute("begin", animBegin, animate);
-  ElementRe.setAttribute("fill", "freeze", animate);
-  ElementRe.setAttribute("keyTimes", "0;0.5;1", animate);
-  ElementRe.setAttribute("repeatCount", "indefinite", animate);
-
-  animate;
-};
-
 let scriptText = {|
    /* <![CDATA[ */
-function clearAnimacy() {
+function clearSelection() {
+   document.querySelectorAll("svg.code").forEach(function(x) { x.setAttribute("class", "code"); });
+}
+
+function stepAnimacy() {
+   document.querySelectorAll("svg.selected").forEach(function(x) { x.setAttribute("class", "code"); });
    document.querySelectorAll("svg.animate").forEach(function(x) { x.setAttribute("class", "code previous"); });
    document.querySelectorAll("svg.previous").forEach(function(x) { x.setAttribute("class", "code"); });
 }
@@ -89,18 +81,18 @@ function init() {
     if (!document.body) {
         var nowShowing = 0;
         const ids = Array.prototype.slice.call(document.querySelectorAll("svg.code"), null).map(function(x, i) {
-            if (x.className.animVal.indexOf("animate") !== -1) {
+            if (/animate|selected/.test(x.className.animVal)) {
                 nowShowing = i;
             }
             return x.id;
          });
          var lastChanged = 0.0;
          function tick(timestamp) {
-             if (timestamp - lastChanged > 4000.0) {
-                 var id = "#" + ids[nowShowing];
-                 clearAnimacy();
-                 document.querySelector(id).setAttribute("class", " code animate");
+             if (timestamp - lastChanged >= 1000.0) {
+                 clearSelection();
                  nowShowing = (nowShowing + 1) % ids.length;
+                 var id = "#" + ids[nowShowing];
+                 document.querySelector(id).setAttribute("class", " code selected");
                  lastChanged = timestamp;
              }
              window.requestAnimationFrame(tick);
@@ -132,10 +124,7 @@ let styleText = {|
       animation: fadeIn 2s infinite alternate;
    }
 
-   svg|svg.previous {
-       animation: fadeIn 1s infinite alternate;
-   }
-   svg|svg.selected g.codeGroup {
+   svg|svg.previous g.codeGroup, svg|svg.selected g.codeGroup {
        opacity: 0.1;
    }
 |};
@@ -270,7 +259,7 @@ let createSvgSkeleton = hash => {
   ElementRe.setAttribute("viewBox", "0 0 1 1", svg);
 
   let defs = DocumentRe.createElementNS(svgNs, "defs", document);
-  let rainbowGradient = createRainbowGradient(0.85);
+  let rainbowGradient = createRainbowGradient(0.9);
   ElementRe.appendChild(rainbowGradient, defs);
   ElementRe.appendChild(defs, svg);
 
@@ -284,7 +273,7 @@ let createSvgSkeleton = hash => {
 };
 
 let createIconSvg =
-    (~code: QrCode.t, ~border: int, ~bg: bool, ~invert: bool)
+    (~code: QrCode.t, ~border: int, ~bg: bool, ~hash: string, ~invert: bool)
     : (Dom.element, int) => {
   let size = QrCode.size(code);
   let sizeWithBorder = size + border * 2;
@@ -296,7 +285,7 @@ let createIconSvg =
   if (bg) {
     if (! invert) {
       let defs = DocumentRe.createElementNS(svgNs, "defs", document);
-      let rainbowGradient = createRainbowGradient(0.85);
+      let rainbowGradient = createRainbowGradient(0.9);
       ElementRe.appendChild(rainbowGradient, defs);
       ElementRe.appendChild(defs, svg);
     };
@@ -309,10 +298,19 @@ let createIconSvg =
       ElementRe.setAttribute("fill", "url(#rainbow)", rect);
     } else {
       ElementRe.setAttribute("fill", "#000000", rect);
-      ElementRe.setAttribute("fill-opacity", "0.8", rect);
     };
     ElementRe.appendChild(rect, svg);
   };
+
+  let rect = DocumentRe.createElementNS(svgNs, "rect", document);
+  ElementRe.setAttribute("width", "100%", rect);
+  ElementRe.setAttribute("height", "100%", rect);
+  ElementRe.setAttribute(
+    "fill",
+    "#" ++ Js.String.slice(~from=0, ~to_=6, hash),
+    rect,
+  );
+  ElementRe.appendChild(rect, svg);
 
   let path = createQrCodePathElement(code, border);
   if (invert) {
@@ -347,9 +345,9 @@ let svgToImg = (~svg: Dom.element) : Dom.element => {
   svgImg;
 };
 
-let codeToImage = (~code: QrCode.t, ~border: int) : Dom.element => {
+let codeToImage = (~code: QrCode.t, ~border: int, ~hash: string) : Dom.element => {
   let (iconSvg, sizeWithBorder) =
-    createIconSvg(~code, ~border=6, ~invert=true, ~bg=false);
+    createIconSvg(~code, ~border=6, ~invert=true, ~hash, ~bg=false);
   let sizeStr = string_of_int(sizeWithBorder);
 
   let iconSvgUrl = svgToDataURL(iconSvg);

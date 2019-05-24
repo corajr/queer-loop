@@ -14,10 +14,6 @@ function withQuerySelector(query, f) {
   return Belt_Option.map(Belt_Option.flatMap(Caml_option.nullable_to_opt(document.querySelector(query)), ElementRe.asHtmlElement), f);
 }
 
-function withQuerySelectorAll(query, f) {
-  return $$Array.map(f, Array.prototype.slice.call(document.querySelectorAll(query)));
-}
-
 function catMaybes(ary) {
   var newArray = /* array */[];
   $$Array.iter((function (param) {
@@ -37,6 +33,11 @@ function mapMaybe(f, arrayA) {
 
 function withQuerySelectorAllFrom(query, element, f) {
   var arrayA = Array.prototype.slice.call(element.querySelectorAll(query));
+  return Curry._1(f, catMaybes($$Array.map(ElementRe.ofNode, arrayA)));
+}
+
+function withQuerySelectorAll(query, f) {
+  var arrayA = Array.prototype.slice.call(document.querySelectorAll(query));
   return Curry._1(f, catMaybes($$Array.map(ElementRe.ofNode, arrayA)));
 }
 
@@ -93,10 +94,10 @@ export {
   svgNs ,
   withQuerySelectorDom ,
   withQuerySelector ,
-  withQuerySelectorAll ,
   catMaybes ,
   mapMaybe ,
   withQuerySelectorAllFrom ,
+  withQuerySelectorAll ,
   withQuerySelectorSub ,
   removeFromParentNode ,
   removeFromParent ,

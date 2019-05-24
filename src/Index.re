@@ -3,6 +3,7 @@ open Color;
 open Hash;
 open QrCodeGen;
 open Options;
+open SvgScript;
 open Util;
 open Webapi.Dom;
 
@@ -49,15 +50,24 @@ let copyVideoToSnapshotCanvas = _ =>
     Ctx.setGlobalAlpha(snapshotCtx, currentOptions^.opacity);
     Array.mapi(
       (i, canvas) => {
-        let h = getHeight(canvas);
-        let x = (getWidth(canvas) - h) / 2;
+        let fullWidth = getWidth(canvas);
+        let fullHeight = getHeight(canvas);
+        let w = min(fullWidth, fullHeight);
+        let (x, y) =
+          if (fullWidth > fullHeight) {
+            let offset = (fullWidth - w) / 2;
+            (offset, 0);
+          } else {
+            let offset = (fullHeight - w) / 2;
+            (0, offset);
+          };
         Ctx.drawImageSourceRectDestRect(
           snapshotCtx,
           ~image=canvas,
           ~sx=x,
-          ~sy=0,
-          ~sw=h,
-          ~sh=h,
+          ~sy=y,
+          ~sw=w,
+          ~sh=w,
           ~dx=0,
           ~dy=0,
           ~dw=getWidth(snapshotCanvas),
@@ -67,52 +77,6 @@ let copyVideoToSnapshotCanvas = _ =>
       canvasesRef^,
     );
   });
-
-let _writeLogEntry = ((timestamp, text, hash)) =>
-  withQuerySelectorDom("#snapshotCanvas", snapshotCanvas =>
-    withQuerySelectorDom("#log", log => {
-      let entry = DocumentRe.createElement("div", document);
-
-      let time = DocumentRe.createElement("time", document);
-      let textChild = DocumentRe.createElement("span", document);
-      ElementRe.setInnerText(textChild, text);
-
-      let hashColor = Js.String.slice(~from=0, ~to_=6, hash);
-
-      ElementRe.setAttribute("style", {j|color: #$hashColor;|j}, entry);
-      ElementRe.appendChild(time, entry);
-      ElementRe.appendChild(textChild, entry);
-      ElementRe.appendChild(entry, log);
-    })
-  )
-  |> ignore;
-
-let writeLogEntry = Debouncer.make(~wait=100, _writeLogEntry);
-
-let takeSnapshot = codeImg =>
-  withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
-    let snapshotCtx = getContext(snapshotCanvas);
-    toDataURLjpg(snapshotCanvas, 0.9);
-  });
-
-let copySnapshotToIcon = _ =>
-  withQuerySelectorDom("#iconCanvas", iconCanvas =>
-    withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
-      let iconCtx = getContext(iconCanvas);
-      Ctx.drawImageSourceRectDestRect(
-        iconCtx,
-        ~image=snapshotCanvas,
-        ~sx=0,
-        ~sy=0,
-        ~sw=getWidth(snapshotCanvas),
-        ~sh=getHeight(snapshotCanvas),
-        ~dx=0,
-        ~dy=0,
-        ~dw=getWidth(iconCanvas),
-        ~dh=getHeight(iconCanvas),
-      );
-    })
-  );
 
 let getTimestamp = _ => Js.Date.toISOString(Js.Date.make());
 
@@ -127,54 +91,6 @@ let setHashToNow = _ => setHash(getTimestamp());
 
 let hasChanged = ref(false);
 
-let setAnimacy = (svg, hash) => {
-  withQuerySelectorAllFrom(
-    ".animate",
-    svg,
-    Array.map(animated =>
-      ElementRe.setAttribute("class", "code previous", animated)
-    ),
-  );
-  withQuerySelectorAllFrom(
-    ".previous",
-    svg,
-    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
-  );
-  withQuerySelectorAllFrom(
-    ".selected",
-    svg,
-    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
-  );
-
-  ElementRe.querySelector("#code" ++ hash, svg)
-  |. Belt.Option.map(toAnimate =>
-       ElementRe.setAttribute("class", "code animate", toAnimate)
-     );
-};
-let setSelection = (svg, hash) => {
-  withQuerySelectorAllFrom(
-    ".animate",
-    svg,
-    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
-  );
-
-  withQuerySelectorAllFrom(
-    ".previous",
-    svg,
-    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
-  );
-  withQuerySelectorAllFrom(
-    ".selected",
-    svg,
-    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
-  );
-
-  ElementRe.querySelector("#code" ++ hash, svg)
-  |. Belt.Option.map(toAnimate =>
-       ElementRe.setAttribute("class", "code selected", toAnimate)
-     );
-};
-
 let onClick = (maybeHash, _) => {
   if (! hasChanged^) {
     hasChanged := true;
@@ -183,14 +99,83 @@ let onClick = (maybeHash, _) => {
   switch (maybeHash) {
   | Some(hash) =>
     switch (Js.Dict.get(dataSeen, hash)) {
-    | Some(_) =>
-      withQuerySelectorDom("#queer-loop svg", svg => setSelection(svg, hash))
-      |> ignore
+    | Some(_) => activateHash(hash)
     | None => ()
     }
   | None => setHashToNow()
   };
 };
+
+let _writeLogEntry = ((timestamp, localeString, text, hash)) =>
+  withQuerySelectorDom("#log", log => {
+    let entry = DocumentRe.createElement("a", document);
+    ElementRe.setAttribute("href", "#" ++ hash, entry);
+    let linkClasses = ElementRe.classList(entry);
+    DomTokenListRe.addMany(
+      [|"log-entry", "codeLink", "code" ++ hash|],
+      linkClasses,
+    );
+
+    ElementRe.addEventListener(
+      "click",
+      evt => {
+        EventRe.preventDefault(evt);
+        onClick(Some(hash), ());
+      },
+      entry,
+    );
+
+    let timeDiv = DocumentRe.createElement("div", document);
+    let time = DocumentRe.createElement("time", document);
+    ElementRe.setAttribute("datetime", timestamp, time);
+    ElementRe.setTextContent(time, timestamp);
+
+    let textChild = DocumentRe.createElement("span", document);
+    ElementRe.setInnerText(textChild, text);
+
+    let hashColor = Js.String.slice(~from=0, ~to_=6, hash);
+
+    ElementRe.setAttribute(
+      "style",
+      {j|background-color: #$(hashColor)66;|j},
+      entry,
+    );
+
+    ElementRe.appendChild(time, timeDiv);
+    ElementRe.appendChild(timeDiv, entry);
+    ElementRe.appendChild(textChild, entry);
+    ElementRe.appendChild(entry, log);
+  })
+  |> ignore;
+
+let writeLogEntry = Debouncer.make(~wait=100, _writeLogEntry);
+
+let takeSnapshot = codeImg =>
+  withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
+    let snapshotCtx = getContext(snapshotCanvas);
+    toDataURLjpg(snapshotCanvas, 0.9);
+  });
+
+let copySnapshotToIcon = _ =>
+  withQuerySelectorDom("#iconCanvas", iconCanvas =>
+    withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
+      let iconCtx = getContext(iconCanvas);
+
+      Ctx.setGlobalAlpha(iconCtx, 1.0);
+      Ctx.drawImageSourceRectDestRect(
+        iconCtx,
+        ~image=snapshotCanvas,
+        ~sx=0,
+        ~sy=0,
+        ~sw=getWidth(snapshotCanvas),
+        ~sh=getHeight(snapshotCanvas),
+        ~dx=0,
+        ~dy=0,
+        ~dw=getWidth(iconCanvas),
+        ~dh=getHeight(iconCanvas),
+      );
+    })
+  );
 
 let setCode = text =>
   Hash.hexDigest("SHA-1", text)
@@ -255,7 +240,8 @@ let setCode = text =>
                    ElementRe.setAttribute("href", url, a);
                  });
 
-                 let iconCodeImg = QueerCode.codeToImage(~code, ~border);
+                 let iconCodeImg =
+                   QueerCode.codeToImage(~code, ~border, ~hash);
                  ElementRe.addEventListener(
                    "load",
                    _evt =>
@@ -265,11 +251,22 @@ let setCode = text =>
                          setHeight(iconCanvas, sizeWithBorder);
                          let ctx = getContext(iconCanvas);
                          copySnapshotToIcon();
+                         Ctx.setGlobalAlpha(ctx, 0.5);
+                         Ctx.drawImage(ctx, ~image=iconCodeImg, ~dx=0, ~dy=0);
                          toDataURL(iconCanvas);
                        })
                      ) {
                      | Some(iconUrl) =>
                        withQuerySelectorDom("#codes", container => {
+                         let a =
+                           DocumentRe.createElementNS(htmlNs, "a", document);
+                         ElementRe.setAttribute("href", "#" ++ hash, a);
+                         let linkClasses = ElementRe.classList(a);
+                         DomTokenListRe.addMany(
+                           [|"codeLink", "code" ++ hash|],
+                           linkClasses,
+                         );
+
                          let img =
                            DocumentRe.createElementNS(
                              htmlNs,
@@ -278,12 +275,16 @@ let setCode = text =>
                            );
                          ElementRe.setAttribute("src", iconUrl, img);
 
+                         ElementRe.appendChild(img, a);
                          ElementRe.addEventListener(
                            "click",
-                           onClick(Some(hash)),
-                           img,
+                           evt => {
+                             EventRe.preventDefault(evt);
+                             onClick(Some(hash), ());
+                           },
+                           a,
                          );
-                         ElementRe.appendChild(img, container);
+                         ElementRe.appendChild(a, container);
                        })
                        |> ignore
                      | None => ()
@@ -478,7 +479,7 @@ let init: unit => unit =
       if (input !== "") {
         Hash.hexDigest("SHA-1", input)
         |> Js.Promise.then_(hexHash => {
-             let timestamp = getTimestamp();
+             let (timestamp, localeString) = getTimestampAndLocaleString();
              if (! hasChanged^) {
                hasChanged := true;
              };
@@ -487,14 +488,15 @@ let init: unit => unit =
                Belt.Option.isSome(Js.Dict.get(dataSeen, hexHash));
              let isSelf = hexHash === currentSignature^;
 
-             if (isSelf) {
-               writeLogEntry((timestamp, {j|queer-loop detected|j}, hexHash));
-             } else if (! alreadySeen) {
-               writeLogEntry((timestamp, input, hexHash));
-             };
-
              if (isSelf || ! alreadySeen) {
                Js.Dict.set(dataSeen, hexHash, input);
+
+               writeLogEntry((
+                 timestamp,
+                 localeString,
+                 isSelf ? "queer-loop" : input,
+                 hexHash,
+               ));
 
                setHashToNow();
              };
