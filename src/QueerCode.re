@@ -79,35 +79,81 @@ let makeAnimate = (values, duration, animBegin) => {
 };
 
 let scriptText = {|
-   function init() {
-     if (!document.body) {
-       const ids = Array.prototype.slice.call(document.querySelectorAll("symbol"), null).map(function(x) { return x.id; });
-       var i = 0;
-       var frameCount = 0;
-       var use = document.querySelector("use");
-       console.log(use);
-       function tick(timestamp) {
-          if (frameCount % 60 == 0) {
-               use.setAttribute("href", href = "#" + ids[i]);
-               i = (i + 1) % ids.length;
-          }
-          frameCount++;
-          window.requestAnimationFrame(tick);
-       }
-       window.requestAnimationFrame(tick);
-   }
-   }
+function clearAnimacy() {
+   document.querySelectorAll("svg.animate").forEach(function(x) { x.setAttribute("class", "code previous"); });
+   document.querySelectorAll("svg.previous").forEach(function(x) { x.setAttribute("class", "code"); });
+}
 
-   window.addEventListener("load", init, false);
+function init() {
+    if (!document.body) {
+        var nowShowing = 0;
+        const ids = Array.prototype.slice.call(document.querySelectorAll("svg.code"), null).map(function(x, i) {
+            if (x.className.animVal.indexOf("animate") !== -1) {
+                nowShowing = i;
+            }
+            return x.id;
+         });
+         var lastChanged = 0.0;
+         function tick(timestamp) {
+             if (timestamp - lastChanged > 4000.0) {
+                 var id = "#" + ids[nowShowing];
+                 clearAnimacy();
+                 document.querySelector(id).setAttribute("class", " code animate");
+                 nowShowing = (nowShowing + 1) % ids.length;
+                 lastChanged = timestamp;
+             }
+             window.requestAnimationFrame(tick);
+         }
+         window.requestAnimationFrame(tick);
+    }
+}
+
+window.addEventListener("load", init, false);
 |};
 
 [@bs.set] external setText : (Dom.element, string) => unit = "text";
+
+let styleText = {|
+   /* <![CDATA[ */
+   @namespace svg "http://www.w3.org/2000/svg";
+
+   @keyframes fadeOut {
+   from { opacity: 1; }
+   }
+
+   svg|svg svg|svg {
+     display: none;
+   }
+
+   svg|svg.animate, svg|svg.previous {
+      display: block;
+   }
+
+   image, g.codeGroup {
+       mix-blend-mode: difference;
+   }
+
+   svg|svg.animate g.codeGroup {
+      animation: fadeIn 2s infinite alternate;
+   }
+   svg|svg.previous g.codeGroup {
+      animation: fadeIn 4s infinite alternate;
+   }
+   /* ]]> */
+
+|};
 
 let createScript = () : Dom.element => {
   let script = DocumentRe.createElementNS(svgNs, "script", document);
 
   ElementRe.setTextContent(script, scriptText);
   script;
+};
+let createStyle = () : Dom.element => {
+  let style = DocumentRe.createElementNS(svgNs, "style", document);
+
+  ElementRe.setTextContent(style, styleText);
+  style;
 };
 
 let createSymbol =

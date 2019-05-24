@@ -51,12 +51,20 @@ function makeAnimate(values, duration, animBegin) {
   return animate;
 }
 
-var scriptText = "\n   function init() {\n     if (!document.body) {\n       const ids = Array.prototype.slice.call(document.querySelectorAll(\"symbol\"), null).map(function(x) { return x.id; });\n       var i = 0;\n       var frameCount = 0;\n       var use = document.querySelector(\"use\");\n       console.log(use);\n       function tick(timestamp) {\n          if (frameCount % 60 == 0) {\n               use.setAttribute(\"href\", href = \"#\" + ids[i]);\n               i = (i + 1) % ids.length;\n          }\n          frameCount++;\n          window.requestAnimationFrame(tick);\n       }\n       window.requestAnimationFrame(tick);\n   }\n   }\n\n   window.addEventListener(\"load\", init, false);\n";
+var scriptText = "\nfunction clearAnimacy() {\n   document.querySelectorAll(\"svg.animate\").forEach(function(x) { x.setAttribute(\"class\", \"code previous\"); });\n   document.querySelectorAll(\"svg.previous\").forEach(function(x) { x.setAttribute(\"class\", \"code\"); });\n}\n\nfunction init() {\n    if (!document.body) {\n        var nowShowing = 0;\n        const ids = Array.prototype.slice.call(document.querySelectorAll(\"svg.code\"), null).map(function(x, i) {\n            if (x.className.animVal.indexOf(\"animate\") !== -1) {\n                nowShowing = i;\n            }\n            return x.id;\n         });\n         var lastChanged = 0.0;\n         function tick(timestamp) {\n             if (timestamp - lastChanged > 4000.0) {\n                 var id = \"#\" + ids[nowShowing];\n                 clearAnimacy();\n                 document.querySelector(id).setAttribute(\"class\", \" code animate\");\n                 nowShowing = (nowShowing + 1) % ids.length;\n                 lastChanged = timestamp;\n             }\n             window.requestAnimationFrame(tick);\n         }\n         window.requestAnimationFrame(tick);\n    }\n}\n\nwindow.addEventListener(\"load\", init, false);\n";
+
+var styleText = "\n   /* <![CDATA[ */\n   @namespace svg \"http://www.w3.org/2000/svg\";\n\n   @keyframes fadeOut {\n   from { opacity: 1; }\n   }\n\n   svg|svg svg|svg {\n     display: none;\n   }\n\n   svg|svg.animate, svg|svg.previous {\n      display: block;\n   }\n\n   image, g.codeGroup {\n       mix-blend-mode: difference;\n   }\n\n   svg|svg.animate g.codeGroup {\n      animation: fadeIn 2s infinite alternate;\n   }\n   svg|svg.previous g.codeGroup {\n      animation: fadeIn 4s infinite alternate;\n   }\n   /* ]]> */\n\n";
 
 function createScript(param) {
   var script = document.createElementNS(svgNs, "script");
   script.textContent = scriptText;
   return script;
+}
+
+function createStyle(param) {
+  var style = document.createElementNS(svgNs, "style");
+  style.textContent = styleText;
+  return style;
 }
 
 function createSymbol(href, code, hash, maybeDataURL, localeString, border, invert, animated) {
@@ -218,7 +226,9 @@ export {
   createRainbowGradient ,
   makeAnimate ,
   scriptText ,
+  styleText ,
   createScript ,
+  createStyle ,
   createSymbol ,
   createSvgSkeleton ,
   createIconSvg ,
