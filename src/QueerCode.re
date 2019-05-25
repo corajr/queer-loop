@@ -120,19 +120,20 @@ let styleText = {|
       display: block;
    }
 
-   svg|svg.animate {
-      animation: fadeIn 2s infinite alternate;
-   }
+    svg|svg.animationsEnabled svg|svg.animate {
+    animation: fadeIn 2s infinite alternate;
+  }
+
 
    svg|svg.previous g.codeGroup, svg|svg.selected g.codeGroup {
        opacity: 0.1;
    }
 |};
 
-let createScript = () : Dom.element => {
+let createScript = string : Dom.element => {
   let script = DocumentRe.createElementNS(svgNs, "script", document);
 
-  ElementRe.setTextContent(script, scriptText);
+  ElementRe.setTextContent(script, string);
   script;
 };
 
@@ -207,6 +208,7 @@ let createCodeSvg =
       ~timestamp: string,
       ~border: int,
       ~invert: bool,
+      ~animated: bool,
     )
     : Dom.element => {
   let size = QrCode.size(code);
@@ -251,6 +253,11 @@ let createCodeSvg =
     codeSvg,
   );
 
+  if (animated) {
+    let codeSvgClasses = ElementRe.classList(codeSvg);
+    DomTokenListRe.add("animationsEnabled", codeSvgClasses);
+  };
+
   codeSvg;
 };
 
@@ -263,7 +270,7 @@ let createSvgSkeleton = hash => {
   ElementRe.appendChild(rainbowGradient, defs);
   ElementRe.appendChild(defs, svg);
 
-  let script = createScript();
+  let script = createScript(scriptText);
   ElementRe.appendChild(script, svg);
 
   let style = createStyle();

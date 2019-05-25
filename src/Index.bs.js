@@ -172,7 +172,7 @@ function setCode(text) {
             var sizeWithBorder = code.size + 12 | 0;
             var match = getTimestampAndLocaleString(/* () */0);
             var timestamp = match[0];
-            var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, match[1], timestamp, 6, Options$QueerLoop.currentOptions[0][/* invert */4]);
+            var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, match[1], timestamp, 6, Options$QueerLoop.currentOptions[0][/* invert */4], Options$QueerLoop.currentOptions[0][/* animate */5]);
             var codeImg = QueerCode$QueerLoop.svgToImg(codeSvg);
             codeImg.addEventListener("load", (function (param) {
                     Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (loopContainer) {

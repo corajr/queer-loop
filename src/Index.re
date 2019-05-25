@@ -204,6 +204,7 @@ let setCode = text =>
              ~localeString,
              ~timestamp,
              ~invert=currentOptions^.invert,
+             ~animated=currentOptions^.animate,
            );
 
          let codeImg = QueerCode.svgToImg(codeSvg);
