@@ -1,3 +1,4 @@
+import inliner from './rollup-plugin-inliner';
 import resolve from 'rollup-plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 import serve from 'rollup-plugin-serve';
@@ -9,13 +10,17 @@ export default [{
     output: {
         name: 'index',
         file: 'index.js',
-        sourcemap: true,
+        sourcemap: 'inline',
         format: 'iife'
     },
     plugins: [
         resolve(),
+        inliner({
+            template: 'index.html.in',
+            target: 'index.html',
+        }),
+        production && terser(),
         !production && serve(),
-        production && terser()
     ],
 },
 {
@@ -23,7 +28,7 @@ export default [{
     output: {
         name: 'worker',
         file: 'worker.js',
-        sourcemap: true,
+        sourcemap: 'inline',
         format: 'iife'
     },
     plugins: [

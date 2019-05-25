@@ -208,7 +208,6 @@ let createCodeSvg =
       ~timestamp: string,
       ~border: int,
       ~invert: bool,
-      ~animated: bool,
     )
     : Dom.element => {
   let size = QrCode.size(code);
@@ -253,28 +252,36 @@ let createCodeSvg =
     codeSvg,
   );
 
-  if (animated) {
-    let codeSvgClasses = ElementRe.classList(codeSvg);
-    DomTokenListRe.add("animationsEnabled", codeSvgClasses);
-  };
-
   codeSvg;
 };
 
 let createSvgSkeleton = hash => {
   let svg = DocumentRe.createElementNS(svgNs, "svg", document);
   ElementRe.setAttribute("viewBox", "0 0 1 1", svg);
+  ElementRe.setAttribute("class", "root", svg);
 
   let defs = DocumentRe.createElementNS(svgNs, "defs", document);
   let rainbowGradient = createRainbowGradient(0.9);
   ElementRe.appendChild(rainbowGradient, defs);
   ElementRe.appendChild(defs, svg);
 
-  let script = createScript(scriptText);
-  ElementRe.appendChild(script, svg);
+  withQuerySelectorDom("script.main", main => {
+    let script = createScript(ElementRe.textContent(main));
+    ElementRe.appendChild(script, svg);
+  });
 
   let style = createStyle();
   ElementRe.appendChild(style, svg);
+
+  let htmlContainer =
+    DocumentRe.createElementNS(svgNs, "foreignObject", document);
+  ElementRe.setAttribute("x", "0", htmlContainer);
+  ElementRe.setAttribute("y", "0", htmlContainer);
+  ElementRe.setAttribute("width", "1", htmlContainer);
+  ElementRe.setAttribute("height", "1", htmlContainer);
+  ElementRe.setAttribute("class", "htmlContainer", htmlContainer);
+
+  ElementRe.appendChild(htmlContainer, svg);
 
   svg;
 };

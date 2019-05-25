@@ -41,8 +41,6 @@ function createRainbowGradient(lightness) {
   return gradient;
 }
 
-var scriptText = "\n   /* <![CDATA[ */\nfunction clearSelection() {\n   document.querySelectorAll(\"svg.code\").forEach(function(x) { x.setAttribute(\"class\", \"code\"); });\n}\n\nfunction stepAnimacy() {\n   document.querySelectorAll(\"svg.selected\").forEach(function(x) { x.setAttribute(\"class\", \"code\"); });\n   document.querySelectorAll(\"svg.animate\").forEach(function(x) { x.setAttribute(\"class\", \"code previous\"); });\n   document.querySelectorAll(\"svg.previous\").forEach(function(x) { x.setAttribute(\"class\", \"code\"); });\n}\n\nfunction init() {\n    if (!document.body) {\n        var nowShowing = 0;\n        const ids = Array.prototype.slice.call(document.querySelectorAll(\"svg.code\"), null).map(function(x, i) {\n            if (/animate|selected/.test(x.className.animVal)) {\n                nowShowing = i;\n            }\n            return x.id;\n         });\n         var lastChanged = 0.0;\n         function tick(timestamp) {\n             if (timestamp - lastChanged >= 1000.0) {\n                 clearSelection();\n                 nowShowing = (nowShowing + 1) % ids.length;\n                 var id = \"#\" + ids[nowShowing];\n                 document.querySelector(id).setAttribute(\"class\", \" code selected\");\n                 lastChanged = timestamp;\n             }\n             window.requestAnimationFrame(tick);\n         }\n         window.requestAnimationFrame(tick);\n    }\n}\n\nwindow.addEventListener(\"load\", init, false);\n   /* ]]> */\n";
-
 var styleText = "\n   @namespace svg \"http://www.w3.org/2000/svg\";\n\n   @keyframes fadeIn {\n   from { opacity: 0.0; }\n   }\n\n   svg|svg svg|svg {\n     display: none;\n   }\n\n   svg|svg.animate, svg|svg.previous, svg|svg.selected {\n      display: block;\n   }\n\n    svg|svg.animationsEnabled svg|svg.animate {\n    animation: fadeIn 2s infinite alternate;\n  }\n\n\n   svg|svg.previous g.codeGroup, svg|svg.selected g.codeGroup {\n       opacity: 0.1;\n   }\n";
 
 function createScript(string) {
@@ -88,7 +86,7 @@ function createTimeLink(href, timestamp, localeString, sizeWithBorder, border) {
   return timeLink;
 }
 
-function createCodeSvg(href, code, hash, localeString, timestamp, border, invert, animated) {
+function createCodeSvg(href, code, hash, localeString, timestamp, border, invert) {
   var size = code.size;
   var sizeWithBorder = size + (border << 1) | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
@@ -113,24 +111,31 @@ function createCodeSvg(href, code, hash, localeString, timestamp, border, invert
   codeGroup.setAttribute("class", "codeGroup");
   codeSvg.appendChild(codeGroup);
   codeSvg.appendChild(createTimeLink(href, timestamp, localeString, sizeWithBorder, border));
-  if (animated) {
-    var codeSvgClasses = codeSvg.classList;
-    codeSvgClasses.add("animationsEnabled");
-  }
   return codeSvg;
 }
 
 function createSvgSkeleton(hash) {
   var svg = document.createElementNS(svgNs, "svg");
   svg.setAttribute("viewBox", "0 0 1 1");
+  svg.setAttribute("class", "root");
   var defs = document.createElementNS(svgNs, "defs");
   var rainbowGradient = createRainbowGradient(0.9);
   defs.appendChild(rainbowGradient);
   svg.appendChild(defs);
-  var script = createScript(scriptText);
-  svg.appendChild(script);
+  Util$QueerLoop.withQuerySelectorDom("script.main", (function (main) {
+          var script = createScript(main.textContent);
+          svg.appendChild(script);
+          return /* () */0;
+        }));
   var style = createStyle(/* () */0);
   svg.appendChild(style);
+  var htmlContainer = document.createElementNS(svgNs, "foreignObject");
+  htmlContainer.setAttribute("x", "0");
+  htmlContainer.setAttribute("y", "0");
+  htmlContainer.setAttribute("width", "1");
+  htmlContainer.setAttribute("height", "1");
+  htmlContainer.setAttribute("class", "htmlContainer");
+  svg.appendChild(htmlContainer);
   return svg;
 }
 
@@ -223,6 +228,8 @@ function drawCanvas(canvas, code) {
   }
   return /* () */0;
 }
+
+var scriptText = "\n   /* <![CDATA[ */\nfunction clearSelection() {\n   document.querySelectorAll(\"svg.code\").forEach(function(x) { x.setAttribute(\"class\", \"code\"); });\n}\n\nfunction stepAnimacy() {\n   document.querySelectorAll(\"svg.selected\").forEach(function(x) { x.setAttribute(\"class\", \"code\"); });\n   document.querySelectorAll(\"svg.animate\").forEach(function(x) { x.setAttribute(\"class\", \"code previous\"); });\n   document.querySelectorAll(\"svg.previous\").forEach(function(x) { x.setAttribute(\"class\", \"code\"); });\n}\n\nfunction init() {\n    if (!document.body) {\n        var nowShowing = 0;\n        const ids = Array.prototype.slice.call(document.querySelectorAll(\"svg.code\"), null).map(function(x, i) {\n            if (/animate|selected/.test(x.className.animVal)) {\n                nowShowing = i;\n            }\n            return x.id;\n         });\n         var lastChanged = 0.0;\n         function tick(timestamp) {\n             if (timestamp - lastChanged >= 1000.0) {\n                 clearSelection();\n                 nowShowing = (nowShowing + 1) % ids.length;\n                 var id = \"#\" + ids[nowShowing];\n                 document.querySelector(id).setAttribute(\"class\", \" code selected\");\n                 lastChanged = timestamp;\n             }\n             window.requestAnimationFrame(tick);\n         }\n         window.requestAnimationFrame(tick);\n    }\n}\n\nwindow.addEventListener(\"load\", init, false);\n   /* ]]> */\n";
 
 export {
   getPathString ,

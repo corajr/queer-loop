@@ -204,7 +204,6 @@ let setCode = text =>
              ~localeString,
              ~timestamp,
              ~invert=currentOptions^.invert,
-             ~animated=currentOptions^.animate,
            );
 
          let codeImg = QueerCode.svgToImg(codeSvg);
@@ -227,19 +226,21 @@ let setCode = text =>
                    | None =>
                      let svg = QueerCode.createSvgSkeleton(hash);
                      ElementRe.appendChild(svg, loopContainer);
+                     ElementRe.addEventListener("click", onClick(None), svg);
                      svg;
                    };
 
                  ElementRe.appendChild(codeSvg, rootSvg);
 
+                 if (currentOptions^.animate) {
+                   ElementRe.setAttribute(
+                     "class",
+                     "root animationsEnabled",
+                     rootSvg,
+                   );
+                 };
+
                  setAnimacy(rootSvg, hash);
-
-                 let url = QueerCode.svgToDataURL(rootSvg);
-
-                 withQuerySelectorDom("#download", a => {
-                   ElementRe.setAttribute("download", timestamp ++ ".svg", a);
-                   ElementRe.setAttribute("href", url, a);
-                 });
 
                  let iconCodeImg =
                    QueerCode.codeToImage(~code, ~border, ~hash);
@@ -292,6 +293,13 @@ let setCode = text =>
                      },
                    iconCodeImg,
                  );
+
+                 let url = QueerCode.svgToDataURL(rootSvg);
+
+                 withQuerySelectorDom("#download", a => {
+                   ElementRe.setAttribute("download", timestamp ++ ".svg", a);
+                   ElementRe.setAttribute("href", url, a);
+                 });
 
                  currentSignature := hash;
                | None => ()
@@ -457,7 +465,7 @@ let init: unit => unit =
     };
 
     if (currentOptions^.background != "") {
-      setBackground("body", currentOptions^.background) |> ignore;
+      setBackground(".background", currentOptions^.background) |> ignore;
     };
 
     initialHash := Js.String.sliceToEnd(~from=1, getHash());
@@ -467,10 +475,6 @@ let init: unit => unit =
     } else {
       onHashChange();
     };
-
-    withQuerySelectorDom("#queer-loop", el =>
-      ElementRe.addEventListener("click", onClick(None), el)
-    );
 
     withQuerySelectorDom("#codeContents", el =>
       ElementRe.addEventListener("blur", _evt => onInput(), el)
@@ -515,7 +519,7 @@ let init: unit => unit =
              camera => {
                let videoEl =
                  DocumentRe.createElementNS(htmlNs, "video", document);
-               withQuerySelectorDom("#htmlContainer", body =>
+               withQuerySelectorDom(".htmlContainer", body =>
                  ElementRe.appendChild(videoEl, body)
                );
 
@@ -538,7 +542,7 @@ let init: unit => unit =
          Js.Promise.resolve();
        })
     |> Js.Promise.catch(err => {
-         Js.Console.error2("getCameras failed", err);
+         Js.Console.log("Camera input disabled.");
          withQuerySelectorDom("#welcome", welcome =>
            ElementRe.setAttribute("style", "display: block;", welcome)
          );

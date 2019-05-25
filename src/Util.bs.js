@@ -31,6 +31,10 @@ function mapMaybe(f, arrayA) {
   return catMaybes($$Array.map(f, arrayA));
 }
 
+function withQuerySelectorFrom(query, element, f) {
+  return Belt_Option.map(Caml_option.nullable_to_opt(element.querySelector(query)), f);
+}
+
 function withQuerySelectorAllFrom(query, element, f) {
   var arrayA = Array.prototype.slice.call(element.querySelectorAll(query));
   return Curry._1(f, catMaybes($$Array.map(ElementRe.ofNode, arrayA)));
@@ -96,6 +100,7 @@ export {
   withQuerySelector ,
   catMaybes ,
   mapMaybe ,
+  withQuerySelectorFrom ,
   withQuerySelectorAllFrom ,
   withQuerySelectorAll ,
   withQuerySelectorSub ,

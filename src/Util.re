@@ -27,6 +27,9 @@ let catMaybes: array(option('a)) => array('a) =
 let mapMaybe: ('a => option('b), array('a)) => array('b) =
   (f, arrayA) => catMaybes(Array.map(f, arrayA));
 
+let withQuerySelectorFrom = (query, element, f) =>
+  ElementRe.querySelector(query, element) |. Belt.Option.map(f);
+
 let withQuerySelectorAllFrom = (query, element, f) =>
   ElementRe.querySelectorAll(query, element)
   |> DomRe.NodeList.toArray

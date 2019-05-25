@@ -172,7 +172,7 @@ function setCode(text) {
             var sizeWithBorder = code.size + 12 | 0;
             var match = getTimestampAndLocaleString(/* () */0);
             var timestamp = match[0];
-            var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, match[1], timestamp, 6, Options$QueerLoop.currentOptions[0][/* invert */4], Options$QueerLoop.currentOptions[0][/* animate */5]);
+            var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, match[1], timestamp, 6, Options$QueerLoop.currentOptions[0][/* invert */4]);
             var codeImg = QueerCode$QueerLoop.svgToImg(codeSvg);
             codeImg.addEventListener("load", (function (param) {
                     Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (loopContainer) {
@@ -184,18 +184,18 @@ function setCode(text) {
                               if (match$1 == null) {
                                 var svg = QueerCode$QueerLoop.createSvgSkeleton(hash);
                                 loopContainer.appendChild(svg);
+                                svg.addEventListener("click", (function (param) {
+                                        return onClick(undefined, param);
+                                      }));
                                 rootSvg = svg;
                               } else {
                                 rootSvg = match$1;
                               }
                               rootSvg.appendChild(codeSvg);
+                              if (Options$QueerLoop.currentOptions[0][/* animate */5]) {
+                                rootSvg.setAttribute("class", "root animationsEnabled");
+                              }
                               SvgScript$QueerLoop.setAnimacy(rootSvg, hash);
-                              var url = QueerCode$QueerLoop.svgToDataURL(rootSvg);
-                              Util$QueerLoop.withQuerySelectorDom("#download", (function (a) {
-                                      a.setAttribute("download", timestamp + ".svg");
-                                      a.setAttribute("href", url);
-                                      return /* () */0;
-                                    }));
                               var iconCodeImg = QueerCode$QueerLoop.codeToImage(code, 6, hash);
                               iconCodeImg.addEventListener("load", (function (_evt) {
                                       var match = Util$QueerLoop.withQuerySelectorDom("#iconCanvas", (function (iconCanvas) {
@@ -228,6 +228,12 @@ function setCode(text) {
                                       } else {
                                         return /* () */0;
                                       }
+                                    }));
+                              var url = QueerCode$QueerLoop.svgToDataURL(rootSvg);
+                              Util$QueerLoop.withQuerySelectorDom("#download", (function (a) {
+                                      a.setAttribute("download", timestamp + ".svg");
+                                      a.setAttribute("href", url);
+                                      return /* () */0;
                                     }));
                               currentSignature[0] = hash;
                               return /* () */0;
@@ -377,7 +383,7 @@ function init(param) {
     ];
   }
   if (Options$QueerLoop.currentOptions[0][/* background */0] !== "") {
-    setBackground("body", Options$QueerLoop.currentOptions[0][/* background */0]);
+    setBackground(".background", Options$QueerLoop.currentOptions[0][/* background */0]);
   }
   initialHash[0] = Util$QueerLoop.getHash(/* () */0).slice(1);
   if (initialHash[0] === "") {
@@ -386,12 +392,6 @@ function init(param) {
   } else {
     onHashChange(/* () */0);
   }
-  Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (el) {
-          el.addEventListener("click", (function (param) {
-                  return onClick(undefined, param);
-                }));
-          return /* () */0;
-        }));
   Util$QueerLoop.withQuerySelectorDom("#codeContents", (function (el) {
           el.addEventListener("blur", (function (_evt) {
                   return Curry._1(onInput, /* () */0);
@@ -428,7 +428,7 @@ function init(param) {
               camerasRef[0] = cameras;
               return Promise.all($$Array.map((function (camera) {
                                 var videoEl = document.createElementNS(Util$QueerLoop.htmlNs, "video");
-                                Util$QueerLoop.withQuerySelectorDom("#htmlContainer", (function (body) {
+                                Util$QueerLoop.withQuerySelectorDom(".htmlContainer", (function (body) {
                                         body.appendChild(videoEl);
                                         return /* () */0;
                                       }));
@@ -439,7 +439,7 @@ function init(param) {
             requestAnimationFrame(onTick);
             return Promise.resolve(/* () */0);
           })).catch((function (err) {
-          console.error("getCameras failed", err);
+          console.log("Camera input disabled.");
           Util$QueerLoop.withQuerySelectorDom("#welcome", (function (welcome) {
                   welcome.setAttribute("style", "display: block;");
                   return /* () */0;
