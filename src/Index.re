@@ -177,139 +177,169 @@ let copySnapshotToIcon = _ =>
     })
   );
 
+type svgOrHtml =
+  | Svg
+  | Html;
+
+let hasBody = [%bs.raw () => "return !!document.body;"];
+
+let withRootSvg = (hash, f: Dom.element => unit) : unit =>
+  if (hasBody()) {
+    withQuerySelectorDom("#queer-loop", loopContainer =>
+      switch (ElementRe.querySelector("svg", loopContainer)) {
+      | Some(svg) => f(svg)
+      | None =>
+        let svg = QueerCode.createSvgSkeleton(hash);
+        ElementRe.addEventListener("click", onClick(None), svg);
+        ElementRe.appendChild(svg, loopContainer);
+        f(svg);
+      }
+    )
+    |> ignore;
+  } else {
+    withQuerySelectorDom("svg.root", f) |> ignore;
+  };
+
 let setCode = text =>
   Hash.hexDigest("SHA-1", text)
   |> Js.Promise.then_(hash => {
-       let alreadySeen = Belt.Option.isSome(Js.Dict.get(dataSeen, hash));
+       withRootSvg(
+         hash,
+         rootSvg => {
+           let alreadySeen = Belt.Option.isSome(Js.Dict.get(dataSeen, hash));
 
-       if (! alreadySeen) {
-         Js.Dict.set(dataSeen, hash, text);
+           if (! alreadySeen) {
+             Js.Dict.set(dataSeen, hash, text);
 
-         let code =
-           Belt.Option.getWithDefault(
-             QrCode.encodeText(text, Ecc.medium),
-             defaultCode,
-           );
-         let border = 6;
-         let sizeWithBorder = QrCode.size(code) + border * 2;
+             let code =
+               Belt.Option.getWithDefault(
+                 QrCode.encodeText(text, Ecc.medium),
+                 defaultCode,
+               );
+             let border = 6;
+             let sizeWithBorder = QrCode.size(code) + border * 2;
 
-         let (timestamp, localeString) = getTimestampAndLocaleString();
+             let (timestamp, localeString) = getTimestampAndLocaleString();
 
-         let codeSvg =
-           QueerCode.createCodeSvg(
-             ~href=text,
-             ~hash,
-             ~code,
-             ~border,
-             ~localeString,
-             ~timestamp,
-             ~invert=currentOptions^.invert,
-           );
+             let codeSvg =
+               QueerCode.createCodeSvg(
+                 ~href=text,
+                 ~hash,
+                 ~code,
+                 ~border,
+                 ~localeString,
+                 ~timestamp,
+                 ~invert=currentOptions^.invert,
+               );
 
-         let codeImg = QueerCode.svgToImg(codeSvg);
+             let codeImg = QueerCode.svgToImg(codeSvg);
 
-         ElementRe.addEventListener(
-           "load",
-           _ =>
-             withQuerySelectorDom("#queer-loop", loopContainer =>
-               switch (takeSnapshot()) {
-               | Some(snapshotUrl) =>
-                 QueerCode.addBackground(
-                   ~codeSvg,
-                   ~dataURL=snapshotUrl,
-                   ~sizeWithBorder,
-                 );
+             ElementRe.addEventListener(
+               "load",
+               _ =>
+                 withQuerySelectorDom("#queer-loop", loopContainer =>
+                   switch (takeSnapshot()) {
+                   | Some(snapshotUrl) =>
+                     QueerCode.addBackground(
+                       ~codeSvg,
+                       ~dataURL=snapshotUrl,
+                       ~sizeWithBorder,
+                     );
 
-                 let rootSvg =
-                   switch (ElementRe.querySelector("svg", loopContainer)) {
-                   | Some(svg) => svg
-                   | None =>
-                     let svg = QueerCode.createSvgSkeleton(hash);
-                     ElementRe.appendChild(svg, loopContainer);
-                     ElementRe.addEventListener("click", onClick(None), svg);
-                     svg;
-                   };
+                     ElementRe.appendChild(codeSvg, rootSvg);
 
-                 ElementRe.appendChild(codeSvg, rootSvg);
+                     if (currentOptions^.animate) {
+                       ElementRe.setAttribute(
+                         "class",
+                         "root animationsEnabled",
+                         rootSvg,
+                       );
+                     };
 
-                 if (currentOptions^.animate) {
-                   ElementRe.setAttribute(
-                     "class",
-                     "root animationsEnabled",
-                     rootSvg,
-                   );
-                 };
+                     setAnimacy(rootSvg, hash);
 
-                 setAnimacy(rootSvg, hash);
+                     let iconCodeImg =
+                       QueerCode.codeToImage(~code, ~border, ~hash);
+                     ElementRe.addEventListener(
+                       "load",
+                       _evt =>
+                         switch (
+                           withQuerySelectorDom("#iconCanvas", iconCanvas => {
+                             setWidth(iconCanvas, sizeWithBorder);
+                             setHeight(iconCanvas, sizeWithBorder);
+                             let ctx = getContext(iconCanvas);
+                             copySnapshotToIcon();
+                             Ctx.setGlobalAlpha(ctx, 0.5);
+                             Ctx.drawImage(
+                               ctx,
+                               ~image=iconCodeImg,
+                               ~dx=0,
+                               ~dy=0,
+                             );
+                             toDataURL(iconCanvas);
+                           })
+                         ) {
+                         | Some(iconUrl) =>
+                           withQuerySelectorDom("#codes", container => {
+                             let a =
+                               DocumentRe.createElementNS(
+                                 htmlNs,
+                                 "a",
+                                 document,
+                               );
+                             ElementRe.setAttribute("href", "#" ++ hash, a);
+                             let linkClasses = ElementRe.classList(a);
+                             DomTokenListRe.addMany(
+                               [|"codeLink", "code" ++ hash|],
+                               linkClasses,
+                             );
 
-                 let iconCodeImg =
-                   QueerCode.codeToImage(~code, ~border, ~hash);
-                 ElementRe.addEventListener(
-                   "load",
-                   _evt =>
-                     switch (
-                       withQuerySelectorDom("#iconCanvas", iconCanvas => {
-                         setWidth(iconCanvas, sizeWithBorder);
-                         setHeight(iconCanvas, sizeWithBorder);
-                         let ctx = getContext(iconCanvas);
-                         copySnapshotToIcon();
-                         Ctx.setGlobalAlpha(ctx, 0.5);
-                         Ctx.drawImage(ctx, ~image=iconCodeImg, ~dx=0, ~dy=0);
-                         toDataURL(iconCanvas);
-                       })
-                     ) {
-                     | Some(iconUrl) =>
-                       withQuerySelectorDom("#codes", container => {
-                         let a =
-                           DocumentRe.createElementNS(htmlNs, "a", document);
-                         ElementRe.setAttribute("href", "#" ++ hash, a);
-                         let linkClasses = ElementRe.classList(a);
-                         DomTokenListRe.addMany(
-                           [|"codeLink", "code" ++ hash|],
-                           linkClasses,
-                         );
+                             let img =
+                               DocumentRe.createElementNS(
+                                 htmlNs,
+                                 "img",
+                                 document,
+                               );
+                             ElementRe.setAttribute("src", iconUrl, img);
 
-                         let img =
-                           DocumentRe.createElementNS(
-                             htmlNs,
-                             "img",
-                             document,
-                           );
-                         ElementRe.setAttribute("src", iconUrl, img);
+                             ElementRe.appendChild(img, a);
+                             ElementRe.addEventListener(
+                               "click",
+                               evt => {
+                                 EventRe.preventDefault(evt);
+                                 onClick(Some(hash), ());
+                               },
+                               a,
+                             );
+                             ElementRe.appendChild(a, container);
+                           })
+                           |> ignore
+                         | None => ()
+                         },
+                       iconCodeImg,
+                     );
 
-                         ElementRe.appendChild(img, a);
-                         ElementRe.addEventListener(
-                           "click",
-                           evt => {
-                             EventRe.preventDefault(evt);
-                             onClick(Some(hash), ());
-                           },
-                           a,
-                         );
-                         ElementRe.appendChild(a, container);
-                       })
-                       |> ignore
-                     | None => ()
-                     },
-                   iconCodeImg,
-                 );
+                     let url = QueerCode.svgToDataURL(rootSvg);
 
-                 let url = QueerCode.svgToDataURL(rootSvg);
+                     withQuerySelectorDom("#download", a => {
+                       ElementRe.setAttribute(
+                         "download",
+                         timestamp ++ ".svg",
+                         a,
+                       );
+                       ElementRe.setAttribute("href", url, a);
+                     });
 
-                 withQuerySelectorDom("#download", a => {
-                   ElementRe.setAttribute("download", timestamp ++ ".svg", a);
-                   ElementRe.setAttribute("href", url, a);
-                 });
-
-                 currentSignature := hash;
-               | None => ()
-               }
-             )
-             |> ignore,
-           codeImg,
-         )
-         |> ignore;
-       };
+                     currentSignature := hash;
+                   | None => ()
+                   }
+                 )
+                 |> ignore,
+               codeImg,
+             );
+           };
+         },
+       );
 
        Js.Promise.resolve();
      })
@@ -323,29 +353,28 @@ let setText =
     |> ignore
   );
 
-let onHashChange: unit => unit =
-  _ => {
-    let opts = currentOptions^;
+let onHashChange = _evt => {
+  let opts = currentOptions^;
 
-    let url = UrlRe.make(DomRe.Location.href(WindowRe.location(window)));
+  let url = UrlRe.make(DomRe.Location.href(WindowRe.location(window)));
 
-    let (timestamp, localeString) = getTimestampAndLocaleString();
-    withQuerySelectorDom("title", title =>
-      ElementRe.setInnerText(title, localeString)
-    );
+  let (timestamp, localeString) = getTimestampAndLocaleString();
+  withQuerySelectorDom("title", title =>
+    ElementRe.setInnerText(title, localeString)
+  );
 
-    withQuerySelectorDom("time", time => {
-      ElementRe.setAttribute("datetime", timestamp, time);
-      ElementRe.setInnerText(time, localeString);
-    });
-    let urlText =
-      (opts.includeDomain ? UrlRe.origin(url) : "")
-      ++ (opts.includeQueryString ? UrlRe.search(url) : "")
-      ++ (opts.includeHash ? UrlRe.hash(url) : "");
+  withQuerySelectorDom("time", time => {
+    ElementRe.setAttribute("datetime", timestamp, time);
+    ElementRe.setInnerText(time, localeString);
+  });
+  let urlText =
+    (opts.includeDomain ? UrlRe.origin(url) : "")
+    ++ (opts.includeQueryString ? UrlRe.search(url) : "")
+    ++ (opts.includeHash ? UrlRe.hash(url) : "");
 
-    setCode(urlText);
-    setText(urlText);
-  };
+  setCode(urlText);
+  setText(urlText);
+};
 
 let frameCount = ref(0);
 
@@ -402,157 +431,176 @@ let boolParam: (bool, option(string)) => bool =
 let pick: (array('a), array(int)) => array('a) =
   (ary, indices) => Array.map(i => ary[i], indices);
 
-let init: unit => unit =
-  _ => {
-    withQuerySelectorDom("#snapshotCanvas", canvas => {
-      setWidth(canvas, 480);
-      setHeight(canvas, 480);
-    });
+let init = _evt => {
+  withQuerySelectorDom("#snapshotCanvas", canvas => {
+    setWidth(canvas, 480);
+    setHeight(canvas, 480);
+  });
 
-    let queryString = getQueryString();
-    if (queryString !== "") {
-      let params = URLSearchParamsRe.make(queryString);
+  let queryString = getQueryString();
+  if (queryString !== "") {
+    let params = URLSearchParamsRe.make(queryString);
 
-      let cameraIndices =
-        Array.map(int_of_string, URLSearchParamsRe.getAll("c", params));
+    let cameraIndices =
+      Array.map(int_of_string, URLSearchParamsRe.getAll("c", params));
 
-      currentOptions :=
-        {
-          includeDomain:
-            boolParam(
-              currentOptions^.includeDomain,
-              URLSearchParamsRe.get("d", params),
+    currentOptions :=
+      {
+        includeDomain:
+          boolParam(
+            currentOptions^.includeDomain,
+            URLSearchParamsRe.get("d", params),
+          ),
+        includeQueryString:
+          boolParam(
+            currentOptions^.includeQueryString,
+            URLSearchParamsRe.get("q", params),
+          ),
+        includeHash:
+          boolParam(
+            currentOptions^.includeHash,
+            URLSearchParamsRe.get("h", params),
+          ),
+        invert:
+          boolParam(
+            currentOptions^.invert,
+            URLSearchParamsRe.get("i", params),
+          ),
+        animate:
+          boolParam(
+            currentOptions^.invert,
+            URLSearchParamsRe.get("a", params),
+          ),
+        opacity:
+          Belt.Option.getWithDefault(
+            Belt.Option.map(
+              URLSearchParamsRe.get("o", params),
+              Js.Float.fromString,
             ),
-          includeQueryString:
-            boolParam(
-              currentOptions^.includeQueryString,
-              URLSearchParamsRe.get("q", params),
+            currentOptions^.opacity,
+          ),
+        background:
+          Belt.Option.getWithDefault(
+            Belt.Option.map(
+              URLSearchParamsRe.get("b", params),
+              decodeURIComponent,
             ),
-          includeHash:
-            boolParam(
-              currentOptions^.includeHash,
-              URLSearchParamsRe.get("h", params),
-            ),
-          invert:
-            boolParam(
-              currentOptions^.invert,
-              URLSearchParamsRe.get("i", params),
-            ),
-          animate:
-            boolParam(
-              currentOptions^.invert,
-              URLSearchParamsRe.get("a", params),
-            ),
-          opacity:
-            Belt.Option.getWithDefault(
-              Belt.Option.map(
-                URLSearchParamsRe.get("o", params),
-                Js.Float.fromString,
-              ),
-              currentOptions^.opacity,
-            ),
-          background:
-            Belt.Option.getWithDefault(
-              Belt.Option.map(
-                URLSearchParamsRe.get("b", params),
-                decodeURIComponent,
-              ),
-              currentOptions^.background,
-            ),
-          cameraIndices:
-            Array.length(cameraIndices) == 0 ? [|0|] : cameraIndices,
-        };
-    };
-
-    if (currentOptions^.background != "") {
-      setBackground(".background", currentOptions^.background) |> ignore;
-    };
-
-    initialHash := Js.String.sliceToEnd(~from=1, getHash());
-    if (initialHash^ == "") {
-      initialHash := getTimestamp();
-      setHash(initialHash^);
-    } else {
-      onHashChange();
-    };
-
-    withQuerySelectorDom("#codeContents", el =>
-      ElementRe.addEventListener("blur", _evt => onInput(), el)
-    );
-
-    let response = input =>
-      if (input !== "") {
-        Hash.hexDigest("SHA-1", input)
-        |> Js.Promise.then_(hexHash => {
-             let (timestamp, localeString) = getTimestampAndLocaleString();
-             if (! hasChanged^) {
-               hasChanged := true;
-             };
-
-             let alreadySeen =
-               Belt.Option.isSome(Js.Dict.get(dataSeen, hexHash));
-             let isSelf = hexHash === currentSignature^;
-
-             if (isSelf || ! alreadySeen) {
-               Js.Dict.set(dataSeen, hexHash, input);
-
-               writeLogEntry((
-                 timestamp,
-                 localeString,
-                 isSelf ? "queer-loop" : input,
-                 hexHash,
-               ));
-
-               setHashToNow();
-             };
-             Js.Promise.resolve();
-           })
-        |> ignore;
+            currentOptions^.background,
+          ),
+        cameraIndices:
+          Array.length(cameraIndices) == 0 ? [|0|] : cameraIndices,
       };
-
-    UserMedia.getCameras()
-    |> Js.Promise.then_(cameras => {
-         camerasRef := cameras;
-
-         Js.Promise.all(
-           Array.map(
-             camera => {
-               let videoEl =
-                 DocumentRe.createElementNS(htmlNs, "video", document);
-               withQuerySelectorDom(".htmlContainer", body =>
-                 ElementRe.appendChild(videoEl, body)
-               );
-
-               Scanner.scanUsingDeviceId(
-                 videoEl,
-                 UserMedia.deviceIdGet(camera),
-                 currentOptions,
-                 response,
-               );
-             },
-             pick(cameras, currentOptions^.cameraIndices),
-           ),
-         );
-       })
-    |> Js.Promise.then_(canvases => {
-         canvasesRef := canvases;
-
-         Webapi.requestAnimationFrame(onTick);
-
-         Js.Promise.resolve();
-       })
-    |> Js.Promise.catch(err => {
-         Js.Console.log("Camera input disabled.");
-         withQuerySelectorDom("#welcome", welcome =>
-           ElementRe.setAttribute("style", "display: block;", welcome)
-         );
-         Js.Promise.resolve();
-       })
-    |> ignore;
-
-    ();
   };
 
-WindowRe.addEventListener("load", _ => init(), window);
+  if (currentOptions^.background != "") {
+    setBackground(".background", currentOptions^.background) |> ignore;
+  };
 
-WindowRe.addEventListener("hashchange", _ => onHashChange(), window);
+  initialHash := Js.String.sliceToEnd(~from=1, getHash());
+  if (initialHash^ == "") {
+    initialHash := getTimestamp();
+    setHash(initialHash^);
+  } else {
+    onHashChange();
+  };
+
+  if (! hasBody()) {
+    withQuerySelectorDom("svg.root", svg =>
+      ElementRe.addEventListener("click", onClick(None), svg)
+    )
+    |> ignore;
+  };
+
+  withQuerySelectorDom("#codeContents", el =>
+    ElementRe.addEventListener("blur", _evt => onInput(), el)
+  );
+
+  let response = input =>
+    if (input !== "") {
+      Hash.hexDigest("SHA-1", input)
+      |> Js.Promise.then_(hexHash => {
+           let (timestamp, localeString) = getTimestampAndLocaleString();
+           if (! hasChanged^) {
+             hasChanged := true;
+           };
+
+           let alreadySeen =
+             Belt.Option.isSome(Js.Dict.get(dataSeen, hexHash));
+           let isSelf = hexHash === currentSignature^;
+
+           if (isSelf || ! alreadySeen) {
+             Js.Dict.set(dataSeen, hexHash, input);
+
+             writeLogEntry((
+               timestamp,
+               localeString,
+               isSelf ? "queer-loop" : input,
+               hexHash,
+             ));
+
+             setHashToNow();
+           };
+           Js.Promise.resolve();
+         })
+      |> ignore;
+    };
+
+  UserMedia.getCameras()
+  |> Js.Promise.then_(cameras => {
+       camerasRef := cameras;
+       Js.log2("Cameras found:", cameras);
+
+       Js.Promise.all(
+         Array.map(
+           camera => {
+             let videoEl =
+               DocumentRe.createElementNS(htmlNs, "video", document);
+             withQuerySelectorDom(".htmlContainer", body =>
+               ElementRe.appendChild(videoEl, body)
+             );
+
+             Scanner.scanUsingDeviceId(
+               videoEl,
+               UserMedia.deviceIdGet(camera),
+               currentOptions,
+               response,
+             );
+           },
+           pick(cameras, currentOptions^.cameraIndices),
+         ),
+       );
+     })
+  |> Js.Promise.then_(canvases => {
+       canvasesRef := canvases;
+
+       Webapi.requestAnimationFrame(onTick);
+
+       Js.log("Initalization complete.");
+
+       Js.Promise.resolve();
+     })
+  |> Js.Promise.catch(err => {
+       Js.Console.log("Camera input disabled.");
+       Js.log("Initalization complete.");
+       withQuerySelectorDom("#welcome", welcome =>
+         ElementRe.setAttribute("style", "display: block;", welcome)
+       );
+       Js.Promise.resolve();
+     })
+  |> ignore;
+
+  ();
+};
+
+[@bs.val] [@bs.scope "window"] external queerLoop : bool = "";
+
+let activateQueerLoop: unit => unit = [%bs.raw
+  () => "window.queerLoop = true;"
+];
+
+if (! queerLoop) {
+  Js.log("Initializing queer-loop...");
+  activateQueerLoop();
+  WindowRe.addEventListener("load", init, window);
+  WindowRe.addEventListener("hashchange", onHashChange, window);
+};
