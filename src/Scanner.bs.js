@@ -20,8 +20,8 @@ function syncScan(scanCallback, invertOptions, imageData) {
 function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
   return UserMedia$QueerLoop.initStreamByDeviceId(videoEl, deviceId).then((function (video) {
                 var canvas = document.createElementNS(Util$QueerLoop.htmlNs, "canvas");
-                Util$QueerLoop.withQuerySelectorDom("body", (function (body) {
-                        body.appendChild(canvas);
+                Util$QueerLoop.withQuerySelectorDom("#htmlContainer", (function (htmlContainer) {
+                        htmlContainer.appendChild(canvas);
                         return /* () */0;
                       }));
                 var maybeWorker;

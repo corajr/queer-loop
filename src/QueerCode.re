@@ -65,46 +65,6 @@ let createRainbowGradient: float => Dom.element =
     gradient;
   };
 
-let scriptText = {|
-   /* <![CDATA[ */
-function clearSelection() {
-   document.querySelectorAll("svg.code").forEach(function(x) { x.setAttribute("class", "code"); });
-}
-
-function stepAnimacy() {
-   document.querySelectorAll("svg.selected").forEach(function(x) { x.setAttribute("class", "code"); });
-   document.querySelectorAll("svg.animate").forEach(function(x) { x.setAttribute("class", "code previous"); });
-   document.querySelectorAll("svg.previous").forEach(function(x) { x.setAttribute("class", "code"); });
-}
-
-function init() {
-    if (!document.body) {
-        var nowShowing = 0;
-        const ids = Array.prototype.slice.call(document.querySelectorAll("svg.code"), null).map(function(x, i) {
-            if (/animate|selected/.test(x.className.animVal)) {
-                nowShowing = i;
-            }
-            return x.id;
-         });
-         var lastChanged = 0.0;
-         function tick(timestamp) {
-             if (timestamp - lastChanged >= 1000.0) {
-                 clearSelection();
-                 nowShowing = (nowShowing + 1) % ids.length;
-                 var id = "#" + ids[nowShowing];
-                 document.querySelector(id).setAttribute("class", " code selected");
-                 lastChanged = timestamp;
-             }
-             window.requestAnimationFrame(tick);
-         }
-         window.requestAnimationFrame(tick);
-    }
-}
-
-window.addEventListener("load", init, false);
-   /* ]]> */
-|};
-
 let styleText = {|
    @namespace svg "http://www.w3.org/2000/svg";
 
@@ -116,17 +76,23 @@ let styleText = {|
      display: none;
    }
 
-   svg|svg.animate, svg|svg.previous, svg|svg.selected {
+   svg|svg.animate, svg|svg.previous, svg|svg.active {
       display: block;
    }
 
-    svg|svg.animationsEnabled svg|svg.animate {
-    animation: fadeIn 2s infinite alternate;
-  }
+   svg|svg.animate.temporarilyInactive {
+      display: none;
+   }
 
+   svg|svg.animationsEnabled svg|svg.animate {
+     animation: fadeIn 2s infinite alternate;
+   }
 
-   svg|svg.previous g.codeGroup, svg|svg.selected g.codeGroup {
+   svg|svg.previous g.codeGroup, svg|svg.active g.codeGroup {
        opacity: 0.1;
+   }
+   svg|svg.active {
+       mix-blend-mode: screen;
    }
 |};
 
@@ -257,7 +223,7 @@ let createCodeSvg =
 
 let createSvgSkeleton = hash => {
   let svg = DocumentRe.createElementNS(svgNs, "svg", document);
-  ElementRe.setAttribute("viewBox", "0 0 1 1", svg);
+  ElementRe.setAttribute("viewBox", "0 0 2 2", svg);
   ElementRe.setAttribute("class", "root", svg);
 
   let defs = DocumentRe.createElementNS(svgNs, "defs", document);
@@ -272,6 +238,15 @@ let createSvgSkeleton = hash => {
 
   let style = createStyle();
   ElementRe.appendChild(style, svg);
+
+  let centralGroup = DocumentRe.createElementNS(svgNs, "g", document);
+  ElementRe.setId(centralGroup, "centralGroup");
+  ElementRe.setAttribute(
+    "transform",
+    {j|translate(0.5,0.5) scale(0.5)|j},
+    centralGroup,
+  );
+  ElementRe.appendChild(centralGroup, svg);
 
   let htmlContainer =
     DocumentRe.createElementNS(svgNs, "foreignObject", document);

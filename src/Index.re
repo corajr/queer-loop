@@ -98,10 +98,12 @@ let onClick = (maybeHash, _) => {
 
   switch (maybeHash) {
   | Some(hash) =>
-    switch (Js.Dict.get(dataSeen, hash)) {
-    | Some(_) => activateHash(hash)
-    | None => ()
-    }
+    let becameActive =
+      switch (Js.Dict.get(dataSeen, hash)) {
+      | Some(_) => toggleHash(hash)
+      | None => false
+      };
+    ();
   | None => setHashToNow()
   };
 };
@@ -237,7 +239,7 @@ let setCode = text =>
              ElementRe.addEventListener(
                "load",
                _ =>
-                 withQuerySelectorDom("#queer-loop", loopContainer =>
+                 withQuerySelectorDom("#centralGroup", centralGroup =>
                    switch (takeSnapshot()) {
                    | Some(snapshotUrl) =>
                      QueerCode.addBackground(
@@ -246,7 +248,7 @@ let setCode = text =>
                        ~sizeWithBorder,
                      );
 
-                     ElementRe.appendChild(codeSvg, rootSvg);
+                     ElementRe.appendChild(codeSvg, centralGroup);
 
                      if (currentOptions^.animate) {
                        ElementRe.setAttribute(

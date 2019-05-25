@@ -104,10 +104,11 @@ function onClick(maybeHash, param) {
     var hash = maybeHash;
     var match = Js_dict.get(dataSeen, hash);
     if (match !== undefined) {
-      return SvgScript$QueerLoop.activateHash(hash);
+      SvgScript$QueerLoop.toggleHash(hash);
     } else {
-      return /* () */0;
+      false;
     }
+    return /* () */0;
   } else {
     return Util$QueerLoop.setHash(new Date().toISOString());
   }
@@ -202,11 +203,11 @@ function setCode(text) {
                     var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, match[1], timestamp, 6, Options$QueerLoop.currentOptions[0][/* invert */4]);
                     var codeImg = QueerCode$QueerLoop.svgToImg(codeSvg);
                     codeImg.addEventListener("load", (function (param) {
-                            Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (loopContainer) {
+                            Util$QueerLoop.withQuerySelectorDom("#centralGroup", (function (centralGroup) {
                                     var match = takeSnapshot(/* () */0);
                                     if (match !== undefined) {
                                       QueerCode$QueerLoop.addBackground(codeSvg, sizeWithBorder, match);
-                                      rootSvg.appendChild(codeSvg);
+                                      centralGroup.appendChild(codeSvg);
                                       if (Options$QueerLoop.currentOptions[0][/* animate */5]) {
                                         rootSvg.setAttribute("class", "root animationsEnabled");
                                       }
