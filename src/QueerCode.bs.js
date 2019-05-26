@@ -28,9 +28,9 @@ function createQrCodePathElement(code, border) {
   return path;
 }
 
-function createRainbowGradient(lightness) {
+function createRainbowGradient(lightness, id) {
   var gradient = document.createElementNS(svgNs, "linearGradient");
-  gradient.id = "rainbow";
+  gradient.id = id;
   for(var i = 0; i <= 7; ++i){
     var stop = document.createElementNS(svgNs, "stop");
     stop.setAttribute("offset", (100.0 * i / 7.0).toString() + "%");
@@ -102,13 +102,15 @@ function createCodeSvg(href, code, hash, localeString, timestamp, border, invert
   if (invert) {
     rect.setAttribute("fill", "#000000");
   } else {
-    rect.setAttribute("fill", "url(#rainbow)");
+    rect.setAttribute("fill", "#FFFFFF");
   }
   codeGroup.appendChild(rect);
   var path = createQrCodePathElement(code, border);
   codeGroup.appendChild(path);
   if (invert) {
-    path.setAttribute("fill", "#FFFFFF");
+    path.setAttribute("fill", "url(#lightRainbow)");
+  } else {
+    path.setAttribute("fill", "url(#darkRainbow)");
   }
   codeGroup.setAttribute("class", "codeGroup");
   codeSvg.appendChild(codeGroup);
@@ -123,8 +125,10 @@ function createSvgSkeleton(hash) {
   svg.setAttribute("viewBox", "0 0 1 1");
   svg.setAttribute("class", "root");
   var defs = document.createElementNS(svgNs, "defs");
-  var rainbowGradient = createRainbowGradient(0.9);
-  defs.appendChild(rainbowGradient);
+  var lightRainbowGradient = createRainbowGradient(0.9, "lightRainbow");
+  var darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");
+  defs.appendChild(lightRainbowGradient);
+  defs.appendChild(darkRainbowGradient);
   svg.appendChild(defs);
   Util$QueerLoop.withQuerySelectorDom("script.main", (function (main) {
           var script = createScript(main.textContent);
@@ -145,20 +149,20 @@ function createIconSvg(code, border, bg, hash, invert) {
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
   var svg = document.createElementNS(svgNs, "svg");
   svg.setAttribute("viewBox", viewBox);
+  var defs = document.createElementNS(svgNs, "defs");
+  var lightRainbowGradient = createRainbowGradient(0.9, "lightRainbow");
+  var darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");
+  defs.appendChild(lightRainbowGradient);
+  defs.appendChild(darkRainbowGradient);
+  svg.appendChild(defs);
   if (bg) {
-    if (!invert) {
-      var defs = document.createElementNS(svgNs, "defs");
-      var rainbowGradient = createRainbowGradient(0.9);
-      defs.appendChild(rainbowGradient);
-      svg.appendChild(defs);
-    }
     var rect = document.createElementNS(svgNs, "rect");
     rect.setAttribute("width", "100%");
     rect.setAttribute("height", "100%");
     if (invert) {
       rect.setAttribute("fill", "#000000");
     } else {
-      rect.setAttribute("fill", "url(#rainbow)");
+      rect.setAttribute("fill", "#FFFFFF");
     }
     svg.appendChild(rect);
   }
@@ -169,9 +173,9 @@ function createIconSvg(code, border, bg, hash, invert) {
   svg.appendChild(rect$1);
   var path = createQrCodePathElement(code, border);
   if (invert) {
-    path.setAttribute("fill", "#FFFFFF");
+    path.setAttribute("fill", "url(#lightRainbow)");
   } else {
-    path.setAttribute("fill", "#000000");
+    path.setAttribute("fill", "url(#darkRainbow)");
   }
   svg.appendChild(path);
   return /* tuple */[

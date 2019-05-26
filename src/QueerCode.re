@@ -35,12 +35,12 @@ let createQrCodePathElement: (QrCode.t, int) => Dom.element =
     path;
   };
 
-let createRainbowGradient: float => Dom.element =
-  lightness => {
+let createRainbowGradient: (float, string) => Dom.element =
+  (lightness, id) => {
     let gradient =
       DocumentRe.createElementNS(svgNs, "linearGradient", document);
 
-    ElementRe.setId(gradient, "rainbow");
+    ElementRe.setId(gradient, id);
     for (i in 0 to 7) {
       let stop = DocumentRe.createElementNS(svgNs, "stop", document);
       ElementRe.setAttribute(
@@ -199,7 +199,7 @@ let createCodeSvg =
   ElementRe.setAttribute("height", "100%", rect);
 
   if (! invert) {
-    ElementRe.setAttribute("fill", "url(#rainbow)", rect);
+    ElementRe.setAttribute("fill", "#FFFFFF", rect);
   } else {
     ElementRe.setAttribute("fill", "#000000", rect);
   };
@@ -210,7 +210,9 @@ let createCodeSvg =
   ElementRe.appendChild(path, codeGroup);
 
   if (invert) {
-    ElementRe.setAttribute("fill", "#FFFFFF", path);
+    ElementRe.setAttribute("fill", "url(#lightRainbow)", path);
+  } else {
+    ElementRe.setAttribute("fill", "url(#darkRainbow)", path);
   };
   ElementRe.setAttribute("class", "codeGroup", codeGroup);
 
@@ -238,8 +240,10 @@ let createSvgSkeleton = hash => {
   ElementRe.setAttribute("class", "root", svg);
 
   let defs = DocumentRe.createElementNS(svgNs, "defs", document);
-  let rainbowGradient = createRainbowGradient(0.9);
-  ElementRe.appendChild(rainbowGradient, defs);
+  let lightRainbowGradient = createRainbowGradient(0.9, "lightRainbow");
+  let darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");
+  ElementRe.appendChild(lightRainbowGradient, defs);
+  ElementRe.appendChild(darkRainbowGradient, defs);
   ElementRe.appendChild(defs, svg);
 
   withQuerySelectorDom("script.main", main => {
@@ -282,20 +286,20 @@ let createIconSvg =
   let svg = DocumentRe.createElementNS(svgNs, "svg", document);
   ElementRe.setAttribute("viewBox", viewBox, svg);
 
-  if (bg) {
-    if (! invert) {
-      let defs = DocumentRe.createElementNS(svgNs, "defs", document);
-      let rainbowGradient = createRainbowGradient(0.9);
-      ElementRe.appendChild(rainbowGradient, defs);
-      ElementRe.appendChild(defs, svg);
-    };
+  let defs = DocumentRe.createElementNS(svgNs, "defs", document);
+  let lightRainbowGradient = createRainbowGradient(0.9, "lightRainbow");
+  let darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");
+  ElementRe.appendChild(lightRainbowGradient, defs);
+  ElementRe.appendChild(darkRainbowGradient, defs);
+  ElementRe.appendChild(defs, svg);
 
+  if (bg) {
     let rect = DocumentRe.createElementNS(svgNs, "rect", document);
     ElementRe.setAttribute("width", "100%", rect);
     ElementRe.setAttribute("height", "100%", rect);
 
     if (! invert) {
-      ElementRe.setAttribute("fill", "url(#rainbow)", rect);
+      ElementRe.setAttribute("fill", "#FFFFFF", rect);
     } else {
       ElementRe.setAttribute("fill", "#000000", rect);
     };
@@ -314,9 +318,9 @@ let createIconSvg =
 
   let path = createQrCodePathElement(code, border);
   if (invert) {
-    ElementRe.setAttribute("fill", "#FFFFFF", path);
+    ElementRe.setAttribute("fill", "url(#lightRainbow)", path);
   } else {
-    ElementRe.setAttribute("fill", "#000000", path);
+    ElementRe.setAttribute("fill", "url(#darkRainbow)", path);
   };
   ElementRe.appendChild(path, svg);
   (svg, sizeWithBorder);
