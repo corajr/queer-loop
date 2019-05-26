@@ -27,13 +27,14 @@
          }
 
          #download {
-             position: absolute;
+             position: fixed;
+             z-index: 100;
              bottom: 0;
-             right: 0;
+             left: 50%;
+             transform: translate(-50%, 0%);
              font-size: 12.5vmin;
              text-decoration: none;
              color: white;
-             margin-bottom: -3vmin;
          }
 
          #download:visited {
@@ -142,10 +143,11 @@
                         <span id="codeContents" contenteditable="true"></span>
                     </div>
                 </div>
+
+                <a id="download">save</a>
             </div>
             <div id="log"></div>
         </div>
 
-        <a id="download">save</a>
     </body>
 </html>
