@@ -55,9 +55,11 @@ let scanUsingDeviceId =
   initStreamByDeviceId(videoEl, deviceId)
   |> Js.Promise.then_(video => {
        let canvas = DocumentRe.createElementNS(htmlNs, "canvas", document);
-       withQuerySelectorDom("#htmlContainer", htmlContainer =>
-         ElementRe.appendChild(canvas, htmlContainer)
-       );
+
+       withQuerySelectorDom("#htmlContainer", htmlContainer => {
+         ElementRe.appendChild(video, htmlContainer);
+         ElementRe.appendChild(canvas, htmlContainer);
+       });
 
        let maybeWorker =
          switch (WebWorkers.create_webworker("worker.js")) {

@@ -94,6 +94,8 @@ function createCodeSvg(href, code, hash, localeString, timestamp, border, invert
   codeSvg.id = "code" + hash;
   codeSvg.setAttribute("viewBox", viewBox);
   var codeGroup = document.createElementNS(svgNs, "g");
+  var scale = size / sizeWithBorder;
+  codeGroup.setAttribute("transform", "translate(" + (String(border) + ("," + (String(border) + (") scale(" + (String(scale) + ")"))))));
   var rect = document.createElementNS(svgNs, "rect");
   rect.setAttribute("width", "100%");
   rect.setAttribute("height", "100%");
@@ -110,7 +112,9 @@ function createCodeSvg(href, code, hash, localeString, timestamp, border, invert
   }
   codeGroup.setAttribute("class", "codeGroup");
   codeSvg.appendChild(codeGroup);
-  codeSvg.appendChild(createTimeLink(href, timestamp, localeString, sizeWithBorder, border));
+  var metadataGroup = document.createElementNS(svgNs, "g");
+  metadataGroup.appendChild(createTimeLink(href, timestamp, localeString, sizeWithBorder, border));
+  codeSvg.appendChild(metadataGroup);
   return codeSvg;
 }
 
@@ -132,13 +136,6 @@ function createSvgSkeleton(hash) {
   var centralGroup = document.createElementNS(svgNs, "g");
   centralGroup.id = "centralGroup";
   svg.appendChild(centralGroup);
-  var htmlContainer = document.createElementNS(svgNs, "foreignObject");
-  htmlContainer.setAttribute("x", "0");
-  htmlContainer.setAttribute("y", "0");
-  htmlContainer.setAttribute("width", "1");
-  htmlContainer.setAttribute("height", "1");
-  htmlContainer.setAttribute("class", "htmlContainer");
-  svg.appendChild(htmlContainer);
   return svg;
 }
 

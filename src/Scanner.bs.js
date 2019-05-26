@@ -49,6 +49,7 @@ function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
   return UserMedia$QueerLoop.initStreamByDeviceId(videoEl, deviceId).then((function (video) {
                 var canvas = document.createElementNS(Util$QueerLoop.htmlNs, "canvas");
                 Util$QueerLoop.withQuerySelectorDom("#htmlContainer", (function (htmlContainer) {
+                        htmlContainer.appendChild(video);
                         htmlContainer.appendChild(canvas);
                         return /* () */0;
                       }));

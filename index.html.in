@@ -6,33 +6,24 @@
          h1 { display: none; }
 
          body { margin: 0; font-family: "Courier New", monospace; }
-         canvas, video {
+         canvas {
              display: none;
+             pointer-events: none;
+         }
+
+         video {
+             position: fixed;
+             min-width: 100vw;
+             min-height: 100vh;
+             left: 50%;
+             top: 50%;
+             transform: translate(-50%, -50%);
+             mix-blend-mode: multiply;
              pointer-events: none;
          }
 
          #welcome {
              display: none;
-         }
-
-         #snapshotCanvas {
-             display: block;
-             position: fixed;
-             width: 100vmin;
-             height: 100vmin;
-             left: 50%;
-             top: 50%;
-             pointer-events: none;
-             opacity: 0.9;
-             transform: translate(-50%, -50%);
-         }
-
-         #codes {
-             display: flex;
-             flex-wrap: wrap;
-             justify-content: flex-start;
-             align-items: flex-start;
-             z-index: 100;
          }
 
          #download {
@@ -70,6 +61,11 @@
          }
 
          #codes {
+             display: flex;
+             flex-wrap: wrap;
+             justify-content: flex-start;
+             align-items: flex-start;
+             z-index: 100;
              flex-basis: 20%;
          }
 
@@ -89,6 +85,7 @@
          #log {
              flex-basis: 20%;
              flex-wrap: wrap;
+             z-index: 100;
          }
 
          .log-entry {

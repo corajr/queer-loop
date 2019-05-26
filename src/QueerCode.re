@@ -186,6 +186,14 @@ let createCodeSvg =
 
   let codeGroup = DocumentRe.createElementNS(svgNs, "g", document);
 
+  let scale = float_of_int(size) /. float_of_int(sizeWithBorder);
+
+  ElementRe.setAttribute(
+    "transform",
+    {j|translate($border,$border) scale($scale)|j},
+    codeGroup,
+  );
+
   let rect = DocumentRe.createElementNS(svgNs, "rect", document);
   ElementRe.setAttribute("width", "100%", rect);
   ElementRe.setAttribute("height", "100%", rect);
@@ -207,6 +215,8 @@ let createCodeSvg =
   ElementRe.setAttribute("class", "codeGroup", codeGroup);
 
   ElementRe.appendChild(codeGroup, codeSvg);
+
+  let metadataGroup = DocumentRe.createElementNS(svgNs, "g", document);
   ElementRe.appendChild(
     createTimeLink(
       ~href,
@@ -215,8 +225,9 @@ let createCodeSvg =
       ~border,
       ~sizeWithBorder,
     ),
-    codeSvg,
+    metadataGroup,
   );
+  ElementRe.appendChild(metadataGroup, codeSvg);
 
   codeSvg;
 };
@@ -248,15 +259,15 @@ let createSvgSkeleton = hash => {
   /* ); */
   ElementRe.appendChild(centralGroup, svg);
 
-  let htmlContainer =
-    DocumentRe.createElementNS(svgNs, "foreignObject", document);
-  ElementRe.setAttribute("x", "0", htmlContainer);
-  ElementRe.setAttribute("y", "0", htmlContainer);
-  ElementRe.setAttribute("width", "1", htmlContainer);
-  ElementRe.setAttribute("height", "1", htmlContainer);
-  ElementRe.setAttribute("class", "htmlContainer", htmlContainer);
+  /* let htmlContainer = */
+  /*   DocumentRe.createElementNS(svgNs, "foreignObject", document); */
+  /* ElementRe.setAttribute("x", "0", htmlContainer); */
+  /* ElementRe.setAttribute("y", "0", htmlContainer); */
+  /* ElementRe.setAttribute("width", "1", htmlContainer); */
+  /* ElementRe.setAttribute("height", "1", htmlContainer); */
+  /* ElementRe.setAttribute("class", "htmlContainer", htmlContainer); */
 
-  ElementRe.appendChild(htmlContainer, svg);
+  /* ElementRe.appendChild(htmlContainer, svg); */
 
   svg;
 };
