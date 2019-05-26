@@ -5,7 +5,7 @@ open UserMedia;
 open Util;
 open Webapi.Dom;
 
-let syncScan = (scanCallback, invertOptions, imageData) =>
+let syncScan = (scanCallback, srcCanvas, invertOptions, imageData) =>
   switch (
     jsQR(
       dataGet(imageData),
@@ -14,9 +14,40 @@ let syncScan = (scanCallback, invertOptions, imageData) =>
       invertOptions,
     )
   ) {
-  | Some(code) => scanCallback(textDataGet(code))
+  | Some(code) => scanCallback(srcCanvas, code)
   | None => ()
   };
+
+let copyVideoToSnapshotCanvas = videoCanvas =>
+  withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
+    let snapshotCtx = getContext(snapshotCanvas);
+
+    Ctx.setGlobalCompositeOperation(snapshotCtx, "source-over");
+    Ctx.setGlobalAlpha(snapshotCtx, currentOptions^.opacity);
+    let fullWidth = getWidth(videoCanvas);
+    let fullHeight = getHeight(videoCanvas);
+    let w = min(fullWidth, fullHeight);
+    let (x, y) =
+      if (fullWidth > fullHeight) {
+        let offset = (fullWidth - w) / 2;
+        (offset, 0);
+      } else {
+        let offset = (fullHeight - w) / 2;
+        (0, offset);
+      };
+    Ctx.drawImageSourceRectDestRect(
+      snapshotCtx,
+      ~image=videoCanvas,
+      ~sx=x,
+      ~sy=y,
+      ~sw=w,
+      ~sh=w,
+      ~dx=0,
+      ~dy=0,
+      ~dw=getWidth(snapshotCanvas),
+      ~dh=getHeight(snapshotCanvas),
+    );
+  });
 
 let scanUsingDeviceId =
     (videoEl, deviceId, currentOptions, scanCallback)
@@ -45,7 +76,7 @@ let scanUsingDeviceId =
            e => {
              let maybeCode: option(code) = WebWorkers.MessageEvent.data(e);
              switch (maybeCode) {
-             | Some(qrCode) => scanCallback(textDataGet(qrCode))
+             | Some(qrCode) => scanCallback(canvas, qrCode)
              | None => ()
              };
            }
@@ -69,6 +100,7 @@ let scanUsingDeviceId =
            if (frameCount^ mod 5 == 0) {
              let ctx = getContext(canvas);
              Ctx.drawImage(ctx, ~image=video, ~dx=0, ~dy=0);
+             copyVideoToSnapshotCanvas(canvas);
 
              let invert = currentOptions^.invert ? OnlyInvert : DontInvert;
              switch (invert) {
@@ -87,7 +119,7 @@ let scanUsingDeviceId =
                  worker,
                  (dataGet(imageData), width, height, DontInvert),
                )
-             | None => syncScan(scanCallback, DontInvert, imageData)
+             | None => syncScan(scanCallback, canvas, DontInvert, imageData)
              };
            };
          };

@@ -223,7 +223,7 @@ let createCodeSvg =
 
 let createSvgSkeleton = hash => {
   let svg = DocumentRe.createElementNS(svgNs, "svg", document);
-  ElementRe.setAttribute("viewBox", "0 0 2 2", svg);
+  ElementRe.setAttribute("viewBox", "0 0 1 1", svg);
   ElementRe.setAttribute("class", "root", svg);
 
   let defs = DocumentRe.createElementNS(svgNs, "defs", document);
@@ -241,11 +241,11 @@ let createSvgSkeleton = hash => {
 
   let centralGroup = DocumentRe.createElementNS(svgNs, "g", document);
   ElementRe.setId(centralGroup, "centralGroup");
-  ElementRe.setAttribute(
-    "transform",
-    {j|translate(0.5,0.5) scale(0.5)|j},
-    centralGroup,
-  );
+  /* ElementRe.setAttribute( */
+  /*   "transform", */
+  /*   {j|translate(0.5,0.5) scale(0.5)|j}, */
+  /*   centralGroup, */
+  /* ); */
   ElementRe.appendChild(centralGroup, svg);
 
   let htmlContainer =
@@ -336,7 +336,7 @@ let svgToImg = (~svg: Dom.element) : Dom.element => {
 
 let codeToImage = (~code: QrCode.t, ~border: int, ~hash: string) : Dom.element => {
   let (iconSvg, sizeWithBorder) =
-    createIconSvg(~code, ~border=6, ~invert=true, ~hash, ~bg=false);
+    createIconSvg(~code, ~border, ~invert=true, ~hash, ~bg=false);
   let sizeStr = string_of_int(sizeWithBorder);
 
   let iconSvgUrl = svgToDataURL(iconSvg);

@@ -9,6 +9,7 @@ import * as Belt_Option from "../node_modules/bs-platform/lib/es6/belt_Option.js
 import * as Caml_format from "../node_modules/bs-platform/lib/es6/caml_format.js";
 import * as Caml_option from "../node_modules/bs-platform/lib/es6/caml_option.js";
 import * as Hash$QueerLoop from "./Hash.bs.js";
+import * as JsQr$QueerLoop from "./JsQr.bs.js";
 import * as Util$QueerLoop from "./Util.bs.js";
 import * as Options$QueerLoop from "./Options.bs.js";
 import * as Scanner$QueerLoop from "./Scanner.bs.js";
@@ -44,35 +45,6 @@ var dataSeen = { };
 var currentSignature = /* record */[/* contents */""];
 
 var canvasesRef = /* record */[/* contents : array */[]];
-
-function copyVideoToSnapshotCanvas(param) {
-  return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
-                var snapshotCtx = snapshotCanvas.getContext("2d");
-                snapshotCtx.globalCompositeOperation = "source-over";
-                snapshotCtx.globalAlpha = Options$QueerLoop.currentOptions[0][/* opacity */6];
-                return $$Array.mapi((function (i, canvas) {
-                              var fullWidth = canvas.width;
-                              var fullHeight = canvas.height;
-                              var w = fullWidth < fullHeight ? fullWidth : fullHeight;
-                              var match;
-                              if (fullWidth > fullHeight) {
-                                var offset = (fullWidth - w | 0) / 2 | 0;
-                                match = /* tuple */[
-                                  offset,
-                                  0
-                                ];
-                              } else {
-                                var offset$1 = (fullHeight - w | 0) / 2 | 0;
-                                match = /* tuple */[
-                                  0,
-                                  offset$1
-                                ];
-                              }
-                              snapshotCtx.drawImage(canvas, match[0], match[1], w, w, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
-                              return /* () */0;
-                            }), canvasesRef[0]);
-              }));
-}
 
 function getTimestamp(param) {
   return new Date().toISOString();
@@ -312,9 +284,6 @@ var lastUpdated = /* record */[/* contents */0.0];
 
 function onTick(ts) {
   frameCount[0] = frameCount[0] + 1 | 0;
-  if (frameCount[0] % 5 === 1) {
-    copyVideoToSnapshotCanvas(/* () */0);
-  }
   if (ts - lastUpdated[0] >= 10000.0) {
     Util$QueerLoop.setHash(new Date().toISOString());
   }
@@ -424,7 +393,8 @@ function init(_evt) {
                 }));
           return /* () */0;
         }));
-  var response = function (input) {
+  var response = function (srcCanvas, inputCode) {
+    var input = inputCode.data;
     if (input !== "") {
       Hash$QueerLoop.hexDigest("SHA-1", input).then((function (hexHash) {
               var match = getTimestampAndLocaleString(/* () */0);
@@ -441,6 +411,19 @@ function init(_evt) {
                       isSelf ? "queer-loop" : input,
                       hexHash
                     ]);
+                Util$QueerLoop.withQuerySelectorDom("#inputCanvas", (function (destCanvas) {
+                        var $$location = inputCode.location;
+                        var rect = JsQr$QueerLoop.extractAABB($$location);
+                        var dw = rect[/* w */2];
+                        var dh = rect[/* h */3];
+                        if (destCanvas.width !== dw) {
+                          destCanvas.width = dw;
+                          destCanvas.height = dh;
+                        }
+                        var ctx = destCanvas.getContext("2d");
+                        ctx.drawImage(srcCanvas, rect[/* x */0], rect[/* y */1], rect[/* w */2], rect[/* h */3], 0, 0, dw, dh);
+                        return /* () */0;
+                      }));
                 Util$QueerLoop.setHash(new Date().toISOString());
               }
               return Promise.resolve(/* () */0);
@@ -501,7 +484,6 @@ export {
   dataSeen ,
   currentSignature ,
   canvasesRef ,
-  copyVideoToSnapshotCanvas ,
   getTimestamp ,
   getTimestampAndLocaleString ,
   asOfNow ,

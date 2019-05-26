@@ -116,7 +116,7 @@ function createCodeSvg(href, code, hash, localeString, timestamp, border, invert
 
 function createSvgSkeleton(hash) {
   var svg = document.createElementNS(svgNs, "svg");
-  svg.setAttribute("viewBox", "0 0 2 2");
+  svg.setAttribute("viewBox", "0 0 1 1");
   svg.setAttribute("class", "root");
   var defs = document.createElementNS(svgNs, "defs");
   var rainbowGradient = createRainbowGradient(0.9);
@@ -131,7 +131,6 @@ function createSvgSkeleton(hash) {
   svg.appendChild(style);
   var centralGroup = document.createElementNS(svgNs, "g");
   centralGroup.id = "centralGroup";
-  centralGroup.setAttribute("transform", "translate(0.5,0.5) scale(0.5)");
   svg.appendChild(centralGroup);
   var htmlContainer = document.createElementNS(svgNs, "foreignObject");
   htmlContainer.setAttribute("x", "0");
@@ -202,7 +201,7 @@ function svgToImg(svg) {
 }
 
 function codeToImage(code, border, hash) {
-  var match = createIconSvg(code, 6, false, hash, true);
+  var match = createIconSvg(code, border, false, hash, true);
   var sizeStr = String(match[1]);
   var iconSvgUrl = svgToDataURL(match[0]);
   var iconSvgImg = document.createElementNS(Util$QueerLoop.htmlNs, "img");

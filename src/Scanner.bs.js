@@ -5,16 +5,44 @@ import * as Caml_option from "../node_modules/bs-platform/lib/es6/caml_option.js
 import * as JsQr$QueerLoop from "./JsQr.bs.js";
 import * as Util$QueerLoop from "./Util.bs.js";
 import * as Canvas$QueerLoop from "./Canvas.bs.js";
+import * as Options$QueerLoop from "./Options.bs.js";
 import * as Caml_js_exceptions from "../node_modules/bs-platform/lib/es6/caml_js_exceptions.js";
 import * as UserMedia$QueerLoop from "./UserMedia.bs.js";
 
-function syncScan(scanCallback, invertOptions, imageData) {
+function syncScan(scanCallback, srcCanvas, invertOptions, imageData) {
   var match = JsQr$QueerLoop.jsQR(imageData.data, imageData.width, imageData.height, invertOptions);
   if (match !== undefined) {
-    return Curry._1(scanCallback, Caml_option.valFromOption(match).data);
+    return Curry._2(scanCallback, srcCanvas, Caml_option.valFromOption(match));
   } else {
     return /* () */0;
   }
+}
+
+function copyVideoToSnapshotCanvas(videoCanvas) {
+  return Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
+                var snapshotCtx = snapshotCanvas.getContext("2d");
+                snapshotCtx.globalCompositeOperation = "source-over";
+                snapshotCtx.globalAlpha = Options$QueerLoop.currentOptions[0][/* opacity */6];
+                var fullWidth = videoCanvas.width;
+                var fullHeight = videoCanvas.height;
+                var w = fullWidth < fullHeight ? fullWidth : fullHeight;
+                var match;
+                if (fullWidth > fullHeight) {
+                  var offset = (fullWidth - w | 0) / 2 | 0;
+                  match = /* tuple */[
+                    offset,
+                    0
+                  ];
+                } else {
+                  var offset$1 = (fullHeight - w | 0) / 2 | 0;
+                  match = /* tuple */[
+                    0,
+                    offset$1
+                  ];
+                }
+                snapshotCtx.drawImage(videoCanvas, match[0], match[1], w, w, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+                return /* () */0;
+              }));
 }
 
 function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
@@ -44,7 +72,7 @@ function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
                   var msgBackHandler = function (e) {
                     var maybeCode = e.data;
                     if (maybeCode !== undefined) {
-                      return Curry._1(scanCallback, Caml_option.valFromOption(maybeCode).data);
+                      return Curry._2(scanCallback, canvas, Caml_option.valFromOption(maybeCode));
                     } else {
                       return /* () */0;
                     }
@@ -63,6 +91,7 @@ function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
                     if (frameCount[0] % 5 === 0) {
                       var ctx = canvas.getContext("2d");
                       ctx.drawImage(video, 0, 0);
+                      copyVideoToSnapshotCanvas(canvas);
                       var match = currentOptions[0][/* invert */4];
                       var invert = match ? /* OnlyInvert */2 : /* DontInvert */1;
                       if (invert !== 1) {
@@ -77,7 +106,7 @@ function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
                               /* DontInvert */1
                             ]);
                       } else {
-                        syncScan(scanCallback, /* DontInvert */1, imageData);
+                        syncScan(scanCallback, canvas, /* DontInvert */1, imageData);
                       }
                     }
                     
@@ -93,6 +122,7 @@ function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
 
 export {
   syncScan ,
+  copyVideoToSnapshotCanvas ,
   scanUsingDeviceId ,
   
 }

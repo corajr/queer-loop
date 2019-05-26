@@ -42,42 +42,6 @@ let currentSignature: ref(string) = ref("");
 
 let canvasesRef: ref(array(Dom.element)) = ref([||]);
 
-let copyVideoToSnapshotCanvas = _ =>
-  withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
-    let snapshotCtx = getContext(snapshotCanvas);
-
-    Ctx.setGlobalCompositeOperation(snapshotCtx, "source-over");
-    Ctx.setGlobalAlpha(snapshotCtx, currentOptions^.opacity);
-    Array.mapi(
-      (i, canvas) => {
-        let fullWidth = getWidth(canvas);
-        let fullHeight = getHeight(canvas);
-        let w = min(fullWidth, fullHeight);
-        let (x, y) =
-          if (fullWidth > fullHeight) {
-            let offset = (fullWidth - w) / 2;
-            (offset, 0);
-          } else {
-            let offset = (fullHeight - w) / 2;
-            (0, offset);
-          };
-        Ctx.drawImageSourceRectDestRect(
-          snapshotCtx,
-          ~image=canvas,
-          ~sx=x,
-          ~sy=y,
-          ~sw=w,
-          ~sh=w,
-          ~dx=0,
-          ~dy=0,
-          ~dw=getWidth(snapshotCanvas),
-          ~dh=getHeight(snapshotCanvas),
-        );
-      },
-      canvasesRef^,
-    );
-  });
-
 let getTimestamp = _ => Js.Date.toISOString(Js.Date.make());
 
 let getTimestampAndLocaleString = _ => {
@@ -385,9 +349,6 @@ let lastUpdated = ref(0.0);
 
 let rec onTick = ts => {
   frameCount := frameCount^ + 1;
-  if (frameCount^ mod 5 == 1) {
-    copyVideoToSnapshotCanvas() |> ignore;
-  };
 
   if (ts -. lastUpdated^ >= 10000.0) {
     /* withQuerySelectorDom("svg", svg => { */
@@ -517,7 +478,8 @@ let init = _evt => {
     ElementRe.addEventListener("blur", _evt => onInput(), el)
   );
 
-  let response = input =>
+  let response = (srcCanvas, inputCode) => {
+    let input = JsQr.textDataGet(inputCode);
     if (input !== "") {
       Hash.hexDigest("SHA-1", input)
       |> Js.Promise.then_(hexHash => {
@@ -540,12 +502,39 @@ let init = _evt => {
                hexHash,
              ));
 
+             withQuerySelectorDom("#inputCanvas", destCanvas => {
+               open JsQr;
+               let location = locationGet(inputCode);
+               let rect = extractAABB(location);
+               let dw = rect.w;
+               let dh = rect.h;
+               if (getWidth(destCanvas) !== dw) {
+                 setWidth(destCanvas, dw);
+                 setHeight(destCanvas, dh);
+               };
+               let ctx = getContext(destCanvas);
+
+               Ctx.drawImageSourceRectDestRect(
+                 ctx,
+                 ~image=srcCanvas,
+                 ~sx=rect.x,
+                 ~sy=rect.y,
+                 ~sw=rect.w,
+                 ~sh=rect.h,
+                 ~dx=0,
+                 ~dy=0,
+                 ~dw,
+                 ~dh,
+               );
+             });
+
              setHashToNow();
            };
            Js.Promise.resolve();
          })
       |> ignore;
     };
+  };
 
   UserMedia.getCameras()
   |> Js.Promise.then_(cameras => {

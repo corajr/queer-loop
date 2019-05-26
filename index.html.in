@@ -17,9 +17,9 @@
 
          #snapshotCanvas {
              display: block;
-             position: absolute;
-             min-width: 100vw;
-             min-height: 100vh;
+             position: fixed;
+             width: 100vmin;
+             height: 100vmin;
              left: 50%;
              top: 50%;
              pointer-events: none;
@@ -50,9 +50,8 @@
          }
 
          #htmlContainer {
-             position: fixed;
              display: flex;
-             justify-content: space-evenly;
+             justify-content: space-between;
              align-items: center;
              width: 95vw;
              height: 95vh;
@@ -80,8 +79,11 @@
 
          #queer-loop {
              z-index: 100;
-             width: 480px;
              margin: auto;
+             position: fixed;
+             left: 50%;
+             top: 50%;
+             transform: translate(-50%, -50%);
          }
 
          #log {
