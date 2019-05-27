@@ -149,6 +149,7 @@ function createIconSvg(code, border, bg, hash, invert) {
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
   var svg = document.createElementNS(svgNs, "svg");
   svg.setAttribute("viewBox", viewBox);
+  svg.setAttribute("class", "icon");
   var defs = document.createElementNS(svgNs, "defs");
   var lightRainbowGradient = createRainbowGradient(0.95, "lightRainbow");
   var darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");

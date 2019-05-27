@@ -45,6 +45,41 @@ function copyVideoToSnapshotCanvas(videoCanvas) {
               }));
 }
 
+function runScanFromCanvas(canvas, maybeWorker, scanCallback) {
+  var ctx = canvas.getContext("2d");
+  if (maybeWorker !== undefined) {
+    var msgBackHandler = function (e) {
+      var maybeCode = e.data;
+      if (maybeCode !== undefined) {
+        return Curry._2(scanCallback, canvas, Caml_option.valFromOption(maybeCode));
+      } else {
+        return /* () */0;
+      }
+    };
+    Caml_option.valFromOption(maybeWorker).onmessage = msgBackHandler;
+  }
+  var invert = Options$QueerLoop.currentOptions[0][/* invert */4];
+  if (invert) {
+    Canvas$QueerLoop.invert(canvas);
+  }
+  var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  if (maybeWorker !== undefined) {
+    Caml_option.valFromOption(maybeWorker).postMessage(/* tuple */[
+          imageData.data,
+          (function (prim) {
+              return prim.width;
+            }),
+          (function (prim) {
+              return prim.height;
+            }),
+          /* DontInvert */1
+        ]);
+    return /* () */0;
+  } else {
+    return syncScan(scanCallback, canvas, /* DontInvert */1, imageData);
+  }
+}
+
 function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
   return UserMedia$QueerLoop.initStreamByDeviceId(videoEl, deviceId).then((function (video) {
                 var canvas = document.createElementNS(Util$QueerLoop.htmlNs, "canvas");
@@ -69,17 +104,6 @@ function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
                 if (exit === 1) {
                   maybeWorker = Caml_option.some(worker);
                 }
-                if (maybeWorker !== undefined) {
-                  var msgBackHandler = function (e) {
-                    var maybeCode = e.data;
-                    if (maybeCode !== undefined) {
-                      return Curry._2(scanCallback, canvas, Caml_option.valFromOption(maybeCode));
-                    } else {
-                      return /* () */0;
-                    }
-                  };
-                  Caml_option.valFromOption(maybeWorker).onmessage = msgBackHandler;
-                }
                 var frameCount = /* record */[/* contents */0];
                 var onTick = function (param) {
                   if (video.readyState === 4) {
@@ -93,11 +117,23 @@ function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
                       var ctx = canvas.getContext("2d");
                       ctx.drawImage(video, 0, 0);
                       copyVideoToSnapshotCanvas(canvas);
+                      var ctx$1 = canvas.getContext("2d");
+                      if (maybeWorker !== undefined) {
+                        var msgBackHandler = function (e) {
+                          var maybeCode = e.data;
+                          if (maybeCode !== undefined) {
+                            return Curry._2(scanCallback, canvas, Caml_option.valFromOption(maybeCode));
+                          } else {
+                            return /* () */0;
+                          }
+                        };
+                        Caml_option.valFromOption(maybeWorker).onmessage = msgBackHandler;
+                      }
                       var invert = currentOptions[0][/* invert */4];
                       if (invert) {
                         Canvas$QueerLoop.invert(canvas);
                       }
-                      var imageData = ctx.getImageData(0, 0, width, height);
+                      var imageData = ctx$1.getImageData(0, 0, canvas.width, canvas.height);
                       if (maybeWorker !== undefined) {
                         Caml_option.valFromOption(maybeWorker).postMessage(/* tuple */[
                               imageData.data,
@@ -123,6 +159,7 @@ function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
 export {
   syncScan ,
   copyVideoToSnapshotCanvas ,
+  runScanFromCanvas ,
   scanUsingDeviceId ,
   
 }

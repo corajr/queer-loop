@@ -142,6 +142,10 @@ function getNextColor(current) {
   return rgbFloatToHex(match$2[0], match$2[1], match$2[2]);
 }
 
+function sinebow(t) {
+  return "";
+}
+
 export {
   floatFromHexDigits ,
   rgbFloatFromHash ,
@@ -152,6 +156,7 @@ export {
   rgbToHsv ,
   hsvToRgb ,
   getNextColor ,
+  sinebow ,
   
 }
 /* No side effect */

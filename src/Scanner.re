@@ -49,6 +49,49 @@ let copyVideoToSnapshotCanvas = videoCanvas =>
     );
   });
 
+let runScanFromCanvas = (canvas, maybeWorker, scanCallback) => {
+  let ctx = getContext(canvas);
+  switch (maybeWorker) {
+  | Some(worker) =>
+    let msgBackHandler: WebWorkers.MessageEvent.t => unit = (
+      e => {
+        let maybeCode: option(code) = WebWorkers.MessageEvent.data(e);
+        switch (maybeCode) {
+        | Some(qrCode) => scanCallback(canvas, qrCode)
+        | None => ()
+        };
+      }
+    );
+    WebWorkers.onMessage(worker, msgBackHandler);
+
+  | None => ()
+  };
+
+  let invert = currentOptions^.invert;
+
+  if (invert) {
+    Canvas.invert(canvas);
+  };
+
+  let imageData =
+    Ctx.getImageData(
+      ctx,
+      ~sx=0,
+      ~sy=0,
+      ~sw=getWidth(canvas),
+      ~sh=getHeight(canvas),
+    );
+
+  switch (maybeWorker) {
+  | Some(worker) =>
+    WebWorkers.postMessage(
+      worker,
+      (dataGet(imageData), width, height, DontInvert),
+    )
+  | None => syncScan(scanCallback, canvas, DontInvert, imageData)
+  };
+};
+
 let scanUsingDeviceId =
     (videoEl, deviceId, currentOptions, scanCallback)
     : Js.Promise.t(Dom.element) =>
@@ -72,22 +115,6 @@ let scanUsingDeviceId =
            None;
          };
 
-       switch (maybeWorker) {
-       | Some(worker) =>
-         let msgBackHandler: WebWorkers.MessageEvent.t => unit = (
-           e => {
-             let maybeCode: option(code) = WebWorkers.MessageEvent.data(e);
-             switch (maybeCode) {
-             | Some(qrCode) => scanCallback(canvas, qrCode)
-             | None => ()
-             };
-           }
-         );
-         WebWorkers.onMessage(worker, msgBackHandler);
-
-       | None => ()
-       };
-
        let frameCount = ref(0);
 
        let rec onTick = _ => {
@@ -103,6 +130,23 @@ let scanUsingDeviceId =
              let ctx = getContext(canvas);
              Ctx.drawImage(ctx, ~image=video, ~dx=0, ~dy=0);
              copyVideoToSnapshotCanvas(canvas);
+             let ctx = getContext(canvas);
+             switch (maybeWorker) {
+             | Some(worker) =>
+               let msgBackHandler: WebWorkers.MessageEvent.t => unit = (
+                 e => {
+                   let maybeCode: option(code) =
+                     WebWorkers.MessageEvent.data(e);
+                   switch (maybeCode) {
+                   | Some(qrCode) => scanCallback(canvas, qrCode)
+                   | None => ()
+                   };
+                 }
+               );
+               WebWorkers.onMessage(worker, msgBackHandler);
+
+             | None => ()
+             };
 
              let invert = currentOptions^.invert;
 
@@ -111,7 +155,13 @@ let scanUsingDeviceId =
              };
 
              let imageData =
-               Ctx.getImageData(ctx, ~sx=0, ~sy=0, ~sw=width, ~sh=height);
+               Ctx.getImageData(
+                 ctx,
+                 ~sx=0,
+                 ~sy=0,
+                 ~sw=getWidth(canvas),
+                 ~sh=getHeight(canvas),
+               );
 
              switch (maybeWorker) {
              | Some(worker) =>

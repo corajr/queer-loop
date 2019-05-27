@@ -55,6 +55,54 @@ let setHashToNow = _ => setHash(getTimestamp());
 
 let hasChanged = ref(false);
 
+type state =
+  | Asleep
+  | Dreaming
+  | Awake;
+
+let queerLoopState: ref(state) = ref(Dreaming);
+
+let simulateSelfRecognition = _ =>
+  switch (queerLoopState^) {
+  | Asleep
+  | Awake
+  | Dreaming =>
+    Js.log("Simulating self recognition...");
+    withQuerySelectorDom("#snapshotCanvas", snapshotCanvas => {
+      let ctx = getContext(snapshotCanvas);
+      let size = getWidth(snapshotCanvas);
+      withQuerySelectorDom("img", codeImg =>
+        Ctx.drawImageDestRect(
+          ctx,
+          ~image=codeImg,
+          ~dx=0,
+          ~dy=0,
+          ~dw=size,
+          ~dh=size,
+        )
+      );
+
+      Ctx.drawImageDestRect(
+        ctx,
+        ~image=snapshotCanvas,
+        ~dx=1,
+        ~dy=1,
+        ~dw=size - 1,
+        ~dh=size - 1,
+      );
+
+      Scanner.runScanFromCanvas(
+        snapshotCanvas,
+        None,
+        (canvas, qrCode) => {
+          Js.log("simulating scan");
+          Js.log("simulating scan");
+        },
+      );
+    })
+    |> ignore;
+  };
+
 let onClick = (maybeHash, _) => {
   if (! hasChanged^) {
     hasChanged := true;
@@ -68,7 +116,10 @@ let onClick = (maybeHash, _) => {
       | None => false
       };
     ();
-  | None => setHashToNow()
+  | None =>
+    simulateSelfRecognition();
+
+    setHashToNow();
   };
 };
 
@@ -226,6 +277,7 @@ let setCode = text =>
 
                      let iconCodeImg =
                        QueerCode.codeToImage(~code, ~border, ~hash);
+
                      ElementRe.addEventListener(
                        "load",
                        _evt =>
@@ -355,10 +407,10 @@ let rec onTick = ts => {
     /*   let newSize = Js.Float.toString(sin(ts) ** 2.0); */
     /*   ElementRe.setAttributeNS(svgNs, "width", {j|0 0 $newSize $newSize|j}); */
     /* }); */
+    simulateSelfRecognition();
+    lastUpdated := ts;
     setHashToNow();
   };
-
-  lastUpdated := ts;
 
   Webapi.requestAnimationFrame(onTick);
 };
@@ -567,6 +619,7 @@ let init = _evt => {
        Webapi.requestAnimationFrame(onTick);
 
        Js.log("Initalization complete.");
+       queerLoopState := Awake;
 
        Js.Promise.resolve();
      })

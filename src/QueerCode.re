@@ -289,6 +289,8 @@ let createIconSvg =
   let svg = DocumentRe.createElementNS(svgNs, "svg", document);
   ElementRe.setAttribute("viewBox", viewBox, svg);
 
+  ElementRe.setAttribute("class", "icon", svg);
+
   let defs = DocumentRe.createElementNS(svgNs, "defs", document);
   let lightRainbowGradient =
     createRainbowGradient(lightRainbowLightness, "lightRainbow");

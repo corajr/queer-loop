@@ -68,6 +68,27 @@ function setHashToNow(param) {
 
 var hasChanged = /* record */[/* contents */false];
 
+var queerLoopState = /* record */[/* contents : Dreaming */1];
+
+function simulateSelfRecognition(param) {
+  console.log("Simulating self recognition...");
+  Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (snapshotCanvas) {
+          var ctx = snapshotCanvas.getContext("2d");
+          var size = snapshotCanvas.width;
+          Util$QueerLoop.withQuerySelectorDom("img", (function (codeImg) {
+                  ctx.drawImage(codeImg, 0, 0, size, size);
+                  return /* () */0;
+                }));
+          ctx.drawImage(snapshotCanvas, 1, 1, size - 1 | 0, size - 1 | 0);
+          return Scanner$QueerLoop.runScanFromCanvas(snapshotCanvas, undefined, (function (canvas, qrCode) {
+                        console.log("simulating scan");
+                        console.log("simulating scan");
+                        return /* () */0;
+                      }));
+        }));
+  return /* () */0;
+}
+
 function onClick(maybeHash, param) {
   if (!hasChanged[0]) {
     hasChanged[0] = true;
@@ -82,6 +103,7 @@ function onClick(maybeHash, param) {
     }
     return /* () */0;
   } else {
+    simulateSelfRecognition(/* () */0);
     return Util$QueerLoop.setHash(new Date().toISOString());
   }
 }
@@ -285,9 +307,10 @@ var lastUpdated = /* record */[/* contents */0.0];
 function onTick(ts) {
   frameCount[0] = frameCount[0] + 1 | 0;
   if (ts - lastUpdated[0] >= 10000.0) {
+    simulateSelfRecognition(/* () */0);
+    lastUpdated[0] = ts;
     Util$QueerLoop.setHash(new Date().toISOString());
   }
-  lastUpdated[0] = ts;
   requestAnimationFrame(onTick);
   return /* () */0;
 }
@@ -448,6 +471,7 @@ function init(_evt) {
             canvasesRef[0] = canvases;
             requestAnimationFrame(onTick);
             console.log("Initalization complete.");
+            queerLoopState[0] = /* Awake */2;
             return Promise.resolve(/* () */0);
           })).catch((function (err) {
           console.log("Camera input disabled.");
@@ -489,6 +513,8 @@ export {
   asOfNow ,
   setHashToNow ,
   hasChanged ,
+  queerLoopState ,
+  simulateSelfRecognition ,
   onClick ,
   _writeLogEntry ,
   writeLogEntry ,

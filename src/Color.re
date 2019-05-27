@@ -100,3 +100,5 @@ let getNextColor = current => {
 
   rgbFloatToHex(r_, g_, b_);
 };
+
+let sinebow: float => string = t => "";
