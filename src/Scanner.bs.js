@@ -93,9 +93,8 @@ function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
                       var ctx = canvas.getContext("2d");
                       ctx.drawImage(video, 0, 0);
                       copyVideoToSnapshotCanvas(canvas);
-                      var match = currentOptions[0][/* invert */4];
-                      var invert = match ? /* OnlyInvert */2 : /* DontInvert */1;
-                      if (invert !== 1) {
+                      var invert = currentOptions[0][/* invert */4];
+                      if (invert) {
                         Canvas$QueerLoop.invert(canvas);
                       }
                       var imageData = ctx.getImageData(0, 0, width, height);

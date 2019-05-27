@@ -2,6 +2,8 @@ open Util;
 open QrCodeGen;
 open Webapi.Dom;
 
+let lightRainbowLightness = 0.95;
+
 let getPathString: (QrCode.t, int) => string =
   (code, border) => {
     let size = QrCode.size(code);
@@ -240,7 +242,8 @@ let createSvgSkeleton = hash => {
   ElementRe.setAttribute("class", "root", svg);
 
   let defs = DocumentRe.createElementNS(svgNs, "defs", document);
-  let lightRainbowGradient = createRainbowGradient(0.9, "lightRainbow");
+  let lightRainbowGradient =
+    createRainbowGradient(lightRainbowLightness, "lightRainbow");
   let darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");
   ElementRe.appendChild(lightRainbowGradient, defs);
   ElementRe.appendChild(darkRainbowGradient, defs);
@@ -287,7 +290,8 @@ let createIconSvg =
   ElementRe.setAttribute("viewBox", viewBox, svg);
 
   let defs = DocumentRe.createElementNS(svgNs, "defs", document);
-  let lightRainbowGradient = createRainbowGradient(0.9, "lightRainbow");
+  let lightRainbowGradient =
+    createRainbowGradient(lightRainbowLightness, "lightRainbow");
   let darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");
   ElementRe.appendChild(lightRainbowGradient, defs);
   ElementRe.appendChild(darkRainbowGradient, defs);

@@ -104,12 +104,10 @@ let scanUsingDeviceId =
              Ctx.drawImage(ctx, ~image=video, ~dx=0, ~dy=0);
              copyVideoToSnapshotCanvas(canvas);
 
-             let invert = currentOptions^.invert ? OnlyInvert : DontInvert;
-             switch (invert) {
-             | DontInvert => ()
-             | OnlyInvert
-             | AttemptBoth
-             | InvertFirst => Canvas.invert(canvas)
+             let invert = currentOptions^.invert;
+
+             if (invert) {
+               Canvas.invert(canvas);
              };
 
              let imageData =

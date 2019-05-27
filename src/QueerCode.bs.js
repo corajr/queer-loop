@@ -125,7 +125,7 @@ function createSvgSkeleton(hash) {
   svg.setAttribute("viewBox", "0 0 1 1");
   svg.setAttribute("class", "root");
   var defs = document.createElementNS(svgNs, "defs");
-  var lightRainbowGradient = createRainbowGradient(0.9, "lightRainbow");
+  var lightRainbowGradient = createRainbowGradient(0.95, "lightRainbow");
   var darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");
   defs.appendChild(lightRainbowGradient);
   defs.appendChild(darkRainbowGradient);
@@ -150,7 +150,7 @@ function createIconSvg(code, border, bg, hash, invert) {
   var svg = document.createElementNS(svgNs, "svg");
   svg.setAttribute("viewBox", viewBox);
   var defs = document.createElementNS(svgNs, "defs");
-  var lightRainbowGradient = createRainbowGradient(0.9, "lightRainbow");
+  var lightRainbowGradient = createRainbowGradient(0.95, "lightRainbow");
   var darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");
   defs.appendChild(lightRainbowGradient);
   defs.appendChild(darkRainbowGradient);
@@ -233,7 +233,10 @@ function drawCanvas(canvas, code) {
   return /* () */0;
 }
 
+var lightRainbowLightness = 0.95;
+
 export {
+  lightRainbowLightness ,
   getPathString ,
   svgNs ,
   createQrCodePathElement ,
