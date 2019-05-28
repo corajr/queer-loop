@@ -11,14 +11,17 @@
              pointer-events: none;
          }
 
-         video {
+         iframe, video {
              position: fixed;
              min-width: 100vw;
              min-height: 100vh;
              left: 50%;
              top: 50%;
              transform: translate(-50%, -50%);
-             mix-blend-mode: multiply;
+             mix-blend-mode: screen;
+         }
+
+         video {
              pointer-events: none;
          }
 
@@ -83,6 +86,7 @@
              left: 50%;
              top: 50%;
              transform: translate(-50%, -50%);
+             mix-blend-mode: hard-light;
          }
 
          #log {
@@ -121,6 +125,9 @@
              bottom: 0;
              border: 6px solid rgba(255, 255, 255, 0.5);
          }
+         #codeText {
+             display: none;
+         }
 
          #codeContents {
              color: white;
@@ -137,6 +144,8 @@
         <canvas id="iconCanvas"></canvas>
 
         <h1><time id="lastUpdated"></time></h1>
+        <div id="videoContainer"></div>
+        <iframe width="560" height="315" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
         <div id="htmlContainer">
             <div id="codes"></div>
             <div id="focus">

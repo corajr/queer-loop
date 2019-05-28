@@ -99,7 +99,7 @@ let scanUsingDeviceId =
   |> Js.Promise.then_(video => {
        let canvas = DocumentRe.createElementNS(htmlNs, "canvas", document);
 
-       withQuerySelectorDom("#htmlContainer", htmlContainer => {
+       withQuerySelectorDom("#videoContainer", htmlContainer => {
          ElementRe.appendChild(video, htmlContainer);
          ElementRe.appendChild(canvas, htmlContainer);
        });

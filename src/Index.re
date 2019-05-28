@@ -437,6 +437,36 @@ let boolParam: (bool, option(string)) => bool =
 let pick: (array('a), array(int)) => array('a) =
   (ary, indices) => Array.map(i => ary[i], indices);
 
+let cycleThroughPast = _ => {
+  let allIds =
+    withQuerySelectorAll(
+      ".code",
+      mapMaybe(item => ElementRe.getAttribute("id", item)),
+    );
+  let currentId =
+    Belt.Option.getWithDefault(
+      Belt.Option.getWithDefault(
+        withQuerySelectorDom(".animate", live => {
+          removeClassSvg(live, "animate");
+          addClassSvg(live, "active");
+          ElementRe.getAttribute("id", live);
+        }),
+        None,
+      ),
+      "",
+    );
+  let i = ref(Js.Array.indexOf(currentId, allIds));
+  _ => {
+    withQuerySelectorDom(".active", live => removeClassSvg(live, "active"))
+    |> ignore;
+    i := (i^ + 1) mod Array.length(allIds);
+    withQuerySelectorDom("#" ++ allIds[i^], live =>
+      addClassSvg(live, "active")
+    )
+    |> ignore;
+  };
+};
+
 let init = _evt => {
   withQuerySelectorDom("#snapshotCanvas", canvas => {
     setWidth(canvas, 480);
@@ -495,11 +525,31 @@ let init = _evt => {
           ),
         cameraIndices:
           Array.length(cameraIndices) == 0 ? [|0|] : cameraIndices,
+        url: URLSearchParamsRe.get("u", params),
       };
   };
 
   if (currentOptions^.background != "") {
     setBackground(".background", currentOptions^.background) |> ignore;
+  };
+
+  switch (currentOptions^.url) {
+  | Some(url) =>
+    withQuerySelectorDom("iframe", iframe => {
+      ElementRe.setAttribute(
+        "width",
+        string_of_int(WindowRe.innerWidth(window)),
+        iframe,
+      );
+      ElementRe.setAttribute(
+        "height",
+        string_of_int(WindowRe.innerHeight(window)),
+        iframe,
+      );
+      ElementRe.setAttribute("src", url, iframe);
+    })
+    |> ignore
+  | None => ()
   };
 
   initialHash := Js.String.sliceToEnd(~from=1, getHash());
@@ -511,8 +561,9 @@ let init = _evt => {
   };
 
   if (! hasBody()) {
+    /* ElementRe.addEventListener("click", onClick(None), svg) */
     withQuerySelectorDom("svg.root", svg =>
-      ElementRe.addEventListener("click", onClick(None), svg)
+      ElementRe.addEventListener("click", cycleThroughPast(), svg)
     )
     |> ignore;
   };
@@ -589,9 +640,6 @@ let init = _evt => {
            camera => {
              let videoEl =
                DocumentRe.createElementNS(htmlNs, "video", document);
-             withQuerySelectorDom(".htmlContainer", body =>
-               ElementRe.appendChild(videoEl, body)
-             );
 
              Scanner.scanUsingDeviceId(
                videoEl,

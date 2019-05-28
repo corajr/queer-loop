@@ -6,6 +6,7 @@ type options = {
   invert: bool,
   animate: bool,
   opacity: float,
+  url: option(string),
   cameraIndices: array(int),
 };
 
@@ -17,6 +18,7 @@ let defaultOptions = {
   invert: false,
   animate: true,
   opacity: 0.1,
+  url: None,
   cameraIndices: [|0|],
 };
 

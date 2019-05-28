@@ -5,6 +5,7 @@ import * as Curry from "../node_modules/bs-platform/lib/es6/curry.js";
 import * as Js_dict from "../node_modules/bs-platform/lib/es6/js_dict.js";
 import * as Debouncer from "../node_modules/re-debouncer/src/Debouncer.bs.js";
 import * as Caml_array from "../node_modules/bs-platform/lib/es6/caml_array.js";
+import * as Caml_int32 from "../node_modules/bs-platform/lib/es6/caml_int32.js";
 import * as Belt_Option from "../node_modules/bs-platform/lib/es6/belt_Option.js";
 import * as Caml_format from "../node_modules/bs-platform/lib/es6/caml_format.js";
 import * as Caml_option from "../node_modules/bs-platform/lib/es6/caml_option.js";
@@ -360,6 +361,30 @@ function pick(ary, indices) {
               }), indices);
 }
 
+function cycleThroughPast(param) {
+  var allIds = Util$QueerLoop.withQuerySelectorAll(".code", (function (param) {
+          return Util$QueerLoop.mapMaybe((function (item) {
+                        return Caml_option.nullable_to_opt(item.getAttribute("id"));
+                      }), param);
+        }));
+  var currentId = Belt_Option.getWithDefault(Belt_Option.getWithDefault(Util$QueerLoop.withQuerySelectorDom(".animate", (function (live) {
+                  SvgScript$QueerLoop.removeClassSvg(live, "animate");
+                  SvgScript$QueerLoop.addClassSvg(live, "active");
+                  return Caml_option.nullable_to_opt(live.getAttribute("id"));
+                })), undefined), "");
+  var i = /* record */[/* contents */allIds.indexOf(currentId)];
+  return (function (param) {
+      Util$QueerLoop.withQuerySelectorDom(".active", (function (live) {
+              return SvgScript$QueerLoop.removeClassSvg(live, "active");
+            }));
+      i[0] = Caml_int32.mod_(i[0] + 1 | 0, allIds.length);
+      Util$QueerLoop.withQuerySelectorDom("#" + Caml_array.caml_array_get(allIds, i[0]), (function (live) {
+              return SvgScript$QueerLoop.addClassSvg(live, "active");
+            }));
+      return /* () */0;
+    });
+}
+
 function init(_evt) {
   Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
           canvas.width = 480;
@@ -383,11 +408,22 @@ function init(_evt) {
       /* opacity */Belt_Option.getWithDefault(Belt_Option.map(Caml_option.nullable_to_opt(params.get("o")), (function (prim) {
                   return Number(prim);
                 })), Options$QueerLoop.currentOptions[0][/* opacity */6]),
+      /* url */Caml_option.nullable_to_opt(params.get("u")),
       /* cameraIndices */match ? /* array */[0] : cameraIndices
     ];
   }
   if (Options$QueerLoop.currentOptions[0][/* background */0] !== "") {
     setBackground(".background", Options$QueerLoop.currentOptions[0][/* background */0]);
+  }
+  var match$1 = Options$QueerLoop.currentOptions[0][/* url */7];
+  if (match$1 !== undefined) {
+    var url = match$1;
+    Util$QueerLoop.withQuerySelectorDom("iframe", (function (iframe) {
+            iframe.setAttribute("width", String(window.innerWidth));
+            iframe.setAttribute("height", String(window.innerHeight));
+            iframe.setAttribute("src", url);
+            return /* () */0;
+          }));
   }
   initialHash[0] = Util$QueerLoop.getHash(/* () */0).slice(1);
   if (initialHash[0] === "") {
@@ -398,9 +434,7 @@ function init(_evt) {
   }
   if (!Curry._1(hasBody, /* () */0)) {
     Util$QueerLoop.withQuerySelectorDom("svg.root", (function (svg) {
-            svg.addEventListener("click", (function (param) {
-                    return onClick(undefined, param);
-                  }));
+            svg.addEventListener("click", cycleThroughPast(/* () */0));
             return /* () */0;
           }));
   }
@@ -455,12 +489,8 @@ function init(_evt) {
               console.log("Cameras found:", cameras);
               return Promise.all($$Array.map((function (camera) {
                                 var videoEl = document.createElementNS(Util$QueerLoop.htmlNs, "video");
-                                Util$QueerLoop.withQuerySelectorDom(".htmlContainer", (function (body) {
-                                        body.appendChild(videoEl);
-                                        return /* () */0;
-                                      }));
                                 return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, Options$QueerLoop.currentOptions, response);
-                              }), pick(cameras, Options$QueerLoop.currentOptions[0][/* cameraIndices */7])));
+                              }), pick(cameras, Options$QueerLoop.currentOptions[0][/* cameraIndices */8])));
             })).then((function (canvases) {
             canvasesRef[0] = canvases;
             requestAnimationFrame(onTick);
@@ -528,6 +558,7 @@ export {
   onInput ,
   boolParam ,
   pick ,
+  cycleThroughPast ,
   init ,
   activateQueerLoop ,
   
