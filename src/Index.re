@@ -116,10 +116,7 @@ let onClick = (maybeHash, _) => {
       | None => false
       };
     ();
-  | None =>
-    simulateSelfRecognition();
-
-    setHashToNow();
+  | None => setHashToNow()
   };
 };
 
@@ -402,15 +399,9 @@ let lastUpdated = ref(0.0);
 let rec onTick = ts => {
   frameCount := frameCount^ + 1;
 
-  if (ts -. lastUpdated^ >= 10000.0) {
-    /* withQuerySelectorDom("svg", svg => { */
-    /*   let newSize = Js.Float.toString(sin(ts) ** 2.0); */
-    /*   ElementRe.setAttributeNS(svgNs, "width", {j|0 0 $newSize $newSize|j}); */
-    /* }); */
-    simulateSelfRecognition();
-    lastUpdated := ts;
-    setHashToNow();
-  };
+  /* if (ts -. lastUpdated^ >= 10000.0) { */
+  /*   lastUpdated := ts; */
+  /* }; */
 
   Webapi.requestAnimationFrame(onTick);
 };
@@ -483,7 +474,7 @@ let init = _evt => {
           ),
         animate:
           boolParam(
-            currentOptions^.invert,
+            currentOptions^.animate,
             URLSearchParamsRe.get("a", params),
           ),
         opacity:

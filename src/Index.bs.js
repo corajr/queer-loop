@@ -103,7 +103,6 @@ function onClick(maybeHash, param) {
     }
     return /* () */0;
   } else {
-    simulateSelfRecognition(/* () */0);
     return Util$QueerLoop.setHash(new Date().toISOString());
   }
 }
@@ -306,11 +305,6 @@ var lastUpdated = /* record */[/* contents */0.0];
 
 function onTick(ts) {
   frameCount[0] = frameCount[0] + 1 | 0;
-  if (ts - lastUpdated[0] >= 10000.0) {
-    simulateSelfRecognition(/* () */0);
-    lastUpdated[0] = ts;
-    Util$QueerLoop.setHash(new Date().toISOString());
-  }
   requestAnimationFrame(onTick);
   return /* () */0;
 }
@@ -385,7 +379,7 @@ function init(_evt) {
       /* includeQueryString */boolParam(Options$QueerLoop.currentOptions[0][/* includeQueryString */2], Caml_option.nullable_to_opt(params.get("q"))),
       /* includeHash */boolParam(Options$QueerLoop.currentOptions[0][/* includeHash */3], Caml_option.nullable_to_opt(params.get("h"))),
       /* invert */boolParam(Options$QueerLoop.currentOptions[0][/* invert */4], Caml_option.nullable_to_opt(params.get("i"))),
-      /* animate */boolParam(Options$QueerLoop.currentOptions[0][/* invert */4], Caml_option.nullable_to_opt(params.get("a"))),
+      /* animate */boolParam(Options$QueerLoop.currentOptions[0][/* animate */5], Caml_option.nullable_to_opt(params.get("a"))),
       /* opacity */Belt_Option.getWithDefault(Belt_Option.map(Caml_option.nullable_to_opt(params.get("o")), (function (prim) {
                   return Number(prim);
                 })), Options$QueerLoop.currentOptions[0][/* opacity */6]),

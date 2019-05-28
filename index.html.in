@@ -78,8 +78,8 @@
              z-index: 100;
              margin: auto;
              position: fixed;
-             max-width: 100vmin;
-             max-height: 100vmin;
+             width: 100vmin;
+             height: 100vmin;
              left: 50%;
              top: 50%;
              transform: translate(-50%, -50%);
