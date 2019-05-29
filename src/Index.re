@@ -528,6 +528,7 @@ let init = _evt => {
         cameraIndices:
           Array.length(cameraIndices) == 0 ? [|0|] : cameraIndices,
         url: URLSearchParamsRe.get("u", params),
+        title: URLSearchParamsRe.get("t", params),
         youtubeVideo: URLSearchParamsRe.get("v", params),
       };
   };
@@ -583,7 +584,7 @@ let init = _evt => {
         string_of_int(WindowRe.innerHeight(window)),
         iframe,
       );
-      let url = {j|https://www.youtube-nocookie.com/embed/$ytId|j};
+      let url = {j|https://www.youtube-nocookie.com/embed/$ytId?cc_load_policy=1|j};
       ElementRe.setAttribute("src", url, iframe);
       ElementRe.appendChild(iframe, iframeContainer);
     })
@@ -688,7 +689,13 @@ let init = _evt => {
                response,
              );
            },
-           pick(cameras, currentOptions^.cameraIndices),
+           pick(
+             cameras,
+             Array.map(
+               x => x mod Array.length(cameras),
+               currentOptions^.cameraIndices,
+             ),
+           ),
          ),
        );
      })

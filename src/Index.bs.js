@@ -408,6 +408,7 @@ function init(_evt) {
       /* opacity */Belt_Option.getWithDefault(Belt_Option.map(Caml_option.nullable_to_opt(params.get("o")), (function (prim) {
                   return Number(prim);
                 })), Options$QueerLoop.currentOptions[0][/* opacity */6]),
+      /* title */Caml_option.nullable_to_opt(params.get("t")),
       /* url */Caml_option.nullable_to_opt(params.get("u")),
       /* youtubeVideo */Caml_option.nullable_to_opt(params.get("v")),
       /* cameraIndices */match ? /* array */[0] : cameraIndices
@@ -416,7 +417,7 @@ function init(_evt) {
   if (Options$QueerLoop.currentOptions[0][/* background */0] !== "") {
     setBackground(".background", Options$QueerLoop.currentOptions[0][/* background */0]);
   }
-  var match$1 = Options$QueerLoop.currentOptions[0][/* url */7];
+  var match$1 = Options$QueerLoop.currentOptions[0][/* url */8];
   if (match$1 !== undefined) {
     Util$QueerLoop.withQuerySelectorDom("#iframeContainer", (function (iframeContainer) {
             var iframe = document.createElementNS(Util$QueerLoop.htmlNs, "iframe");
@@ -427,7 +428,7 @@ function init(_evt) {
             return /* () */0;
           }));
   }
-  var match$2 = Options$QueerLoop.currentOptions[0][/* youtubeVideo */8];
+  var match$2 = Options$QueerLoop.currentOptions[0][/* youtubeVideo */9];
   if (match$2 !== undefined) {
     var ytId = match$2;
     Util$QueerLoop.withQuerySelectorDom("#iframeContainer", (function (iframeContainer) {
@@ -436,7 +437,7 @@ function init(_evt) {
             iframe.setAttribute("frameborder", "0");
             iframe.setAttribute("allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture");
             iframe.setAttribute("height", String(window.innerHeight));
-            var url = "https://www.youtube-nocookie.com/embed/" + (String(ytId) + "");
+            var url = "https://www.youtube-nocookie.com/embed/" + (String(ytId) + "?cc_load_policy=1");
             iframe.setAttribute("src", url);
             iframeContainer.appendChild(iframe);
             return /* () */0;
@@ -507,7 +508,9 @@ function init(_evt) {
               return Promise.all($$Array.map((function (camera) {
                                 var videoEl = document.createElementNS(Util$QueerLoop.htmlNs, "video");
                                 return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, Options$QueerLoop.currentOptions, response);
-                              }), pick(cameras, Options$QueerLoop.currentOptions[0][/* cameraIndices */9])));
+                              }), pick(cameras, $$Array.map((function (x) {
+                                        return Caml_int32.mod_(x, cameras.length);
+                                      }), Options$QueerLoop.currentOptions[0][/* cameraIndices */10]))));
             })).then((function (canvases) {
             canvasesRef[0] = canvases;
             requestAnimationFrame(onTick);
