@@ -28,7 +28,7 @@ export default [{
     output: {
         name: 'worker',
         file: 'worker.js',
-        sourcemap: 'inline',
+        sourcemap: true,
         format: 'iife'
     },
     plugins: [
