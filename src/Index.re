@@ -155,6 +155,8 @@ let _writeLogEntry = ((timestamp, localeString, text, hash)) =>
       entry,
     );
 
+    /* SpeechSynthesis.(speak(Utterance.make(text))); */
+
     ElementRe.appendChild(time, timeDiv);
     ElementRe.appendChild(timeDiv, entry);
     ElementRe.appendChild(textChild, entry);
