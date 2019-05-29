@@ -550,7 +550,12 @@ let init = _evt => {
         string_of_int(WindowRe.innerHeight(window)),
         iframe,
       );
-      ElementRe.setAttribute("src", url, iframe);
+      ElementRe.setAttribute(
+        "allow",
+        "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; microphone; camera",
+        iframe,
+      );
+
       ElementRe.appendChild(iframe, iframeContainer);
     })
     |> ignore
