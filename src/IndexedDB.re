@@ -50,13 +50,32 @@ module DB = {
     dbObjectStoreNames: domStringList,
   };
 
+  external eventTargetAsDBRequest : Dom.eventTarget => t = "%identity";
+
   [@bs.send]
   external _open :
     (factory, ~name: string, ~version: int=?, unit) => request(t) =
     "open";
 
-  let open_ = (~name, ~version) : Js.Promise.t(t) =>
-    asPromise(_open(indexedDB, ~name, ~version, ()));
+  let open_ =
+      (
+        ~name,
+        ~version,
+        ~upgradeNeededHandler=db => {
+                                Js.log("Upgrading database...");
+                                ();
+                              },
+        unit,
+      )
+      : Js.Promise.t(t) => {
+    let request = _open(indexedDB, ~name, ~version, ());
+    EventTargetRe.addEventListener(
+      "upgradeneeded",
+      upgradeNeededHandler,
+      asEventTarget(request),
+    );
+    asPromise(request);
+  };
 };
 
 module KeyRange = {

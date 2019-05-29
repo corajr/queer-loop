@@ -5,7 +5,10 @@ import * as IndexedDB$QueerLoop from "../src/IndexedDB.bs.js";
 
 Jest.describe("open", (function (param) {
         return Jest.test("opens a connection to the database", (function (param) {
-                      var request = IndexedDB$QueerLoop.DB[/* open_ */0]("test", 1);
+                      var partial_arg = IndexedDB$QueerLoop.DB[/* open_ */0];
+                      var request = function (param, param$1) {
+                        return partial_arg("test", 1, param, param$1);
+                      };
                       return Jest.ExpectJs[/* toBeTruthy */29](Jest.ExpectJs[/* expect */0](request));
                     }));
       }));

@@ -684,6 +684,9 @@ let activateQueerLoop: unit => unit = [%bs.raw
 if (! queerLoop) {
   Js.log("Initializing queer-loop...");
   activateQueerLoop();
+
+  /* let db = IndexedDB.DB.open_(~name="queer-loop", ~version=1, ()); */
+  /* db; */
   WindowRe.addEventListener("load", init, window);
   WindowRe.addEventListener("hashchange", onHashChange, window);
 };

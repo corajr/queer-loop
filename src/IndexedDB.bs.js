@@ -15,8 +15,14 @@ function asPromise(request) {
               }));
 }
 
-function open_(name, version) {
-  return asPromise(window.indexedDB.open(name, version));
+function open_(name, version, $staropt$star, unit) {
+  var upgradeNeededHandler = $staropt$star !== undefined ? $staropt$star : (function (db) {
+        console.log("Upgrading database...");
+        return /* () */0;
+      });
+  var request = window.indexedDB.open(name, version);
+  request.addEventListener("upgradeneeded", upgradeNeededHandler);
+  return asPromise(request);
 }
 
 var DB = /* module */[/* open_ */open_];
