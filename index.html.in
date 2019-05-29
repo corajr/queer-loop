@@ -145,7 +145,7 @@
 
         <h1><time id="lastUpdated"></time></h1>
         <div id="videoContainer"></div>
-        <iframe width="560" height="315" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        <div id="iframeContainer"></div>
         <div id="htmlContainer">
             <div id="codes"></div>
             <div id="focus">

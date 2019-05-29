@@ -409,6 +409,7 @@ function init(_evt) {
                   return Number(prim);
                 })), Options$QueerLoop.currentOptions[0][/* opacity */6]),
       /* url */Caml_option.nullable_to_opt(params.get("u")),
+      /* youtubeVideo */Caml_option.nullable_to_opt(params.get("v")),
       /* cameraIndices */match ? /* array */[0] : cameraIndices
     ];
   }
@@ -418,10 +419,27 @@ function init(_evt) {
   var match$1 = Options$QueerLoop.currentOptions[0][/* url */7];
   if (match$1 !== undefined) {
     var url = match$1;
-    Util$QueerLoop.withQuerySelectorDom("iframe", (function (iframe) {
+    Util$QueerLoop.withQuerySelectorDom("#iframeContainer", (function (iframeContainer) {
+            var iframe = document.createElementNS(Util$QueerLoop.htmlNs, "iframe");
             iframe.setAttribute("width", String(window.innerWidth));
             iframe.setAttribute("height", String(window.innerHeight));
             iframe.setAttribute("src", url);
+            iframeContainer.appendChild(iframe);
+            return /* () */0;
+          }));
+  }
+  var match$2 = Options$QueerLoop.currentOptions[0][/* youtubeVideo */8];
+  if (match$2 !== undefined) {
+    var ytId = match$2;
+    Util$QueerLoop.withQuerySelectorDom("#iframeContainer", (function (iframeContainer) {
+            var iframe = document.createElementNS(Util$QueerLoop.htmlNs, "iframe");
+            iframe.setAttribute("width", String(window.innerWidth));
+            iframe.setAttribute("frameborder", "0");
+            iframe.setAttribute("allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture");
+            iframe.setAttribute("height", String(window.innerHeight));
+            var url = "https://www.youtube-nocookie.com/embed/" + (String(ytId) + "");
+            iframe.setAttribute("src", url);
+            iframeContainer.appendChild(iframe);
             return /* () */0;
           }));
   }
@@ -490,7 +508,7 @@ function init(_evt) {
               return Promise.all($$Array.map((function (camera) {
                                 var videoEl = document.createElementNS(Util$QueerLoop.htmlNs, "video");
                                 return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, Options$QueerLoop.currentOptions, response);
-                              }), pick(cameras, Options$QueerLoop.currentOptions[0][/* cameraIndices */8])));
+                              }), pick(cameras, Options$QueerLoop.currentOptions[0][/* cameraIndices */9])));
             })).then((function (canvases) {
             canvasesRef[0] = canvases;
             requestAnimationFrame(onTick);

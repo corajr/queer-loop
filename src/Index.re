@@ -528,6 +528,7 @@ let init = _evt => {
         cameraIndices:
           Array.length(cameraIndices) == 0 ? [|0|] : cameraIndices,
         url: URLSearchParamsRe.get("u", params),
+        youtubeVideo: URLSearchParamsRe.get("v", params),
       };
   };
 
@@ -537,7 +538,8 @@ let init = _evt => {
 
   switch (currentOptions^.url) {
   | Some(url) =>
-    withQuerySelectorDom("iframe", iframe => {
+    withQuerySelectorDom("#iframeContainer", iframeContainer => {
+      let iframe = DocumentRe.createElementNS(htmlNs, "iframe", document);
       ElementRe.setAttribute(
         "width",
         string_of_int(WindowRe.innerWidth(window)),
@@ -549,8 +551,39 @@ let init = _evt => {
         iframe,
       );
       ElementRe.setAttribute("src", url, iframe);
+      ElementRe.appendChild(iframe, iframeContainer);
     })
     |> ignore
+  | None => ()
+  };
+
+  switch (currentOptions^.youtubeVideo) {
+  | Some(ytId) =>
+    withQuerySelectorDom("#iframeContainer", iframeContainer => {
+      let iframe = DocumentRe.createElementNS(htmlNs, "iframe", document);
+      ElementRe.setAttribute(
+        "width",
+        string_of_int(WindowRe.innerWidth(window)),
+        iframe,
+      );
+      ElementRe.setAttribute("frameborder", "0", iframe);
+      ElementRe.setAttribute(
+        "allow",
+        "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture",
+        iframe,
+      );
+
+      ElementRe.setAttribute(
+        "height",
+        string_of_int(WindowRe.innerHeight(window)),
+        iframe,
+      );
+      let url = {j|https://www.youtube-nocookie.com/embed/$ytId|j};
+      ElementRe.setAttribute("src", url, iframe);
+      ElementRe.appendChild(iframe, iframeContainer);
+    })
+    |> ignore
+
   | None => ()
   };
 

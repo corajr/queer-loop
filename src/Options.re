@@ -7,6 +7,7 @@ type options = {
   animate: bool,
   opacity: float,
   url: option(string),
+  youtubeVideo: option(string),
   cameraIndices: array(int),
 };
 
@@ -19,6 +20,7 @@ let defaultOptions = {
   animate: true,
   opacity: 0.1,
   url: None,
+  youtubeVideo: None,
   cameraIndices: [|0|],
 };
 
