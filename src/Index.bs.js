@@ -420,11 +420,13 @@ function init(_evt) {
   }
   var match$1 = Options$QueerLoop.currentOptions[0][/* url */8];
   if (match$1 !== undefined) {
+    var url = match$1;
     Util$QueerLoop.withQuerySelectorDom("#iframeContainer", (function (iframeContainer) {
             var iframe = document.createElementNS(Util$QueerLoop.htmlNs, "iframe");
             iframe.setAttribute("width", String(window.innerWidth));
             iframe.setAttribute("height", String(window.innerHeight));
             iframe.setAttribute("allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; microphone; camera");
+            iframe.setAttribute("src", url);
             iframeContainer.appendChild(iframe);
             return /* () */0;
           }));

@@ -563,6 +563,8 @@ let init = _evt => {
         iframe,
       );
 
+      ElementRe.setAttribute("src", url, iframe);
+
       ElementRe.appendChild(iframe, iframeContainer);
     })
     |> ignore
