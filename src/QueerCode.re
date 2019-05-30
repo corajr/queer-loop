@@ -344,6 +344,18 @@ let svgToDataURL: Dom.element => string =
     "data:image/svg+xml;utf8," ++ encodeURIComponent(str);
   };
 
+let svgToBlob: Dom.element => Blob.t =
+  svg => {
+    let xmlSerializer = XMLSerializer.make();
+    let str = XMLSerializer.serializeToString(xmlSerializer, svg);
+    let blob =
+      Blob.makeFromString(
+        [|str|],
+        Blob.opts(~mimeType="image/svg+xml;charset=utf-8"),
+      );
+    blob;
+  };
+
 let svgToImg = (~svg: Dom.element) : Dom.element => {
   let svgUrl = svgToDataURL(svg);
   let svgImg = DocumentRe.createElementNS(htmlNs, "img", document);
@@ -351,6 +363,40 @@ let svgToImg = (~svg: Dom.element) : Dom.element => {
   ElementRe.setAttribute("src", svgUrl, svgImg);
   ElementRe.setAttribute("width", "480", svgImg);
   ElementRe.setAttribute("height", "480", svgImg);
+
+  svgImg;
+};
+
+let svgToBlobObjectURL = (~svg: Dom.element) => {
+  let svgBlob = svgToBlob(svg);
+  UrlRe.createObjectURL(Blob.asFileT(svgBlob));
+};
+
+let svgToPng =
+    (~svg: Dom.element, ~width: int=480, ~height: int=480, unit)
+    : Dom.element => {
+  let svgBlob = svgToBlob(svg);
+  let svgUrl = UrlRe.createObjectURL(Blob.asFileT(svgBlob));
+
+  let svgImg = DocumentRe.createElementNS(htmlNs, "img", document);
+  let widthStr = string_of_int(width);
+  let heightStr = string_of_int(height);
+  ElementRe.addEventListener(
+    "load",
+    _ =>
+      withQuerySelectorDom("#snapshotCanvas", canvas => {
+        let ctx = Canvas.getContext(canvas);
+
+        Canvas.Ctx.drawImage(ctx, ~image=svgImg, ~dx=0, ~dy=0);
+        UrlRe.revokeObjectURL(svgUrl);
+      })
+      |> ignore,
+    svgImg,
+  );
+
+  ElementRe.setAttribute("src", svgUrl, svgImg);
+  ElementRe.setAttribute("width", widthStr, svgImg);
+  ElementRe.setAttribute("height", heightStr, svgImg);
 
   svgImg;
 };

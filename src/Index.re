@@ -216,6 +216,14 @@ let withRootSvg = (hash, f: Dom.element => unit) : unit =>
     withQuerySelectorDom("svg.root", f) |> ignore;
   };
 
+let setOnClick: (Dom.element, Dom.event => unit) => unit = [%bs.raw
+  (el, handler) => {|el.onclick = handler;|}
+];
+
+let simulateClick: Dom.element => unit = [%bs.raw el => {|el.click();|}];
+
+let activeObjectURLs: array((string, string)) = [||];
+
 let setCode = text =>
   Hash.hexDigest("SHA-1", text)
   |> Js.Promise.then_(hash => {
@@ -225,6 +233,14 @@ let setCode = text =>
            let alreadySeen = Belt.Option.isSome(Js.Dict.get(dataSeen, hash));
 
            if (! alreadySeen) {
+             withQuerySelectorDom("#htmlContainer", htmlContainer => {
+               let classList = ElementRe.classList(htmlContainer);
+               if (currentOptions^.invert) {
+                 DomTokenListRe.add("invert", classList);
+               } else {
+                 DomTokenListRe.remove("invert", classList);
+               };
+             });
              Js.Dict.set(dataSeen, hash, text);
 
              let code =
@@ -336,15 +352,44 @@ let setCode = text =>
                        iconCodeImg,
                      );
 
-                     let url = QueerCode.svgToDataURL(rootSvg);
-
                      withQuerySelectorDom("#download", a => {
                        ElementRe.setAttribute(
                          "download",
                          timestamp ++ ".svg",
                          a,
                        );
-                       ElementRe.setAttribute("href", url, a);
+
+                       let downloadOnClickHandler = evt =>
+                         if (EventRe.isTrusted(evt)) {
+                           EventRe.preventDefault(evt);
+
+                           let blobObjectUrl =
+                             QueerCode.svgToBlobObjectURL(rootSvg);
+                           ElementRe.setAttribute("href", blobObjectUrl, a);
+                           Js.Array.push(
+                             (timestamp, blobObjectUrl),
+                             activeObjectURLs,
+                           );
+                           simulateClick(a);
+                         } else {
+                           Js_global.setTimeout(
+                             _ =>
+                               while (Array.length(activeObjectURLs) > 0) {
+                                 switch (Js.Array.pop(activeObjectURLs)) {
+                                 | Some((timestamp, objectURL)) =>
+                                   Js.log(
+                                     {j|Freeing memory from $timestamp.|j},
+                                   );
+                                   UrlRe.revokeObjectURL(objectURL);
+                                 | None => ()
+                                 };
+                               },
+                             1000,
+                           )
+                           |> ignore;
+                         };
+
+                       setOnClick(a, downloadOnClickHandler);
                      });
 
                      currentSignature := hash;
@@ -592,7 +637,7 @@ let init = _evt => {
         string_of_int(WindowRe.innerHeight(window)),
         iframe,
       );
-      let url = {j|https://www.youtube-nocookie.com/embed/$ytId?cc_load_policy=1|j};
+      let url = {j|https://www.youtube-nocookie.com/embed/$ytId?cc_load_policy=1&autoplay=1|j};
       ElementRe.setAttribute("src", url, iframe);
       ElementRe.appendChild(iframe, iframeContainer);
     })

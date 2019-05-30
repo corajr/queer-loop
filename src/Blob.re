@@ -6,8 +6,12 @@ type opts = {
   mimeType: string,
 };
 
+external asFileT : t => FileRe.t = "%identity";
+
 [@bs.new]
 external make : (array(Js.Typed_array.ArrayBuffer.t), opts) => t = "Blob";
+
+[@bs.new] external makeFromString : (array(string), opts) => t = "Blob";
 
 let toArrayBuffer: t => Js.Promise.t(Js.Typed_array.ArrayBuffer.t) = [%bs.raw
   blob => {|

@@ -21,6 +21,10 @@
              mix-blend-mode: screen;
          }
 
+         .invert iframe, .invert video {
+             mix-blend-mode: multiply;
+         }
+
          video {
              pointer-events: none;
          }
@@ -81,12 +85,11 @@
              z-index: 100;
              margin: auto;
              position: fixed;
-             width: 100vmin;
-             height: 100vmin;
+             width: 480px;
+             height: 480px;
              left: 50%;
              top: 50%;
              transform: translate(-50%, -50%);
-             mix-blend-mode: hard-light;
          }
 
          #log {
@@ -136,17 +139,19 @@
         </style>
     </head>
     <body>
-        <div id="welcome">
-            queer-loop requests camera access to be able to see itself-- in the mirror or on the device of a friend. If you want to see what will happen if you agree, click or tap on the central icon (this simulates 1 look in the mirror).
-        </div>
-
-        <canvas id="snapshotCanvas"></canvas>
-        <canvas id="iconCanvas"></canvas>
-
-        <h1><time id="lastUpdated"></time></h1>
-        <div id="videoContainer"></div>
-        <div id="iframeContainer"></div>
         <div id="htmlContainer">
+            <div id="welcome">
+                queer-loop requests camera access to be able to see itself-- in the mirror or on the device of a friend. If you want to see what will happen if you agree, click or tap on the central icon (this simulates 1 look in the mirror).
+            </div>
+
+            <canvas id="snapshotCanvas"></canvas>
+            <canvas id="iconCanvas"></canvas>
+
+            <h1><time id="lastUpdated"></time></h1>
+            <div id="sources">
+                <div id="videoContainer"></div>
+                <div id="iframeContainer"></div>
+            </div>
             <div id="codes"></div>
             <div id="focus">
                 <div id="queer-loop">
@@ -159,6 +164,5 @@
             </div>
             <div id="log"></div>
         </div>
-
     </body>
 </html>

@@ -193,12 +193,47 @@ function svgToDataURL(svg) {
   return "data:image/svg+xml;utf8," + encodeURIComponent(str);
 }
 
+function svgToBlob(svg) {
+  var xmlSerializer = new XMLSerializer();
+  var str = xmlSerializer.serializeToString(svg);
+  return new Blob(/* array */[str], {
+              type: "image/svg+xml;charset=utf-8"
+            });
+}
+
 function svgToImg(svg) {
   var svgUrl = svgToDataURL(svg);
   var svgImg = document.createElementNS(Util$QueerLoop.htmlNs, "img");
   svgImg.setAttribute("src", svgUrl);
   svgImg.setAttribute("width", "480");
   svgImg.setAttribute("height", "480");
+  return svgImg;
+}
+
+function svgToBlobObjectURL(svg) {
+  return URL.createObjectURL(svgToBlob(svg));
+}
+
+function svgToPng(svg, $staropt$star, $staropt$star$1, unit) {
+  var width = $staropt$star !== undefined ? $staropt$star : 480;
+  var height = $staropt$star$1 !== undefined ? $staropt$star$1 : 480;
+  var svgBlob = svgToBlob(svg);
+  var svgUrl = URL.createObjectURL(svgBlob);
+  var svgImg = document.createElementNS(Util$QueerLoop.htmlNs, "img");
+  var widthStr = String(width);
+  var heightStr = String(height);
+  svgImg.addEventListener("load", (function (param) {
+          Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
+                  var ctx = canvas.getContext("2d");
+                  ctx.drawImage(svgImg, 0, 0);
+                  URL.revokeObjectURL(svgUrl);
+                  return /* () */0;
+                }));
+          return /* () */0;
+        }));
+  svgImg.setAttribute("src", svgUrl);
+  svgImg.setAttribute("width", widthStr);
+  svgImg.setAttribute("height", heightStr);
   return svgImg;
 }
 
@@ -252,7 +287,10 @@ export {
   createIconSvg ,
   $$XMLSerializer ,
   svgToDataURL ,
+  svgToBlob ,
   svgToImg ,
+  svgToBlobObjectURL ,
+  svgToPng ,
   codeToImage ,
   drawCanvas ,
   

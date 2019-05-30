@@ -182,6 +182,12 @@ function withRootSvg(hash, f) {
   }
 }
 
+function setOnClick (el,handler){el.onclick = handler;};
+
+function simulateClick (el){el.click();};
+
+var activeObjectURLs = /* array */[];
+
 function setCode(text) {
   Hash$QueerLoop.hexDigest("SHA-1", text).then((function (hash) {
           withRootSvg(hash, (function (rootSvg) {
@@ -189,6 +195,16 @@ function setCode(text) {
                   if (alreadySeen) {
                     return 0;
                   } else {
+                    Util$QueerLoop.withQuerySelectorDom("#htmlContainer", (function (htmlContainer) {
+                            var classList = htmlContainer.classList;
+                            if (Options$QueerLoop.currentOptions[0][/* invert */4]) {
+                              classList.add("invert");
+                              return /* () */0;
+                            } else {
+                              classList.remove("invert");
+                              return /* () */0;
+                            }
+                          }));
                     dataSeen[hash] = text;
                     var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
                     var sizeWithBorder = code.size + 12 | 0;
@@ -239,11 +255,34 @@ function setCode(text) {
                                                 return /* () */0;
                                               }
                                             }));
-                                      var url = QueerCode$QueerLoop.svgToDataURL(rootSvg);
                                       Util$QueerLoop.withQuerySelectorDom("#download", (function (a) {
                                               a.setAttribute("download", timestamp + ".svg");
-                                              a.setAttribute("href", url);
-                                              return /* () */0;
+                                              var downloadOnClickHandler = function (evt) {
+                                                if (evt.isTrusted) {
+                                                  evt.preventDefault();
+                                                  var blobObjectUrl = QueerCode$QueerLoop.svgToBlobObjectURL(rootSvg);
+                                                  a.setAttribute("href", blobObjectUrl);
+                                                  activeObjectURLs.push(/* tuple */[
+                                                        timestamp,
+                                                        blobObjectUrl
+                                                      ]);
+                                                  return simulateClick(a);
+                                                } else {
+                                                  setTimeout((function (param) {
+                                                          while(activeObjectURLs.length !== 0) {
+                                                            var match = activeObjectURLs.pop();
+                                                            if (match !== undefined) {
+                                                              console.log("Freeing memory from " + (String(match[0]) + "."));
+                                                              URL.revokeObjectURL(match[1]);
+                                                            }
+                                                            
+                                                          };
+                                                          return /* () */0;
+                                                        }), 1000);
+                                                  return /* () */0;
+                                                }
+                                              };
+                                              return setOnClick(a, downloadOnClickHandler);
                                             }));
                                       currentSignature[0] = hash;
                                       return /* () */0;
@@ -440,7 +479,7 @@ function init(_evt) {
             iframe.setAttribute("frameborder", "0");
             iframe.setAttribute("allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture");
             iframe.setAttribute("height", String(window.innerHeight));
-            var url = "https://www.youtube-nocookie.com/embed/" + (String(ytId) + "?cc_load_policy=1");
+            var url = "https://www.youtube-nocookie.com/embed/" + (String(ytId) + "?cc_load_policy=1&autoplay=1");
             iframe.setAttribute("src", url);
             iframeContainer.appendChild(iframe);
             return /* () */0;
@@ -569,6 +608,9 @@ export {
   copySnapshotToIcon ,
   hasBody ,
   withRootSvg ,
+  setOnClick ,
+  simulateClick ,
+  activeObjectURLs ,
   setCode ,
   setText ,
   onHashChange ,
