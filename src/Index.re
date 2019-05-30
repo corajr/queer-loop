@@ -377,7 +377,13 @@ let onHashChange = _evt => {
 
   let (timestamp, localeString) = getTimestampAndLocaleString();
   withQuerySelectorDom("title", title =>
-    ElementRe.setInnerText(title, localeString)
+    ElementRe.setInnerText(
+      title,
+      switch (currentOptions^.title) {
+      | Some(titleStr) => titleStr
+      | None => localeString
+      },
+    )
   );
 
   withQuerySelectorDom("time", time => {

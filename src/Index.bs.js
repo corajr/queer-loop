@@ -276,7 +276,8 @@ function onHashChange(_evt) {
   var localeString = match[1];
   var timestamp = match[0];
   Util$QueerLoop.withQuerySelectorDom("title", (function (title) {
-          title.innerText = localeString;
+          var match = Options$QueerLoop.currentOptions[0][/* title */7];
+          title.innerText = match !== undefined ? match : localeString;
           return /* () */0;
         }));
   Util$QueerLoop.withQuerySelectorDom("time", (function (time) {
