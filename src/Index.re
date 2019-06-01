@@ -9,25 +9,7 @@ open Webapi.Dom;
 
 let domain = "qqq.lu";
 
-let setBackground = (selector, bgCss) =>
-  withQuerySelector(
-    selector,
-    el => {
-      DomRe.CssStyleDeclaration.setProperty(
-        "background",
-        bgCss,
-        "",
-        HtmlElementRe.style(el),
-      );
-      Js.log(bgCss);
-    },
-  );
-
-let codeRegex = Js.Re.fromString("https:\/\/" ++ domain ++ "\/#(.+)");
-
 let defaultCode = QrCode._encodeText("https://" ++ domain, Ecc.low);
-
-let defaultHash = "fff";
 
 let initialHash: ref(string) = ref("");
 
@@ -222,7 +204,30 @@ let setOnClick: (Dom.element, Dom.event => unit) => unit = [%bs.raw
 
 let simulateClick: Dom.element => unit = [%bs.raw el => {|el.click();|}];
 
-let activeObjectURLs: array((string, string)) = [||];
+let save = timestamp =>
+  withRootSvg("", rootSvg => {
+    let downloadLink = DocumentRe.createElementNS(htmlNs, "a", document);
+    ElementRe.setAttribute("download", timestamp ++ ".svg", downloadLink);
+
+    withQuerySelectorDom("#htmlContainer", htmlContainer => {
+      let blobObjectUrl = QueerCode.svgToBlobObjectURL(rootSvg);
+      ElementRe.setAttribute("href", blobObjectUrl, downloadLink);
+
+      ElementRe.appendChild(downloadLink, htmlContainer);
+      simulateClick(downloadLink);
+
+      Js_global.setTimeout(
+        _ => {
+          Js.log({j|Freeing memory from $timestamp.|j});
+          UrlRe.revokeObjectURL(blobObjectUrl);
+          ElementRe.removeChild(downloadLink, htmlContainer);
+          ();
+        },
+        0,
+      );
+    });
+    ();
+  });
 
 let setCode = text =>
   Hash.hexDigest("SHA-1", text)
@@ -353,42 +358,7 @@ let setCode = text =>
                      );
 
                      withQuerySelectorDom("#download", a => {
-                       ElementRe.setAttribute(
-                         "download",
-                         timestamp ++ ".svg",
-                         a,
-                       );
-
-                       let downloadOnClickHandler = evt =>
-                         if (EventRe.isTrusted(evt)) {
-                           EventRe.preventDefault(evt);
-
-                           let blobObjectUrl =
-                             QueerCode.svgToBlobObjectURL(rootSvg);
-                           ElementRe.setAttribute("href", blobObjectUrl, a);
-                           Js.Array.push(
-                             (timestamp, blobObjectUrl),
-                             activeObjectURLs,
-                           );
-                           simulateClick(a);
-                         } else {
-                           Js_global.setTimeout(
-                             _ =>
-                               while (Array.length(activeObjectURLs) > 0) {
-                                 switch (Js.Array.pop(activeObjectURLs)) {
-                                 | Some((timestamp, objectURL)) =>
-                                   Js.log(
-                                     {j|Freeing memory from $timestamp.|j},
-                                   );
-                                   UrlRe.revokeObjectURL(objectURL);
-                                 | None => ()
-                                 };
-                               },
-                             1000,
-                           )
-                           |> ignore;
-                         };
-
+                       let downloadOnClickHandler = evt => save(timestamp);
                        setOnClick(a, downloadOnClickHandler);
                      });
 
@@ -521,6 +491,7 @@ let cycleThroughPast = _ => {
 };
 
 let init = _evt => {
+  HtmlShell.setup();
   withQuerySelectorDom("#snapshotCanvas", canvas => {
     setWidth(canvas, 480);
     setHeight(canvas, 480);

@@ -6,6 +6,8 @@ import * as ElementRe from "../node_modules/bs-webapi/src/dom/nodes/ElementRe.js
 import * as Belt_Option from "../node_modules/bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "../node_modules/bs-platform/lib/es6/caml_option.js";
 
+var htmlNs = "http://www.w3.org/1999/xhtml";
+
 function withQuerySelectorDom(query, f) {
   return Belt_Option.map(Caml_option.nullable_to_opt(document.querySelector(query)), f);
 }
@@ -71,6 +73,12 @@ function removeFromParent(element) {
   }
 }
 
+function createElementWithId(tagName, id) {
+  var element = document.createElementNS(htmlNs, tagName);
+  element.id = id;
+  return element;
+}
+
 function getHash(param) {
   return window.location.hash;
 }
@@ -89,7 +97,16 @@ function setQueryString(search) {
   return /* () */0;
 }
 
-var htmlNs = "http://www.w3.org/1999/xhtml";
+function setBackground(selector, bgCss) {
+  return withQuerySelector(selector, (function (el) {
+                el.style.setProperty("background", bgCss, "");
+                console.log(bgCss);
+                return /* () */0;
+              }));
+}
+
+function setSrc (img,src){
+     img.src = src;};
 
 var svgNs = "http://www.w3.org/2000/svg";
 
@@ -106,10 +123,13 @@ export {
   withQuerySelectorSub ,
   removeFromParentNode ,
   removeFromParent ,
+  createElementWithId ,
   getHash ,
   setHash ,
   getQueryString ,
   setQueryString ,
+  setBackground ,
+  setSrc ,
   
 }
 /* ElementRe Not a pure module */

@@ -61,6 +61,12 @@ let removeFromParent = element =>
   | None => ()
   };
 
+let createElementWithId = (tagName: string, id: string) : Dom.element => {
+  let element = DocumentRe.createElementNS(htmlNs, tagName, document);
+  ElementRe.setId(element, id);
+  element;
+};
+
 [@bs.val]
 external encodeURIComponent : string => string = "encodeURIComponent";
 
@@ -76,3 +82,20 @@ let getQueryString = _ => DomRe.Location.search(WindowRe.location(window));
 
 let setQueryString = search =>
   DomRe.Location.setSearch(WindowRe.location(window), search);
+
+let setBackground = (selector, bgCss) =>
+  withQuerySelector(
+    selector,
+    el => {
+      DomRe.CssStyleDeclaration.setProperty(
+        "background",
+        bgCss,
+        "",
+        HtmlElementRe.style(el),
+      );
+      Js.log(bgCss);
+    },
+  );
+
+let setSrc = [%bs.raw (img, src) => {|
+     img.src = src;|}];

@@ -15,22 +15,13 @@ import * as Util$QueerLoop from "./Util.bs.js";
 import * as Options$QueerLoop from "./Options.bs.js";
 import * as Scanner$QueerLoop from "./Scanner.bs.js";
 import * as Caml_js_exceptions from "../node_modules/bs-platform/lib/es6/caml_js_exceptions.js";
+import * as HtmlShell$QueerLoop from "./HtmlShell.bs.js";
 import * as QrCodeGen$QueerLoop from "./QrCodeGen.bs.js";
 import * as QueerCode$QueerLoop from "./QueerCode.bs.js";
 import * as SvgScript$QueerLoop from "./SvgScript.bs.js";
 import * as UserMedia$QueerLoop from "./UserMedia.bs.js";
 
 var domain = "qqq.lu";
-
-function setBackground(selector, bgCss) {
-  return Util$QueerLoop.withQuerySelector(selector, (function (el) {
-                el.style.setProperty("background", bgCss, "");
-                console.log(bgCss);
-                return /* () */0;
-              }));
-}
-
-var codeRegex = new RegExp("https:\\/\\/qqq.lu\\/#(.+)");
 
 var defaultCode = QrCodeGen$QueerLoop.QrCode[/* _encodeText */0]("https://qqq.lu", QrCodeGen$QueerLoop.Ecc[/* low */0]);
 
@@ -186,7 +177,25 @@ function setOnClick (el,handler){el.onclick = handler;};
 
 function simulateClick (el){el.click();};
 
-var activeObjectURLs = /* array */[];
+function save(timestamp) {
+  return withRootSvg("", (function (rootSvg) {
+                var downloadLink = document.createElementNS(Util$QueerLoop.htmlNs, "a");
+                downloadLink.setAttribute("download", timestamp + ".svg");
+                Util$QueerLoop.withQuerySelectorDom("#htmlContainer", (function (htmlContainer) {
+                        var blobObjectUrl = QueerCode$QueerLoop.svgToBlobObjectURL(rootSvg);
+                        downloadLink.setAttribute("href", blobObjectUrl);
+                        htmlContainer.appendChild(downloadLink);
+                        simulateClick(downloadLink);
+                        return setTimeout((function (param) {
+                                      console.log("Freeing memory from " + (String(timestamp) + "."));
+                                      URL.revokeObjectURL(blobObjectUrl);
+                                      htmlContainer.removeChild(downloadLink);
+                                      return /* () */0;
+                                    }), 0);
+                      }));
+                return /* () */0;
+              }));
+}
 
 function setCode(text) {
   Hash$QueerLoop.hexDigest("SHA-1", text).then((function (hash) {
@@ -256,31 +265,8 @@ function setCode(text) {
                                               }
                                             }));
                                       Util$QueerLoop.withQuerySelectorDom("#download", (function (a) {
-                                              a.setAttribute("download", timestamp + ".svg");
                                               var downloadOnClickHandler = function (evt) {
-                                                if (evt.isTrusted) {
-                                                  evt.preventDefault();
-                                                  var blobObjectUrl = QueerCode$QueerLoop.svgToBlobObjectURL(rootSvg);
-                                                  a.setAttribute("href", blobObjectUrl);
-                                                  activeObjectURLs.push(/* tuple */[
-                                                        timestamp,
-                                                        blobObjectUrl
-                                                      ]);
-                                                  return simulateClick(a);
-                                                } else {
-                                                  setTimeout((function (param) {
-                                                          while(activeObjectURLs.length !== 0) {
-                                                            var match = activeObjectURLs.pop();
-                                                            if (match !== undefined) {
-                                                              console.log("Freeing memory from " + (String(match[0]) + "."));
-                                                              URL.revokeObjectURL(match[1]);
-                                                            }
-                                                            
-                                                          };
-                                                          return /* () */0;
-                                                        }), 1000);
-                                                  return /* () */0;
-                                                }
+                                                return save(timestamp);
                                               };
                                               return setOnClick(a, downloadOnClickHandler);
                                             }));
@@ -426,6 +412,7 @@ function cycleThroughPast(param) {
 }
 
 function init(_evt) {
+  HtmlShell$QueerLoop.setup(/* () */0);
   Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
           canvas.width = 480;
           canvas.height = 480;
@@ -455,7 +442,7 @@ function init(_evt) {
     ];
   }
   if (Options$QueerLoop.currentOptions[0][/* background */0] !== "") {
-    setBackground(".background", Options$QueerLoop.currentOptions[0][/* background */0]);
+    Util$QueerLoop.setBackground(".background", Options$QueerLoop.currentOptions[0][/* background */0]);
   }
   var match$1 = Options$QueerLoop.currentOptions[0][/* url */8];
   if (match$1 !== undefined) {
@@ -580,14 +567,9 @@ if (!window.queerLoop) {
   window.addEventListener("hashchange", onHashChange);
 }
 
-var defaultHash = "fff";
-
 export {
   domain ,
-  setBackground ,
-  codeRegex ,
   defaultCode ,
-  defaultHash ,
   initialHash ,
   camerasRef ,
   setSrc ,
@@ -610,7 +592,7 @@ export {
   withRootSvg ,
   setOnClick ,
   simulateClick ,
-  activeObjectURLs ,
+  save ,
   setCode ,
   setText ,
   onHashChange ,
@@ -628,4 +610,4 @@ export {
   activateQueerLoop ,
   
 }
-/* codeRegex Not a pure module */
+/* defaultCode Not a pure module */
