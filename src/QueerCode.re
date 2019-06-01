@@ -3,6 +3,7 @@ open QrCodeGen;
 open Webapi.Dom;
 
 let lightRainbowLightness = 0.95;
+let darkRainbowLightness = 0.1;
 
 let getPathString: (QrCode.t, int) => string =
   (code, border) => {
@@ -90,6 +91,17 @@ let styleText = {|
      animation: fadeIn 2s infinite alternate;
    }
 
+   .background {
+      opacity: 0.5;
+   }
+
+   .text {
+      color: white;
+      mix-blend-mode: difference;
+      font-size: 1.5px;
+      text-align: center;
+   }
+
    svg|svg.previous g.codeGroup, svg|svg.active g.codeGroup {
        opacity: 0.1;
    }
@@ -125,6 +137,7 @@ let addBackground =
     background,
   );
   ElementRe.setAttribute("href", dataURL, background);
+  ElementRe.setAttribute("class", "background", background);
   ElementRe.querySelector(".codeGroup", codeSvg)
   |. Belt.Option.map(codeGroup =>
        ElementRe.insertBefore(background, codeGroup, codeSvg)
@@ -167,6 +180,33 @@ let createTimeLink =
   timeLink;
 };
 
+let createTextBox =
+    (~text: string, ~border: int, ~sizeWithBorder: int)
+    : Dom.element => {
+  let htmlContainer =
+    DocumentRe.createElementNS(svgNs, "foreignObject", document);
+  ElementRe.setAttribute("x", "0", htmlContainer);
+  ElementRe.setAttribute(
+    "y",
+    string_of_int(sizeWithBorder - border + 1),
+    htmlContainer,
+  );
+  ElementRe.setAttribute(
+    "width",
+    string_of_int(sizeWithBorder),
+    htmlContainer,
+  );
+  ElementRe.setAttribute("height", string_of_int(border), htmlContainer);
+
+  let textDiv = DocumentRe.createElementNS(htmlNs, "div", document);
+  ElementRe.setTextContent(textDiv, text);
+  let classes = ElementRe.classList(textDiv);
+  DomTokenListRe.add("text", classes);
+  ElementRe.appendChild(textDiv, htmlContainer);
+
+  htmlContainer;
+};
+
 let createCodeSvg =
     (
       ~href: string,
@@ -176,6 +216,8 @@ let createCodeSvg =
       ~timestamp: string,
       ~border: int,
       ~invert: bool,
+      ~pathFill: option(string)=?,
+      unit,
     )
     : Dom.element => {
   let size = QrCode.size(code);
@@ -211,11 +253,16 @@ let createCodeSvg =
   let path = createQrCodePathElement(code, border);
   ElementRe.appendChild(path, codeGroup);
 
-  if (invert) {
-    ElementRe.setAttribute("fill", "url(#lightRainbow)", path);
-  } else {
-    ElementRe.setAttribute("fill", "url(#darkRainbow)", path);
+  switch (pathFill) {
+  | Some(fill) => ElementRe.setAttribute("fill", fill, path)
+  | None =>
+    if (invert) {
+      ElementRe.setAttribute("fill", "url(#lightRainbow)", path);
+    } else {
+      ElementRe.setAttribute("fill", "url(#darkRainbow)", path);
+    }
   };
+
   ElementRe.setAttribute("class", "codeGroup", codeGroup);
 
   ElementRe.appendChild(codeGroup, codeSvg);
@@ -231,6 +278,9 @@ let createCodeSvg =
     ),
     metadataGroup,
   );
+
+  let codeText = createTextBox(~text=href, ~border, ~sizeWithBorder);
+  ElementRe.appendChild(codeText, metadataGroup);
   ElementRe.appendChild(metadataGroup, codeSvg);
 
   codeSvg;
@@ -244,7 +294,8 @@ let createSvgSkeleton = hash => {
   let defs = DocumentRe.createElementNS(svgNs, "defs", document);
   let lightRainbowGradient =
     createRainbowGradient(lightRainbowLightness, "lightRainbow");
-  let darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");
+  let darkRainbowGradient =
+    createRainbowGradient(darkRainbowLightness, "darkRainbow");
   ElementRe.appendChild(lightRainbowGradient, defs);
   ElementRe.appendChild(darkRainbowGradient, defs);
   ElementRe.appendChild(defs, svg);
@@ -294,7 +345,8 @@ let createIconSvg =
   let defs = DocumentRe.createElementNS(svgNs, "defs", document);
   let lightRainbowGradient =
     createRainbowGradient(lightRainbowLightness, "lightRainbow");
-  let darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");
+  let darkRainbowGradient =
+    createRainbowGradient(darkRainbowLightness, "darkRainbow");
   ElementRe.appendChild(lightRainbowGradient, defs);
   ElementRe.appendChild(darkRainbowGradient, defs);
   ElementRe.appendChild(defs, svg);

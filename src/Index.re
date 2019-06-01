@@ -96,7 +96,7 @@ let onClick = (maybeHash, _) => {
   };
 };
 
-let _writeLogEntry = ((timestamp, localeString, text, hash)) =>
+let _writeLogEntry = ((isoformat, localeString, text, hash)) =>
   withQuerySelectorDom("#log", log => {
     let entry = DocumentRe.createElement("a", document);
     ElementRe.setAttribute("href", "#" ++ hash, entry);
@@ -117,8 +117,8 @@ let _writeLogEntry = ((timestamp, localeString, text, hash)) =>
 
     let timeDiv = DocumentRe.createElement("div", document);
     let time = DocumentRe.createElement("time", document);
-    ElementRe.setAttribute("datetime", timestamp, time);
-    ElementRe.setTextContent(time, timestamp);
+    ElementRe.setAttribute("datetime", isoformat, time);
+    ElementRe.setTextContent(time, localeString);
 
     let textChild = DocumentRe.createElement("span", document);
     ElementRe.setInnerText(textChild, text);
@@ -275,6 +275,7 @@ let setCode = (text, date) =>
                  ~localeString,
                  ~timestamp=isoformat,
                  ~invert=currentOptions^.invert,
+                 (),
                );
 
              let codeImg = QueerCode.svgToImg(codeSvg);
@@ -285,11 +286,14 @@ let setCode = (text, date) =>
                  withQuerySelectorDom("#centralGroup", centralGroup =>
                    switch (takeSnapshot()) {
                    | Some(snapshotUrl) =>
-                     QueerCode.addBackground(
-                       ~codeSvg,
-                       ~dataURL=snapshotUrl,
-                       ~sizeWithBorder,
-                     );
+                     if (hasChanged^) {
+                       QueerCode.addBackground(
+                         ~codeSvg,
+                         ~dataURL=snapshotUrl,
+                         ~sizeWithBorder,
+                       )
+                       |> ignore;
+                     };
 
                      ElementRe.appendChild(codeSvg, centralGroup);
 
@@ -660,7 +664,10 @@ let init = _evt => {
     if (input !== "") {
       maybeCachedHexDigest(input)
       |> Js.Promise.then_(hexHash => {
-           let (timestamp, localeString) = getTimestampAndLocaleString();
+           let date = Js.Date.make();
+           let isoformat = Js.Date.toISOString(date);
+           let localeString = Js.Date.toLocaleString(date);
+
            if (! hasChanged^) {
              hasChanged := true;
            };
@@ -673,7 +680,7 @@ let init = _evt => {
              Js.Dict.set(dataSeen, hexHash, input);
 
              writeLogEntry((
-               timestamp,
+               isoformat,
                localeString,
                isSelf ? "queer-loop" : input,
                hexHash,

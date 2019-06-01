@@ -91,7 +91,8 @@ function onClick(maybeHash, param) {
 function _writeLogEntry(param) {
   var hash = param[3];
   var text = param[2];
-  var timestamp = param[0];
+  var localeString = param[1];
+  var isoformat = param[0];
   Util$QueerLoop.withQuerySelectorDom("#log", (function (log) {
           var entry = document.createElement("a");
           entry.setAttribute("href", "#" + hash);
@@ -103,8 +104,8 @@ function _writeLogEntry(param) {
                 }));
           var timeDiv = document.createElement("div");
           var time = document.createElement("time");
-          time.setAttribute("datetime", timestamp);
-          time.textContent = timestamp;
+          time.setAttribute("datetime", isoformat);
+          time.textContent = localeString;
           var textChild = document.createElement("span");
           textChild.innerText = text;
           var hashColor = hash.slice(0, 6);
@@ -222,13 +223,15 @@ function setCode(text, date) {
                     var sizeWithBorder = code.size + 12 | 0;
                     var isoformat = date.toISOString();
                     var localeString = date.toLocaleString();
-                    var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, localeString, isoformat, 6, Options$QueerLoop.currentOptions[0][/* invert */4]);
+                    var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, localeString, isoformat, 6, Options$QueerLoop.currentOptions[0][/* invert */4], undefined, /* () */0);
                     var codeImg = QueerCode$QueerLoop.svgToImg(codeSvg);
                     codeImg.addEventListener("load", (function (param) {
                             Util$QueerLoop.withQuerySelectorDom("#centralGroup", (function (centralGroup) {
                                     var match = takeSnapshot(/* () */0);
                                     if (match !== undefined) {
-                                      QueerCode$QueerLoop.addBackground(codeSvg, sizeWithBorder, match);
+                                      if (hasChanged[0]) {
+                                        QueerCode$QueerLoop.addBackground(codeSvg, sizeWithBorder, match);
+                                      }
                                       centralGroup.appendChild(codeSvg);
                                       if (Options$QueerLoop.currentOptions[0][/* animate */5]) {
                                         rootSvg.setAttribute("class", "root animationsEnabled");
@@ -499,7 +502,9 @@ function init(_evt) {
     var input = inputCode.data;
     if (input !== "") {
       maybeCachedHexDigest(input).then((function (hexHash) {
-              var match = Time$QueerLoop.getTimestampAndLocaleString(/* () */0);
+              var date = new Date();
+              var isoformat = date.toISOString();
+              var localeString = date.toLocaleString();
               if (!hasChanged[0]) {
                 hasChanged[0] = true;
               }
@@ -508,8 +513,8 @@ function init(_evt) {
               if (isSelf || !alreadySeen) {
                 dataSeen[hexHash] = input;
                 Curry._1(writeLogEntry, /* tuple */[
-                      match[0],
-                      match[1],
+                      isoformat,
+                      localeString,
                       isSelf ? "queer-loop" : input,
                       hexHash
                     ]);

@@ -18,7 +18,7 @@ let defaultOptions = {
   includeQueryString: true,
   includeHash: true,
   invert: false,
-  animate: true,
+  animate: false,
   opacity: 0.1,
   title: None,
   url: None,

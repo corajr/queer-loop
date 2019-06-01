@@ -41,7 +41,7 @@ function createRainbowGradient(lightness, id) {
   return gradient;
 }
 
-var styleText = "\n   @namespace svg \"http://www.w3.org/2000/svg\";\n\n   @keyframes fadeIn {\n   from { opacity: 0.0; }\n   }\n\n   svg|svg svg|svg {\n     display: none;\n   }\n\n   svg|svg.animate, svg|svg.previous, svg|svg.active {\n      display: block;\n   }\n\n   svg|svg.animate.temporarilyInactive {\n      display: none;\n   }\n\n   svg|svg.animationsEnabled svg|svg.animate {\n     animation: fadeIn 2s infinite alternate;\n   }\n\n   svg|svg.previous g.codeGroup, svg|svg.active g.codeGroup {\n       opacity: 0.1;\n   }\n   svg|svg.active {\n       mix-blend-mode: screen;\n   }\n";
+var styleText = "\n   @namespace svg \"http://www.w3.org/2000/svg\";\n\n   @keyframes fadeIn {\n   from { opacity: 0.0; }\n   }\n\n   svg|svg svg|svg {\n     display: none;\n   }\n\n   svg|svg.animate, svg|svg.previous, svg|svg.active {\n      display: block;\n   }\n\n   svg|svg.animate.temporarilyInactive {\n      display: none;\n   }\n\n   svg|svg.animationsEnabled svg|svg.animate {\n     animation: fadeIn 2s infinite alternate;\n   }\n\n   .background {\n      opacity: 0.5;\n   }\n\n   .text {\n      color: white;\n      mix-blend-mode: difference;\n      font-size: 1.5px;\n      text-align: center;\n   }\n\n   svg|svg.previous g.codeGroup, svg|svg.active g.codeGroup {\n       opacity: 0.1;\n   }\n   svg|svg.active {\n       mix-blend-mode: screen;\n   }\n";
 
 function createScript(string) {
   var script = document.createElementNS(svgNs, "script");
@@ -63,6 +63,7 @@ function addBackground(codeSvg, sizeWithBorder, dataURL) {
   background.setAttribute("width", String(sizeWithBorder));
   background.setAttribute("height", String(sizeWithBorder));
   background.setAttribute("href", dataURL);
+  background.setAttribute("class", "background");
   return Belt_Option.map(Caml_option.nullable_to_opt(codeSvg.querySelector(".codeGroup")), (function (codeGroup) {
                 return codeSvg.insertBefore(background, codeGroup);
               }));
@@ -86,7 +87,21 @@ function createTimeLink(href, timestamp, localeString, sizeWithBorder, border) {
   return timeLink;
 }
 
-function createCodeSvg(href, code, hash, localeString, timestamp, border, invert) {
+function createTextBox(text, border, sizeWithBorder) {
+  var htmlContainer = document.createElementNS(svgNs, "foreignObject");
+  htmlContainer.setAttribute("x", "0");
+  htmlContainer.setAttribute("y", String((sizeWithBorder - border | 0) + 1 | 0));
+  htmlContainer.setAttribute("width", String(sizeWithBorder));
+  htmlContainer.setAttribute("height", String(border));
+  var textDiv = document.createElementNS(Util$QueerLoop.htmlNs, "div");
+  textDiv.textContent = text;
+  var classes = textDiv.classList;
+  classes.add("text");
+  htmlContainer.appendChild(textDiv);
+  return htmlContainer;
+}
+
+function createCodeSvg(href, code, hash, localeString, timestamp, border, invert, pathFill, unit) {
   var size = code.size;
   var sizeWithBorder = size + (border << 1) | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
@@ -107,7 +122,9 @@ function createCodeSvg(href, code, hash, localeString, timestamp, border, invert
   codeGroup.appendChild(rect);
   var path = createQrCodePathElement(code, border);
   codeGroup.appendChild(path);
-  if (invert) {
+  if (pathFill !== undefined) {
+    path.setAttribute("fill", pathFill);
+  } else if (invert) {
     path.setAttribute("fill", "url(#lightRainbow)");
   } else {
     path.setAttribute("fill", "url(#darkRainbow)");
@@ -116,6 +133,8 @@ function createCodeSvg(href, code, hash, localeString, timestamp, border, invert
   codeSvg.appendChild(codeGroup);
   var metadataGroup = document.createElementNS(svgNs, "g");
   metadataGroup.appendChild(createTimeLink(href, timestamp, localeString, sizeWithBorder, border));
+  var codeText = createTextBox(href, border, sizeWithBorder);
+  metadataGroup.appendChild(codeText);
   codeSvg.appendChild(metadataGroup);
   return codeSvg;
 }
@@ -271,8 +290,11 @@ function drawCanvas(canvas, code) {
 
 var lightRainbowLightness = 0.95;
 
+var darkRainbowLightness = 0.1;
+
 export {
   lightRainbowLightness ,
+  darkRainbowLightness ,
   getPathString ,
   svgNs ,
   createQrCodePathElement ,
@@ -282,6 +304,7 @@ export {
   createStyle ,
   addBackground ,
   createTimeLink ,
+  createTextBox ,
   createCodeSvg ,
   createSvgSkeleton ,
   createIconSvg ,
