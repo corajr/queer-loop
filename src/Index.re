@@ -229,8 +229,21 @@ let save = timestamp =>
     ();
   });
 
+let hashCache: Js.Dict.t(string) = Js.Dict.empty();
+
+let maybeCachedHexDigest = text =>
+  switch (Js.Dict.get(hashCache, text)) {
+  | Some(cachedHash) => Js.Promise.resolve(cachedHash)
+  | None =>
+    Hash.hexDigest("SHA-1", text)
+    |> Js.Promise.then_(hash => {
+         Js.Dict.set(hashCache, text, hash);
+         Js.Promise.resolve(hash);
+       })
+  };
+
 let setCode = text =>
-  Hash.hexDigest("SHA-1", text)
+  maybeCachedHexDigest(text)
   |> Js.Promise.then_(hash => {
        withRootSvg(
          hash,
@@ -640,7 +653,7 @@ let init = _evt => {
   let response = (srcCanvas, inputCode) => {
     let input = JsQr.textDataGet(inputCode);
     if (input !== "") {
-      Hash.hexDigest("SHA-1", input)
+      maybeCachedHexDigest(input)
       |> Js.Promise.then_(hexHash => {
            let (timestamp, localeString) = getTimestampAndLocaleString();
            if (! hasChanged^) {

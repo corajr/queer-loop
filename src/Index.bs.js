@@ -197,8 +197,22 @@ function save(timestamp) {
               }));
 }
 
+var hashCache = { };
+
+function maybeCachedHexDigest(text) {
+  var match = Js_dict.get(hashCache, text);
+  if (match !== undefined) {
+    return Promise.resolve(match);
+  } else {
+    return Hash$QueerLoop.hexDigest("SHA-1", text).then((function (hash) {
+                  hashCache[text] = hash;
+                  return Promise.resolve(hash);
+                }));
+  }
+}
+
 function setCode(text) {
-  Hash$QueerLoop.hexDigest("SHA-1", text).then((function (hash) {
+  maybeCachedHexDigest(text).then((function (hash) {
           withRootSvg(hash, (function (rootSvg) {
                   var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hash));
                   if (alreadySeen) {
@@ -494,7 +508,7 @@ function init(_evt) {
   var response = function (srcCanvas, inputCode) {
     var input = inputCode.data;
     if (input !== "") {
-      Hash$QueerLoop.hexDigest("SHA-1", input).then((function (hexHash) {
+      maybeCachedHexDigest(input).then((function (hexHash) {
               var match = getTimestampAndLocaleString(/* () */0);
               if (!hasChanged[0]) {
                 hasChanged[0] = true;
@@ -593,6 +607,8 @@ export {
   setOnClick ,
   simulateClick ,
   save ,
+  hashCache ,
+  maybeCachedHexDigest ,
   setCode ,
   setText ,
   onHashChange ,
