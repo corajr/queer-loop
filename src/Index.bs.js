@@ -11,6 +11,7 @@ import * as Caml_format from "../node_modules/bs-platform/lib/es6/caml_format.js
 import * as Caml_option from "../node_modules/bs-platform/lib/es6/caml_option.js";
 import * as Hash$QueerLoop from "./Hash.bs.js";
 import * as JsQr$QueerLoop from "./JsQr.bs.js";
+import * as Time$QueerLoop from "./Time.bs.js";
 import * as Util$QueerLoop from "./Util.bs.js";
 import * as Options$QueerLoop from "./Options.bs.js";
 import * as Scanner$QueerLoop from "./Scanner.bs.js";
@@ -38,24 +39,12 @@ var currentSignature = /* record */[/* contents */""];
 
 var canvasesRef = /* record */[/* contents : array */[]];
 
-function getTimestamp(param) {
-  return new Date().toISOString();
-}
-
-function getTimestampAndLocaleString(param) {
-  var date = new Date();
-  return /* tuple */[
-          date.toISOString(),
-          date.toLocaleString()
-        ];
-}
-
 function asOfNow(f) {
   return Curry._1(f, new Date());
 }
 
 function setHashToNow(param) {
-  return Util$QueerLoop.setHash(new Date().toISOString());
+  return Util$QueerLoop.setHash(Time$QueerLoop.getTimestamp(/* () */0));
 }
 
 var hasChanged = /* record */[/* contents */false];
@@ -95,7 +84,7 @@ function onClick(maybeHash, param) {
     }
     return /* () */0;
   } else {
-    return Util$QueerLoop.setHash(new Date().toISOString());
+    return Util$QueerLoop.setHash(Time$QueerLoop.getTimestamp(/* () */0));
   }
 }
 
@@ -211,7 +200,7 @@ function maybeCachedHexDigest(text) {
   }
 }
 
-function setCode(text) {
+function setCode(text, date) {
   maybeCachedHexDigest(text).then((function (hash) {
           withRootSvg(hash, (function (rootSvg) {
                   var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hash));
@@ -231,9 +220,9 @@ function setCode(text) {
                     dataSeen[hash] = text;
                     var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
                     var sizeWithBorder = code.size + 12 | 0;
-                    var match = getTimestampAndLocaleString(/* () */0);
-                    var timestamp = match[0];
-                    var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, match[1], timestamp, 6, Options$QueerLoop.currentOptions[0][/* invert */4]);
+                    var isoformat = date.toISOString();
+                    var localeString = date.toLocaleString();
+                    var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, localeString, isoformat, 6, Options$QueerLoop.currentOptions[0][/* invert */4]);
                     var codeImg = QueerCode$QueerLoop.svgToImg(codeSvg);
                     codeImg.addEventListener("load", (function (param) {
                             Util$QueerLoop.withQuerySelectorDom("#centralGroup", (function (centralGroup) {
@@ -280,7 +269,7 @@ function setCode(text) {
                                             }));
                                       Util$QueerLoop.withQuerySelectorDom("#download", (function (a) {
                                               var downloadOnClickHandler = function (evt) {
-                                                return save(timestamp);
+                                                return save(isoformat);
                                               };
                                               return setOnClick(a, downloadOnClickHandler);
                                             }));
@@ -311,16 +300,17 @@ var setText = Debouncer.make(200, (function (hash) {
 function onHashChange(_evt) {
   var opts = Options$QueerLoop.currentOptions[0];
   var url = new URL(window.location.href);
-  var match = getTimestampAndLocaleString(/* () */0);
-  var localeString = match[1];
-  var timestamp = match[0];
+  var match = Time$QueerLoop.maybeDeserializeTime(url.hash.slice(1));
+  var date = match !== undefined ? Caml_option.valFromOption(match) : new Date();
+  var isoformat = date.toISOString();
+  var localeString = date.toLocaleString();
   Util$QueerLoop.withQuerySelectorDom("title", (function (title) {
           var match = Options$QueerLoop.currentOptions[0][/* title */7];
           title.innerText = match !== undefined ? match : localeString;
           return /* () */0;
         }));
   Util$QueerLoop.withQuerySelectorDom("time", (function (time) {
-          time.setAttribute("datetime", timestamp);
+          time.setAttribute("datetime", isoformat);
           time.innerText = localeString;
           return /* () */0;
         }));
@@ -334,7 +324,7 @@ function onHashChange(_evt) {
     ) + (
       match$3 ? url.hash : ""
     ));
-  setCode(urlText);
+  setCode(urlText, date);
   return Curry._1(setText, urlText);
 }
 
@@ -488,7 +478,7 @@ function init(_evt) {
   }
   initialHash[0] = Util$QueerLoop.getHash(/* () */0).slice(1);
   if (initialHash[0] === "") {
-    initialHash[0] = new Date().toISOString();
+    initialHash[0] = Time$QueerLoop.getTimestamp(/* () */0);
     Util$QueerLoop.setHash(initialHash[0]);
   } else {
     onHashChange(/* () */0);
@@ -509,7 +499,7 @@ function init(_evt) {
     var input = inputCode.data;
     if (input !== "") {
       maybeCachedHexDigest(input).then((function (hexHash) {
-              var match = getTimestampAndLocaleString(/* () */0);
+              var match = Time$QueerLoop.getTimestampAndLocaleString(/* () */0);
               if (!hasChanged[0]) {
                 hasChanged[0] = true;
               }
@@ -536,7 +526,7 @@ function init(_evt) {
                         ctx.drawImage(srcCanvas, rect[/* x */0], rect[/* y */1], rect[/* w */2], rect[/* h */3], 0, 0, dw, dh);
                         return /* () */0;
                       }));
-                Util$QueerLoop.setHash(new Date().toISOString());
+                Util$QueerLoop.setHash(Time$QueerLoop.getTimestamp(/* () */0));
               }
               return Promise.resolve(/* () */0);
             }));
@@ -590,8 +580,6 @@ export {
   dataSeen ,
   currentSignature ,
   canvasesRef ,
-  getTimestamp ,
-  getTimestampAndLocaleString ,
   asOfNow ,
   setHashToNow ,
   hasChanged ,

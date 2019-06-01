@@ -4,6 +4,7 @@ open Hash;
 open QrCodeGen;
 open Options;
 open SvgScript;
+open Time;
 open Util;
 open Webapi.Dom;
 
@@ -23,13 +24,6 @@ let dataSeen: Js.Dict.t(string) = Js.Dict.empty();
 let currentSignature: ref(string) = ref("");
 
 let canvasesRef: ref(array(Dom.element)) = ref([||]);
-
-let getTimestamp = _ => Js.Date.toISOString(Js.Date.make());
-
-let getTimestampAndLocaleString = _ => {
-  let date = Js.Date.make();
-  (Js.Date.toISOString(date), Js.Date.toLocaleString(date));
-};
 
 let asOfNow = f => Js.Date.make() |> f;
 
@@ -242,7 +236,7 @@ let maybeCachedHexDigest = text =>
        })
   };
 
-let setCode = text =>
+let setCode = (text, date) =>
   maybeCachedHexDigest(text)
   |> Js.Promise.then_(hash => {
        withRootSvg(
@@ -269,7 +263,8 @@ let setCode = text =>
              let border = 6;
              let sizeWithBorder = QrCode.size(code) + border * 2;
 
-             let (timestamp, localeString) = getTimestampAndLocaleString();
+             let isoformat = Js.Date.toISOString(date);
+             let localeString = Js.Date.toLocaleString(date);
 
              let codeSvg =
                QueerCode.createCodeSvg(
@@ -278,7 +273,7 @@ let setCode = text =>
                  ~code,
                  ~border,
                  ~localeString,
-                 ~timestamp,
+                 ~timestamp=isoformat,
                  ~invert=currentOptions^.invert,
                );
 
@@ -371,7 +366,7 @@ let setCode = text =>
                      );
 
                      withQuerySelectorDom("#download", a => {
-                       let downloadOnClickHandler = evt => save(timestamp);
+                       let downloadOnClickHandler = evt => save(isoformat);
                        setOnClick(a, downloadOnClickHandler);
                      });
 
@@ -403,7 +398,17 @@ let onHashChange = _evt => {
 
   let url = UrlRe.make(DomRe.Location.href(WindowRe.location(window)));
 
-  let (timestamp, localeString) = getTimestampAndLocaleString();
+  let date =
+    switch (
+      maybeDeserializeTime(Js.String.sliceToEnd(~from=1, UrlRe.hash(url)))
+    ) {
+    | Some(date) => date
+    | None => Js.Date.make()
+    };
+
+  let isoformat = Js.Date.toISOString(date);
+  let localeString = Js.Date.toLocaleString(date);
+
   withQuerySelectorDom("title", title =>
     ElementRe.setInnerText(
       title,
@@ -415,7 +420,7 @@ let onHashChange = _evt => {
   );
 
   withQuerySelectorDom("time", time => {
-    ElementRe.setAttribute("datetime", timestamp, time);
+    ElementRe.setAttribute("datetime", isoformat, time);
     ElementRe.setInnerText(time, localeString);
   });
   let urlText =
@@ -423,7 +428,7 @@ let onHashChange = _evt => {
     ++ (opts.includeQueryString ? UrlRe.search(url) : "")
     ++ (opts.includeHash ? UrlRe.hash(url) : "");
 
-  setCode(urlText);
+  setCode(urlText, date);
   setText(urlText);
 };
 
