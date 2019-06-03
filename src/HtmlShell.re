@@ -3,7 +3,20 @@ open QueerCode;
 open Webapi.Dom;
 open Util;
 
-let styleText = {|
+let pitchClasses = {
+  let pcToStr = (i, v) => {
+    let iStr = string_of_int(i);
+    let vStr = Js.Float.toString(v);
+    {j|#pc$iStr {
+    background: hsl($(vStr)turn,100%,50%);
+}|j};
+  };
+  let pcs =
+    Array.mapi(pcToStr, Array.init(12, i => float_of_int(i) /. 12.0));
+  Js.Array.joinWith("\n", pcs);
+};
+let styleText =
+  {|
 h1 { display: none; }
 
 body { margin: 0; font-family: "courier new", monospace; }
@@ -32,21 +45,6 @@ video {
 
 #welcome {
   display: none;
-}
-
-#download {
-  position: fixed;
-  z-index: 100;
-  bottom: 0;
-  left: 50%;
-  transform: translate(-50%, 0%);
-  font-size: 12.5vmin;
-  text-decoration: none;
-  color: white;
-}
-
-#download:visited {
-  color: white;
 }
 
 #htmlContainer {
@@ -115,11 +113,11 @@ video {
   display: flex;
 }
 
-.codelink.active {
+.codeLink.active {
   position: relative;
 }
 
-.codelink.active:after {
+.codeLink.active:after {
   position: absolute;
   content: '';
   display: block;
@@ -129,16 +127,22 @@ video {
   bottom: 0;
   border: 6px solid rgba(255, 255, 255, 0.5);
 }
-#codetext {
-  display: none;
+
+#chromaBackdrop {
+   position: fixed;
+   width: 100vw;
+   display: flex;
+   pointer-events: none;
 }
 
-#codecontents {
-  color: white;
-  mix-blend-mode: difference;
+.pitchClass {
+   height: 100vh;
+   width: calc(100vw / 12);
+   opacity: 0.0;
+   transition: opacity 0.5s;
 }
-
-|};
+|}
+  ++ pitchClasses;
 
 let createStyle = () : Dom.element => {
   let style = DocumentRe.createElementNS(htmlNs, "style", document);
@@ -168,6 +172,11 @@ let createStructureOn = (htmlContainer: Dom.element) : unit => {
   let saveIcon = createIconFromText("save");
   ElementRe.appendChild(saveIcon, download);
   ElementRe.appendChild(download, toolbar);
+
+  let micIcon = createIconFromText("mic");
+  let mic = createElementWithId("div", "mic");
+  ElementRe.appendChild(micIcon, mic);
+  ElementRe.appendChild(mic, toolbar);
   ElementRe.appendChild(toolbar, focus);
 
   let log = createElementWithId("div", "log");
@@ -175,6 +184,16 @@ let createStructureOn = (htmlContainer: Dom.element) : unit => {
   ElementRe.appendChild(snapshotCanvas, htmlContainer);
   ElementRe.appendChild(iconCanvas, htmlContainer);
   ElementRe.appendChild(sources, htmlContainer);
+
+  let chromaBackdrop = createElementWithId("div", "chromaBackdrop");
+  for (i in 0 to 11) {
+    let pitchClassBackdrop =
+      createElementWithId("div", "pc" ++ string_of_int(i));
+    ElementRe.setClassName(pitchClassBackdrop, "pitchClass");
+    ElementRe.appendChild(pitchClassBackdrop, chromaBackdrop);
+  };
+  ElementRe.appendChild(chromaBackdrop, htmlContainer);
+
   ElementRe.appendChild(codes, htmlContainer);
   ElementRe.appendChild(focus, htmlContainer);
   ElementRe.appendChild(log, htmlContainer);

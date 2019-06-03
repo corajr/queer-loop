@@ -13,6 +13,7 @@ import * as Hash$QueerLoop from "./Hash.bs.js";
 import * as JsQr$QueerLoop from "./JsQr.bs.js";
 import * as Time$QueerLoop from "./Time.bs.js";
 import * as Util$QueerLoop from "./Util.bs.js";
+import * as Audio$QueerLoop from "./Audio.bs.js";
 import * as Options$QueerLoop from "./Options.bs.js";
 import * as Scanner$QueerLoop from "./Scanner.bs.js";
 import * as Caml_js_exceptions from "../node_modules/bs-platform/lib/es6/caml_js_exceptions.js";
@@ -418,8 +419,61 @@ function cycleThroughPast(param) {
     });
 }
 
+function featuresCallback(features) {
+  var rms = features.rms;
+  var rmsS = (0.5 + 0.5 * rms).toString();
+  Util$QueerLoop.withQuerySelectorDom("#chromaBackdrop", (function (chromaBackdrop) {
+          chromaBackdrop.setAttribute("style", "opacity: " + (String(rmsS) + ""));
+          return /* () */0;
+        }));
+  var chroma = features.chroma;
+  return $$Array.iteri((function (i, v) {
+                Util$QueerLoop.withQuerySelectorDom("#pc" + String((i + 5 | 0) % 12), (function (pc) {
+                        var vStr = v.toString();
+                        pc.setAttribute("style", "opacity: " + (String(vStr) + ""));
+                        return /* () */0;
+                      }));
+                return /* () */0;
+              }), chroma);
+}
+
+var audioEnabled = /* record */[/* contents */false];
+
+function enableAudio(param) {
+  if (audioEnabled[0]) {
+    return 0;
+  } else {
+    audioEnabled[0] = true;
+    var audioContext = new (window.AudioContext)();
+    Audio$QueerLoop.getAudioSource(audioContext).then((function (maybeSource) {
+            if (maybeSource !== undefined) {
+              var opts = {
+                audioContext: audioContext,
+                source: maybeSource,
+                bufferSize: 4096,
+                featureExtractors: /* array */[
+                  "rms",
+                  "chroma"
+                ],
+                callback: featuresCallback
+              };
+              var analyzer = Meyda.createMeydaAnalyzer(opts);
+              analyzer.start();
+            }
+            return Promise.resolve(/* () */0);
+          }));
+    return /* () */0;
+  }
+}
+
 function init(_evt) {
   HtmlShell$QueerLoop.setup(/* () */0);
+  Util$QueerLoop.withQuerySelectorDom("#mic", (function (mic) {
+          mic.addEventListener("click", (function (_evt) {
+                  return enableAudio(/* () */0);
+                }));
+          return /* () */0;
+        }));
   Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
           canvas.width = 480;
           canvas.height = 480;
@@ -615,6 +669,9 @@ export {
   boolParam ,
   pick ,
   cycleThroughPast ,
+  featuresCallback ,
+  audioEnabled ,
+  enableAudio ,
   init ,
   activateQueerLoop ,
   

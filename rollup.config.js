@@ -1,5 +1,6 @@
 import inliner from './rollup-plugin-inliner';
 import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
 import { terser } from 'rollup-plugin-terser';
 import serve from 'rollup-plugin-serve';
 
@@ -11,10 +12,14 @@ export default [{
         name: 'index',
         file: 'index.js',
         sourcemap: 'inline',
+        moduleName: 'index',
         format: 'iife'
     },
     plugins: [
-        resolve(),
+        resolve({
+            mainFields: ['jsnext:main', 'main']
+        }),
+        commonjs(),
         inliner({
             template: 'index.html.in',
             target: 'index.html',

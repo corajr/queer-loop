@@ -512,8 +512,68 @@ let cycleThroughPast = _ => {
   };
 };
 
+let featuresCallback:
+  {
+    .
+    "rms": float,
+    "chroma": array(float),
+  } =>
+  unit =
+  features => {
+    let rms = features##rms;
+    let rmsS = Js.Float.toString(0.5 +. 0.5 *. rms);
+    withQuerySelectorDom("#chromaBackdrop", chromaBackdrop =>
+      ElementRe.setAttribute("style", {j|opacity: $rmsS|j}, chromaBackdrop)
+    )
+    |> ignore;
+
+    let chroma = features##chroma;
+    Array.iteri(
+      (i, v) =>
+        withQuerySelectorDom(
+          "#pc" ++ string_of_int((i + 5) mod 12),
+          pc => {
+            let vStr = Js.Float.toString(v);
+            ElementRe.setAttribute("style", {j|opacity: $vStr|j}, pc);
+          },
+        )
+        |> ignore,
+      chroma,
+    );
+  };
+
+let audioEnabled = ref(false);
+
+let enableAudio = _ =>
+  if (! audioEnabled^) {
+    audioEnabled := true;
+    let audioContext = Audio.make();
+    Audio.getAudioSource(audioContext)
+    |> Js.Promise.then_(maybeSource => {
+         switch (maybeSource) {
+         | Some(source) =>
+           let opts =
+             Meyda.analyzerOpts(
+               ~audioContext,
+               ~source,
+               ~bufferSize=4096,
+               ~featureExtractors=[|"rms", "chroma"|],
+               ~callback=featuresCallback,
+             );
+           let analyzer = Meyda.createMeydaAnalyzer(opts);
+           Meyda.start(analyzer);
+         | None => ()
+         };
+         Js.Promise.resolve();
+       });
+    ();
+  };
+
 let init = _evt => {
   HtmlShell.setup();
+  withQuerySelectorDom("#mic", mic =>
+    ElementRe.addEventListener("click", _evt => enableAudio(), mic)
+  );
   withQuerySelectorDom("#snapshotCanvas", canvas => {
     setWidth(canvas, 480);
     setHeight(canvas, 480);
