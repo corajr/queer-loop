@@ -11,7 +11,12 @@ let maybeDeserializeTime = str => {
   if (Js.Float.isFinite(t)) {
     let date = Js.Date.make();
     Js.Date.setTime(date, t);
-    Some(date);
+    switch (Js.Date.toISOString(date)) {
+    | _ => Some(date)
+    | exception err =>
+      Js.Console.error3("Could not make valid date from:", t, err);
+      None;
+    };
   } else {
     None;
   };

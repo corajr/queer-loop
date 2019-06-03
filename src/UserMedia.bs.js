@@ -12,6 +12,12 @@ function getCameras(param) {
               }));
 }
 
+function getAudioStream(param) {
+  return window.navigator.mediaDevices.getUserMedia({
+              audio: true
+            });
+}
+
 function initStreamByDeviceId(videoEl, deviceId) {
   return window.navigator.mediaDevices.getUserMedia({
                 video: {
@@ -30,6 +36,7 @@ function initStreamByDeviceId(videoEl, deviceId) {
 
 export {
   getCameras ,
+  getAudioStream ,
   initStreamByDeviceId ,
   
 }

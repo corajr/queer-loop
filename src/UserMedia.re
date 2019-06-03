@@ -3,8 +3,15 @@ type mediaStream;
 [@bs.deriving abstract]
 type videoConstraint = {deviceId: string};
 
+type audioConstraint = bool;
+
 [@bs.deriving abstract]
-type constraints = {video: videoConstraint};
+type constraints = {
+  [@bs.optional]
+  video: videoConstraint,
+  [@bs.optional]
+  audio: audioConstraint,
+};
 
 [@bs.deriving abstract]
 type mediaDeviceInfo = {
@@ -40,9 +47,11 @@ external setSrcObject : (Dom.element, mediaStream) => unit = "srcObject";
 
 [@bs.send] external play : Dom.element => unit = "";
 
+let getAudioStream = _ => getUserMedia(constraints(~audio=true, ()));
+
 let initStreamByDeviceId: (Dom.element, string) => Js.Promise.t(Dom.element) =
   (videoEl, deviceId) =>
-    getUserMedia(constraints(~video=videoConstraint(~deviceId)))
+    getUserMedia(constraints(~video=videoConstraint(~deviceId), ()))
     |> Js.Promise.then_(stream => {
          setSrcObject(videoEl, stream);
          switch (DomRe.Element.asHtmlElement(videoEl)) {
