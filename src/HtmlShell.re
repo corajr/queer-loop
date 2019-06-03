@@ -1,4 +1,5 @@
 /** Add in the basic structure/style of the HTML page. **/
+open QueerCode;
 open Webapi.Dom;
 open Util;
 
@@ -48,7 +49,7 @@ video {
   color: white;
 }
 
-#htmlcontainer {
+#htmlContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -57,13 +58,13 @@ video {
 }
 
 @media (orientation: landscape) {
-  #htmlcontainer {
+  #htmlContainer {
       flex-direction: row;
   }
 }
 
 @media (orientation: portrait) {
-  #htmlcontainer {
+  #htmlContainer {
       flex-direction: column;
   }
 }
@@ -152,7 +153,6 @@ let createStructureOn = (htmlContainer: Dom.element) : unit => {
   let iconCanvas = createElementWithId("canvas", "iconCanvas");
 
   let sources = createElementWithId("div", "sources");
-
   let videoContainer = createElementWithId("div", "videoContainer");
   let iframeContainer = createElementWithId("div", "iframeContainer");
   ElementRe.appendChild(videoContainer, sources);
@@ -163,9 +163,12 @@ let createStructureOn = (htmlContainer: Dom.element) : unit => {
   let queerLoop = createElementWithId("div", "queer-loop");
   ElementRe.appendChild(queerLoop, focus);
 
+  let toolbar = createElementWithId("div", "toolbar");
   let download = createElementWithId("div", "download");
-  ElementRe.setTextContent(download, "save");
-  ElementRe.appendChild(download, focus);
+  let saveIcon = createIconFromText("save");
+  ElementRe.appendChild(saveIcon, download);
+  ElementRe.appendChild(download, toolbar);
+  ElementRe.appendChild(toolbar, focus);
 
   let log = createElementWithId("div", "log");
 

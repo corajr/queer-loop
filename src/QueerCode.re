@@ -102,6 +102,12 @@ let styleText = {|
       text-align: center;
    }
 
+   .iconText {
+      font-size: 6px;
+      color: black;
+      mix-blend-mode: source-over;
+   }
+
    svg|svg.previous g.codeGroup, svg|svg.active g.codeGroup {
        opacity: 0.1;
    }
@@ -181,7 +187,13 @@ let createTimeLink =
 };
 
 let createTextBox =
-    (~text: string, ~border: int, ~sizeWithBorder: int)
+    (
+      ~text: string,
+      ~border: int,
+      ~sizeWithBorder: int,
+      ~additionalClasses: array(string)=[||],
+      unit,
+    )
     : Dom.element => {
   let htmlContainer =
     DocumentRe.createElementNS(svgNs, "foreignObject", document);
@@ -202,6 +214,7 @@ let createTextBox =
   ElementRe.setTextContent(textDiv, text);
   let classes = ElementRe.classList(textDiv);
   DomTokenListRe.add("text", classes);
+  DomTokenListRe.addMany(additionalClasses, classes);
   ElementRe.appendChild(textDiv, htmlContainer);
 
   htmlContainer;
@@ -279,7 +292,7 @@ let createCodeSvg =
     metadataGroup,
   );
 
-  let codeText = createTextBox(~text=href, ~border, ~sizeWithBorder);
+  let codeText = createTextBox(~text=href, ~border, ~sizeWithBorder, ());
   ElementRe.appendChild(codeText, metadataGroup);
   ElementRe.appendChild(metadataGroup, codeSvg);
 
@@ -383,6 +396,61 @@ let createIconSvg =
   ElementRe.appendChild(path, svg);
   (svg, sizeWithBorder);
 };
+
+let createIconFromText = (~text: string) : Dom.element =>
+  switch (QrCode.encodeText(text, Ecc.low)) {
+  | Some(code) =>
+    let size = QrCode.size(code);
+    let border = 6;
+    let sizeWithBorder = size + border * 2;
+    let viewBox = {j|0 0 $sizeWithBorder $sizeWithBorder|j};
+
+    let svg = DocumentRe.createElementNS(svgNs, "svg", document);
+    ElementRe.setAttribute("viewBox", viewBox, svg);
+
+    ElementRe.setAttribute("class", "icon", svg);
+
+    let defs = DocumentRe.createElementNS(svgNs, "defs", document);
+    let lightRainbowGradient =
+      createRainbowGradient(lightRainbowLightness, "lightRainbow");
+    let darkRainbowGradient =
+      createRainbowGradient(darkRainbowLightness, "darkRainbow");
+    ElementRe.appendChild(lightRainbowGradient, defs);
+    ElementRe.appendChild(darkRainbowGradient, defs);
+    ElementRe.appendChild(defs, svg);
+
+    let rect = DocumentRe.createElementNS(svgNs, "rect", document);
+    ElementRe.setAttribute("width", "100%", rect);
+    ElementRe.setAttribute("height", "100%", rect);
+    ElementRe.setAttribute("fill", "url(#lightRainbow)", rect);
+    ElementRe.appendChild(rect, svg);
+
+    let path = createQrCodePathElement(code, border);
+    ElementRe.setAttribute("fill", "url(#darkRainbow)", path);
+    ElementRe.appendChild(path, svg);
+
+    let codeText =
+      createTextBox(
+        ~text,
+        ~border,
+        ~sizeWithBorder,
+        ~additionalClasses=[|"iconText"|],
+        (),
+      );
+    ElementRe.setAttribute(
+      "y",
+      string_of_int(sizeWithBorder - border),
+      codeText,
+    );
+
+    ElementRe.appendChild(codeText, svg);
+
+    ElementRe.setAttribute("width", string_of_int(sizeWithBorder * 2), svg);
+    ElementRe.setAttribute("height", string_of_int(sizeWithBorder * 2), svg);
+
+    svg;
+  | None => DocumentRe.createElementNS(htmlNs, "div", document)
+  };
 
 module XMLSerializer = {
   type t;
