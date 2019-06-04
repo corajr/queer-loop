@@ -549,10 +549,17 @@ function init(_evt) {
     onHashChange(/* () */0);
   }
   if (!Curry._1(hasBody, /* () */0)) {
-    Util$QueerLoop.withQuerySelectorDom("svg.root", (function (svg) {
-            svg.addEventListener("click", cycleThroughPast(/* () */0));
-            return /* () */0;
-          }));
+    var stepFn = cycleThroughPast(/* () */0);
+    var lastUpdated = /* record */[/* contents */0.0];
+    var onTick$1 = function (ts) {
+      if (ts - lastUpdated[0] >= 500.0) {
+        Curry._1(stepFn, /* () */0);
+        lastUpdated[0] = ts;
+      }
+      requestAnimationFrame(onTick$1);
+      return /* () */0;
+    };
+    requestAnimationFrame(onTick$1);
   }
   Util$QueerLoop.withQuerySelectorDom("#codeContents", (function (el) {
           el.addEventListener("blur", (function (_evt) {

@@ -501,15 +501,17 @@ let cycleThroughPast = _ => {
       "",
     );
   let i = ref(Js.Array.indexOf(currentId, allIds));
-  _ => {
-    withQuerySelectorDom(".active", live => removeClassSvg(live, "active"))
-    |> ignore;
-    i := (i^ + 1) mod Array.length(allIds);
-    withQuerySelectorDom("#" ++ allIds[i^], live =>
-      addClassSvg(live, "active")
-    )
-    |> ignore;
-  };
+  let step: unit => unit =
+    _ => {
+      withQuerySelectorDom(".active", live => removeClassSvg(live, "active"))
+      |> ignore;
+      i := (i^ + 1) mod Array.length(allIds);
+      withQuerySelectorDom("#" ++ allIds[i^], live =>
+        addClassSvg(live, "active")
+      )
+      |> ignore;
+    };
+  step;
 };
 
 let featuresCallback:
@@ -719,10 +721,16 @@ let init = _evt => {
 
   if (! hasBody()) {
     /* ElementRe.addEventListener("click", onClick(None), svg) */
-    withQuerySelectorDom("svg.root", svg =>
-      ElementRe.addEventListener("click", cycleThroughPast(), svg)
-    )
-    |> ignore;
+    let stepFn = cycleThroughPast();
+    let lastUpdated = ref(0.0);
+    let rec onTick = ts => {
+      if (ts -. lastUpdated^ >= 500.0) {
+        stepFn();
+        lastUpdated := ts;
+      };
+      Webapi.requestAnimationFrame(onTick);
+    };
+    Webapi.requestAnimationFrame(onTick);
   };
 
   withQuerySelectorDom("#codeContents", el =>

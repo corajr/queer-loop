@@ -71,28 +71,22 @@ let createRainbowGradient: (float, string) => Dom.element =
 let styleText = {|
    @namespace svg "http://www.w3.org/2000/svg";
 
-   @keyframes fadeIn {
-   from { opacity: 0.0; }
-   }
-
-   svg|svg svg|svg {
-     display: none;
+   svg|svg svg|svg, .background {
+     visibility: hidden;
+     transition: visibility 0s, opacity 0.5s;
    }
 
    svg|svg.animate, svg|svg.previous, svg|svg.active {
-      display: block;
+      visibility: visible;
    }
 
    svg|svg.animate.temporarilyInactive {
-      display: none;
+      visibility: hidden;
    }
 
-   svg|svg.animationsEnabled svg|svg.animate {
-     animation: fadeIn 2s infinite alternate;
-   }
-
-   .background {
-      opacity: 0.5;
+   svg|svg.animate .background, svg|svg.previous .background, svg|svg.active .background {
+      visibility: visible;
+      opacity: 1.0;
    }
 
    .text {
@@ -111,8 +105,14 @@ let styleText = {|
    svg|svg.previous g.codeGroup, svg|svg.active g.codeGroup {
        opacity: 0.1;
    }
+
    svg|svg.active {
+       opacity: 0.5;
        mix-blend-mode: screen;
+   }
+
+   svg|svg.previous {
+       opacity: 0.25;
    }
 |};
 
