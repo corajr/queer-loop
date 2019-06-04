@@ -128,6 +128,10 @@ video {
   border: 6px solid rgba(255, 255, 255, 0.5);
 }
 
+#toolbar {
+   z-index: 101;
+}
+
 #chromaBackdrop {
    position: fixed;
    width: 100vw;
