@@ -157,8 +157,8 @@ function setOscillatorType(audioCtx, oscillator, type_) {
   if (typeof type_ === "number") {
     return /* () */0;
   } else {
-    var match = type_[0];
-    var periodicWave = audioCtx.createPeriodicWave(match[/* real */0], match[/* imag */1]);
+    var desc = type_[0];
+    var periodicWave = audioCtx.createPeriodicWave(desc.real, desc.imag);
     oscillator.setPeriodicWave(periodicWave);
     return /* () */0;
   }

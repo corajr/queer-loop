@@ -6,7 +6,6 @@ open Options;
 open SvgScript;
 open Time;
 open Util;
-open Webapi.Dom;
 
 let domain = "qqq.lu";
 
@@ -97,47 +96,49 @@ let onClick = (maybeHash, _) => {
 };
 
 let _writeLogEntry = ((isoformat, localeString, text, hash)) =>
-  withQuerySelectorDom("#log", log => {
-    let entry = DocumentRe.createElement("a", document);
-    ElementRe.setAttribute("href", "#" ++ hash, entry);
-    let linkClasses = ElementRe.classList(entry);
-    DomTokenListRe.addMany(
-      [|"log-entry", "codeLink", "code" ++ hash|],
-      linkClasses,
-    );
+  Webapi.Dom.(
+    withQuerySelectorDom("#log", log => {
+      let entry = DocumentRe.createElement("a", document);
+      ElementRe.setAttribute("href", "#" ++ hash, entry);
+      let linkClasses = ElementRe.classList(entry);
+      DomTokenListRe.addMany(
+        [|"log-entry", "codeLink", "code" ++ hash|],
+        linkClasses,
+      );
 
-    ElementRe.addEventListener(
-      "click",
-      evt => {
-        EventRe.preventDefault(evt);
-        onClick(Some(hash), ());
-      },
-      entry,
-    );
+      ElementRe.addEventListener(
+        "click",
+        evt => {
+          EventRe.preventDefault(evt);
+          onClick(Some(hash), ());
+        },
+        entry,
+      );
 
-    let timeDiv = DocumentRe.createElement("div", document);
-    let time = DocumentRe.createElement("time", document);
-    ElementRe.setAttribute("datetime", isoformat, time);
-    ElementRe.setTextContent(time, localeString);
+      let timeDiv = DocumentRe.createElement("div", document);
+      let time = DocumentRe.createElement("time", document);
+      ElementRe.setAttribute("datetime", isoformat, time);
+      ElementRe.setTextContent(time, localeString);
 
-    let textChild = DocumentRe.createElement("span", document);
-    ElementRe.setInnerText(textChild, text);
+      let textChild = DocumentRe.createElement("span", document);
+      ElementRe.setInnerText(textChild, text);
 
-    let hashColor = Js.String.slice(~from=0, ~to_=6, hash);
+      let hashColor = Js.String.slice(~from=0, ~to_=6, hash);
 
-    ElementRe.setAttribute(
-      "style",
-      {j|background-color: #$(hashColor)66;|j},
-      entry,
-    );
+      ElementRe.setAttribute(
+        "style",
+        {j|background-color: #$(hashColor)66;|j},
+        entry,
+      );
 
-    /* SpeechSynthesis.(speak(Utterance.make(text))); */
+      /* SpeechSynthesis.(speak(Utterance.make(text))); */
 
-    ElementRe.appendChild(time, timeDiv);
-    ElementRe.appendChild(timeDiv, entry);
-    ElementRe.appendChild(textChild, entry);
-    ElementRe.appendChild(entry, log);
-  })
+      ElementRe.appendChild(time, timeDiv);
+      ElementRe.appendChild(timeDiv, entry);
+      ElementRe.appendChild(textChild, entry);
+      ElementRe.appendChild(entry, log);
+    })
+  )
   |> ignore;
 
 let writeLogEntry = Debouncer.make(~wait=100, _writeLogEntry);
@@ -199,29 +200,31 @@ let setOnClick: (Dom.element, Dom.event => unit) => unit = [%bs.raw
 let simulateClick: Dom.element => unit = [%bs.raw el => {|el.click();|}];
 
 let save = timestamp =>
-  withRootSvg("", rootSvg => {
-    let downloadLink = DocumentRe.createElementNS(htmlNs, "a", document);
-    ElementRe.setAttribute("download", timestamp ++ ".svg", downloadLink);
+  Webapi.Dom.(
+    withRootSvg("", rootSvg => {
+      let downloadLink = DocumentRe.createElementNS(htmlNs, "a", document);
+      ElementRe.setAttribute("download", timestamp ++ ".svg", downloadLink);
 
-    withQuerySelectorDom("#htmlContainer", htmlContainer => {
-      let blobObjectUrl = QueerCode.svgToBlobObjectURL(rootSvg);
-      ElementRe.setAttribute("href", blobObjectUrl, downloadLink);
+      withQuerySelectorDom("#htmlContainer", htmlContainer => {
+        let blobObjectUrl = QueerCode.svgToBlobObjectURL(rootSvg);
+        ElementRe.setAttribute("href", blobObjectUrl, downloadLink);
 
-      ElementRe.appendChild(downloadLink, htmlContainer);
-      simulateClick(downloadLink);
+        ElementRe.appendChild(downloadLink, htmlContainer);
+        simulateClick(downloadLink);
 
-      Js_global.setTimeout(
-        _ => {
-          Js.log({j|Freeing memory from $timestamp.|j});
-          UrlRe.revokeObjectURL(blobObjectUrl);
-          ElementRe.removeChild(downloadLink, htmlContainer);
-          ();
-        },
-        0,
-      );
-    });
-    ();
-  });
+        Js_global.setTimeout(
+          _ => {
+            Js.log({j|Freeing memory from $timestamp.|j});
+            UrlRe.revokeObjectURL(blobObjectUrl);
+            ElementRe.removeChild(downloadLink, htmlContainer);
+            ();
+          },
+          0,
+        );
+      });
+      ();
+    })
+  );
 
 let hashCache: Js.Dict.t(string) = Js.Dict.empty();
 
@@ -261,140 +264,143 @@ let toggleInversion = _ =>
 let setCode = (text, date) =>
   maybeCachedHexDigest(text)
   |> Js.Promise.then_(hash => {
-       withRootSvg(
-         hash,
-         rootSvg => {
-           let alreadySeen = Belt.Option.isSome(Js.Dict.get(dataSeen, hash));
+       Webapi.Dom.(
+         withRootSvg(
+           hash,
+           rootSvg => {
+             let alreadySeen =
+               Belt.Option.isSome(Js.Dict.get(dataSeen, hash));
 
-           if (! alreadySeen) {
-             Js.Dict.set(dataSeen, hash, text);
+             if (! alreadySeen) {
+               Js.Dict.set(dataSeen, hash, text);
 
-             let code =
-               Belt.Option.getWithDefault(
-                 QrCode.encodeText(text, Ecc.medium),
-                 defaultCode,
-               );
-             let border = 6;
-             let sizeWithBorder = QrCode.size(code) + border * 2;
+               let code =
+                 Belt.Option.getWithDefault(
+                   QrCode.encodeText(text, Ecc.medium),
+                   defaultCode,
+                 );
+               let border = 6;
+               let sizeWithBorder = QrCode.size(code) + border * 2;
 
-             let isoformat = Js.Date.toISOString(date);
-             let localeString = Js.Date.toLocaleString(date);
+               let isoformat = Js.Date.toISOString(date);
+               let localeString = Js.Date.toLocaleString(date);
 
-             let codeSvg =
-               QueerCode.createCodeSvg(
-                 ~href=text,
-                 ~hash,
-                 ~code,
-                 ~border,
-                 ~localeString,
-                 ~timestamp=isoformat,
-               );
+               let codeSvg =
+                 QueerCode.createCodeSvg(
+                   ~href=text,
+                   ~hash,
+                   ~code,
+                   ~border,
+                   ~localeString,
+                   ~timestamp=isoformat,
+                 );
 
-             let codeImg = QueerCode.svgToImg(codeSvg);
+               let codeImg = QueerCode.svgToImg(codeSvg);
 
-             ElementRe.addEventListener(
-               "load",
-               _ =>
-                 withQuerySelectorDom("#centralGroup", centralGroup =>
-                   switch (takeSnapshot()) {
-                   | Some(snapshotUrl) =>
-                     if (hasChanged^) {
-                       QueerCode.addBackground(
-                         ~codeSvg,
-                         ~dataURL=snapshotUrl,
-                         ~sizeWithBorder,
-                       )
-                       |> ignore;
-                     };
+               ElementRe.addEventListener(
+                 "load",
+                 _ =>
+                   withQuerySelectorDom("#centralGroup", centralGroup =>
+                     switch (takeSnapshot()) {
+                     | Some(snapshotUrl) =>
+                       if (hasChanged^) {
+                         QueerCode.addBackground(
+                           ~codeSvg,
+                           ~dataURL=snapshotUrl,
+                           ~sizeWithBorder,
+                         )
+                         |> ignore;
+                       };
 
-                     ElementRe.appendChild(codeSvg, centralGroup);
+                       ElementRe.appendChild(codeSvg, centralGroup);
 
-                     if (currentOptions^.animate) {
-                       ElementRe.setAttribute(
-                         "class",
-                         "root animationsEnabled",
-                         rootSvg,
+                       if (currentOptions^.animate) {
+                         ElementRe.setAttribute(
+                           "class",
+                           "root animationsEnabled",
+                           rootSvg,
+                         );
+                       };
+
+                       setAnimacy(rootSvg, hash);
+
+                       let iconCodeImg =
+                         QueerCode.codeToImage(~code, ~border, ~hash);
+
+                       ElementRe.addEventListener(
+                         "load",
+                         _evt =>
+                           switch (
+                             withQuerySelectorDom("#iconCanvas", iconCanvas => {
+                               setWidth(iconCanvas, sizeWithBorder);
+                               setHeight(iconCanvas, sizeWithBorder);
+                               let ctx = getContext(iconCanvas);
+                               copySnapshotToIcon();
+                               Ctx.setGlobalAlpha(ctx, 0.5);
+                               Ctx.drawImage(
+                                 ctx,
+                                 ~image=iconCodeImg,
+                                 ~dx=0,
+                                 ~dy=0,
+                               );
+                               toDataURL(iconCanvas);
+                             })
+                           ) {
+                           | Some(iconUrl) =>
+                             withQuerySelectorDom("#codes", container => {
+                               let a =
+                                 DocumentRe.createElementNS(
+                                   htmlNs,
+                                   "a",
+                                   document,
+                                 );
+                               ElementRe.setAttribute("href", "#" ++ hash, a);
+                               let linkClasses = ElementRe.classList(a);
+                               DomTokenListRe.addMany(
+                                 [|"codeLink", "code" ++ hash|],
+                                 linkClasses,
+                               );
+
+                               let img =
+                                 DocumentRe.createElementNS(
+                                   htmlNs,
+                                   "img",
+                                   document,
+                                 );
+                               ElementRe.setAttribute("src", iconUrl, img);
+
+                               ElementRe.appendChild(img, a);
+                               ElementRe.addEventListener(
+                                 "click",
+                                 evt => {
+                                   EventRe.preventDefault(evt);
+                                   onClick(Some(hash), ());
+                                 },
+                                 a,
+                               );
+                               ElementRe.appendChild(a, container);
+                             })
+                             |> ignore
+                           | None => ()
+                           },
+                         iconCodeImg,
                        );
-                     };
 
-                     setAnimacy(rootSvg, hash);
+                       withQuerySelectorDom("#download", a => {
+                         let downloadOnClickHandler = evt => save(isoformat);
+                         setOnClick(a, downloadOnClickHandler);
+                       });
 
-                     let iconCodeImg =
-                       QueerCode.codeToImage(~code, ~border, ~hash);
-
-                     ElementRe.addEventListener(
-                       "load",
-                       _evt =>
-                         switch (
-                           withQuerySelectorDom("#iconCanvas", iconCanvas => {
-                             setWidth(iconCanvas, sizeWithBorder);
-                             setHeight(iconCanvas, sizeWithBorder);
-                             let ctx = getContext(iconCanvas);
-                             copySnapshotToIcon();
-                             Ctx.setGlobalAlpha(ctx, 0.5);
-                             Ctx.drawImage(
-                               ctx,
-                               ~image=iconCodeImg,
-                               ~dx=0,
-                               ~dy=0,
-                             );
-                             toDataURL(iconCanvas);
-                           })
-                         ) {
-                         | Some(iconUrl) =>
-                           withQuerySelectorDom("#codes", container => {
-                             let a =
-                               DocumentRe.createElementNS(
-                                 htmlNs,
-                                 "a",
-                                 document,
-                               );
-                             ElementRe.setAttribute("href", "#" ++ hash, a);
-                             let linkClasses = ElementRe.classList(a);
-                             DomTokenListRe.addMany(
-                               [|"codeLink", "code" ++ hash|],
-                               linkClasses,
-                             );
-
-                             let img =
-                               DocumentRe.createElementNS(
-                                 htmlNs,
-                                 "img",
-                                 document,
-                               );
-                             ElementRe.setAttribute("src", iconUrl, img);
-
-                             ElementRe.appendChild(img, a);
-                             ElementRe.addEventListener(
-                               "click",
-                               evt => {
-                                 EventRe.preventDefault(evt);
-                                 onClick(Some(hash), ());
-                               },
-                               a,
-                             );
-                             ElementRe.appendChild(a, container);
-                           })
-                           |> ignore
-                         | None => ()
-                         },
-                       iconCodeImg,
-                     );
-
-                     withQuerySelectorDom("#download", a => {
-                       let downloadOnClickHandler = evt => save(isoformat);
-                       setOnClick(a, downloadOnClickHandler);
-                     });
-
-                     currentSignature := hash;
-                   | None => ()
-                   }
-                 )
-                 |> ignore,
-               codeImg,
-             );
-           };
-         },
+                       currentSignature := hash;
+                     | None => ()
+                     }
+                   )
+                   |> ignore,
+                 codeImg,
+               );
+             };
+           },
+         )
        );
 
        Js.Promise.resolve();
@@ -412,7 +418,8 @@ let setText =
 let onHashChange = _evt => {
   let opts = currentOptions^;
 
-  let url = UrlRe.make(DomRe.Location.href(WindowRe.location(window)));
+  let url =
+    UrlRe.make(DomRe.Location.href(WindowRe.location(Webapi.Dom.window)));
 
   let date =
     switch (
@@ -477,8 +484,11 @@ let _onInput = _ =>
     let text = ElementRe.innerText(el);
     maybeUrl(text)
     |. Belt.Option.map(url => {
-         DomRe.Location.setSearch(WindowRe.location(window));
-         DomRe.Location.setHash(WindowRe.location(window), UrlRe.hash(url));
+         DomRe.Location.setSearch(WindowRe.location(Webapi.Dom.window));
+         DomRe.Location.setHash(
+           WindowRe.location(Webapi.Dom.window),
+           UrlRe.hash(url),
+         );
        });
   })
   |> ignore;
@@ -526,15 +536,29 @@ let cycleThroughPast = _ => {
   step;
 };
 
+let maybeAudioContext: ref(option(Audio.audioContext)) = ref(None);
+let maybeOscillator: ref(option(Audio.oscillator)) = ref(None);
+
+let bufferCount = ref(0);
+
+[@bs.deriving abstract]
+type complexSpectrum = {
+  [@bs.as "real"]
+  floatReal: array(float),
+  [@bs.as "imag"]
+  floatImag: array(float),
+};
+
 let featuresCallback:
   {
     .
     "rms": float,
     "chroma": array(float),
-    "complexSpectrum": Audio.periodicWaveDescription,
+    "complexSpectrum": complexSpectrum,
   } =>
   unit =
   features => {
+    open Audio;
     let rms = features##rms;
     let rmsS = Js.Float.toString(sqrt(rms));
     withQuerySelectorDom("#chromaBackdrop", chromaBackdrop =>
@@ -555,34 +579,60 @@ let featuresCallback:
         |> ignore,
       chroma,
     );
+
+    if (bufferCount^ mod 20 == 0) {
+      let spec = features##complexSpectrum;
+      let real = Js.Typed_array.Float32Array.create(floatRealGet(spec));
+      let imag = Js.Typed_array.Float32Array.create(floatImagGet(spec));
+
+      switch (maybeAudioContext^, maybeOscillator^) {
+      | (Some(ctx), None) =>
+        let osc =
+          makeOscillator(~frequency=220.0, ~type_=Sine, ~audioCtx=ctx);
+        let periodicWave = createPeriodicWave(ctx, real, imag);
+        setPeriodicWave(osc, periodicWave);
+        startOscillator(osc);
+        connect(osc, defaultSink(ctx));
+        maybeOscillator := Some(osc);
+      | (Some(ctx), Some(osc)) =>
+        let periodicWave = createPeriodicWave(ctx, real, imag);
+        setPeriodicWave(osc, periodicWave);
+      | _ => ()
+      };
+    };
+    bufferCount := bufferCount^ + 1;
   };
 
-let audioEnabled = ref(false);
+let enableAudio = _ => {
+  let audioContext: Audio.audioContext =
+    switch (maybeAudioContext^) {
+    | Some(ctx) => ctx
+    | None =>
+      let ctx = Audio.make();
+      maybeAudioContext := Some(ctx);
+      ctx;
+    };
 
-let enableAudio = _ =>
-  if (! audioEnabled^) {
-    audioEnabled := true;
-    let audioContext = Audio.make();
-    Audio.getAudioSource(audioContext)
-    |> Js.Promise.then_(maybeSource => {
-         switch (maybeSource) {
-         | Some(source) =>
-           let opts =
-             Meyda.analyzerOpts(
-               ~audioContext,
-               ~source,
-               ~bufferSize=4096,
-               ~featureExtractors=[|"rms", "chroma", "complexSpectrum"|],
-               ~callback=featuresCallback,
-             );
-           let analyzer = Meyda.createMeydaAnalyzer(opts);
-           Meyda.start(analyzer);
-         | None => ()
-         };
-         Js.Promise.resolve();
-       });
-    ();
-  };
+  Audio.getAudioSource(audioContext)
+  |> Js.Promise.then_(maybeSource => {
+       switch (maybeSource) {
+       | Some(source) =>
+         let opts =
+           Meyda.analyzerOpts(
+             ~audioContext,
+             ~source,
+             ~bufferSize=4096,
+             ~featureExtractors=[|"rms", "chroma", "complexSpectrum"|],
+             ~callback=featuresCallback,
+           );
+         let analyzer = Meyda.createMeydaAnalyzer(opts);
+         Meyda.start(analyzer);
+       | None => ()
+       };
+       Js.Promise.resolve();
+     });
+  ();
+};
 
 let showHide = _evt =>
   withQuerySelectorDom("#queer-loop", loop => {
@@ -593,32 +643,35 @@ let showHide = _evt =>
   |> ignore;
 
 let makeIframe = url =>
-  withQuerySelectorDom("#iframeContainer", iframeContainer => {
-    let iframe = DocumentRe.createElementNS(htmlNs, "iframe", document);
-    ElementRe.setAttribute(
-      "width",
-      string_of_int(WindowRe.innerWidth(window)),
-      iframe,
-    );
-    ElementRe.setAttribute(
-      "height",
-      string_of_int(WindowRe.innerHeight(window)),
-      iframe,
-    );
-    ElementRe.setAttribute(
-      "allow",
-      "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; microphone; camera",
-      iframe,
-    );
+  Webapi.Dom.(
+    withQuerySelectorDom("#iframeContainer", iframeContainer => {
+      let iframe = DocumentRe.createElementNS(htmlNs, "iframe", document);
+      ElementRe.setAttribute(
+        "width",
+        string_of_int(WindowRe.innerWidth(window)),
+        iframe,
+      );
+      ElementRe.setAttribute(
+        "height",
+        string_of_int(WindowRe.innerHeight(window)),
+        iframe,
+      );
+      ElementRe.setAttribute(
+        "allow",
+        "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; microphone; camera",
+        iframe,
+      );
 
-    ElementRe.setAttribute("src", url, iframe);
+      ElementRe.setAttribute("src", url, iframe);
 
-    ElementRe.appendChild(iframe, iframeContainer);
-  })
+      ElementRe.appendChild(iframe, iframeContainer);
+    })
+  )
   |> ignore;
 
 let init = _evt => {
   open HtmlShell;
+  open Webapi.Dom;
   setup();
   createIconButtonWithCallback("#toolbar", "mic", _evt => enableAudio());
   createIconButtonWithCallback("#toolbar", "hide", showHide);
@@ -870,6 +923,6 @@ if (! queerLoop) {
 
   /* let db = IndexedDB.DB.open_(~name="queer-loop", ~version=1, ()); */
   /* db; */
-  WindowRe.addEventListener("load", init, window);
-  WindowRe.addEventListener("hashchange", onHashChange, window);
+  WindowRe.addEventListener("load", init, Webapi.Dom.window);
+  WindowRe.addEventListener("hashchange", onHashChange, Webapi.Dom.window);
 };

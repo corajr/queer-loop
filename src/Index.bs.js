@@ -448,6 +448,12 @@ function cycleThroughPast(param) {
     });
 }
 
+var maybeAudioContext = /* record */[/* contents */undefined];
+
+var maybeOscillator = /* record */[/* contents */undefined];
+
+var bufferCount = /* record */[/* contents */0];
+
 function featuresCallback(features) {
   var rms = features.rms;
   var rmsS = Math.sqrt(rms).toString();
@@ -456,44 +462,69 @@ function featuresCallback(features) {
           return /* () */0;
         }));
   var chroma = features.chroma;
-  return $$Array.iteri((function (i, v) {
-                Util$QueerLoop.withQuerySelectorDom("#pc" + String((i + 5 | 0) % 12), (function (pc) {
-                        var vStr = v.toString();
-                        pc.setAttribute("style", "opacity: " + (String(vStr) + ""));
-                        return /* () */0;
-                      }));
-                return /* () */0;
-              }), chroma);
+  $$Array.iteri((function (i, v) {
+          Util$QueerLoop.withQuerySelectorDom("#pc" + String((i + 5 | 0) % 12), (function (pc) {
+                  var vStr = v.toString();
+                  pc.setAttribute("style", "opacity: " + (String(vStr) + ""));
+                  return /* () */0;
+                }));
+          return /* () */0;
+        }), chroma);
+  if (bufferCount[0] % 20 === 0) {
+    var spec = features.complexSpectrum;
+    var real = new Float32Array(spec.real);
+    var imag = new Float32Array(spec.imag);
+    var match = maybeAudioContext[0];
+    var match$1 = maybeOscillator[0];
+    if (match !== undefined) {
+      var ctx = Caml_option.valFromOption(match);
+      if (match$1 !== undefined) {
+        var periodicWave = ctx.createPeriodicWave(real, imag);
+        Caml_option.valFromOption(match$1).setPeriodicWave(periodicWave);
+      } else {
+        var osc = Audio$QueerLoop.makeOscillator(220.0, /* Sine */0, ctx);
+        var periodicWave$1 = ctx.createPeriodicWave(real, imag);
+        osc.setPeriodicWave(periodicWave$1);
+        osc.start();
+        osc.connect(ctx.destination);
+        maybeOscillator[0] = Caml_option.some(osc);
+      }
+    }
+    
+  }
+  bufferCount[0] = bufferCount[0] + 1 | 0;
+  return /* () */0;
 }
 
-var audioEnabled = /* record */[/* contents */false];
-
 function enableAudio(param) {
-  if (audioEnabled[0]) {
-    return 0;
+  var match = maybeAudioContext[0];
+  var audioContext;
+  if (match !== undefined) {
+    audioContext = Caml_option.valFromOption(match);
   } else {
-    audioEnabled[0] = true;
-    var audioContext = new (window.AudioContext)();
-    Audio$QueerLoop.getAudioSource(audioContext).then((function (maybeSource) {
-            if (maybeSource !== undefined) {
-              var opts = {
-                audioContext: audioContext,
-                source: maybeSource,
-                bufferSize: 4096,
-                featureExtractors: /* array */[
-                  "rms",
-                  "chroma",
-                  "complexSpectrum"
-                ],
-                callback: featuresCallback
-              };
-              var analyzer = Meyda.createMeydaAnalyzer(opts);
-              analyzer.start();
-            }
-            return Promise.resolve(/* () */0);
-          }));
-    return /* () */0;
+    var ctx = new (window.AudioContext)();
+    maybeAudioContext[0] = Caml_option.some(ctx);
+    audioContext = ctx;
   }
+  Audio$QueerLoop.getAudioSource(audioContext).then((function (maybeSource) {
+          if (maybeSource !== undefined) {
+            var opts = {
+              audioContext: audioContext,
+              source: maybeSource,
+              bufferSize: 4096,
+              featureExtractors: /* array */[
+                "rms",
+                "chroma",
+                "complexSpectrum"
+              ],
+              callback: featuresCallback
+            };
+            var analyzer = Meyda.createMeydaAnalyzer(opts);
+            analyzer.start();
+          }
+          return Promise.resolve(/* () */0);
+        }));
+  return /* () */0;
 }
 
 function showHide(_evt) {
@@ -720,8 +751,10 @@ export {
   boolParam ,
   pick ,
   cycleThroughPast ,
+  maybeAudioContext ,
+  maybeOscillator ,
+  bufferCount ,
   featuresCallback ,
-  audioEnabled ,
   enableAudio ,
   showHide ,
   makeIframe ,

@@ -50,9 +50,10 @@ type biquadFilter =
 
 type periodicWave;
 
+[@bs.deriving abstract]
 type periodicWaveDescription = {
-  real: array(float),
-  imag: array(float),
+  real: Js.Typed_array.Float32Array.t,
+  imag: Js.Typed_array.Float32Array.t,
 };
 
 type oscillatorType =
@@ -236,7 +237,12 @@ external createMediaElementSource : (audioContext, Dom.element) => audioNode =
 
 [@bs.send]
 external createPeriodicWave :
-  (audioContext, array(float), array(float)) => periodicWave =
+  (
+    audioContext,
+    Js.Typed_array.Float32Array.t,
+    Js.Typed_array.Float32Array.t
+  ) =>
+  periodicWave =
   "";
 
 [@bs.send] external setPeriodicWave : (oscillator, periodicWave) => unit = "";
@@ -449,8 +455,9 @@ let setOscillatorType =
     (~audioCtx: audioContext, ~oscillator: oscillator, ~type_: oscillatorType) => {
   oscillatorTypeSet(oscillator, string_of_oscillatorType(type_));
   switch (type_) {
-  | Custom({real, imag}) =>
-    let periodicWave = createPeriodicWave(audioCtx, real, imag);
+  | Custom(desc) =>
+    let periodicWave =
+      createPeriodicWave(audioCtx, realGet(desc), imagGet(desc));
     setPeriodicWave(oscillator, periodicWave);
   | _ => ()
   };
