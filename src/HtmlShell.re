@@ -135,8 +135,11 @@ video {
 
 #toolbar {
    z-index: 101;
+   position: fixed;
    display: flex;
-   flex-direction: row;
+   flex-direction: column;
+   top: 0;
+   left:  0;
 }
 
 #chromaBackdrop {
@@ -202,7 +205,7 @@ let createStructureOn = (htmlContainer: Dom.element) : unit => {
   let saveIcon = createIconFromText("save");
   ElementRe.appendChild(saveIcon, download);
   ElementRe.appendChild(download, toolbar);
-  ElementRe.appendChild(toolbar, codes);
+  ElementRe.appendChild(toolbar, htmlContainer);
 
   let log = createElementWithId("div", "log");
 

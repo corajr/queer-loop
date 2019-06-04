@@ -517,6 +517,7 @@ let featuresCallback:
     .
     "rms": float,
     "chroma": array(float),
+    "complexSpectrum": Audio.periodicWaveDescription,
   } =>
   unit =
   features => {
@@ -557,7 +558,7 @@ let enableAudio = _ =>
                ~audioContext,
                ~source,
                ~bufferSize=4096,
-               ~featureExtractors=[|"rms", "chroma"|],
+               ~featureExtractors=[|"rms", "chroma", "complexSpectrum"|],
                ~callback=featuresCallback,
              );
            let analyzer = Meyda.createMeydaAnalyzer(opts);

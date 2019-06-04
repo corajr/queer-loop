@@ -453,7 +453,8 @@ function enableAudio(param) {
                 bufferSize: 4096,
                 featureExtractors: /* array */[
                   "rms",
-                  "chroma"
+                  "chroma",
+                  "complexSpectrum"
                 ],
                 callback: featuresCallback
               };
