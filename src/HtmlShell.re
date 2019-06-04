@@ -89,6 +89,11 @@ video {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  transition: opacity 0.5s;
+}
+
+.hidden {
+   opacity: 0.0;
 }
 
 #log {
@@ -134,7 +139,10 @@ video {
 
 #chromaBackdrop {
    position: fixed;
-   width: 100vw;
+   left: 50%;
+   transform: translate(-50%, 0%);
+   width: 480px;
+   height: 100vh;
    display: flex;
    pointer-events: none;
 }
@@ -156,6 +164,21 @@ let createStyle = () : Dom.element => {
   style;
 };
 
+let createIconButtonWithCallback =
+    (~parentSelector: string, ~name: string, ~callback: Dom.event => unit)
+    : unit => {
+  let icon = createIconFromText(name);
+  let button = createElementWithId("div", name);
+  ElementRe.appendChild(icon, button);
+
+  ElementRe.addEventListener("click", callback, button);
+
+  withQuerySelectorDom(parentSelector, toolbar =>
+    ElementRe.appendChild(button, toolbar)
+  )
+  |> ignore;
+};
+
 let createStructureOn = (htmlContainer: Dom.element) : unit => {
   let snapshotCanvas = createElementWithId("canvas", "snapshotCanvas");
   let iconCanvas = createElementWithId("canvas", "iconCanvas");
@@ -172,15 +195,11 @@ let createStructureOn = (htmlContainer: Dom.element) : unit => {
   ElementRe.appendChild(queerLoop, focus);
 
   let toolbar = createElementWithId("div", "toolbar");
+
   let download = createElementWithId("div", "download");
   let saveIcon = createIconFromText("save");
   ElementRe.appendChild(saveIcon, download);
   ElementRe.appendChild(download, toolbar);
-
-  let micIcon = createIconFromText("mic");
-  let mic = createElementWithId("div", "mic");
-  ElementRe.appendChild(micIcon, mic);
-  ElementRe.appendChild(mic, toolbar);
   ElementRe.appendChild(toolbar, focus);
 
   let log = createElementWithId("div", "log");

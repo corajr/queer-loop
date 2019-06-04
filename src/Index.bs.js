@@ -466,14 +466,21 @@ function enableAudio(param) {
   }
 }
 
-function init(_evt) {
-  HtmlShell$QueerLoop.setup(/* () */0);
-  Util$QueerLoop.withQuerySelectorDom("#mic", (function (mic) {
-          mic.addEventListener("click", (function (_evt) {
-                  return enableAudio(/* () */0);
-                }));
+function showHide(_evt) {
+  Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (loop) {
+          var classes = loop.classList;
+          classes.toggle("hidden");
           return /* () */0;
         }));
+  return /* () */0;
+}
+
+function init(_evt) {
+  HtmlShell$QueerLoop.setup(/* () */0);
+  HtmlShell$QueerLoop.createIconButtonWithCallback("#toolbar", "mic", (function (_evt) {
+          return enableAudio(/* () */0);
+        }));
+  HtmlShell$QueerLoop.createIconButtonWithCallback("#toolbar", "hide", showHide);
   Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
           canvas.width = 480;
           canvas.height = 480;
@@ -672,6 +679,7 @@ export {
   featuresCallback ,
   audioEnabled ,
   enableAudio ,
+  showHide ,
   init ,
   activateQueerLoop ,
   

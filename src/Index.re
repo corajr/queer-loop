@@ -569,11 +569,20 @@ let enableAudio = _ =>
     ();
   };
 
+let showHide = _evt =>
+  withQuerySelectorDom("#queer-loop", loop => {
+    let classes = ElementRe.classList(loop);
+    DomTokenListRe.toggle("hidden", classes);
+    ();
+  })
+  |> ignore;
+
 let init = _evt => {
-  HtmlShell.setup();
-  withQuerySelectorDom("#mic", mic =>
-    ElementRe.addEventListener("click", _evt => enableAudio(), mic)
-  );
+  open HtmlShell;
+  setup();
+  createIconButtonWithCallback("#toolbar", "mic", _evt => enableAudio());
+  createIconButtonWithCallback("#toolbar", "hide", showHide);
+
   withQuerySelectorDom("#snapshotCanvas", canvas => {
     setWidth(canvas, 480);
     setHeight(canvas, 480);
