@@ -27,6 +27,7 @@ var svgNs = "http://www.w3.org/2000/svg";
 function createQrCodePathElement(code, border) {
   var path = document.createElementNS(svgNs, "path");
   path.setAttribute("d", getPathString(code, border));
+  path.setAttribute("class", "codePath");
   return path;
 }
 
@@ -43,7 +44,7 @@ function createRainbowGradient(lightness, id) {
   return gradient;
 }
 
-var styleText = "\n   @namespace svg \"http://www.w3.org/2000/svg\";\n\n   svg|svg svg|svg, .background {\n     visibility: hidden;\n     transition: visibility 0s, opacity 0.5s;\n   }\n\n   svg|svg.animate, svg|svg.previous, svg|svg.active {\n      visibility: visible;\n   }\n\n   svg|svg.animate.temporarilyInactive {\n      visibility: hidden;\n   }\n\n   svg|svg.animate .background, svg|svg.previous .background, svg|svg.active .background {\n      visibility: visible;\n      opacity: 1.0;\n   }\n\n   .text {\n      color: white;\n      mix-blend-mode: difference;\n      font-size: 1.5px;\n      text-align: center;\n   }\n\n   .iconText {\n      font-size: 6px;\n      color: black;\n      mix-blend-mode: source-over;\n   }\n\n   svg|svg.previous g.codeGroup, svg|svg.active g.codeGroup {\n       opacity: 0.1;\n   }\n\n   svg|svg.active {\n       opacity: 0.5;\n       mix-blend-mode: screen;\n   }\n\n   svg|svg.previous {\n       opacity: 0.25;\n   }\n";
+var styleText = "\n   @namespace svg \"http://www.w3.org/2000/svg\";\n\n   svg|svg svg|svg, .background {\n     visibility: hidden;\n     transition: visibility 0s, opacity 0.5s;\n   }\n\n   svg|svg.animate, svg|svg.previous, svg|svg.active {\n      visibility: visible;\n   }\n\n   svg|svg.animate.temporarilyInactive {\n      visibility: hidden;\n   }\n\n   svg|svg.animate .background, svg|svg.previous .background, svg|svg.active .background {\n      visibility: visible;\n      opacity: 1.0;\n   }\n\n   .codeBackdrop {\n      fill: white;\n   }\n\n   .invert .codeBackdrop {\n      fill: black;\n   }\n\n   .codePath {\n      fill: url(#darkRainbow);\n   }\n\n   .invert .codePath {\n      fill: url(#lightRainbow);\n   }\n\n   .text, a, a:visited {\n      color: white;\n      mix-blend-mode: difference;\n   }\n\n   svg|text {\n      fill: url(#lightRainbow);\n   }\n\n   .invert svg|text {\n      fill: url(#darkRainbow);\n   }\n\n   .text {\n      font-size: 1.5px;\n      text-align: center;\n   }\n\n   .iconText {\n      font-size: 6px;\n      color: black;\n   }\n   .invert .iconText {\n      color: white;\n   }\n\n\n   svg|svg.previous g.codeGroup, svg|svg.active g.codeGroup {\n       opacity: 0.1;\n   }\n\n   svg|svg.active {\n       opacity: 0.5;\n       mix-blend-mode: screen;\n   }\n\n   svg|svg.previous {\n       opacity: 0.25;\n   }\n";
 
 function createScript(string) {
   var script = document.createElementNS(svgNs, "script");
@@ -80,8 +81,6 @@ function createTimeLink(href, timestamp, localeString, sizeWithBorder, border) {
   timeText.setAttribute("alignment-baseline", "middle");
   timeText.setAttribute("style", "text-align: center; font-family: \"Courier New\", monospace;");
   timeText.setAttribute("textLength", "90%");
-  timeText.setAttribute("fill", "#FFFFFF");
-  timeText.setAttribute("style", "mix-blend-mode: difference");
   timeText.textContent = localeString;
   var timeLink = document.createElementNS(svgNs, "a");
   timeLink.setAttribute("href", href);
@@ -105,7 +104,7 @@ function createTextBox(text, border, sizeWithBorder, $staropt$star, unit) {
   return htmlContainer;
 }
 
-function createCodeSvg(href, code, hash, localeString, timestamp, border, invert, pathFill, unit) {
+function createCodeSvg(href, code, hash, localeString, timestamp, border) {
   var size = code.size;
   var sizeWithBorder = size + (border << 1) | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
@@ -118,21 +117,10 @@ function createCodeSvg(href, code, hash, localeString, timestamp, border, invert
   var rect = document.createElementNS(svgNs, "rect");
   rect.setAttribute("width", "100%");
   rect.setAttribute("height", "100%");
-  if (invert) {
-    rect.setAttribute("fill", "#000000");
-  } else {
-    rect.setAttribute("fill", "#FFFFFF");
-  }
+  rect.setAttribute("class", "codeBackdrop");
   codeGroup.appendChild(rect);
   var path = createQrCodePathElement(code, border);
   codeGroup.appendChild(path);
-  if (pathFill !== undefined) {
-    path.setAttribute("fill", pathFill);
-  } else if (invert) {
-    path.setAttribute("fill", "url(#lightRainbow)");
-  } else {
-    path.setAttribute("fill", "url(#darkRainbow)");
-  }
   codeGroup.setAttribute("class", "codeGroup");
   codeSvg.appendChild(codeGroup);
   var metadataGroup = document.createElementNS(svgNs, "g");
@@ -166,7 +154,7 @@ function createSvgSkeleton(hash) {
   return svg;
 }
 
-function createIconSvg(code, border, bg, hash, invert) {
+function createIconSvg(code, border, bg, hash) {
   var size = code.size;
   var sizeWithBorder = size + (border << 1) | 0;
   var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
@@ -183,11 +171,7 @@ function createIconSvg(code, border, bg, hash, invert) {
     var rect = document.createElementNS(svgNs, "rect");
     rect.setAttribute("width", "100%");
     rect.setAttribute("height", "100%");
-    if (invert) {
-      rect.setAttribute("fill", "#000000");
-    } else {
-      rect.setAttribute("fill", "#FFFFFF");
-    }
+    rect.setAttribute("class", "codeBackdrop");
     svg.appendChild(rect);
   }
   var rect$1 = document.createElementNS(svgNs, "rect");
@@ -196,11 +180,6 @@ function createIconSvg(code, border, bg, hash, invert) {
   rect$1.setAttribute("fill", "#" + hash.slice(0, 6));
   svg.appendChild(rect$1);
   var path = createQrCodePathElement(code, border);
-  if (invert) {
-    path.setAttribute("fill", "url(#lightRainbow)");
-  } else {
-    path.setAttribute("fill", "url(#darkRainbow)");
-  }
   svg.appendChild(path);
   return /* tuple */[
           svg,
@@ -227,10 +206,9 @@ function createIconFromText(text) {
     var rect = document.createElementNS(svgNs, "rect");
     rect.setAttribute("width", "100%");
     rect.setAttribute("height", "100%");
-    rect.setAttribute("fill", "url(#lightRainbow)");
+    rect.setAttribute("class", "codeBackdrop");
     svg.appendChild(rect);
     var path = createQrCodePathElement(code, 6);
-    path.setAttribute("fill", "url(#darkRainbow)");
     svg.appendChild(path);
     var codeText = createTextBox(text, 6, sizeWithBorder, /* array */["iconText"], /* () */0);
     codeText.setAttribute("y", String(sizeWithBorder - 6 | 0));
@@ -296,7 +274,7 @@ function svgToPng(svg, $staropt$star, $staropt$star$1, unit) {
 }
 
 function codeToImage(code, border, hash) {
-  var match = createIconSvg(code, border, false, hash, true);
+  var match = createIconSvg(code, border, false, hash);
   var sizeStr = String(match[1]);
   var iconSvgUrl = svgToDataURL(match[0]);
   var iconSvgImg = document.createElementNS(Util$QueerLoop.htmlNs, "img");

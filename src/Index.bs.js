@@ -202,6 +202,43 @@ function maybeCachedHexDigest(text) {
   }
 }
 
+function toggleInversion(param) {
+  Util$QueerLoop.withQuerySelectorDom("#htmlContainer", (function (htmlContainer) {
+          var currentInversion = Options$QueerLoop.currentOptions[0][/* invert */4];
+          var init = Options$QueerLoop.currentOptions[0];
+          Options$QueerLoop.currentOptions[0] = /* record */[
+            /* background */init[/* background */0],
+            /* includeDomain */init[/* includeDomain */1],
+            /* includeQueryString */init[/* includeQueryString */2],
+            /* includeHash */init[/* includeHash */3],
+            /* invert */!currentInversion,
+            /* animate */init[/* animate */5],
+            /* opacity */init[/* opacity */6],
+            /* title */init[/* title */7],
+            /* url */init[/* url */8],
+            /* youtubeVideo */init[/* youtubeVideo */9],
+            /* cameraIndices */init[/* cameraIndices */10]
+          ];
+          var classList = htmlContainer.classList;
+          if (Options$QueerLoop.currentOptions[0][/* invert */4]) {
+            classList.add("invert");
+          } else {
+            classList.remove("invert");
+          }
+          return withRootSvg("", (function (rootSvg) {
+                        var classList = rootSvg.classList;
+                        if (Options$QueerLoop.currentOptions[0][/* invert */4]) {
+                          classList.add("invert");
+                          return /* () */0;
+                        } else {
+                          classList.remove("invert");
+                          return /* () */0;
+                        }
+                      }));
+        }));
+  return /* () */0;
+}
+
 function setCode(text, date) {
   maybeCachedHexDigest(text).then((function (hash) {
           withRootSvg(hash, (function (rootSvg) {
@@ -209,22 +246,12 @@ function setCode(text, date) {
                   if (alreadySeen) {
                     return 0;
                   } else {
-                    Util$QueerLoop.withQuerySelectorDom("#htmlContainer", (function (htmlContainer) {
-                            var classList = htmlContainer.classList;
-                            if (Options$QueerLoop.currentOptions[0][/* invert */4]) {
-                              classList.add("invert");
-                              return /* () */0;
-                            } else {
-                              classList.remove("invert");
-                              return /* () */0;
-                            }
-                          }));
                     dataSeen[hash] = text;
                     var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
                     var sizeWithBorder = code.size + 12 | 0;
                     var isoformat = date.toISOString();
                     var localeString = date.toLocaleString();
-                    var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, localeString, isoformat, 6, Options$QueerLoop.currentOptions[0][/* invert */4], undefined, /* () */0);
+                    var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, localeString, isoformat, 6);
                     var codeImg = QueerCode$QueerLoop.svgToImg(codeSvg);
                     codeImg.addEventListener("load", (function (param) {
                             Util$QueerLoop.withQuerySelectorDom("#centralGroup", (function (centralGroup) {
@@ -482,6 +509,9 @@ function init(_evt) {
           return enableAudio(/* () */0);
         }));
   HtmlShell$QueerLoop.createIconButtonWithCallback("#toolbar", "hide", showHide);
+  HtmlShell$QueerLoop.createIconButtonWithCallback("#toolbar", "invert", (function (_evt) {
+          return toggleInversion(/* () */0);
+        }));
   Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
           canvas.width = 480;
           canvas.height = 480;
@@ -671,6 +701,7 @@ export {
   save ,
   hashCache ,
   maybeCachedHexDigest ,
+  toggleInversion ,
   setCode ,
   setText ,
   onHashChange ,

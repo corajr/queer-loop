@@ -35,6 +35,7 @@ let createQrCodePathElement: (QrCode.t, int) => Dom.element =
   (code, border) => {
     let path = DocumentRe.createElementNS(svgNs, "path", document);
     ElementRe.setAttribute("d", getPathString(code, border), path);
+    ElementRe.setAttribute("class", "codePath", path);
     path;
   };
 
@@ -89,9 +90,36 @@ let styleText = {|
       opacity: 1.0;
    }
 
-   .text {
+   .codeBackdrop {
+      fill: white;
+   }
+
+   .invert .codeBackdrop {
+      fill: black;
+   }
+
+   .codePath {
+      fill: url(#darkRainbow);
+   }
+
+   .invert .codePath {
+      fill: url(#lightRainbow);
+   }
+
+   .text, a, a:visited {
       color: white;
       mix-blend-mode: difference;
+   }
+
+   svg|text {
+      fill: url(#lightRainbow);
+   }
+
+   .invert svg|text {
+      fill: url(#darkRainbow);
+   }
+
+   .text {
       font-size: 1.5px;
       text-align: center;
    }
@@ -99,8 +127,11 @@ let styleText = {|
    .iconText {
       font-size: 6px;
       color: black;
-      mix-blend-mode: source-over;
    }
+   .invert .iconText {
+      color: white;
+   }
+
 
    svg|svg.previous g.codeGroup, svg|svg.active g.codeGroup {
        opacity: 0.1;
@@ -176,8 +207,6 @@ let createTimeLink =
     timeText,
   );
   ElementRe.setAttribute("textLength", "90%", timeText);
-  ElementRe.setAttribute("fill", "#FFFFFF", timeText);
-  ElementRe.setAttribute("style", "mix-blend-mode: difference", timeText);
   ElementRe.setTextContent(timeText, localeString);
 
   let timeLink = DocumentRe.createElementNS(svgNs, "a", document);
@@ -228,9 +257,6 @@ let createCodeSvg =
       ~localeString: string,
       ~timestamp: string,
       ~border: int,
-      ~invert: bool,
-      ~pathFill: option(string)=?,
-      unit,
     )
     : Dom.element => {
   let size = QrCode.size(code);
@@ -254,30 +280,13 @@ let createCodeSvg =
   let rect = DocumentRe.createElementNS(svgNs, "rect", document);
   ElementRe.setAttribute("width", "100%", rect);
   ElementRe.setAttribute("height", "100%", rect);
-
-  if (! invert) {
-    ElementRe.setAttribute("fill", "#FFFFFF", rect);
-  } else {
-    ElementRe.setAttribute("fill", "#000000", rect);
-  };
-
+  ElementRe.setAttribute("class", "codeBackdrop", rect);
   ElementRe.appendChild(rect, codeGroup);
 
   let path = createQrCodePathElement(code, border);
   ElementRe.appendChild(path, codeGroup);
 
-  switch (pathFill) {
-  | Some(fill) => ElementRe.setAttribute("fill", fill, path)
-  | None =>
-    if (invert) {
-      ElementRe.setAttribute("fill", "url(#lightRainbow)", path);
-    } else {
-      ElementRe.setAttribute("fill", "url(#darkRainbow)", path);
-    }
-  };
-
   ElementRe.setAttribute("class", "codeGroup", codeGroup);
-
   ElementRe.appendChild(codeGroup, codeSvg);
 
   let metadataGroup = DocumentRe.createElementNS(svgNs, "g", document);
@@ -344,7 +353,7 @@ let createSvgSkeleton = hash => {
 };
 
 let createIconSvg =
-    (~code: QrCode.t, ~border: int, ~bg: bool, ~hash: string, ~invert: bool)
+    (~code: QrCode.t, ~border: int, ~bg: bool, ~hash: string)
     : (Dom.element, int) => {
   let size = QrCode.size(code);
   let sizeWithBorder = size + border * 2;
@@ -368,12 +377,7 @@ let createIconSvg =
     let rect = DocumentRe.createElementNS(svgNs, "rect", document);
     ElementRe.setAttribute("width", "100%", rect);
     ElementRe.setAttribute("height", "100%", rect);
-
-    if (! invert) {
-      ElementRe.setAttribute("fill", "#FFFFFF", rect);
-    } else {
-      ElementRe.setAttribute("fill", "#000000", rect);
-    };
+    ElementRe.setAttribute("class", "codeBackdrop", rect);
     ElementRe.appendChild(rect, svg);
   };
 
@@ -388,11 +392,6 @@ let createIconSvg =
   ElementRe.appendChild(rect, svg);
 
   let path = createQrCodePathElement(code, border);
-  if (invert) {
-    ElementRe.setAttribute("fill", "url(#lightRainbow)", path);
-  } else {
-    ElementRe.setAttribute("fill", "url(#darkRainbow)", path);
-  };
   ElementRe.appendChild(path, svg);
   (svg, sizeWithBorder);
 };
@@ -422,11 +421,10 @@ let createIconFromText = (~text: string) : Dom.element =>
     let rect = DocumentRe.createElementNS(svgNs, "rect", document);
     ElementRe.setAttribute("width", "100%", rect);
     ElementRe.setAttribute("height", "100%", rect);
-    ElementRe.setAttribute("fill", "url(#lightRainbow)", rect);
+    ElementRe.setAttribute("class", "codeBackdrop", rect);
     ElementRe.appendChild(rect, svg);
 
     let path = createQrCodePathElement(code, border);
-    ElementRe.setAttribute("fill", "url(#darkRainbow)", path);
     ElementRe.appendChild(path, svg);
 
     let codeText =
@@ -523,7 +521,7 @@ let svgToPng =
 
 let codeToImage = (~code: QrCode.t, ~border: int, ~hash: string) : Dom.element => {
   let (iconSvg, sizeWithBorder) =
-    createIconSvg(~code, ~border, ~invert=true, ~hash, ~bg=false);
+    createIconSvg(~code, ~border, ~hash, ~bg=false);
   let sizeStr = string_of_int(sizeWithBorder);
 
   let iconSvgUrl = svgToDataURL(iconSvg);

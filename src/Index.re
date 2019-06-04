@@ -236,6 +236,28 @@ let maybeCachedHexDigest = text =>
        })
   };
 
+let toggleInversion = _ =>
+  withQuerySelectorDom("#htmlContainer", htmlContainer => {
+    let currentInversion = currentOptions^.invert;
+    currentOptions := {...currentOptions^, invert: ! currentInversion};
+
+    let classList = ElementRe.classList(htmlContainer);
+    if (currentOptions^.invert) {
+      DomTokenListRe.add("invert", classList);
+    } else {
+      DomTokenListRe.remove("invert", classList);
+    };
+    withRootSvg("", rootSvg => {
+      let classList = ElementRe.classList(rootSvg);
+      if (currentOptions^.invert) {
+        DomTokenListRe.add("invert", classList);
+      } else {
+        DomTokenListRe.remove("invert", classList);
+      };
+    });
+  })
+  |> ignore;
+
 let setCode = (text, date) =>
   maybeCachedHexDigest(text)
   |> Js.Promise.then_(hash => {
@@ -245,14 +267,6 @@ let setCode = (text, date) =>
            let alreadySeen = Belt.Option.isSome(Js.Dict.get(dataSeen, hash));
 
            if (! alreadySeen) {
-             withQuerySelectorDom("#htmlContainer", htmlContainer => {
-               let classList = ElementRe.classList(htmlContainer);
-               if (currentOptions^.invert) {
-                 DomTokenListRe.add("invert", classList);
-               } else {
-                 DomTokenListRe.remove("invert", classList);
-               };
-             });
              Js.Dict.set(dataSeen, hash, text);
 
              let code =
@@ -274,8 +288,6 @@ let setCode = (text, date) =>
                  ~border,
                  ~localeString,
                  ~timestamp=isoformat,
-                 ~invert=currentOptions^.invert,
-                 (),
                );
 
              let codeImg = QueerCode.svgToImg(codeSvg);
@@ -585,6 +597,9 @@ let init = _evt => {
   setup();
   createIconButtonWithCallback("#toolbar", "mic", _evt => enableAudio());
   createIconButtonWithCallback("#toolbar", "hide", showHide);
+  createIconButtonWithCallback("#toolbar", "invert", _evt =>
+    toggleInversion()
+  );
 
   withQuerySelectorDom("#snapshotCanvas", canvas => {
     setWidth(canvas, 480);
