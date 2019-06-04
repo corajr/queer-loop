@@ -89,7 +89,7 @@ video {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  transition: opacity 0.5s;
+  transition: opacity 0.1s;
 }
 
 .hidden {
@@ -145,18 +145,26 @@ video {
 #chromaBackdrop {
    position: fixed;
    left: 50%;
+   top: 0%;
    transform: translate(-50%, 0%);
    width: 480px;
-   height: 100vh;
+   min-height: 100vh;
    display: flex;
    pointer-events: none;
+}
+
+#inputCanvas {
+   position: fixed;
+   display: block;
+   right: 0;
+   top: 0;
 }
 
 .pitchClass {
    height: 100vh;
    width: calc(100vw / 12);
    opacity: 0.0;
-   transition: opacity 0.5s;
+   transition: opacity 0.1s;
 }
 |}
   ++ pitchClasses;
@@ -185,6 +193,7 @@ let createIconButtonWithCallback =
 };
 
 let createStructureOn = (htmlContainer: Dom.element) : unit => {
+  let inputCanvas = createElementWithId("canvas", "inputCanvas");
   let snapshotCanvas = createElementWithId("canvas", "snapshotCanvas");
   let iconCanvas = createElementWithId("canvas", "iconCanvas");
 
@@ -196,8 +205,6 @@ let createStructureOn = (htmlContainer: Dom.element) : unit => {
 
   let codes = createElementWithId("div", "codes");
   let focus = createElementWithId("div", "focus");
-  let queerLoop = createElementWithId("div", "queer-loop");
-  ElementRe.appendChild(queerLoop, focus);
 
   let toolbar = createElementWithId("div", "toolbar");
 
@@ -211,6 +218,7 @@ let createStructureOn = (htmlContainer: Dom.element) : unit => {
 
   ElementRe.appendChild(snapshotCanvas, htmlContainer);
   ElementRe.appendChild(iconCanvas, htmlContainer);
+  ElementRe.appendChild(inputCanvas, htmlContainer);
   ElementRe.appendChild(sources, htmlContainer);
 
   let chromaBackdrop = createElementWithId("div", "chromaBackdrop");
@@ -220,7 +228,10 @@ let createStructureOn = (htmlContainer: Dom.element) : unit => {
     ElementRe.setClassName(pitchClassBackdrop, "pitchClass");
     ElementRe.appendChild(pitchClassBackdrop, chromaBackdrop);
   };
-  ElementRe.appendChild(chromaBackdrop, htmlContainer);
+  ElementRe.appendChild(chromaBackdrop, focus);
+
+  let queerLoop = createElementWithId("div", "queer-loop");
+  ElementRe.appendChild(queerLoop, focus);
 
   ElementRe.appendChild(codes, htmlContainer);
   ElementRe.appendChild(focus, htmlContainer);

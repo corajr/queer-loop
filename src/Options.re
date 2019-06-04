@@ -8,6 +8,8 @@ type options = {
   opacity: float,
   title: option(string),
   url: option(string),
+  poem: option(string),
+  wiki: option(string),
   youtubeVideo: option(string),
   cameraIndices: array(int),
 };
@@ -22,6 +24,8 @@ let defaultOptions = {
   opacity: 0.1,
   title: None,
   url: None,
+  poem: None,
+  wiki: None,
   youtubeVideo: None,
   cameraIndices: [|0|],
 };

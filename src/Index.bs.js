@@ -216,8 +216,10 @@ function toggleInversion(param) {
             /* opacity */init[/* opacity */6],
             /* title */init[/* title */7],
             /* url */init[/* url */8],
-            /* youtubeVideo */init[/* youtubeVideo */9],
-            /* cameraIndices */init[/* cameraIndices */10]
+            /* poem */init[/* poem */9],
+            /* wiki */init[/* wiki */10],
+            /* youtubeVideo */init[/* youtubeVideo */11],
+            /* cameraIndices */init[/* cameraIndices */12]
           ];
           var classList = htmlContainer.classList;
           if (Options$QueerLoop.currentOptions[0][/* invert */4]) {
@@ -448,7 +450,7 @@ function cycleThroughPast(param) {
 
 function featuresCallback(features) {
   var rms = features.rms;
-  var rmsS = (0.5 + 0.5 * rms).toString();
+  var rmsS = Math.sqrt(rms).toString();
   Util$QueerLoop.withQuerySelectorDom("#chromaBackdrop", (function (chromaBackdrop) {
           chromaBackdrop.setAttribute("style", "opacity: " + (String(rmsS) + ""));
           return /* () */0;
@@ -503,6 +505,19 @@ function showHide(_evt) {
   return /* () */0;
 }
 
+function makeIframe(url) {
+  Util$QueerLoop.withQuerySelectorDom("#iframeContainer", (function (iframeContainer) {
+          var iframe = document.createElementNS(Util$QueerLoop.htmlNs, "iframe");
+          iframe.setAttribute("width", String(window.innerWidth));
+          iframe.setAttribute("height", String(window.innerHeight));
+          iframe.setAttribute("allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; microphone; camera");
+          iframe.setAttribute("src", url);
+          iframeContainer.appendChild(iframe);
+          return /* () */0;
+        }));
+  return /* () */0;
+}
+
 function init(_evt) {
   HtmlShell$QueerLoop.setup(/* () */0);
   HtmlShell$QueerLoop.createIconButtonWithCallback("#toolbar", "mic", (function (_evt) {
@@ -536,6 +551,8 @@ function init(_evt) {
                 })), Options$QueerLoop.currentOptions[0][/* opacity */6]),
       /* title */Caml_option.nullable_to_opt(params.get("t")),
       /* url */Caml_option.nullable_to_opt(params.get("u")),
+      /* poem */Caml_option.nullable_to_opt(params.get("p")),
+      /* wiki */Caml_option.nullable_to_opt(params.get("w")),
       /* youtubeVideo */Caml_option.nullable_to_opt(params.get("v")),
       /* cameraIndices */match ? /* array */[0] : cameraIndices
     ];
@@ -545,31 +562,19 @@ function init(_evt) {
   }
   var match$1 = Options$QueerLoop.currentOptions[0][/* url */8];
   if (match$1 !== undefined) {
-    var url = match$1;
-    Util$QueerLoop.withQuerySelectorDom("#iframeContainer", (function (iframeContainer) {
-            var iframe = document.createElementNS(Util$QueerLoop.htmlNs, "iframe");
-            iframe.setAttribute("width", String(window.innerWidth));
-            iframe.setAttribute("height", String(window.innerHeight));
-            iframe.setAttribute("allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; microphone; camera");
-            iframe.setAttribute("src", url);
-            iframeContainer.appendChild(iframe);
-            return /* () */0;
-          }));
+    makeIframe(match$1);
   }
-  var match$2 = Options$QueerLoop.currentOptions[0][/* youtubeVideo */9];
+  var match$2 = Options$QueerLoop.currentOptions[0][/* youtubeVideo */11];
   if (match$2 !== undefined) {
-    var ytId = match$2;
-    Util$QueerLoop.withQuerySelectorDom("#iframeContainer", (function (iframeContainer) {
-            var iframe = document.createElementNS(Util$QueerLoop.htmlNs, "iframe");
-            iframe.setAttribute("width", String(window.innerWidth));
-            iframe.setAttribute("frameborder", "0");
-            iframe.setAttribute("allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture");
-            iframe.setAttribute("height", String(window.innerHeight));
-            var url = "https://www.youtube-nocookie.com/embed/" + (String(ytId) + "?cc_load_policy=1&autoplay=1");
-            iframe.setAttribute("src", url);
-            iframeContainer.appendChild(iframe);
-            return /* () */0;
-          }));
+    makeIframe("https://www.youtube-nocookie.com/embed/" + (String(match$2) + "?cc_load_policy=1&autoplay=1"));
+  }
+  var match$3 = Options$QueerLoop.currentOptions[0][/* poem */9];
+  if (match$3 !== undefined) {
+    makeIframe("https://poets.org/poem/" + (String(match$3) + "?mbd=1"));
+  }
+  var match$4 = Options$QueerLoop.currentOptions[0][/* wiki */10];
+  if (match$4 !== undefined) {
+    makeIframe("https://en.m.wikipedia.org/wiki/" + (String(match$4) + ""));
   }
   initialHash[0] = Util$QueerLoop.getHash(/* () */0).slice(1);
   if (initialHash[0] === "") {
@@ -607,6 +612,19 @@ function init(_evt) {
               if (!hasChanged[0]) {
                 hasChanged[0] = true;
               }
+              Util$QueerLoop.withQuerySelectorDom("#inputCanvas", (function (destCanvas) {
+                      var $$location = inputCode.location;
+                      var rect = JsQr$QueerLoop.extractAABB($$location);
+                      var dw = rect[/* w */2];
+                      var dh = rect[/* h */3];
+                      if (destCanvas.width !== dw) {
+                        destCanvas.width = dw;
+                        destCanvas.height = dh;
+                      }
+                      var ctx = destCanvas.getContext("2d");
+                      ctx.drawImage(srcCanvas, rect[/* x */0], rect[/* y */1], rect[/* w */2], rect[/* h */3], 0, 0, dw, dh);
+                      return /* () */0;
+                    }));
               var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hexHash));
               var isSelf = hexHash === currentSignature[0];
               if (isSelf || !alreadySeen) {
@@ -617,19 +635,6 @@ function init(_evt) {
                       isSelf ? "queer-loop" : input,
                       hexHash
                     ]);
-                Util$QueerLoop.withQuerySelectorDom("#inputCanvas", (function (destCanvas) {
-                        var $$location = inputCode.location;
-                        var rect = JsQr$QueerLoop.extractAABB($$location);
-                        var dw = rect[/* w */2];
-                        var dh = rect[/* h */3];
-                        if (destCanvas.width !== dw) {
-                          destCanvas.width = dw;
-                          destCanvas.height = dh;
-                        }
-                        var ctx = destCanvas.getContext("2d");
-                        ctx.drawImage(srcCanvas, rect[/* x */0], rect[/* y */1], rect[/* w */2], rect[/* h */3], 0, 0, dw, dh);
-                        return /* () */0;
-                      }));
                 Util$QueerLoop.setHash(Time$QueerLoop.getTimestamp(/* () */0));
               }
               return Promise.resolve(/* () */0);
@@ -647,7 +652,7 @@ function init(_evt) {
                                 return Scanner$QueerLoop.scanUsingDeviceId(videoEl, camera.deviceId, Options$QueerLoop.currentOptions, response);
                               }), pick(cameras, $$Array.map((function (x) {
                                         return Caml_int32.mod_(x, cameras.length);
-                                      }), Options$QueerLoop.currentOptions[0][/* cameraIndices */10]))));
+                                      }), Options$QueerLoop.currentOptions[0][/* cameraIndices */12]))));
             })).then((function (canvases) {
             canvasesRef[0] = canvases;
             requestAnimationFrame(onTick);
@@ -719,6 +724,7 @@ export {
   audioEnabled ,
   enableAudio ,
   showHide ,
+  makeIframe ,
   init ,
   activateQueerLoop ,
   

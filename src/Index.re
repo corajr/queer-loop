@@ -536,7 +536,7 @@ let featuresCallback:
   unit =
   features => {
     let rms = features##rms;
-    let rmsS = Js.Float.toString(0.5 +. 0.5 *. rms);
+    let rmsS = Js.Float.toString(sqrt(rms));
     withQuerySelectorDom("#chromaBackdrop", chromaBackdrop =>
       ElementRe.setAttribute("style", {j|opacity: $rmsS|j}, chromaBackdrop)
     )
@@ -589,6 +589,31 @@ let showHide = _evt =>
     let classes = ElementRe.classList(loop);
     DomTokenListRe.toggle("hidden", classes);
     ();
+  })
+  |> ignore;
+
+let makeIframe = url =>
+  withQuerySelectorDom("#iframeContainer", iframeContainer => {
+    let iframe = DocumentRe.createElementNS(htmlNs, "iframe", document);
+    ElementRe.setAttribute(
+      "width",
+      string_of_int(WindowRe.innerWidth(window)),
+      iframe,
+    );
+    ElementRe.setAttribute(
+      "height",
+      string_of_int(WindowRe.innerHeight(window)),
+      iframe,
+    );
+    ElementRe.setAttribute(
+      "allow",
+      "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; microphone; camera",
+      iframe,
+    );
+
+    ElementRe.setAttribute("src", url, iframe);
+
+    ElementRe.appendChild(iframe, iframeContainer);
   })
   |> ignore;
 
@@ -660,6 +685,8 @@ let init = _evt => {
           Array.length(cameraIndices) == 0 ? [|0|] : cameraIndices,
         url: URLSearchParamsRe.get("u", params),
         title: URLSearchParamsRe.get("t", params),
+        poem: URLSearchParamsRe.get("p", params),
+        wiki: URLSearchParamsRe.get("w", params),
         youtubeVideo: URLSearchParamsRe.get("v", params),
       };
   };
@@ -669,60 +696,28 @@ let init = _evt => {
   };
 
   switch (currentOptions^.url) {
-  | Some(url) =>
-    withQuerySelectorDom("#iframeContainer", iframeContainer => {
-      let iframe = DocumentRe.createElementNS(htmlNs, "iframe", document);
-      ElementRe.setAttribute(
-        "width",
-        string_of_int(WindowRe.innerWidth(window)),
-        iframe,
-      );
-      ElementRe.setAttribute(
-        "height",
-        string_of_int(WindowRe.innerHeight(window)),
-        iframe,
-      );
-      ElementRe.setAttribute(
-        "allow",
-        "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; microphone; camera",
-        iframe,
-      );
-
-      ElementRe.setAttribute("src", url, iframe);
-
-      ElementRe.appendChild(iframe, iframeContainer);
-    })
-    |> ignore
+  | Some(url) => makeIframe(url)
   | None => ()
   };
 
   switch (currentOptions^.youtubeVideo) {
   | Some(ytId) =>
-    withQuerySelectorDom("#iframeContainer", iframeContainer => {
-      let iframe = DocumentRe.createElementNS(htmlNs, "iframe", document);
-      ElementRe.setAttribute(
-        "width",
-        string_of_int(WindowRe.innerWidth(window)),
-        iframe,
-      );
-      ElementRe.setAttribute("frameborder", "0", iframe);
-      ElementRe.setAttribute(
-        "allow",
-        "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture",
-        iframe,
-      );
+    let url = {j|https://www.youtube-nocookie.com/embed/$ytId?cc_load_policy=1&autoplay=1|j};
+    makeIframe(url);
+  | None => ()
+  };
 
-      ElementRe.setAttribute(
-        "height",
-        string_of_int(WindowRe.innerHeight(window)),
-        iframe,
-      );
-      let url = {j|https://www.youtube-nocookie.com/embed/$ytId?cc_load_policy=1&autoplay=1|j};
-      ElementRe.setAttribute("src", url, iframe);
-      ElementRe.appendChild(iframe, iframeContainer);
-    })
-    |> ignore
+  switch (currentOptions^.poem) {
+  | Some(poem) =>
+    let url = {j|https://poets.org/poem/$poem?mbd=1|j};
+    makeIframe(url);
+  | None => ()
+  };
 
+  switch (currentOptions^.wiki) {
+  | Some(wiki) =>
+    let url = {j|https://en.m.wikipedia.org/wiki/$wiki|j};
+    makeIframe(url);
   | None => ()
   };
 
@@ -764,6 +759,31 @@ let init = _evt => {
            if (! hasChanged^) {
              hasChanged := true;
            };
+           withQuerySelectorDom("#inputCanvas", destCanvas => {
+             open JsQr;
+             let location = locationGet(inputCode);
+             let rect = extractAABB(location);
+             let dw = rect.w;
+             let dh = rect.h;
+             if (getWidth(destCanvas) !== dw) {
+               setWidth(destCanvas, dw);
+               setHeight(destCanvas, dh);
+             };
+             let ctx = getContext(destCanvas);
+
+             Ctx.drawImageSourceRectDestRect(
+               ctx,
+               ~image=srcCanvas,
+               ~sx=rect.x,
+               ~sy=rect.y,
+               ~sw=rect.w,
+               ~sh=rect.h,
+               ~dx=0,
+               ~dy=0,
+               ~dw,
+               ~dh,
+             );
+           });
 
            let alreadySeen =
              Belt.Option.isSome(Js.Dict.get(dataSeen, hexHash));
@@ -778,32 +798,6 @@ let init = _evt => {
                isSelf ? "queer-loop" : input,
                hexHash,
              ));
-
-             withQuerySelectorDom("#inputCanvas", destCanvas => {
-               open JsQr;
-               let location = locationGet(inputCode);
-               let rect = extractAABB(location);
-               let dw = rect.w;
-               let dh = rect.h;
-               if (getWidth(destCanvas) !== dw) {
-                 setWidth(destCanvas, dw);
-                 setHeight(destCanvas, dh);
-               };
-               let ctx = getContext(destCanvas);
-
-               Ctx.drawImageSourceRectDestRect(
-                 ctx,
-                 ~image=srcCanvas,
-                 ~sx=rect.x,
-                 ~sy=rect.y,
-                 ~sw=rect.w,
-                 ~sh=rect.h,
-                 ~dx=0,
-                 ~dy=0,
-                 ~dw,
-                 ~dh,
-               );
-             });
 
              setHashToNow();
            };

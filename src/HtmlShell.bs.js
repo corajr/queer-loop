@@ -16,7 +16,7 @@ var pcs = $$Array.mapi(pcToStr, $$Array.init(12, (function (i) {
 
 var pitchClasses = pcs.join("\n");
 
-var styleText = "\nh1 { display: none; }\n\nbody { margin: 0; font-family: \"courier new\", monospace; }\ncanvas {\n  display: none;\n  pointer-events: none;\n}\n\niframe, video {\n  position: fixed;\n  min-width: 100vw;\n  min-height: 100vh;\n  left: 50%;\n  top: 50%;\n  transform: translate(-50%, -50%);\n  mix-blend-mode: screen;\n}\n\n.invert iframe, .invert video {\n  mix-blend-mode: multiply;\n}\n\nvideo {\n  pointer-events: none;\n}\n\n#welcome {\n  display: none;\n}\n\n#htmlContainer {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  width: 95vw;\n  height: 95vh;\n}\n\n@media (orientation: landscape) {\n  #htmlContainer {\n      flex-direction: row;\n  }\n}\n\n@media (orientation: portrait) {\n  #htmlContainer {\n      flex-direction: column;\n  }\n}\n\n#codes {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-start;\n  align-items: flex-start;\n  z-index: 100;\n  flex-basis: 20%;\n}\n\n#focus {\n  flex-basis: 45%;\n}\n\n#queer-loop {\n  z-index: 100;\n  margin: auto;\n  position: fixed;\n  width: 480px;\n  height: 480px;\n  left: 50%;\n  top: 50%;\n  transform: translate(-50%, -50%);\n  transition: opacity 0.5s;\n}\n\n.hidden {\n   opacity: 0.0;\n}\n\n#log {\n  flex-basis: 20%;\n  flex-wrap: wrap;\n  z-index: 100;\n}\n\n.log-entry {\n  display: inline-flex;\n  flex-direction: column;\n  padding: 1em;\n  text-decoration: none;\n  color: white;\n}\n\n.log-entry:active, .log-entry:visited {\n  color: white;\n}\n\n.log-entry div {\n  display: flex;\n}\n\n.codeLink.active {\n  position: relative;\n}\n\n.codeLink.active:after {\n  position: absolute;\n  content: '';\n  display: block;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  border: 6px solid rgba(255, 255, 255, 0.5);\n}\n\n#toolbar {\n   z-index: 101;\n   position: fixed;\n   display: flex;\n   flex-direction: column;\n   top: 0;\n   left:  0;\n}\n\n#chromaBackdrop {\n   position: fixed;\n   left: 50%;\n   transform: translate(-50%, 0%);\n   width: 480px;\n   height: 100vh;\n   display: flex;\n   pointer-events: none;\n}\n\n.pitchClass {\n   height: 100vh;\n   width: calc(100vw / 12);\n   opacity: 0.0;\n   transition: opacity 0.5s;\n}\n" + pitchClasses;
+var styleText = "\nh1 { display: none; }\n\nbody { margin: 0; font-family: \"courier new\", monospace; }\ncanvas {\n  display: none;\n  pointer-events: none;\n}\n\niframe, video {\n  position: fixed;\n  min-width: 100vw;\n  min-height: 100vh;\n  left: 50%;\n  top: 50%;\n  transform: translate(-50%, -50%);\n  mix-blend-mode: screen;\n}\n\n.invert iframe, .invert video {\n  mix-blend-mode: multiply;\n}\n\nvideo {\n  pointer-events: none;\n}\n\n#welcome {\n  display: none;\n}\n\n#htmlContainer {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  width: 95vw;\n  height: 95vh;\n}\n\n@media (orientation: landscape) {\n  #htmlContainer {\n      flex-direction: row;\n  }\n}\n\n@media (orientation: portrait) {\n  #htmlContainer {\n      flex-direction: column;\n  }\n}\n\n#codes {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-start;\n  align-items: flex-start;\n  z-index: 100;\n  flex-basis: 20%;\n}\n\n#focus {\n  flex-basis: 45%;\n}\n\n#queer-loop {\n  z-index: 100;\n  margin: auto;\n  position: fixed;\n  width: 480px;\n  height: 480px;\n  left: 50%;\n  top: 50%;\n  transform: translate(-50%, -50%);\n  transition: opacity 0.1s;\n}\n\n.hidden {\n   opacity: 0.0;\n}\n\n#log {\n  flex-basis: 20%;\n  flex-wrap: wrap;\n  z-index: 100;\n}\n\n.log-entry {\n  display: inline-flex;\n  flex-direction: column;\n  padding: 1em;\n  text-decoration: none;\n  color: white;\n}\n\n.log-entry:active, .log-entry:visited {\n  color: white;\n}\n\n.log-entry div {\n  display: flex;\n}\n\n.codeLink.active {\n  position: relative;\n}\n\n.codeLink.active:after {\n  position: absolute;\n  content: '';\n  display: block;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  border: 6px solid rgba(255, 255, 255, 0.5);\n}\n\n#toolbar {\n   z-index: 101;\n   position: fixed;\n   display: flex;\n   flex-direction: column;\n   top: 0;\n   left:  0;\n}\n\n#chromaBackdrop {\n   position: fixed;\n   left: 50%;\n   top: 0%;\n   transform: translate(-50%, 0%);\n   width: 480px;\n   min-height: 100vh;\n   display: flex;\n   pointer-events: none;\n}\n\n#inputCanvas {\n   position: fixed;\n   display: block;\n   right: 0;\n   top: 0;\n}\n\n.pitchClass {\n   height: 100vh;\n   width: calc(100vw / 12);\n   opacity: 0.0;\n   transition: opacity 0.1s;\n}\n" + pitchClasses;
 
 function createStyle(param) {
   var style = document.createElementNS(Util$QueerLoop.htmlNs, "style");
@@ -38,6 +38,7 @@ function createIconButtonWithCallback(parentSelector, name, callback) {
 }
 
 function createStructureOn(htmlContainer) {
+  var inputCanvas = Util$QueerLoop.createElementWithId("canvas", "inputCanvas");
   var snapshotCanvas = Util$QueerLoop.createElementWithId("canvas", "snapshotCanvas");
   var iconCanvas = Util$QueerLoop.createElementWithId("canvas", "iconCanvas");
   var sources = Util$QueerLoop.createElementWithId("div", "sources");
@@ -47,8 +48,6 @@ function createStructureOn(htmlContainer) {
   sources.appendChild(iframeContainer);
   var codes = Util$QueerLoop.createElementWithId("div", "codes");
   var focus = Util$QueerLoop.createElementWithId("div", "focus");
-  var queerLoop = Util$QueerLoop.createElementWithId("div", "queer-loop");
-  focus.appendChild(queerLoop);
   var toolbar = Util$QueerLoop.createElementWithId("div", "toolbar");
   var download = Util$QueerLoop.createElementWithId("div", "download");
   var saveIcon = QueerCode$QueerLoop.createIconFromText("save");
@@ -58,6 +57,7 @@ function createStructureOn(htmlContainer) {
   var log = Util$QueerLoop.createElementWithId("div", "log");
   htmlContainer.appendChild(snapshotCanvas);
   htmlContainer.appendChild(iconCanvas);
+  htmlContainer.appendChild(inputCanvas);
   htmlContainer.appendChild(sources);
   var chromaBackdrop = Util$QueerLoop.createElementWithId("div", "chromaBackdrop");
   for(var i = 0; i <= 11; ++i){
@@ -65,7 +65,9 @@ function createStructureOn(htmlContainer) {
     pitchClassBackdrop.className = "pitchClass";
     chromaBackdrop.appendChild(pitchClassBackdrop);
   }
-  htmlContainer.appendChild(chromaBackdrop);
+  focus.appendChild(chromaBackdrop);
+  var queerLoop = Util$QueerLoop.createElementWithId("div", "queer-loop");
+  focus.appendChild(queerLoop);
   htmlContainer.appendChild(codes);
   htmlContainer.appendChild(focus);
   htmlContainer.appendChild(log);
