@@ -450,9 +450,9 @@ function cycleThroughPast(param) {
 
 var maybeAudioContext = /* record */[/* contents */undefined];
 
-var maybeOscillator = /* record */[/* contents */undefined];
-
 var bufferCount = /* record */[/* contents */0];
+
+var audioRecording = /* record */[/* contents */false];
 
 function featuresCallback(features) {
   var rms = features.rms;
@@ -470,25 +470,18 @@ function featuresCallback(features) {
                 }));
           return /* () */0;
         }), chroma);
-  if (bufferCount[0] % 20 === 0) {
-    var spec = features.complexSpectrum;
-    var real = new Float32Array(spec.real);
-    var imag = new Float32Array(spec.imag);
+  if (audioRecording[0]) {
     var match = maybeAudioContext[0];
-    var match$1 = maybeOscillator[0];
     if (match !== undefined) {
       var ctx = Caml_option.valFromOption(match);
-      if (match$1 !== undefined) {
-        var periodicWave = ctx.createPeriodicWave(real, imag);
-        Caml_option.valFromOption(match$1).setPeriodicWave(periodicWave);
-      } else {
-        var osc = Audio$QueerLoop.makeOscillator(220.0, /* Sine */0, ctx);
-        var periodicWave$1 = ctx.createPeriodicWave(real, imag);
-        osc.setPeriodicWave(periodicWave$1);
-        osc.start();
-        osc.connect(ctx.destination);
-        maybeOscillator[0] = Caml_option.some(osc);
-      }
+      var audioBuffer = ctx.createBuffer(1, 4096, ctx.sampleRate | 0);
+      var sourceNode = ctx.createBufferSource();
+      var data = features.buffer;
+      var ary = audioBuffer.getChannelData(0);
+      ary.set(data);
+      sourceNode.buffer = audioBuffer;
+      sourceNode.connect(ctx.destination);
+      sourceNode.start();
     }
     
   }
@@ -515,7 +508,7 @@ function enableAudio(param) {
               featureExtractors: /* array */[
                 "rms",
                 "chroma",
-                "complexSpectrum"
+                "buffer"
               ],
               callback: featuresCallback
             };
@@ -752,8 +745,8 @@ export {
   pick ,
   cycleThroughPast ,
   maybeAudioContext ,
-  maybeOscillator ,
   bufferCount ,
+  audioRecording ,
   featuresCallback ,
   enableAudio ,
   showHide ,

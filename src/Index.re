@@ -131,7 +131,7 @@ let _writeLogEntry = ((isoformat, localeString, text, hash)) =>
         entry,
       );
 
-      /* SpeechSynthesis.(speak(Utterance.make(text))); */
+      /* SpeechSynthesis.(speak(Utterance.make(localeString))); */
 
       ElementRe.appendChild(time, timeDiv);
       ElementRe.appendChild(timeDiv, entry);
@@ -537,7 +537,6 @@ let cycleThroughPast = _ => {
 };
 
 let maybeAudioContext: ref(option(Audio.audioContext)) = ref(None);
-let maybeOscillator: ref(option(Audio.oscillator)) = ref(None);
 
 let bufferCount = ref(0);
 
@@ -549,12 +548,14 @@ type complexSpectrum = {
   floatImag: array(float),
 };
 
+let audioRecording = ref(false);
+
 let featuresCallback:
   {
     .
     "rms": float,
     "chroma": array(float),
-    "complexSpectrum": complexSpectrum,
+    "buffer": array(float),
   } =>
   unit =
   features => {
@@ -580,24 +581,19 @@ let featuresCallback:
       chroma,
     );
 
-    if (bufferCount^ mod 20 == 0) {
-      let spec = features##complexSpectrum;
-      let real = Js.Typed_array.Float32Array.create(floatRealGet(spec));
-      let imag = Js.Typed_array.Float32Array.create(floatImagGet(spec));
-
-      switch (maybeAudioContext^, maybeOscillator^) {
-      | (Some(ctx), None) =>
-        let osc =
-          makeOscillator(~frequency=220.0, ~type_=Sine, ~audioCtx=ctx);
-        let periodicWave = createPeriodicWave(ctx, real, imag);
-        setPeriodicWave(osc, periodicWave);
-        startOscillator(osc);
-        connect(osc, defaultSink(ctx));
-        maybeOscillator := Some(osc);
-      | (Some(ctx), Some(osc)) =>
-        let periodicWave = createPeriodicWave(ctx, real, imag);
-        setPeriodicWave(osc, periodicWave);
-      | _ => ()
+    if (audioRecording^) {
+      switch (maybeAudioContext^) {
+      | Some(ctx) =>
+        let audioBuffer =
+          createBuffer(ctx, 1, 4096, int_of_float(sampleRateGet(ctx)));
+        let sourceNode = createBufferSource(ctx);
+        let data = features##buffer;
+        let ary = getChannelData(audioBuffer, 0);
+        Js.Typed_array.Float32Array.setArray(data, ary);
+        bufferSet(sourceNode, audioBuffer);
+        connect(sourceNode, defaultSink(ctx));
+        startAudioBufferSourceNode(sourceNode);
+      | None => ()
       };
     };
     bufferCount := bufferCount^ + 1;
@@ -622,7 +618,7 @@ let enableAudio = _ => {
              ~audioContext,
              ~source,
              ~bufferSize=4096,
-             ~featureExtractors=[|"rms", "chroma", "complexSpectrum"|],
+             ~featureExtractors=[|"rms", "chroma", "buffer"|],
              ~callback=featuresCallback,
            );
          let analyzer = Meyda.createMeydaAnalyzer(opts);
