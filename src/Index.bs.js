@@ -22,6 +22,7 @@ import * as QrCodeGen$QueerLoop from "./QrCodeGen.bs.js";
 import * as QueerCode$QueerLoop from "./QueerCode.bs.js";
 import * as SvgScript$QueerLoop from "./SvgScript.bs.js";
 import * as UserMedia$QueerLoop from "./UserMedia.bs.js";
+import * as AudioDelay$QueerLoop from "./AudioDelay.bs.js";
 
 var domain = "qqq.lu";
 
@@ -450,7 +451,9 @@ function cycleThroughPast(param) {
 
 var maybeAudioContext = /* record */[/* contents */undefined];
 
-var bufferCount = /* record */[/* contents */0];
+var maybeAudioInputNode = /* record */[/* contents */undefined];
+
+var maybeDelay = /* record */[/* contents */undefined];
 
 var audioRecording = /* record */[/* contents */false];
 
@@ -462,31 +465,14 @@ function featuresCallback(features) {
           return /* () */0;
         }));
   var chroma = features.chroma;
-  $$Array.iteri((function (i, v) {
-          Util$QueerLoop.withQuerySelectorDom("#pc" + String((i + 5 | 0) % 12), (function (pc) {
-                  var vStr = v.toString();
-                  pc.setAttribute("style", "opacity: " + (String(vStr) + ""));
-                  return /* () */0;
-                }));
-          return /* () */0;
-        }), chroma);
-  if (audioRecording[0]) {
-    var match = maybeAudioContext[0];
-    if (match !== undefined) {
-      var ctx = Caml_option.valFromOption(match);
-      var audioBuffer = ctx.createBuffer(1, 4096, ctx.sampleRate | 0);
-      var sourceNode = ctx.createBufferSource();
-      var data = features.buffer;
-      var ary = audioBuffer.getChannelData(0);
-      ary.set(data);
-      sourceNode.buffer = audioBuffer;
-      sourceNode.connect(ctx.destination);
-      sourceNode.start();
-    }
-    
-  }
-  bufferCount[0] = bufferCount[0] + 1 | 0;
-  return /* () */0;
+  return $$Array.iteri((function (i, v) {
+                Util$QueerLoop.withQuerySelectorDom("#pc" + String((i + 5 | 0) % 12), (function (pc) {
+                        var vStr = v.toString();
+                        pc.setAttribute("style", "opacity: " + (String(vStr) + ""));
+                        return /* () */0;
+                      }));
+                return /* () */0;
+              }), chroma);
 }
 
 function enableAudio(param) {
@@ -500,10 +486,13 @@ function enableAudio(param) {
     audioContext = ctx;
   }
   Audio$QueerLoop.getAudioSource(audioContext).then((function (maybeSource) {
+          maybeAudioInputNode[0] = maybeSource;
           if (maybeSource !== undefined) {
+            var sourceNode = maybeSource;
+            AudioDelay$QueerLoop.setupDelay(audioContext, sourceNode, audioContext.destination, undefined, undefined, undefined, /* () */0);
             var opts = {
               audioContext: audioContext,
-              source: maybeSource,
+              source: sourceNode,
               bufferSize: 4096,
               featureExtractors: /* array */[
                 "rms",
@@ -745,7 +734,8 @@ export {
   pick ,
   cycleThroughPast ,
   maybeAudioContext ,
-  bufferCount ,
+  maybeAudioInputNode ,
+  maybeDelay ,
   audioRecording ,
   featuresCallback ,
   enableAudio ,

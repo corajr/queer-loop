@@ -537,8 +537,8 @@ let cycleThroughPast = _ => {
 };
 
 let maybeAudioContext: ref(option(Audio.audioContext)) = ref(None);
-
-let bufferCount = ref(0);
+let maybeAudioInputNode: ref(option(Audio.audioNode)) = ref(None);
+let maybeDelay: ref(option(AudioDelay.t)) = ref(None);
 
 [@bs.deriving abstract]
 type complexSpectrum = {
@@ -555,7 +555,6 @@ let featuresCallback:
     .
     "rms": float,
     "chroma": array(float),
-    "buffer": array(float),
   } =>
   unit =
   features => {
@@ -580,23 +579,6 @@ let featuresCallback:
         |> ignore,
       chroma,
     );
-
-    if (audioRecording^) {
-      switch (maybeAudioContext^) {
-      | Some(ctx) =>
-        let audioBuffer =
-          createBuffer(ctx, 1, 4096, int_of_float(sampleRateGet(ctx)));
-        let sourceNode = createBufferSource(ctx);
-        let data = features##buffer;
-        let ary = getChannelData(audioBuffer, 0);
-        Js.Typed_array.Float32Array.setArray(data, ary);
-        bufferSet(sourceNode, audioBuffer);
-        connect(sourceNode, defaultSink(ctx));
-        startAudioBufferSourceNode(sourceNode);
-      | None => ()
-      };
-    };
-    bufferCount := bufferCount^ + 1;
   };
 
 let enableAudio = _ => {
@@ -611,12 +593,19 @@ let enableAudio = _ => {
 
   Audio.getAudioSource(audioContext)
   |> Js.Promise.then_(maybeSource => {
+       maybeAudioInputNode := maybeSource;
        switch (maybeSource) {
-       | Some(source) =>
+       | Some(sourceNode) =>
+         AudioDelay.setupDelay(
+           ~audioContext,
+           ~sourceNode,
+           ~output=Audio.defaultSink(audioContext),
+           (),
+         );
          let opts =
            Meyda.analyzerOpts(
              ~audioContext,
-             ~source,
+             ~source=sourceNode,
              ~bufferSize=4096,
              ~featureExtractors=[|"rms", "chroma", "buffer"|],
              ~callback=featuresCallback,

@@ -131,6 +131,9 @@ type audioBufferSourceNode =
   };
 
 [@bs.deriving abstract]
+type delayNode = pri {delayTime: audioParam};
+
+[@bs.deriving abstract]
 type compressor = {
   threshold: audioParam,
   knee: audioParam,
@@ -207,6 +210,9 @@ external createBuffer : (audioContext, int, int, int) => audioBuffer = "";
 
 [@bs.send]
 external createBufferSource : audioContext => audioBufferSourceNode = "";
+
+[@bs.send]
+external createDelay : (audioContext, ~maxDelay: float) => delayNode = "";
 
 [@bs.send]
 external getChannelData : (audioBuffer, int) => Js.Typed_array.Float32Array.t =
