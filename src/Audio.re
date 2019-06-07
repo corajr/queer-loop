@@ -175,6 +175,8 @@ external unwrapCompressor : compressor => audioNode = "%identity";
 external unwrapChannelMerger : channelMerger => audioNode = "%identity";
 external unwrapStereoPanner : stereoPanner => audioNode = "%identity";
 
+external unwrapDelay : delayNode => audioNode = "%identity";
+
 type bank('a) = {
   input: option(gainNode),
   nodes: array('a),

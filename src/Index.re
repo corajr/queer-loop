@@ -596,12 +596,15 @@ let enableAudio = _ => {
        maybeAudioInputNode := maybeSource;
        switch (maybeSource) {
        | Some(sourceNode) =>
-         AudioDelay.setupDelay(
-           ~audioContext,
-           ~sourceNode,
-           ~output=Audio.defaultSink(audioContext),
-           (),
-         );
+         if (audioRecording^) {
+           AudioDelay.setupDelays(
+             ~audioContext,
+             ~sourceNode,
+             ~output=Audio.defaultSink(audioContext),
+             (),
+           );
+           ();
+         };
          let opts =
            Meyda.analyzerOpts(
              ~audioContext,

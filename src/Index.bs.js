@@ -489,7 +489,9 @@ function enableAudio(param) {
           maybeAudioInputNode[0] = maybeSource;
           if (maybeSource !== undefined) {
             var sourceNode = maybeSource;
-            AudioDelay$QueerLoop.setupDelay(audioContext, sourceNode, audioContext.destination, undefined, undefined, undefined, /* () */0);
+            if (audioRecording[0]) {
+              AudioDelay$QueerLoop.setupDelays(audioContext, sourceNode, audioContext.destination, undefined, undefined, undefined, /* () */0);
+            }
             var opts = {
               audioContext: audioContext,
               source: sourceNode,
