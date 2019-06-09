@@ -557,3 +557,30 @@ let drawCanvas: (Dom.element, QrCode.t) => unit =
       };
     };
   };
+
+let clipCanvas: (Dom.element, QrCode.t) => unit =
+  (canvas, code) => {
+    open Canvas;
+    let size = QrCode.size(code);
+    let border = 6;
+    let width = size + border * 2;
+
+    let scale = getWidth(canvas) / width;
+
+    let ctx = getContext(canvas);
+    Ctx.beginPath(ctx);
+    for (y in - border to size + border) {
+      for (x in - border to size + border) {
+        if (! QrCode.getModule(code, x, y)) {
+          Ctx.rect(
+            ctx,
+            (x + border) * scale,
+            (y + border) * scale,
+            scale,
+            scale,
+          );
+        };
+      };
+    };
+    Ctx.clip(ctx);
+  };

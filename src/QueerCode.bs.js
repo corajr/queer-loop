@@ -2,6 +2,7 @@
 
 import * as Block from "../node_modules/bs-platform/lib/es6/block.js";
 import * as Caml_array from "../node_modules/bs-platform/lib/es6/caml_array.js";
+import * as Caml_int32 from "../node_modules/bs-platform/lib/es6/caml_int32.js";
 import * as Belt_Option from "../node_modules/bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "../node_modules/bs-platform/lib/es6/caml_option.js";
 import * as Util$QueerLoop from "./Util.bs.js";
@@ -305,6 +306,24 @@ function drawCanvas(canvas, code) {
   return /* () */0;
 }
 
+function clipCanvas(canvas, code) {
+  var size = code.size;
+  var width = size + 12 | 0;
+  var scale = Caml_int32.div(canvas.width, width);
+  var ctx = canvas.getContext("2d");
+  ctx.beginPath();
+  for(var y = -6 ,y_finish = size + 6 | 0; y <= y_finish; ++y){
+    for(var x = -6 ,x_finish = size + 6 | 0; x <= x_finish; ++x){
+      if (!code.getModule(x, y)) {
+        ctx.rect(Caml_int32.imul(x + 6 | 0, scale), Caml_int32.imul(y + 6 | 0, scale), scale, scale);
+      }
+      
+    }
+  }
+  ctx.clip();
+  return /* () */0;
+}
+
 var lightRainbowLightness = 0.95;
 
 var darkRainbowLightness = 0.1;
@@ -334,6 +353,7 @@ export {
   svgToPng ,
   codeToImage ,
   drawCanvas ,
+  clipCanvas ,
   
 }
 /* Util-QueerLoop Not a pure module */

@@ -23,6 +23,12 @@ module Ctx = {
   [@bs.send] external fillText : (t, string, int, int) => unit = "";
   [@bs.set] external setFont : (t, string) => unit = "font";
 
+  [@bs.send] external beginPath : t => unit = "";
+  [@bs.send] external clip : t => unit = "";
+  [@bs.send] external rect : (t, int, int, int, int) => unit = "";
+  [@bs.send] external save : t => unit = "";
+  [@bs.send] external restore : t => unit = "";
+
   [@bs.send] external clearRect : (t, int, int, int, int) => unit = "";
 
   [@bs.send]
