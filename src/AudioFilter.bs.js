@@ -18,7 +18,7 @@ function hashToChroma(hexHash) {
 }
 
 function init(audioContext, sourceNode, output, param) {
-  var bank = Audio$QueerLoop.makeFilterBank(audioContext, 12, 32.0, (function (i) {
+  var bank = Audio$QueerLoop.makeFilterBank(audioContext, 12, 64.0, (function (i) {
           return Audio$QueerLoop.noteToFrequency(i + 60.0);
         }));
   Audio$QueerLoop.updateFilterBank(undefined, undefined, bank, /* array */[

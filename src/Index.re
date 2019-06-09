@@ -30,7 +30,7 @@ let setHashToNow = _ => setHash(getTimestamp());
 
 let hasChanged = ref(false);
 
-let audioRecording = ref(true);
+let audioRecording = ref(false);
 let maybeFilterBank: ref(option(Audio.filterBank)) = ref(None);
 
 type state =

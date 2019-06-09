@@ -51,7 +51,7 @@ function setHashToNow(param) {
 
 var hasChanged = /* record */[/* contents */false];
 
-var audioRecording = /* record */[/* contents */true];
+var audioRecording = /* record */[/* contents */false];
 
 var maybeFilterBank = /* record */[/* contents */undefined];
 

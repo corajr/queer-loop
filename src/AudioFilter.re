@@ -22,7 +22,7 @@ let init =
       _: unit,
     ) => {
   let bank =
-    makeFilterBank(~audioCtx=audioContext, ~filterN=12, ~q=32.0, ~freqFunc=i =>
+    makeFilterBank(~audioCtx=audioContext, ~filterN=12, ~q=64.0, ~freqFunc=i =>
       noteToFrequency(float_of_int(i) +. 60.0)
     );
   updateFilterBank(
