@@ -81,13 +81,13 @@ let styleText = {|
       visibility: visible;
    }
 
-   svg|svg.animate.temporarilyInactive {
-      visibility: hidden;
-   }
-
    svg|svg.animate .background, svg|svg.previous .background, svg|svg.active .background {
       visibility: visible;
       opacity: 1.0;
+   }
+
+   svg|svg.animate.temporarilyInactive, svg|svg.animate.temporarilyInactive .background {
+      visibility: hidden;
    }
 
    .codeBackdrop {
@@ -138,7 +138,7 @@ let styleText = {|
    }
 
    svg|svg.active {
-       opacity: 0.5;
+       opacity: 1.0;
        mix-blend-mode: screen;
    }
 
