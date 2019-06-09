@@ -30,6 +30,9 @@ let setHashToNow = _ => setHash(getTimestamp());
 
 let hasChanged = ref(false);
 
+let audioRecording = ref(true);
+let maybeFilterBank: ref(option(Audio.filterBank)) = ref(None);
+
 type state =
   | Asleep
   | Dreaming
@@ -273,6 +276,16 @@ let setCode = (text, date) =>
 
              if (! alreadySeen) {
                Js.Dict.set(dataSeen, hash, text);
+
+               switch (maybeFilterBank^) {
+               | Some(bank) =>
+                 Audio.updateFilterBank(
+                   ~filterBank=bank,
+                   ~filterValues=AudioFilter.hashToChroma(hash),
+                   (),
+                 )
+               | None => ()
+               };
 
                let code =
                  Belt.Option.getWithDefault(
@@ -548,8 +561,6 @@ type complexSpectrum = {
   floatImag: array(float),
 };
 
-let audioRecording = ref(false);
-
 let featuresCallback:
   {
     .
@@ -597,13 +608,13 @@ let enableAudio = _ => {
        switch (maybeSource) {
        | Some(sourceNode) =>
          if (audioRecording^) {
-           AudioDelay.setupDelays(
-             ~audioContext,
-             ~sourceNode,
-             ~output=Audio.defaultSink(audioContext),
-             (),
-           );
-           ();
+           maybeFilterBank :=
+             AudioFilter.init(
+               ~audioContext,
+               ~sourceNode,
+               ~output=Audio.defaultSink(audioContext),
+               (),
+             );
          };
          let opts =
            Meyda.analyzerOpts(

@@ -646,6 +646,7 @@ let updateFilterBank =
       ~outputGain: float=0.1,
       ~filterBank: filterBank,
       ~filterValues: array(float),
+      _: unit,
     ) => {
   let currentTime = currentTime(filterBank.audioCtx);
   switch (filterBank.input) {

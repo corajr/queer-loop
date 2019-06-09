@@ -22,7 +22,7 @@ import * as QrCodeGen$QueerLoop from "./QrCodeGen.bs.js";
 import * as QueerCode$QueerLoop from "./QueerCode.bs.js";
 import * as SvgScript$QueerLoop from "./SvgScript.bs.js";
 import * as UserMedia$QueerLoop from "./UserMedia.bs.js";
-import * as AudioDelay$QueerLoop from "./AudioDelay.bs.js";
+import * as AudioFilter$QueerLoop from "./AudioFilter.bs.js";
 
 var domain = "qqq.lu";
 
@@ -50,6 +50,10 @@ function setHashToNow(param) {
 }
 
 var hasChanged = /* record */[/* contents */false];
+
+var audioRecording = /* record */[/* contents */true];
+
+var maybeFilterBank = /* record */[/* contents */undefined];
 
 var queerLoopState = /* record */[/* contents : Dreaming */1];
 
@@ -250,6 +254,10 @@ function setCode(text, date) {
                     return 0;
                   } else {
                     dataSeen[hash] = text;
+                    var match = maybeFilterBank[0];
+                    if (match !== undefined) {
+                      Audio$QueerLoop.updateFilterBank(undefined, undefined, match, AudioFilter$QueerLoop.hashToChroma(hash), /* () */0);
+                    }
                     var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode[/* encodeText */1](text, QrCodeGen$QueerLoop.Ecc[/* medium */1]), defaultCode);
                     var sizeWithBorder = code.size + 12 | 0;
                     var isoformat = date.toISOString();
@@ -455,8 +463,6 @@ var maybeAudioInputNode = /* record */[/* contents */undefined];
 
 var maybeDelay = /* record */[/* contents */undefined];
 
-var audioRecording = /* record */[/* contents */false];
-
 function featuresCallback(features) {
   var rms = features.rms;
   var rmsS = Math.sqrt(rms).toString();
@@ -490,7 +496,7 @@ function enableAudio(param) {
           if (maybeSource !== undefined) {
             var sourceNode = maybeSource;
             if (audioRecording[0]) {
-              AudioDelay$QueerLoop.setupDelays(audioContext, sourceNode, audioContext.destination, undefined, undefined, undefined, /* () */0);
+              maybeFilterBank[0] = AudioFilter$QueerLoop.init(audioContext, sourceNode, audioContext.destination, /* () */0);
             }
             var opts = {
               audioContext: audioContext,
@@ -707,6 +713,8 @@ export {
   asOfNow ,
   setHashToNow ,
   hasChanged ,
+  audioRecording ,
+  maybeFilterBank ,
   queerLoopState ,
   simulateSelfRecognition ,
   onClick ,
@@ -738,7 +746,6 @@ export {
   maybeAudioContext ,
   maybeAudioInputNode ,
   maybeDelay ,
-  audioRecording ,
   featuresCallback ,
   enableAudio ,
   showHide ,

@@ -313,7 +313,7 @@ function updateBankGains(bank, gainValues) {
   return /* () */0;
 }
 
-function updateFilterBank($staropt$star, $staropt$star$1, filterBank, filterValues) {
+function updateFilterBank($staropt$star, $staropt$star$1, filterBank, filterValues, param) {
   var inputGain = $staropt$star !== undefined ? $staropt$star : 1.0;
   var outputGain = $staropt$star$1 !== undefined ? $staropt$star$1 : 0.1;
   var currentTime = filterBank[/* audioCtx */4].currentTime;
