@@ -9,7 +9,7 @@ let withQuerySelectorDom = (query, f) =>
 let withQuerySelector = (query, f) =>
   document
   |> Document.querySelector(query)
-  |. Belt.Option.flatMap(DomRe.Element.asHtmlElement)
+  |. Belt.Option.flatMap(Element.asHtmlElement)
   |. Belt.Option.map(f);
 
 let catMaybes: array(option('a)) => array('a) =
@@ -28,42 +28,42 @@ let mapMaybe: ('a => option('b), array('a)) => array('b) =
   (f, arrayA) => catMaybes(Array.map(f, arrayA));
 
 let withQuerySelectorFrom = (query, element, f) =>
-  ElementRe.querySelector(query, element) |. Belt.Option.map(f);
+  Element.querySelector(query, element) |. Belt.Option.map(f);
 
 let withQuerySelectorAllFrom = (query, element, f) =>
-  ElementRe.querySelectorAll(query, element)
-  |> DomRe.NodeList.toArray
-  |> mapMaybe(ElementRe.ofNode)
+  Element.querySelectorAll(query, element)
+  |> NodeList.toArray
+  |> mapMaybe(Element.ofNode)
   |> f;
 
 let withQuerySelectorAll = (query, f) =>
   document
   |> Document.querySelectorAll(query)
-  |> DomRe.NodeList.toArray
-  |> mapMaybe(ElementRe.ofNode)
+  |> NodeList.toArray
+  |> mapMaybe(Element.ofNode)
   |> f;
 
 let withQuerySelectorSub = (query, childQuery, f) =>
   document
   |> Document.querySelector(query)
-  |. Belt.Option.flatMap(ElementRe.querySelector(childQuery))
+  |. Belt.Option.flatMap(Element.querySelector(childQuery))
   |. Belt.Option.map(f);
 
 let removeFromParentNode = node =>
-  switch (NodeRe.parentNode(node)) {
-  | Some(parent) => NodeRe.removeChild(node, parent) |> ignore
+  switch (Node.parentNode(node)) {
+  | Some(parent) => Node.removeChild(node, parent) |> ignore
   | None => ()
   };
 
 let removeFromParent = element =>
-  switch (ElementRe.parentElement(element)) {
-  | Some(parent) => ElementRe.removeChild(element, parent) |> ignore
+  switch (Element.parentElement(element)) {
+  | Some(parent) => Element.removeChild(element, parent) |> ignore
   | None => ()
   };
 
 let createElementWithId = (tagName: string, id: string) : Dom.element => {
-  let element = DocumentRe.createElementNS(htmlNs, tagName, document);
-  ElementRe.setId(element, id);
+  let element = Document.createElementNS(htmlNs, tagName, document);
+  Element.setId(element, id);
   element;
 };
 
@@ -73,25 +73,25 @@ external encodeURIComponent : string => string = "encodeURIComponent";
 [@bs.val]
 external decodeURIComponent : string => string = "decodeURIComponent";
 
-let getHash = _ => DomRe.Location.hash(WindowRe.location(window));
+let getHash = _ => Location.hash(Window.location(window));
 
-let setHash = hash =>
-  DomRe.Location.setHash(WindowRe.location(window), hash);
+let setHash = (hash: string) =>
+  Location.setHash(Window.location(window), hash);
 
-let getQueryString = _ => DomRe.Location.search(WindowRe.location(window));
+let getQueryString = _ => Location.search(Window.location(window));
 
 let setQueryString = search =>
-  DomRe.Location.setSearch(WindowRe.location(window), search);
+  Location.setSearch(Window.location(window), search);
 
 let setBackground = (selector, bgCss) =>
   withQuerySelector(
     selector,
     el => {
-      DomRe.CssStyleDeclaration.setProperty(
+      CssStyleDeclaration.setProperty(
         "background",
         bgCss,
         "",
-        HtmlElementRe.style(el),
+        HtmlElement.style(el),
       );
       Js.log(bgCss);
     },

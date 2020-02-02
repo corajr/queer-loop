@@ -347,11 +347,11 @@ let makeCompressor =
     )
     : compressor => {
   let compressor = createDynamicsCompressor(audioCtx);
-  let t = currentTime(audioCtx);
-  setValueAtTime(compressor |. threshold, paramValues.threshold, t);
-  setValueAtTime(compressor |. knee, paramValues.knee, t);
-  setValueAtTime(compressor |. attack, paramValues.attack, t);
-  setValueAtTime(compressor |. release, paramValues.release, t);
+  let t = currentTimeGet(audioCtx);
+  setValueAtTime(compressor |. thresholdGet, paramValues.threshold, t);
+  setValueAtTime(compressor |. kneeGet, paramValues.knee, t);
+  setValueAtTime(compressor |. attackGet, paramValues.attack, t);
+  setValueAtTime(compressor |. releaseGet, paramValues.release, t);
   compressor;
 };
 
@@ -475,7 +475,7 @@ let makeOscillator =
     (~frequency: float=440.0, ~type_=Sine, ~audioCtx: audioContext)
     : oscillator => {
   let oscillator = createOscillator(audioCtx);
-  let t = currentTime(audioCtx);
+  let t = currentTimeGet(audioCtx);
   setValueAtTime(oscillator |. oscillatorFrequencyGet, frequency, t);
   setOscillatorType(audioCtx, oscillator, type_);
   oscillator;
@@ -499,7 +499,7 @@ let makeFilter =
   let filter = createBiquadFilter(audioCtx);
   type_Set(filter, string_of_filterType(filterType));
 
-  let t = currentTime(audioCtx);
+  let t = currentTimeGet(audioCtx);
 
   switch (filterType) {
   | BandPass(f, q)
@@ -508,16 +508,16 @@ let makeFilter =
   | BandPass(f, q)
   | Notch(f, q)
   | AllPass(f, q) =>
-    setValueAtTime(frequency(filter), f, t);
-    setValueAtTime(qualityFactor(filter), q, t);
+    setValueAtTime(frequencyGet(filter), f, t);
+    setValueAtTime(qualityFactorGet(filter), q, t);
   | LowShelf(f, g)
   | HighShelf(f, g) =>
-    setValueAtTime(frequency(filter), f, t);
-    setValueAtTime(gain(filter), g, t);
+    setValueAtTime(frequencyGet(filter), f, t);
+    setValueAtTime(gainGet(filter), g, t);
   | Peaking(f, q, g) =>
-    setValueAtTime(frequency(filter), f, t);
-    setValueAtTime(qualityFactor(filter), q, t);
-    setValueAtTime(gain(filter), g, t);
+    setValueAtTime(frequencyGet(filter), f, t);
+    setValueAtTime(qualityFactorGet(filter), q, t);
+    setValueAtTime(gainGet(filter), g, t);
   };
   filter;
 };
@@ -533,7 +533,7 @@ let makeBankOf:
   (~audioCtx, ~n, ~hasInput, ~f) => {
     let input = hasInput ? Some(createGain(audioCtx)) : None;
     let output = createGain(audioCtx);
-    let t = currentTime(audioCtx);
+    let t = currentTimeGet(audioCtx);
 
     let createNode =
       switch (input) {
@@ -585,7 +585,7 @@ let makeOscillatorBank =
     makeOscillator(~audioCtx, ~type_, ~frequency=freqFunc(n - i));
 
   let bank = makeBankOf(~audioCtx, ~n, ~hasInput=false, ~f=createNode);
-  let t = currentTime(audioCtx);
+  let t = currentTimeGet(audioCtx);
   setValueAtTime(bank.output |. gain_Get, 0.007, t);
   bank;
 };
@@ -628,7 +628,7 @@ type filterBanks =
   | StereoBanks(filterBank, filterBank);
 
 let updateBankGains = (~bank: bank('a), ~gainValues: array(float)) => {
-  let t = currentTime(bank.audioCtx);
+  let t = currentTimeGet(bank.audioCtx);
   let n = Array.length(gainValues);
   for (i in 0 to n - 1) {
     let gainI = n - i - 1;
@@ -648,7 +648,7 @@ let updateFilterBank =
       ~filterValues: array(float),
       _: unit,
     ) => {
-  let currentTime = currentTime(filterBank.audioCtx);
+  let currentTime = currentTimeGet(filterBank.audioCtx);
   switch (filterBank.input) {
   | Some(input) => setValueAtTime(input |. gain_Get, inputGain, currentTime)
   | None => ()
@@ -660,12 +660,16 @@ let updateFilterBank =
 let updateFilterBankDefinition =
     (~filterBank: filterBank, ~freqFunc: int => float, ~q: float) => {
   Js.log("updating filter bank definitions (costly!)");
-  let currentTime = currentTime(filterBank.audioCtx);
+  let currentTime = currentTimeGet(filterBank.audioCtx);
   let n = Array.length(filterBank.nodes);
   Array.iteri(
     (i, filter) => {
-      setValueAtTime(filter |. qualityFactor, q, currentTime);
-      setValueAtTime(filter |. frequency, freqFunc(n - i - 1), currentTime);
+      setValueAtTime(filter |. qualityFactorGet, q, currentTime);
+      setValueAtTime(
+        filter |. frequencyGet,
+        freqFunc(n - i - 1),
+        currentTime,
+      );
     },
     filterBank.nodes,
   );

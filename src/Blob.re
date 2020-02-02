@@ -6,7 +6,7 @@ type opts = {
   mimeType: string,
 };
 
-external asFileT : t => FileRe.t = "%identity";
+external asFileT : t => Webapi.File.t = "%identity";
 
 [@bs.new]
 external make : (array(Js.Typed_array.ArrayBuffer.t), opts) => t = "Blob";

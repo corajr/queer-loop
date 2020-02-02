@@ -101,34 +101,34 @@ let onClick = (maybeHash, _) => {
 let _writeLogEntry = ((isoformat, localeString, text, hash)) =>
   Webapi.Dom.(
     withQuerySelectorDom("#log", log => {
-      let entry = DocumentRe.createElement("a", document);
-      ElementRe.setAttribute("href", "#" ++ hash, entry);
-      let linkClasses = ElementRe.classList(entry);
-      DomTokenListRe.addMany(
+      let entry = Document.createElement("a", document);
+      Element.setAttribute("href", "#" ++ hash, entry);
+      let linkClasses = Element.classList(entry);
+      DomTokenList.addMany(
         [|"log-entry", "codeLink", "code" ++ hash|],
         linkClasses,
       );
 
-      ElementRe.addEventListener(
+      Element.addEventListener(
         "click",
         evt => {
-          EventRe.preventDefault(evt);
+          Event.preventDefault(evt);
           onClick(Some(hash), ());
         },
         entry,
       );
 
-      let timeDiv = DocumentRe.createElement("div", document);
-      let time = DocumentRe.createElement("time", document);
-      ElementRe.setAttribute("datetime", isoformat, time);
-      ElementRe.setTextContent(time, localeString);
+      let timeDiv = Document.createElement("div", document);
+      let time = Document.createElement("time", document);
+      Element.setAttribute("datetime", isoformat, time);
+      Element.setTextContent(time, localeString);
 
-      let textChild = DocumentRe.createElement("span", document);
-      ElementRe.setInnerText(textChild, text);
+      let textChild = Document.createElement("span", document);
+      Element.setInnerText(textChild, text);
 
       let hashColor = Js.String.slice(~from=0, ~to_=6, hash);
 
-      ElementRe.setAttribute(
+      Element.setAttribute(
         "style",
         {j|background-color: #$(hashColor)66;|j},
         entry,
@@ -136,10 +136,10 @@ let _writeLogEntry = ((isoformat, localeString, text, hash)) =>
 
       /* SpeechSynthesis.(speak(Utterance.make(localeString))); */
 
-      ElementRe.appendChild(time, timeDiv);
-      ElementRe.appendChild(timeDiv, entry);
-      ElementRe.appendChild(textChild, entry);
-      ElementRe.appendChild(entry, log);
+      Element.appendChild(time, timeDiv);
+      Element.appendChild(timeDiv, entry);
+      Element.appendChild(textChild, entry);
+      Element.appendChild(entry, log);
     })
   )
   |> ignore;
@@ -180,21 +180,23 @@ type svgOrHtml =
 let hasBody = [%bs.raw () => "return !!document.body;"];
 
 let withRootSvg = (hash, f: Dom.element => unit) : unit =>
-  if (hasBody()) {
-    withQuerySelectorDom("#queer-loop", loopContainer =>
-      switch (ElementRe.querySelector("svg", loopContainer)) {
-      | Some(svg) => f(svg)
-      | None =>
-        let svg = QueerCode.createSvgSkeleton(hash);
-        ElementRe.addEventListener("click", onClick(None), svg);
-        ElementRe.appendChild(svg, loopContainer);
-        f(svg);
-      }
-    )
-    |> ignore;
-  } else {
-    withQuerySelectorDom("svg.root", f) |> ignore;
-  };
+  Webapi.Dom.(
+    if (hasBody()) {
+      withQuerySelectorDom("#queer-loop", loopContainer =>
+        switch (Element.querySelector("svg", loopContainer)) {
+        | Some(svg) => f(svg)
+        | None =>
+          let svg = QueerCode.createSvgSkeleton(hash);
+          Element.addEventListener("click", onClick(None), svg);
+          Element.appendChild(svg, loopContainer);
+          f(svg);
+        }
+      )
+      |> ignore;
+    } else {
+      withQuerySelectorDom("svg.root", f) |> ignore;
+    }
+  );
 
 let setOnClick: (Dom.element, Dom.event => unit) => unit = [%bs.raw
   (el, handler) => {|el.onclick = handler;|}
@@ -205,21 +207,21 @@ let simulateClick: Dom.element => unit = [%bs.raw el => {|el.click();|}];
 let save = timestamp =>
   Webapi.Dom.(
     withRootSvg("", rootSvg => {
-      let downloadLink = DocumentRe.createElementNS(htmlNs, "a", document);
-      ElementRe.setAttribute("download", timestamp ++ ".svg", downloadLink);
+      let downloadLink = Document.createElementNS(htmlNs, "a", document);
+      Element.setAttribute("download", timestamp ++ ".svg", downloadLink);
 
       withQuerySelectorDom("#htmlContainer", htmlContainer => {
         let blobObjectUrl = QueerCode.svgToBlobObjectURL(rootSvg);
-        ElementRe.setAttribute("href", blobObjectUrl, downloadLink);
+        Element.setAttribute("href", blobObjectUrl, downloadLink);
 
-        ElementRe.appendChild(downloadLink, htmlContainer);
+        Element.appendChild(downloadLink, htmlContainer);
         simulateClick(downloadLink);
 
         Js_global.setTimeout(
           _ => {
             Js.log({j|Freeing memory from $timestamp.|j});
-            UrlRe.revokeObjectURL(blobObjectUrl);
-            ElementRe.removeChild(downloadLink, htmlContainer);
+            Webapi.Url.revokeObjectURL(blobObjectUrl);
+            Element.removeChild(downloadLink, htmlContainer);
             ();
           },
           0,
@@ -243,26 +245,28 @@ let maybeCachedHexDigest = text =>
   };
 
 let toggleInversion = _ =>
-  withQuerySelectorDom("#htmlContainer", htmlContainer => {
-    let currentInversion = currentOptions^.invert;
-    currentOptions := {...currentOptions^, invert: ! currentInversion};
+  Webapi.Dom.(
+    withQuerySelectorDom("#htmlContainer", htmlContainer => {
+      let currentInversion = currentOptions^.invert;
+      currentOptions := {...currentOptions^, invert: ! currentInversion};
 
-    let classList = ElementRe.classList(htmlContainer);
-    if (currentOptions^.invert) {
-      DomTokenListRe.add("invert", classList);
-    } else {
-      DomTokenListRe.remove("invert", classList);
-    };
-    withRootSvg("", rootSvg => {
-      let classList = ElementRe.classList(rootSvg);
+      let classList = Element.classList(htmlContainer);
       if (currentOptions^.invert) {
-        DomTokenListRe.add("invert", classList);
+        DomTokenList.add("invert", classList);
       } else {
-        DomTokenListRe.remove("invert", classList);
+        DomTokenList.remove("invert", classList);
       };
-    });
-  })
-  |> ignore;
+      withRootSvg("", rootSvg => {
+        let classList = Element.classList(rootSvg);
+        if (currentOptions^.invert) {
+          DomTokenList.add("invert", classList);
+        } else {
+          DomTokenList.remove("invert", classList);
+        };
+      });
+    })
+    |> ignore
+  );
 
 let setCode = (text, date) =>
   maybeCachedHexDigest(text)
@@ -310,7 +314,7 @@ let setCode = (text, date) =>
 
                let codeImg = QueerCode.svgToImg(codeSvg);
 
-               ElementRe.addEventListener(
+               Element.addEventListener(
                  "load",
                  _ =>
                    withQuerySelectorDom("#centralGroup", centralGroup =>
@@ -325,10 +329,10 @@ let setCode = (text, date) =>
                          |> ignore;
                        };
 
-                       ElementRe.appendChild(codeSvg, centralGroup);
+                       Element.appendChild(codeSvg, centralGroup);
 
                        if (currentOptions^.animate) {
-                         ElementRe.setAttribute(
+                         Element.setAttribute(
                            "class",
                            "root animationsEnabled",
                            rootSvg,
@@ -340,7 +344,7 @@ let setCode = (text, date) =>
                        let iconCodeImg =
                          QueerCode.codeToImage(~code, ~border, ~hash);
 
-                       ElementRe.addEventListener(
+                       Element.addEventListener(
                          "load",
                          _evt =>
                            switch (
@@ -362,36 +366,36 @@ let setCode = (text, date) =>
                            | Some(iconUrl) =>
                              withQuerySelectorDom("#codes", container => {
                                let a =
-                                 DocumentRe.createElementNS(
+                                 Document.createElementNS(
                                    htmlNs,
                                    "a",
                                    document,
                                  );
-                               ElementRe.setAttribute("href", "#" ++ hash, a);
-                               let linkClasses = ElementRe.classList(a);
-                               DomTokenListRe.addMany(
+                               Element.setAttribute("href", "#" ++ hash, a);
+                               let linkClasses = Element.classList(a);
+                               DomTokenList.addMany(
                                  [|"codeLink", "code" ++ hash|],
                                  linkClasses,
                                );
 
                                let img =
-                                 DocumentRe.createElementNS(
+                                 Document.createElementNS(
                                    htmlNs,
                                    "img",
                                    document,
                                  );
-                               ElementRe.setAttribute("src", iconUrl, img);
+                               Element.setAttribute("src", iconUrl, img);
 
-                               ElementRe.appendChild(img, a);
-                               ElementRe.addEventListener(
+                               Element.appendChild(img, a);
+                               Element.addEventListener(
                                  "click",
                                  evt => {
-                                   EventRe.preventDefault(evt);
+                                   Event.preventDefault(evt);
                                    onClick(Some(hash), ());
                                  },
                                  a,
                                );
-                               ElementRe.appendChild(a, container);
+                               Element.appendChild(a, container);
                              })
                              |> ignore
                            | None => ()
@@ -423,20 +427,22 @@ let setCode = (text, date) =>
 let setText =
   Debouncer.make(~wait=200, hash =>
     withQuerySelectorDom("#codeContents", el =>
-      ElementRe.setInnerText(el, decodeURIComponent(hash))
+      Webapi.Dom.Element.setInnerText(el, decodeURIComponent(hash))
     )
     |> ignore
   );
 
 let onHashChange = _evt => {
+  open Webapi.Dom;
   let opts = currentOptions^;
 
-  let url =
-    UrlRe.make(DomRe.Location.href(WindowRe.location(Webapi.Dom.window)));
+  let url = Webapi.Url.make(Location.href(Window.location(window)));
 
   let date =
     switch (
-      maybeDeserializeTime(Js.String.sliceToEnd(~from=1, UrlRe.hash(url)))
+      maybeDeserializeTime(
+        Js.String.sliceToEnd(~from=1, Webapi.Url.hash(url)),
+      )
     ) {
     | Some(date) => date
     | None => Js.Date.make()
@@ -446,7 +452,7 @@ let onHashChange = _evt => {
   let localeString = Js.Date.toLocaleString(date);
 
   withQuerySelectorDom("title", title =>
-    ElementRe.setInnerText(
+    Element.setInnerText(
       title,
       switch (currentOptions^.title) {
       | Some(titleStr) => titleStr
@@ -456,13 +462,13 @@ let onHashChange = _evt => {
   );
 
   withQuerySelectorDom("time", time => {
-    ElementRe.setAttribute("datetime", isoformat, time);
-    ElementRe.setInnerText(time, localeString);
+    Element.setAttribute("datetime", isoformat, time);
+    Element.setInnerText(time, localeString);
   });
   let urlText =
-    (opts.includeDomain ? UrlRe.origin(url) : "")
-    ++ (opts.includeQueryString ? UrlRe.search(url) : "")
-    ++ (opts.includeHash ? UrlRe.hash(url) : "");
+    (opts.includeDomain ? Webapi.Url.origin(url) : "")
+    ++ (opts.includeQueryString ? Webapi.Url.search(url) : "")
+    ++ (opts.includeHash ? Webapi.Url.hash(url) : "");
 
   setCode(urlText, date);
   setText(urlText);
@@ -483,9 +489,9 @@ let rec onTick = ts => {
   Webapi.requestAnimationFrame(onTick);
 };
 
-let maybeUrl: string => option(UrlRe.t) =
+let maybeUrl: string => option(Webapi.Url.t) =
   s =>
-    switch (UrlRe.make(s)) {
+    switch (Webapi.Url.make(s)) {
     | url => Some(url)
     | exception e =>
       Js_console.error2("Could not parse URL", e);
@@ -493,18 +499,17 @@ let maybeUrl: string => option(UrlRe.t) =
     };
 
 let _onInput = _ =>
-  withQuerySelectorDom("#codeContents", el => {
-    let text = ElementRe.innerText(el);
-    maybeUrl(text)
-    |. Belt.Option.map(url => {
-         DomRe.Location.setSearch(WindowRe.location(Webapi.Dom.window));
-         DomRe.Location.setHash(
-           WindowRe.location(Webapi.Dom.window),
-           UrlRe.hash(url),
-         );
-       });
-  })
-  |> ignore;
+  Webapi.Dom.(
+    withQuerySelectorDom("#codeContents", el => {
+      let text = Element.innerText(el);
+      maybeUrl(text)
+      |. Belt.Option.map(url => {
+           Location.setSearch(Window.location(window));
+           Location.setHash(Window.location(window), Webapi.Url.hash(url));
+         });
+    })
+    |> ignore
+  );
 
 let onInput = Debouncer.make(~wait=100, _onInput);
 
@@ -518,10 +523,11 @@ let pick: (array('a), array(int)) => array('a) =
   (ary, indices) => Array.map(i => ary[i], indices);
 
 let cycleThroughPast = _ => {
+  open Webapi.Dom;
   let allIds =
     withQuerySelectorAll(
       ".code",
-      mapMaybe(item => ElementRe.getAttribute("id", item)),
+      mapMaybe(item => Element.getAttribute("id", item)),
     );
   let currentId =
     Belt.Option.getWithDefault(
@@ -529,7 +535,7 @@ let cycleThroughPast = _ => {
         withQuerySelectorDom(".animate", live => {
           removeClassSvg(live, "animate");
           addClassSvg(live, "active");
-          ElementRe.getAttribute("id", live);
+          Element.getAttribute("id", live);
         }),
         None,
       ),
@@ -570,10 +576,11 @@ let featuresCallback:
   unit =
   features => {
     open Audio;
+    open Webapi.Dom;
     let rms = features##rms;
     let rmsS = Js.Float.toString(sqrt(rms));
     withQuerySelectorDom("#chromaBackdrop", chromaBackdrop =>
-      ElementRe.setAttribute("style", {j|opacity: $rmsS|j}, chromaBackdrop)
+      Element.setAttribute("style", {j|opacity: $rmsS|j}, chromaBackdrop)
     )
     |> ignore;
 
@@ -584,7 +591,7 @@ let featuresCallback:
           "#pc" ++ string_of_int((i + 5) mod 12),
           pc => {
             let vStr = Js.Float.toString(v);
-            ElementRe.setAttribute("style", {j|opacity: $vStr|j}, pc);
+            Element.setAttribute("style", {j|opacity: $vStr|j}, pc);
           },
         )
         |> ignore,
@@ -635,8 +642,9 @@ let enableAudio = _ => {
 
 let showHide = _evt =>
   withQuerySelectorDom("#queer-loop", loop => {
-    let classes = ElementRe.classList(loop);
-    DomTokenListRe.toggle("hidden", classes);
+    open Webapi.Dom;
+    let classes = Element.classList(loop);
+    DomTokenList.toggle("hidden", classes);
     ();
   })
   |> ignore;
@@ -644,26 +652,26 @@ let showHide = _evt =>
 let makeIframe = url =>
   Webapi.Dom.(
     withQuerySelectorDom("#iframeContainer", iframeContainer => {
-      let iframe = DocumentRe.createElementNS(htmlNs, "iframe", document);
-      ElementRe.setAttribute(
+      let iframe = Document.createElementNS(htmlNs, "iframe", document);
+      Element.setAttribute(
         "width",
-        string_of_int(WindowRe.innerWidth(window)),
+        string_of_int(Window.innerWidth(window)),
         iframe,
       );
-      ElementRe.setAttribute(
+      Element.setAttribute(
         "height",
-        string_of_int(WindowRe.innerHeight(window)),
+        string_of_int(Window.innerHeight(window)),
         iframe,
       );
-      ElementRe.setAttribute(
+      Element.setAttribute(
         "allow",
         "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; microphone; camera",
         iframe,
       );
 
-      ElementRe.setAttribute("src", url, iframe);
+      Element.setAttribute("src", url, iframe);
 
-      ElementRe.appendChild(iframe, iframeContainer);
+      Element.appendChild(iframe, iframeContainer);
     })
   )
   |> ignore;
@@ -671,6 +679,7 @@ let makeIframe = url =>
 let init = _evt => {
   open HtmlShell;
   open Webapi.Dom;
+  module URLSearchParams = Webapi.Url.URLSearchParams;
   setup();
   createIconButtonWithCallback("#toolbar", "mic", _evt => enableAudio());
   createIconButtonWithCallback("#toolbar", "hide", showHide);
@@ -685,42 +694,42 @@ let init = _evt => {
 
   let queryString = getQueryString();
   if (queryString !== "") {
-    let params = URLSearchParamsRe.make(queryString);
+    let params = URLSearchParams.make(queryString);
 
     let cameraIndices =
-      Array.map(int_of_string, URLSearchParamsRe.getAll("c", params));
+      Array.map(int_of_string, URLSearchParams.getAll("c", params));
 
     currentOptions :=
       {
         includeDomain:
           boolParam(
             currentOptions^.includeDomain,
-            URLSearchParamsRe.get("d", params),
+            URLSearchParams.get("d", params),
           ),
         includeQueryString:
           boolParam(
             currentOptions^.includeQueryString,
-            URLSearchParamsRe.get("q", params),
+            URLSearchParams.get("q", params),
           ),
         includeHash:
           boolParam(
             currentOptions^.includeHash,
-            URLSearchParamsRe.get("h", params),
+            URLSearchParams.get("h", params),
           ),
         invert:
           boolParam(
             currentOptions^.invert,
-            URLSearchParamsRe.get("i", params),
+            URLSearchParams.get("i", params),
           ),
         animate:
           boolParam(
             currentOptions^.animate,
-            URLSearchParamsRe.get("a", params),
+            URLSearchParams.get("a", params),
           ),
         opacity:
           Belt.Option.getWithDefault(
             Belt.Option.map(
-              URLSearchParamsRe.get("o", params),
+              URLSearchParams.get("o", params),
               Js.Float.fromString,
             ),
             currentOptions^.opacity,
@@ -728,18 +737,18 @@ let init = _evt => {
         background:
           Belt.Option.getWithDefault(
             Belt.Option.map(
-              URLSearchParamsRe.get("b", params),
+              URLSearchParams.get("b", params),
               decodeURIComponent,
             ),
             currentOptions^.background,
           ),
         cameraIndices:
           Array.length(cameraIndices) == 0 ? [|0|] : cameraIndices,
-        url: URLSearchParamsRe.get("u", params),
-        title: URLSearchParamsRe.get("t", params),
-        poem: URLSearchParamsRe.get("p", params),
-        wiki: URLSearchParamsRe.get("w", params),
-        youtubeVideo: URLSearchParamsRe.get("v", params),
+        url: URLSearchParams.get("u", params),
+        title: URLSearchParams.get("t", params),
+        poem: URLSearchParams.get("p", params),
+        wiki: URLSearchParams.get("w", params),
+        youtubeVideo: URLSearchParams.get("v", params),
       };
   };
 
@@ -782,7 +791,7 @@ let init = _evt => {
   };
 
   if (! hasBody()) {
-    /* ElementRe.addEventListener("click", onClick(None), svg) */
+    /* Element.addEventListener("click", onClick(None), svg) */
     let stepFn = cycleThroughPast();
     let lastUpdated = ref(0.0);
     let rec onTick = ts => {
@@ -796,7 +805,7 @@ let init = _evt => {
   };
 
   withQuerySelectorDom("#codeContents", el =>
-    ElementRe.addEventListener("blur", _evt => onInput(), el)
+    Element.addEventListener("blur", _evt => onInput(), el)
   );
 
   let response = (srcCanvas, inputCode) => {
@@ -868,7 +877,7 @@ let init = _evt => {
          Array.map(
            camera => {
              let videoEl =
-               DocumentRe.createElementNS(htmlNs, "video", document);
+               Document.createElementNS(htmlNs, "video", document);
 
              Scanner.scanUsingDeviceId(
                videoEl,
@@ -901,7 +910,7 @@ let init = _evt => {
        Js.Console.log("Camera input disabled.");
        Js.log("Initalization complete.");
        withQuerySelectorDom("#welcome", welcome =>
-         ElementRe.setAttribute("style", "display: block;", welcome)
+         Element.setAttribute("style", "display: block;", welcome)
        );
        Js.Promise.resolve();
      })
@@ -917,11 +926,12 @@ let activateQueerLoop: unit => unit = [%bs.raw
 ];
 
 if (! queerLoop) {
+  open Webapi.Dom;
   Js.log("Initializing queer-loop...");
   activateQueerLoop();
 
   /* let db = IndexedDB.DB.open_(~name="queer-loop", ~version=1, ()); */
   /* db; */
-  WindowRe.addEventListener("load", init, Webapi.Dom.window);
-  WindowRe.addEventListener("hashchange", onHashChange, Webapi.Dom.window);
+  Window.addEventListener("load", init, Webapi.Dom.window);
+  Window.addEventListener("hashchange", onHashChange, Webapi.Dom.window);
 };

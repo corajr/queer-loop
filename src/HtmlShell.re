@@ -170,10 +170,10 @@ video {
   ++ pitchClasses;
 
 let createStyle = () : Dom.element => {
-  let style = DocumentRe.createElementNS(htmlNs, "style", document);
-  ElementRe.setAttribute("type", "text/css", style);
+  let style = Document.createElementNS(htmlNs, "style", document);
+  Element.setAttribute("type", "text/css", style);
 
-  ElementRe.setTextContent(style, styleText);
+  Element.setTextContent(style, styleText);
   style;
 };
 
@@ -182,12 +182,12 @@ let createIconButtonWithCallback =
     : unit => {
   let icon = createIconFromText(name);
   let button = createElementWithId("div", name);
-  ElementRe.appendChild(icon, button);
+  Element.appendChild(icon, button);
 
-  ElementRe.addEventListener("click", callback, button);
+  Element.addEventListener("click", callback, button);
 
   withQuerySelectorDom(parentSelector, toolbar =>
-    ElementRe.appendChild(button, toolbar)
+    Element.appendChild(button, toolbar)
   )
   |> ignore;
 };
@@ -200,8 +200,8 @@ let createStructureOn = (htmlContainer: Dom.element) : unit => {
   let sources = createElementWithId("div", "sources");
   let videoContainer = createElementWithId("div", "videoContainer");
   let iframeContainer = createElementWithId("div", "iframeContainer");
-  ElementRe.appendChild(videoContainer, sources);
-  ElementRe.appendChild(iframeContainer, sources);
+  Element.appendChild(videoContainer, sources);
+  Element.appendChild(iframeContainer, sources);
 
   let codes = createElementWithId("div", "codes");
   let focus = createElementWithId("div", "focus");
@@ -210,37 +210,37 @@ let createStructureOn = (htmlContainer: Dom.element) : unit => {
 
   let download = createElementWithId("div", "download");
   let saveIcon = createIconFromText("save");
-  ElementRe.appendChild(saveIcon, download);
-  ElementRe.appendChild(download, toolbar);
-  ElementRe.appendChild(toolbar, htmlContainer);
+  Element.appendChild(saveIcon, download);
+  Element.appendChild(download, toolbar);
+  Element.appendChild(toolbar, htmlContainer);
 
   let log = createElementWithId("div", "log");
 
-  ElementRe.appendChild(snapshotCanvas, htmlContainer);
-  ElementRe.appendChild(iconCanvas, htmlContainer);
-  ElementRe.appendChild(inputCanvas, htmlContainer);
-  ElementRe.appendChild(sources, htmlContainer);
+  Element.appendChild(snapshotCanvas, htmlContainer);
+  Element.appendChild(iconCanvas, htmlContainer);
+  Element.appendChild(inputCanvas, htmlContainer);
+  Element.appendChild(sources, htmlContainer);
 
   let chromaBackdrop = createElementWithId("div", "chromaBackdrop");
   for (i in 0 to 11) {
     let pitchClassBackdrop =
       createElementWithId("div", "pc" ++ string_of_int(i));
-    ElementRe.setClassName(pitchClassBackdrop, "pitchClass");
-    ElementRe.appendChild(pitchClassBackdrop, chromaBackdrop);
+    Element.setClassName(pitchClassBackdrop, "pitchClass");
+    Element.appendChild(pitchClassBackdrop, chromaBackdrop);
   };
-  ElementRe.appendChild(chromaBackdrop, focus);
+  Element.appendChild(chromaBackdrop, focus);
 
   let queerLoop = createElementWithId("div", "queer-loop");
-  ElementRe.appendChild(queerLoop, focus);
+  Element.appendChild(queerLoop, focus);
 
-  ElementRe.appendChild(codes, htmlContainer);
-  ElementRe.appendChild(focus, htmlContainer);
-  ElementRe.appendChild(log, htmlContainer);
+  Element.appendChild(codes, htmlContainer);
+  Element.appendChild(focus, htmlContainer);
+  Element.appendChild(log, htmlContainer);
   ();
 };
 
 let setup = () => {
   let style = createStyle();
-  withQuerySelectorDom("head", head => ElementRe.appendChild(style, head));
+  withQuerySelectorDom("head", head => Element.appendChild(style, head));
   withQuerySelectorDom("#htmlContainer", createStructureOn);
 };

@@ -18,7 +18,7 @@ describe("QueerCode", () => {
 
   describe("drawCanvas", () =>
     test("applies a QueerCode to a canvas", () => {
-      let canvas = DocumentRe.createElement("canvas", document);
+      let canvas = Document.createElement("canvas", document);
       drawCanvas(canvas, qrCode);
       let png = Canvas.toDataURL(canvas);
       let expected = "";

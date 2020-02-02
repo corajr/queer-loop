@@ -86,7 +86,12 @@ let runScanFromCanvas = (canvas, maybeWorker, scanCallback) => {
   | Some(worker) =>
     WebWorkers.postMessage(
       worker,
-      (dataGet(imageData), width, height, DontInvert),
+      (
+        dataGet(imageData),
+        getWidth(canvas),
+        getHeight(canvas),
+        DontInvert,
+      ),
     )
   | None => syncScan(scanCallback, canvas, DontInvert, imageData)
   };
@@ -97,11 +102,11 @@ let scanUsingDeviceId =
     : Js.Promise.t(Dom.element) =>
   initStreamByDeviceId(videoEl, deviceId)
   |> Js.Promise.then_(video => {
-       let canvas = DocumentRe.createElementNS(htmlNs, "canvas", document);
+       let canvas = Document.createElementNS(htmlNs, "canvas", document);
 
        withQuerySelectorDom("#videoContainer", htmlContainer => {
-         ElementRe.appendChild(video, htmlContainer);
-         ElementRe.appendChild(canvas, htmlContainer);
+         Element.appendChild(video, htmlContainer);
+         Element.appendChild(canvas, htmlContainer);
        });
 
        let maybeWorker =

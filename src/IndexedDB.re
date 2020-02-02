@@ -23,18 +23,20 @@ external asEventTarget : 'a => Dom.eventTarget = "%identity";
 
 let asPromise: request('a) => Js.Promise.t('a) =
   request =>
-    Js.Promise.make((~resolve, ~reject) => {
-      EventTargetRe.addEventListener(
-        "error",
-        _evt => reject(. requestErrorGet(request)),
-        asEventTarget(request),
-      );
-      EventTargetRe.addEventListener(
-        "success",
-        _evt => resolve(. requestResultGet(request)),
-        asEventTarget(request),
-      );
-    });
+    Webapi.Dom.(
+      Js.Promise.make((~resolve, ~reject) => {
+        EventTarget.addEventListener(
+          "error",
+          _evt => reject(. requestErrorGet(request)),
+          asEventTarget(request),
+        );
+        EventTarget.addEventListener(
+          "success",
+          _evt => resolve(. requestResultGet(request)),
+          asEventTarget(request),
+        );
+      })
+    );
 
 module DB = {
   type factory;
@@ -68,8 +70,9 @@ module DB = {
         unit,
       )
       : Js.Promise.t(t) => {
+    open Webapi.Dom;
     let request = _open(indexedDB, ~name, ~version, ());
-    EventTargetRe.addEventListener(
+    EventTarget.addEventListener(
       "upgradeneeded",
       upgradeNeededHandler,
       asEventTarget(request),

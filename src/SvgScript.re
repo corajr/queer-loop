@@ -1,27 +1,28 @@
 open Util;
+open Webapi.Dom;
 
 let setAnimacy = (svg, hash) => {
   withQuerySelectorAllFrom(
     ".animate",
     svg,
     Array.map(animated =>
-      ElementRe.setAttribute("class", "code previous", animated)
+      Element.setAttribute("class", "code previous", animated)
     ),
   );
   withQuerySelectorAllFrom(
     ".previous",
     svg,
-    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
+    Array.map(animated => Element.setAttribute("class", "code", animated)),
   );
   withQuerySelectorAllFrom(
     ".selected",
     svg,
-    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
+    Array.map(animated => Element.setAttribute("class", "code", animated)),
   );
 
-  ElementRe.querySelector("#code" ++ hash, svg)
+  Element.querySelector("#code" ++ hash, svg)
   |. Belt.Option.map(toAnimate =>
-       ElementRe.setAttribute("class", "code animate", toAnimate)
+       Element.setAttribute("class", "code animate", toAnimate)
      );
 };
 
@@ -29,24 +30,24 @@ let setSelection = (svg, hash) => {
   withQuerySelectorAllFrom(
     ".animate",
     svg,
-    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
+    Array.map(animated => Element.setAttribute("class", "code", animated)),
   );
 
   withQuerySelectorAllFrom(
     ".previous",
     svg,
-    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
+    Array.map(animated => Element.setAttribute("class", "code", animated)),
   );
 
   withQuerySelectorAllFrom(
     ".selected",
     svg,
-    Array.map(animated => ElementRe.setAttribute("class", "code", animated)),
+    Array.map(animated => Element.setAttribute("class", "code", animated)),
   );
 
-  ElementRe.querySelector("#code" ++ hash, svg)
+  Element.querySelector("#code" ++ hash, svg)
   |. Belt.Option.map(toAnimate =>
-       ElementRe.setAttribute("class", "code selected", toAnimate)
+       Element.setAttribute("class", "code selected", toAnimate)
      );
 };
 
@@ -54,11 +55,11 @@ let modifyClassSet:
   (Belt.Set.String.t => Belt.Set.String.t, Dom.element) => unit =
   (f, el) => {
     let newSet =
-      switch (ElementRe.getAttribute("class", el)) {
+      switch (Element.getAttribute("class", el)) {
       | Some(s) => f(Belt.Set.String.fromArray(Js.String.split(" ", s)))
       | None => f(Belt.Set.String.empty)
       };
-    ElementRe.setAttribute(
+    Element.setAttribute(
       "class",
       Js.Array.joinWith(" ", Belt.Set.String.toArray(newSet)),
       el,
@@ -67,7 +68,7 @@ let modifyClassSet:
 
 let getClassesSvg: Dom.element => Belt.Set.String.t =
   el =>
-    switch (ElementRe.getAttribute("class", el)) {
+    switch (Element.getAttribute("class", el)) {
     | Some(s) => Belt.Set.String.fromArray(Js.String.split(" ", s))
     | None => Belt.Set.String.empty
     };
@@ -101,8 +102,8 @@ let toggleHash = hash : bool => {
       withQuerySelectorAll(
         ".code" ++ hash,
         Array.map(link => {
-          let linkClasses = ElementRe.classList(link);
-          DomTokenListRe.toggle("active", linkClasses);
+          let linkClasses = Element.classList(link);
+          DomTokenList.toggle("active", linkClasses);
         }),
       ),
       x =>

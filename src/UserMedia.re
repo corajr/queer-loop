@@ -1,3 +1,5 @@
+open Webapi.Dom;
+
 type mediaStream;
 
 [@bs.deriving abstract]
@@ -54,9 +56,9 @@ let initStreamByDeviceId: (Dom.element, string) => Js.Promise.t(Dom.element) =
     getUserMedia(constraints(~video=videoConstraint(~deviceId), ()))
     |> Js.Promise.then_(stream => {
          setSrcObject(videoEl, stream);
-         switch (DomRe.Element.asHtmlElement(videoEl)) {
+         switch (Element.asHtmlElement(videoEl)) {
          | Some(video) =>
-           HtmlElementRe.setAttribute("playsinline", "true", video)
+           HtmlElement.setAttribute("playsinline", "true", video)
          | None => ()
          };
          play(videoEl);
