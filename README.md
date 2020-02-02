@@ -3,29 +3,29 @@
 # <a href="https://qqq.lu/#2019-05-20T16:00:22.283Z"><img width="256" height="256" src="queer-loop-animated.svg" alt="an example Q(uee)r code"/> </a>
 
 [queer-loop](https://qqq.lu) is a simple [ReasonML](https://reasonml.github.io/)
-app that generates and reads Q(uee)R codes. Q(uee)R codes are QR codes that
-attempt to encapsulate a particular moment in time.
+app that generates and reads QR codes based on URL parameters.
 
 Tested on:
 - Chrome (desktop and Android mobile)
 
-**NOTE: this only works in iOS version 11 and higher. I'm still working on optimizations and compatibility.**
+**NOTE: this only works in iOS version 11 and higher.**
 
 ## Usage
 
-The prototypical use is to tap on the central Q(uee)r code or hold `queer-loop`
-up to a mirror. The codes added to the background can be opened in a new tab or saved.
+The prototypical use is to hold `queer-loop` up to a mirror so that it can read itself.
+Each capture in this mode represents one instance where the QR code was safely read back
+by the software, accompanied by an image that accumulates frames from the camera.
 
-Here are a few other ways I've found so far to play with it:
+Here are a few ways I've found so far to play with it:
 
-- open two copies of it on different devices and point their screens/cameras at
+- open two copies of qqq.lu on different devices and point their screens/cameras at
   each other
 - hook up a capture card (I use the ClonerAlliance Flint LXT) to a Chromecast,
   and cast...:
     - a phone camera to it
     - the tab to itself
 
-There are also some configuration options, which may be set via URL query parameters.
+Below are the query parameters which may be supplied.
 
 ### Query Parameters
 
@@ -115,13 +115,11 @@ Examples:
 [`https://qqq.lu/?v=DGHjHU_Z8d8`](https://qqq.lu/?v=DGHjHU_Z8d8)
 
 
-
 ## Development
 
 <img width="256" height="256" src="development.svg" alt="a version of queer-loop pointed to localhost" />
 
-This is very much a WIP, so the ergonomics of working with the code are poor at
-present. License is GPL v3.
+License is GPL v3.
 
 ### Requirements
 
@@ -144,5 +142,5 @@ rollup -c -w
 ### Build for Production
 
 ```
-yarn build && rollup -c
+yarn build:production
 ```
