@@ -31,7 +31,7 @@ There are also some configuration options, which may be set via URL query parame
 
 #### a (animation)
 
-`a` controls SVG animation, which may be slow on some devices. Default is 1 (on).
+`a` controls SVG animation, which may be slow on some devices. Default is 0 (off).
 
 Examples:
 
@@ -44,9 +44,9 @@ Examples:
 
 Examples:
 
-[`https://qqq.lu/?bg=url("queer-loop.svg")`](https://qqq.lu/?bg=url("queer-loop.svg"))
-[`https://qqq.lu/?bg=lightpink`](https://qqq.lu/?bg=lightpink)
-[`https://qqq.lu/?bg=%23faa`](https://qqq.lu/?bg=%23faa) (must use "%23" since `#` is reserved for the timestamp)
+[`https://qqq.lu/?b=url("queer-loop.svg")`](https://qqq.lu/?b=url("queer-loop.svg"))
+[`https://qqq.lu/?b=lightpink`](https://qqq.lu/?b=lightpink)
+[`https://qqq.lu/?b=%23faa`](https://qqq.lu/?b=%23faa) (must use "%23" since `#` is reserved for the timestamp)
 
 #### c (camera)
 
@@ -81,6 +81,39 @@ Set the opacity of the camera image (default: 0.1). Smaller values result in a l
 Examples:
 
 [`https://qqq.lu/?o=0.05`](https://qqq.lu/?o=0.05)
+
+#### p (poem)
+
+Get the poem by poets.org slug.
+
+Examples:
+
+[`https://qqq.lu/?p=im-nobody-who-are-you-260`](https://qqq.lu/?p=im-nobody-who-are-you-260)
+
+#### t (title)
+
+Set the page title.
+
+Examples:
+
+[`https://qqq.lu/?t=Hello%20there`](https://qqq.lu/?t=Hello%20there)
+
+#### w (wiki)
+
+Get the English Wikipedia page.
+
+Examples:
+
+[`https://qqq.lu/?w=QR+code`](https://qqq.lu/?w=QR+code)
+
+#### v (video)
+
+Get the video by YouTube ID.
+
+Examples:
+
+[`https://qqq.lu/?v=DGHjHU_Z8d8`](https://qqq.lu/?v=DGHjHU_Z8d8)
+
 
 
 ## Development
