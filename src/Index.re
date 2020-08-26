@@ -467,7 +467,7 @@ let onHashChange = _evt => {
   });
   let urlText =
     switch (opts.url) {
-      | Some(url) => url
+      | Some(url_) => url_ ++ (hasChanged^ ? Webapi.Url.hash(url) : "")
       | None => (opts.includeDomain ? Webapi.Url.origin(url) : "")
     ++ (opts.includeQueryString ? Webapi.Url.search(url) : "")
     ++ (opts.includeHash ? Webapi.Url.hash(url) : "");

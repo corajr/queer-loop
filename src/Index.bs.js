@@ -375,17 +375,20 @@ function onHashChange(_evt) {
   var match$1 = opts.url;
   var urlText;
   if (match$1 !== undefined) {
-    urlText = match$1;
+    var match$2 = hasChanged.contents;
+    urlText = match$1 + (
+      match$2 ? url.hash : ""
+    );
   } else {
-    var match$2 = opts.includeDomain;
-    var match$3 = opts.includeQueryString;
-    var match$4 = opts.includeHash;
+    var match$3 = opts.includeDomain;
+    var match$4 = opts.includeQueryString;
+    var match$5 = opts.includeHash;
     urlText = (
-      match$2 ? url.origin : ""
+      match$3 ? url.origin : ""
     ) + ((
-        match$3 ? url.search : ""
+        match$4 ? url.search : ""
       ) + (
-        match$4 ? url.hash : ""
+        match$5 ? url.hash : ""
       ));
   }
   setCode(urlText, date);
