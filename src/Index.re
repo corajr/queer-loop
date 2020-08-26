@@ -466,9 +466,12 @@ let onHashChange = _evt => {
     Element.setInnerText(time, localeString);
   });
   let urlText =
-    (opts.includeDomain ? Webapi.Url.origin(url) : "")
+    switch (opts.url) {
+      | Some(url) => url
+      | None => (opts.includeDomain ? Webapi.Url.origin(url) : "")
     ++ (opts.includeQueryString ? Webapi.Url.search(url) : "")
     ++ (opts.includeHash ? Webapi.Url.hash(url) : "");
+    };
 
   setCode(urlText, date);
   setText(urlText);

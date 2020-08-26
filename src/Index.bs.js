@@ -372,16 +372,22 @@ function onHashChange(_evt) {
           time.innerText = localeString;
           return /* () */0;
         }));
-  var match$1 = opts.includeDomain;
-  var match$2 = opts.includeQueryString;
-  var match$3 = opts.includeHash;
-  var urlText = (
-    match$1 ? url.origin : ""
-  ) + ((
-      match$2 ? url.search : ""
-    ) + (
-      match$3 ? url.hash : ""
-    ));
+  var match$1 = opts.url;
+  var urlText;
+  if (match$1 !== undefined) {
+    urlText = match$1;
+  } else {
+    var match$2 = opts.includeDomain;
+    var match$3 = opts.includeQueryString;
+    var match$4 = opts.includeHash;
+    urlText = (
+      match$2 ? url.origin : ""
+    ) + ((
+        match$3 ? url.search : ""
+      ) + (
+        match$4 ? url.hash : ""
+      ));
+  }
   setCode(urlText, date);
   return Curry._1(setText, urlText);
 }
