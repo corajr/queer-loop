@@ -98,13 +98,11 @@ Examples:
 
 [`https://qqq.lu/?t=Hello%20there`](https://qqq.lu/?t=Hello%20there)
 
-#### w (wiki)
+#### u (url)
 
-Get the English Wikipedia page.
+Set the URL to point to.
 
-Examples:
-
-[`https://qqq.lu/?w=QR+code`](https://qqq.lu/?w=QR+code)
+[`https://qqq.lu/?u=hyper://bbf20e48b5281a5b0921bf2b9677e61dfb48cf2c626f83a016e7d9a8527dfb0e/`](https://qqq.lu/?u=hyper://bbf20e48b5281a5b0921bf2b9677e61dfb48cf2c626f83a016e7d9a8527dfb0e/)
 
 #### v (video)
 
@@ -113,6 +111,16 @@ Get the video by YouTube ID.
 Examples:
 
 [`https://qqq.lu/?v=DGHjHU_Z8d8`](https://qqq.lu/?v=DGHjHU_Z8d8)
+
+#### w (wiki)
+
+Get the English Wikipedia page.
+
+Examples:
+
+[`https://qqq.lu/?w=QR+code`](https://qqq.lu/?w=QR+code)
+
+
 
 
 ## Development
