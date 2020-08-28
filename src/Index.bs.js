@@ -117,24 +117,21 @@ function _writeLogEntry(param) {
   var isoformat = param[0];
   Util$QueerLoop.withQuerySelectorDom("#log", (function (log) {
           var entry = document.createElement("a");
-          entry.setAttribute("href", "#" + hash);
+          entry.setAttribute("href", text);
           var linkClasses = entry.classList;
           linkClasses.add("log-entry", "codeLink", "code" + hash);
-          entry.addEventListener("click", (function (evt) {
-                  evt.preventDefault();
-                  return onClick(hash, /* () */0);
-                }));
           var timeDiv = document.createElement("div");
           var time = document.createElement("time");
           time.setAttribute("datetime", isoformat);
           time.textContent = localeString;
-          var textChild = document.createElement("span");
-          textChild.innerText = text;
+          var linkChild = document.createElement("a");
+          linkChild.innerText = text;
+          linkChild.setAttribute("href", text);
           var hashColor = hash.slice(0, 6);
           entry.setAttribute("style", "background-color: #" + (String(hashColor) + "66;"));
           timeDiv.appendChild(time);
           entry.appendChild(timeDiv);
-          entry.appendChild(textChild);
+          entry.appendChild(linkChild);
           log.appendChild(entry);
           return /* () */0;
         }));

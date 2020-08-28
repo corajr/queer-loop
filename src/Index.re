@@ -102,20 +102,11 @@ let _writeLogEntry = ((isoformat, localeString, text, hash)) =>
   Webapi.Dom.(
     withQuerySelectorDom("#log", log => {
       let entry = Document.createElement("a", document);
-      Element.setAttribute("href", "#" ++ hash, entry);
+      Element.setAttribute("href", text, entry);
       let linkClasses = Element.classList(entry);
       DomTokenList.addMany(
         [|"log-entry", "codeLink", "code" ++ hash|],
         linkClasses,
-      );
-
-      Element.addEventListener(
-        "click",
-        evt => {
-          Event.preventDefault(evt);
-          onClick(Some(hash), ());
-        },
-        entry,
       );
 
       let timeDiv = Document.createElement("div", document);
@@ -123,8 +114,9 @@ let _writeLogEntry = ((isoformat, localeString, text, hash)) =>
       Element.setAttribute("datetime", isoformat, time);
       Element.setTextContent(time, localeString);
 
-      let textChild = Document.createElement("span", document);
-      Element.setInnerText(textChild, text);
+      let linkChild = Document.createElement("a", document);
+      Element.setInnerText(linkChild, text);
+      Element.setAttribute("href", text, linkChild);
 
       let hashColor = Js.String.slice(~from=0, ~to_=6, hash);
 
@@ -138,7 +130,7 @@ let _writeLogEntry = ((isoformat, localeString, text, hash)) =>
 
       Element.appendChild(time, timeDiv);
       Element.appendChild(timeDiv, entry);
-      Element.appendChild(textChild, entry);
+      Element.appendChild(linkChild, entry);
       Element.appendChild(entry, log);
     })
   )
