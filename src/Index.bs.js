@@ -456,6 +456,25 @@ function pick(ary, indices) {
               }), indices);
 }
 
+function getTimestampFromCode(id) {
+  return Util$QueerLoop.withQuerySelectorDom("#" + id, (function (element) {
+                var match = element.querySelector("text");
+                if (match == null) {
+                  return ;
+                } else {
+                  var timestamp = match.textContent;
+                  var date;
+                  try {
+                    date = new Date(timestamp);
+                  }
+                  catch (exn){
+                    return ;
+                  }
+                  return date.getTime();
+                }
+              }));
+}
+
 function cycleThroughPast(param) {
   var allIds = Util$QueerLoop.withQuerySelectorAll(".code", (function (param) {
           return Util$QueerLoop.mapMaybe((function (item) {
@@ -470,16 +489,43 @@ function cycleThroughPast(param) {
   var i = {
     contents: allIds.indexOf(currentId)
   };
-  return (function (param) {
-      Util$QueerLoop.withQuerySelectorDom(".active", (function (live) {
-              return SvgScript$QueerLoop.removeClassSvg(live, "active");
-            }));
-      i.contents = Caml_int32.mod_(i.contents + 1 | 0, allIds.length);
-      Util$QueerLoop.withQuerySelectorDom("#" + Caml_array.caml_array_get(allIds, i.contents), (function (live) {
-              return SvgScript$QueerLoop.addClassSvg(live, "active");
-            }));
-      return /* () */0;
-    });
+  var timeToNext = function (param) {
+    var currentTime = getTimestampFromCode(Caml_array.caml_array_get(allIds, i.contents));
+    var nextTime = getTimestampFromCode(Caml_array.caml_array_get(allIds, Caml_int32.mod_(i.contents + 1 | 0, allIds.length)));
+    if (currentTime !== undefined) {
+      var match = Caml_option.valFromOption(currentTime);
+      if (match !== undefined) {
+        if (nextTime !== undefined) {
+          var match$1 = Caml_option.valFromOption(nextTime);
+          if (match$1 !== undefined) {
+            return match$1 - match;
+          } else {
+            return 500.0;
+          }
+        } else {
+          return 500.0;
+        }
+      } else {
+        return 500.0;
+      }
+    } else {
+      return 500.0;
+    }
+  };
+  var step = function (param) {
+    Util$QueerLoop.withQuerySelectorDom(".active", (function (live) {
+            return SvgScript$QueerLoop.removeClassSvg(live, "active");
+          }));
+    i.contents = Caml_int32.mod_(i.contents + 1 | 0, allIds.length);
+    Util$QueerLoop.withQuerySelectorDom("#" + Caml_array.caml_array_get(allIds, i.contents), (function (live) {
+            return SvgScript$QueerLoop.addClassSvg(live, "active");
+          }));
+    return /* () */0;
+  };
+  return /* tuple */[
+          step,
+          timeToNext
+        ];
 }
 
 var maybeAudioContext = {
@@ -636,13 +682,19 @@ function init(_evt) {
     onHashChange(/* () */0);
   }
   if (!Curry._1(hasBody, /* () */0)) {
-    var stepFn = cycleThroughPast(/* () */0);
+    var match$5 = cycleThroughPast(/* () */0);
+    var timeToNext = match$5[1];
+    var stepFn = match$5[0];
     var lastUpdated = {
       contents: 0.0
     };
+    var until = {
+      contents: Curry._1(timeToNext, /* () */0)
+    };
     var onTick$1 = function (ts) {
-      if (ts - lastUpdated.contents >= 500.0) {
+      if (ts - lastUpdated.contents >= until.contents) {
         Curry._1(stepFn, /* () */0);
+        until.contents = Curry._1(timeToNext, /* () */0);
         lastUpdated.contents = ts;
       }
       requestAnimationFrame(onTick$1);
@@ -775,6 +827,7 @@ export {
   onInput ,
   boolParam ,
   pick ,
+  getTimestampFromCode ,
   cycleThroughPast ,
   maybeAudioContext ,
   maybeAudioInputNode ,

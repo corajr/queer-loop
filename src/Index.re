@@ -517,6 +517,20 @@ let boolParam: (bool, option(string)) => bool =
 let pick: (array('a), array(int)) => array('a) =
   (ary, indices) => Array.map(i => ary[i], indices);
 
+let getTimestampFromCode = id => {
+  withQuerySelectorDom("#" ++ id, element => {
+    switch (Webapi.Dom.Element.querySelector("text", element)) {
+    | Some(text) => 
+      let timestamp = Webapi.Dom.Element.textContent(text);
+      switch (Js.Date.fromString(timestamp)) {
+      | date => Some(Js.Date.getTime(date))
+      | exception _ => None
+      }
+    | None => None
+    }
+  })
+};
+
 let cycleThroughPast = _ => {
   open Webapi.Dom;
   let allIds =
@@ -537,6 +551,14 @@ let cycleThroughPast = _ => {
       "",
     );
   let i = ref(Js.Array.indexOf(currentId, allIds));
+  let timeToNext = _ => {
+      let currentTime = getTimestampFromCode(allIds[i^]);
+      let nextTime = getTimestampFromCode(allIds[(i^ + 1) mod Array.length(allIds)]);
+      switch (currentTime, nextTime) {
+      | (Some(Some(current)), Some(Some(next))) => next -. current
+      | _ => 500.0
+      };
+    };
   let step: unit => unit =
     _ => {
       withQuerySelectorDom(".active", live => removeClassSvg(live, "active"))
@@ -547,7 +569,7 @@ let cycleThroughPast = _ => {
       )
       |> ignore;
     };
-  step;
+  (step, timeToNext);
 };
 
 let maybeAudioContext: ref(option(Audio.audioContext)) = ref(None);
@@ -787,11 +809,13 @@ let init = _evt => {
 
   if (! hasBody()) {
     /* Element.addEventListener("click", onClick(None), svg) */
-    let stepFn = cycleThroughPast();
+    let (stepFn, timeToNext) = cycleThroughPast();
     let lastUpdated = ref(0.0);
+    let until = ref(timeToNext());
     let rec onTick = ts => {
-      if (ts -. lastUpdated^ >= 500.0) {
+      if (ts -. lastUpdated^ >= until^) {
         stepFn();
+        until := timeToNext();
         lastUpdated := ts;
       };
       Webapi.requestAnimationFrame(onTick);
