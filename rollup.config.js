@@ -1,7 +1,7 @@
-import inliner from './rollup-plugin-inliner';
-import resolve from 'rollup-plugin-node-resolve';
+import inliner from './rollup-plugin-inliner.js';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 import serve from 'rollup-plugin-serve';
 
 const production = !process.env.ROLLUP_WATCH;
@@ -12,11 +12,10 @@ export default [{
         name: 'index',
         file: 'index.js',
         sourcemap: 'inline',
-        moduleName: 'index',
         format: 'iife'
     },
     plugins: [
-        resolve({
+        nodeResolve({
             mainFields: ['jsnext:main', 'main']
         }),
         commonjs(),
@@ -37,7 +36,7 @@ export default [{
         format: 'iife'
     },
     plugins: [
-        resolve(),
+        nodeResolve(),
         production && terser()
     ],
 }];
