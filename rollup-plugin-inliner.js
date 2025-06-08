@@ -12,8 +12,10 @@ export default function inliner (options = {}) {
     const { template, target } = options;
     return {
         name: "inliner",
-        async writeBundle(bundleInfo) {
-            const bundles = getEntryPoints(bundleInfo);
+        async writeBundle(outputOptions, bundle) {
+            // DEBUG: Log the structure of bundle
+            console.log('[inliner] bundle:', Object.keys(bundle), bundle);
+            const bundles = getEntryPoints(bundle);
 
             return new Promise(async (resolve, reject) => {
                 try {
@@ -39,18 +41,20 @@ export default function inliner (options = {}) {
                     // Inject the script tags before the body close tag
                     const injected = [
                         tmpl.slice(0, bodyCloseTag),
-                        bundles.map(b => `<script class="main">${b.code}</script>\n`),
+                        bundles.map(b => `<script class="main">${b.code}</script>\n`).join(""),
                         tmpl.slice(bodyCloseTag, tmpl.length),
                     ].join("");
 
                     // write the injected template to a file
                     const finalTarget = targetFile;
 
-                    const originalTarget = bundles[0].fileName;
+                    const originalTarget = bundles[0]?.fileName;
 
                     await fs.ensureFile(finalTarget);
                     await fs.writeFile(finalTarget, injected);
-                    await fs.remove(originalTarget);
+                    if (originalTarget) {
+                        await fs.remove(originalTarget);
+                    }
                     resolve();
                 } catch (e) {
                     reject(e);
@@ -60,11 +64,12 @@ export default function inliner (options = {}) {
     };
 }
 
-function getEntryPoints(bundleInfo = {}) {
-    const bundles = Object.keys(bundleInfo);
-    return bundles.reduce((entryPoints, bundle) => {
-        if (bundleInfo[bundle].isEntry === true) {
-            entryPoints.push(bundleInfo[bundle]);
+function getEntryPoints(bundle = {}) {
+    const bundles = Object.keys(bundle);
+    return bundles.reduce((entryPoints, bundleName) => {
+        const info = bundle[bundleName];
+        if (info && typeof info === 'object' && info.isEntry === true) {
+            entryPoints.push(info);
         }
         return entryPoints;
     }, []);
