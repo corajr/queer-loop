@@ -11,20 +11,19 @@ var UserMedia$QueerLoop = require("./UserMedia.bs.js");
 function makeDefaultAudioCtx (){return new (window.AudioContext || window.webkitAudioContext)()};
 
 function string_of_oscillatorType(param) {
-  if (typeof param === "number") {
-    switch (param) {
-      case /* Sine */0 :
-          return "sine";
-      case /* Square */1 :
-          return "square";
-      case /* Sawtooth */2 :
-          return "sawtooth";
-      case /* Triangle */3 :
-          return "triangle";
-      
-    }
-  } else {
+  if (typeof param !== "number") {
     return "custom";
+  }
+  switch (param) {
+    case /* Sine */0 :
+        return "sine";
+    case /* Square */1 :
+        return "square";
+    case /* Sawtooth */2 :
+        return "sawtooth";
+    case /* Triangle */3 :
+        return "triangle";
+    
   }
 }
 
@@ -69,8 +68,8 @@ var defaultCompressorValues = {
   release: 0.05
 };
 
-function makeCompressor(audioCtx, $staropt$star) {
-  var paramValues = $staropt$star !== undefined ? $staropt$star : defaultCompressorValues;
+function makeCompressor(audioCtx, paramValuesOpt) {
+  var paramValues = paramValuesOpt !== undefined ? paramValuesOpt : defaultCompressorValues;
   var compressor = audioCtx.createDynamicsCompressor();
   var t = audioCtx.currentTime;
   compressor.threshold.setValueAtTime(paramValues.threshold, t);
@@ -140,11 +139,11 @@ function whiteNoise (audioCtx){
      })();
      };
 
-function makeAnalyser($staropt$star, $staropt$star$1, $staropt$star$2, $staropt$star$3, audioContext) {
-  var fftSize = $staropt$star !== undefined ? $staropt$star : 2048;
-  var minDecibels = $staropt$star$1 !== undefined ? $staropt$star$1 : -100.0;
-  var maxDecibels = $staropt$star$2 !== undefined ? $staropt$star$2 : -30.0;
-  var smoothingTimeConstant = $staropt$star$3 !== undefined ? $staropt$star$3 : 0.8;
+function makeAnalyser(fftSizeOpt, minDecibelsOpt, maxDecibelsOpt, smoothingTimeConstantOpt, audioContext) {
+  var fftSize = fftSizeOpt !== undefined ? fftSizeOpt : 2048;
+  var minDecibels = minDecibelsOpt !== undefined ? minDecibelsOpt : -100.0;
+  var maxDecibels = maxDecibelsOpt !== undefined ? maxDecibelsOpt : -30.0;
+  var smoothingTimeConstant = smoothingTimeConstantOpt !== undefined ? smoothingTimeConstantOpt : 0.8;
   var analyser = audioContext.createAnalyser();
   analyser.fftSize = fftSize;
   analyser.minDecibels = minDecibels;
@@ -156,18 +155,17 @@ function makeAnalyser($staropt$star, $staropt$star$1, $staropt$star$2, $staropt$
 function setOscillatorType(audioCtx, oscillator, type_) {
   oscillator.type = string_of_oscillatorType(type_);
   if (typeof type_ === "number") {
-    return /* () */0;
-  } else {
-    var desc = type_[0];
-    var periodicWave = audioCtx.createPeriodicWave(desc.real, desc.imag);
-    oscillator.setPeriodicWave(periodicWave);
-    return /* () */0;
+    return ;
   }
+  var desc = type_[0];
+  var periodicWave = audioCtx.createPeriodicWave(desc.real, desc.imag);
+  oscillator.setPeriodicWave(periodicWave);
+  
 }
 
-function makeOscillator($staropt$star, $staropt$star$1, audioCtx) {
-  var frequency = $staropt$star !== undefined ? $staropt$star : 440.0;
-  var type_ = $staropt$star$1 !== undefined ? $staropt$star$1 : /* Sine */0;
+function makeOscillator(frequencyOpt, type_Opt, audioCtx) {
+  var frequency = frequencyOpt !== undefined ? frequencyOpt : 440.0;
+  var type_ = type_Opt !== undefined ? type_Opt : /* Sine */0;
   var oscillator = audioCtx.createOscillator();
   var t = audioCtx.currentTime;
   oscillator.frequency.setValueAtTime(frequency, t);
@@ -270,7 +268,7 @@ function makeOscillatorBank(audioCtx, n, type_, freqFunc) {
 }
 
 function getAudioSource(ctx) {
-  return UserMedia$QueerLoop.getAudioStream(/* () */0).then((function (mediaStream) {
+  return UserMedia$QueerLoop.getAudioStream(undefined).then((function (mediaStream) {
                   return Promise.resolve(ctx.createMediaStreamSource(mediaStream));
                 })).catch((function (err) {
                 console.log(err);
@@ -279,18 +277,18 @@ function getAudioSource(ctx) {
 }
 
 function connectFilterBank(noise, filterBank, merger, channel) {
-  var match = filterBank.input;
-  if (match !== undefined) {
-    noise.connect(Caml_option.valFromOption(match));
+  var input = filterBank.input;
+  if (input !== undefined) {
+    noise.connect(Caml_option.valFromOption(input));
   }
   filterBank.output.connect(merger, 0, channel);
-  return /* () */0;
+  
 }
 
 function disconnectFilterBank(noise, filterBank, merger) {
-  var match = filterBank.input;
-  if (match !== undefined) {
-    noise.disconnect(Caml_option.valFromOption(match));
+  var input = filterBank.input;
+  if (input !== undefined) {
+    noise.disconnect(Caml_option.valFromOption(input));
   }
   filterBank.output.disconnect((function (prim, prim$1, prim$2, prim$3, prim$4) {
           return {
@@ -301,26 +299,26 @@ function disconnectFilterBank(noise, filterBank, merger) {
                   release: prim$4
                 };
         }));
-  return /* () */0;
+  
 }
 
 function updateBankGains(bank, gainValues) {
   var t = bank.audioCtx.currentTime;
   var n = gainValues.length;
-  for(var i = 0 ,i_finish = n - 1 | 0; i <= i_finish; ++i){
+  for(var i = 0; i < n; ++i){
     var gainI = (n - i | 0) - 1 | 0;
     Caml_array.caml_array_get(bank.gains, gainI).gain.linearRampToValueAtTime(Caml_array.caml_array_get(gainValues, i), t + 0.05);
   }
-  return /* () */0;
+  
 }
 
-function updateFilterBank($staropt$star, $staropt$star$1, filterBank, filterValues, param) {
-  var inputGain = $staropt$star !== undefined ? $staropt$star : 1.0;
-  var outputGain = $staropt$star$1 !== undefined ? $staropt$star$1 : 0.1;
+function updateFilterBank(inputGainOpt, outputGainOpt, filterBank, filterValues, param) {
+  var inputGain = inputGainOpt !== undefined ? inputGainOpt : 1.0;
+  var outputGain = outputGainOpt !== undefined ? outputGainOpt : 0.1;
   var currentTime = filterBank.audioCtx.currentTime;
-  var match = filterBank.input;
-  if (match !== undefined) {
-    Caml_option.valFromOption(match).gain.setValueAtTime(inputGain, currentTime);
+  var input = filterBank.input;
+  if (input !== undefined) {
+    Caml_option.valFromOption(input).gain.setValueAtTime(inputGain, currentTime);
   }
   filterBank.output.gain.setValueAtTime(outputGain, currentTime);
   return updateBankGains(filterBank, filterValues);
@@ -333,7 +331,7 @@ function updateFilterBankDefinition(filterBank, freqFunc, q) {
   return $$Array.iteri((function (i, filter) {
                 filter.Q.setValueAtTime(q, currentTime);
                 filter.frequency.setValueAtTime(Curry._1(freqFunc, (n - i | 0) - 1 | 0), currentTime);
-                return /* () */0;
+                
               }), filterBank.nodes);
 }
 

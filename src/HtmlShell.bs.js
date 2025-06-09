@@ -33,9 +33,9 @@ function createIconButtonWithCallback(parentSelector, name, callback) {
   button.addEventListener("click", callback);
   Util$QueerLoop.withQuerySelectorDom(parentSelector, (function (toolbar) {
           toolbar.appendChild(button);
-          return /* () */0;
+          
         }));
-  return /* () */0;
+  
 }
 
 function createStructureOn(htmlContainer) {
@@ -72,14 +72,14 @@ function createStructureOn(htmlContainer) {
   htmlContainer.appendChild(codes);
   htmlContainer.appendChild(focus);
   htmlContainer.appendChild(log);
-  return /* () */0;
+  
 }
 
 function setup(param) {
-  var style = createStyle(/* () */0);
+  var style = createStyle(undefined);
   Util$QueerLoop.withQuerySelectorDom("head", (function (head) {
           head.appendChild(style);
-          return /* () */0;
+          
         }));
   return Util$QueerLoop.withQuerySelectorDom("#htmlContainer", createStructureOn);
 }

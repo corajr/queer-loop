@@ -2,7 +2,7 @@
 'use strict';
 
 
-var defaultOptions_cameraIndices = /* array */[0];
+var defaultOptions_cameraIndices = [0];
 
 var defaultOptions = {
   background: "",

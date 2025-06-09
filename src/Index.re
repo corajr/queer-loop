@@ -499,7 +499,6 @@ let _onInput = _ =>
       let text = Element.innerText(el);
       maybeUrl(text)
       |. Belt.Option.map(url => {
-           Location.setSearch(Window.location(window));
            Location.setHash(Window.location(window), Webapi.Url.hash(url));
          });
     })

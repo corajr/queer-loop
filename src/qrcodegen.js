@@ -1058,7 +1058,7 @@ const QrCode = qrcodegen.QrCode;
 const Ecc = qrcodegen.QrCode.Ecc;
 const QrSegment = qrcodegen.QrSegment;
 
-export {
+module.exports = {
     QrCode,
     encodeText,
     Ecc,

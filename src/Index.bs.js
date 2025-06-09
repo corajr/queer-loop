@@ -34,7 +34,7 @@ var initialHash = {
 };
 
 var camerasRef = {
-  contents: /* array */[]
+  contents: []
 };
 
 function setSrc (img,src){
@@ -47,7 +47,7 @@ var currentSignature = {
 };
 
 var canvasesRef = {
-  contents: /* array */[]
+  contents: []
 };
 
 function asOfNow(f) {
@@ -55,7 +55,7 @@ function asOfNow(f) {
 }
 
 function setHashToNow(param) {
-  return Util$QueerLoop.setHash(Time$QueerLoop.getTimestamp(/* () */0));
+  return Util$QueerLoop.setHash(Time$QueerLoop.getTimestamp(undefined));
 }
 
 var hasChanged = {
@@ -81,34 +81,32 @@ function simulateSelfRecognition(param) {
           var size = snapshotCanvas.width;
           Util$QueerLoop.withQuerySelectorDom("img", (function (codeImg) {
                   ctx.drawImage(codeImg, 0, 0, size, size);
-                  return /* () */0;
+                  
                 }));
           ctx.drawImage(snapshotCanvas, 1, 1, size - 1 | 0, size - 1 | 0);
           return Scanner$QueerLoop.runScanFromCanvas(snapshotCanvas, undefined, (function (canvas, qrCode) {
                         console.log("simulating scan");
                         console.log("simulating scan");
-                        return /* () */0;
+                        
                       }));
         }));
-  return /* () */0;
+  
 }
 
 function onClick(maybeHash, param) {
   if (!hasChanged.contents) {
     hasChanged.contents = true;
   }
-  if (maybeHash !== undefined) {
-    var hash = maybeHash;
-    var match = Js_dict.get(dataSeen, hash);
-    if (match !== undefined) {
-      SvgScript$QueerLoop.toggleHash(hash);
-    } else {
-      false;
-    }
-    return /* () */0;
-  } else {
-    return Util$QueerLoop.setHash(Time$QueerLoop.getTimestamp(/* () */0));
+  if (maybeHash === undefined) {
+    return Util$QueerLoop.setHash(Time$QueerLoop.getTimestamp(undefined));
   }
+  var match = Js_dict.get(dataSeen, maybeHash);
+  if (match !== undefined) {
+    SvgScript$QueerLoop.toggleHash(maybeHash);
+  } else {
+    false;
+  }
+  
 }
 
 function _writeLogEntry(param) {
@@ -134,9 +132,9 @@ function _writeLogEntry(param) {
           entry.appendChild(timeDiv);
           entry.appendChild(linkChild);
           log.appendChild(entry);
-          return /* () */0;
+          
         }));
-  return /* () */0;
+  
 }
 
 var writeLogEntry = Debouncer.make(100, _writeLogEntry);
@@ -154,7 +152,7 @@ function copySnapshotToIcon(param) {
                               var iconCtx = iconCanvas.getContext("2d");
                               iconCtx.globalAlpha = 1.0;
                               iconCtx.drawImage(snapshotCanvas, 0, 0, snapshotCanvas.width, snapshotCanvas.height, 0, 0, iconCanvas.width, iconCanvas.height);
-                              return /* () */0;
+                              
                             }));
               }));
 }
@@ -162,24 +160,23 @@ function copySnapshotToIcon(param) {
 function hasBody (){return !!document.body;};
 
 function withRootSvg(hash, f) {
-  if (Curry._1(hasBody, /* () */0)) {
+  if (Curry._1(hasBody, undefined)) {
     Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (loopContainer) {
-            var match = loopContainer.querySelector("svg");
-            if (match == null) {
-              var svg = QueerCode$QueerLoop.createSvgSkeleton(hash);
-              svg.addEventListener("click", (function (param) {
-                      return onClick(undefined, param);
-                    }));
-              loopContainer.appendChild(svg);
+            var svg = loopContainer.querySelector("svg");
+            if (!(svg == null)) {
               return Curry._1(f, svg);
-            } else {
-              return Curry._1(f, match);
             }
+            var svg$1 = QueerCode$QueerLoop.createSvgSkeleton(hash);
+            svg$1.addEventListener("click", (function (param) {
+                    return onClick(undefined, param);
+                  }));
+            loopContainer.appendChild(svg$1);
+            return Curry._1(f, svg$1);
           }));
-    return /* () */0;
+    return ;
   } else {
     Util$QueerLoop.withQuerySelectorDom("svg.root", f);
-    return /* () */0;
+    return ;
   }
 }
 
@@ -200,19 +197,19 @@ function save(timestamp) {
                                       console.log("Freeing memory from " + (String(timestamp) + "."));
                                       URL.revokeObjectURL(blobObjectUrl);
                                       htmlContainer.removeChild(downloadLink);
-                                      return /* () */0;
+                                      
                                     }), 0);
                       }));
-                return /* () */0;
+                
               }));
 }
 
 var hashCache = { };
 
 function maybeCachedHexDigest(text) {
-  var match = Js_dict.get(hashCache, text);
-  if (match !== undefined) {
-    return Promise.resolve(match);
+  var cachedHash = Js_dict.get(hashCache, text);
+  if (cachedHash !== undefined) {
+    return Promise.resolve(cachedHash);
   } else {
     return Hash$QueerLoop.hexDigest("SHA-1", text).then((function (hash) {
                   hashCache[text] = hash;
@@ -250,14 +247,14 @@ function toggleInversion(param) {
                         var classList = rootSvg.classList;
                         if (Options$QueerLoop.currentOptions.contents.invert) {
                           classList.add("invert");
-                          return /* () */0;
+                          return ;
                         } else {
                           classList.remove("invert");
-                          return /* () */0;
+                          return ;
                         }
                       }));
         }));
-  return /* () */0;
+  
 }
 
 function setCode(text, date) {
@@ -265,131 +262,118 @@ function setCode(text, date) {
           withRootSvg(hash, (function (rootSvg) {
                   var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hash));
                   if (alreadySeen) {
-                    return 0;
-                  } else {
-                    dataSeen[hash] = text;
-                    var match = maybeFilterBank.contents;
-                    if (match !== undefined) {
-                      Audio$QueerLoop.updateFilterBank(undefined, undefined, match, AudioFilter$QueerLoop.hashToChroma(hash), /* () */0);
-                    }
-                    var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode.encodeText(text, QrCodeGen$QueerLoop.Ecc.medium), defaultCode);
-                    var sizeWithBorder = code.size + 12 | 0;
-                    var isoformat = date.toISOString();
-                    var localeString = date.toLocaleString();
-                    var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, localeString, isoformat, 6);
-                    var codeImg = QueerCode$QueerLoop.svgToImg(codeSvg);
-                    codeImg.addEventListener("load", (function (param) {
-                            Util$QueerLoop.withQuerySelectorDom("#centralGroup", (function (centralGroup) {
-                                    var match = takeSnapshot(/* () */0);
-                                    if (match !== undefined) {
-                                      if (hasChanged.contents) {
-                                        QueerCode$QueerLoop.addBackground(codeSvg, sizeWithBorder, match);
-                                      }
-                                      centralGroup.appendChild(codeSvg);
-                                      if (Options$QueerLoop.currentOptions.contents.animate) {
-                                        rootSvg.setAttribute("class", "root animationsEnabled");
-                                      }
-                                      SvgScript$QueerLoop.setAnimacy(rootSvg, hash);
-                                      var iconCodeImg = QueerCode$QueerLoop.codeToImage(code, 6, hash);
-                                      iconCodeImg.addEventListener("load", (function (_evt) {
-                                              var match = Util$QueerLoop.withQuerySelectorDom("#iconCanvas", (function (iconCanvas) {
-                                                      iconCanvas.width = sizeWithBorder;
-                                                      iconCanvas.height = sizeWithBorder;
-                                                      var ctx = iconCanvas.getContext("2d");
-                                                      copySnapshotToIcon(/* () */0);
-                                                      ctx.globalAlpha = 0.5;
-                                                      ctx.drawImage(iconCodeImg, 0, 0);
-                                                      return iconCanvas.toDataURL();
-                                                    }));
-                                              if (match !== undefined) {
-                                                var iconUrl = match;
-                                                Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
-                                                        var a = document.createElementNS(Util$QueerLoop.htmlNs, "a");
-                                                        a.setAttribute("href", "#" + hash);
-                                                        var linkClasses = a.classList;
-                                                        linkClasses.add("codeLink", "code" + hash);
-                                                        var img = document.createElementNS(Util$QueerLoop.htmlNs, "img");
-                                                        img.setAttribute("src", iconUrl);
-                                                        a.appendChild(img);
-                                                        a.addEventListener("click", (function (evt) {
-                                                                evt.preventDefault();
-                                                                return onClick(hash, /* () */0);
-                                                              }));
-                                                        container.appendChild(a);
-                                                        return /* () */0;
-                                                      }));
-                                                return /* () */0;
-                                              } else {
-                                                return /* () */0;
-                                              }
-                                            }));
-                                      Util$QueerLoop.withQuerySelectorDom("#download", (function (a) {
-                                              var downloadOnClickHandler = function (evt) {
-                                                return save(isoformat);
-                                              };
-                                              return setOnClick(a, downloadOnClickHandler);
-                                            }));
-                                      currentSignature.contents = hash;
-                                      return /* () */0;
-                                    } else {
-                                      return /* () */0;
-                                    }
-                                  }));
-                            return /* () */0;
-                          }));
-                    return /* () */0;
+                    return ;
                   }
+                  dataSeen[hash] = text;
+                  var bank = maybeFilterBank.contents;
+                  if (bank !== undefined) {
+                    Audio$QueerLoop.updateFilterBank(undefined, undefined, bank, AudioFilter$QueerLoop.hashToChroma(hash), undefined);
+                  }
+                  var code = Belt_Option.getWithDefault(QrCodeGen$QueerLoop.QrCode.encodeText(text, QrCodeGen$QueerLoop.Ecc.medium), defaultCode);
+                  var sizeWithBorder = code.size + 12 | 0;
+                  var isoformat = date.toISOString();
+                  var localeString = date.toLocaleString();
+                  var codeSvg = QueerCode$QueerLoop.createCodeSvg(text, code, hash, localeString, isoformat, 6);
+                  var codeImg = QueerCode$QueerLoop.svgToImg(codeSvg);
+                  codeImg.addEventListener("load", (function (param) {
+                          Util$QueerLoop.withQuerySelectorDom("#centralGroup", (function (centralGroup) {
+                                  var snapshotUrl = takeSnapshot(undefined);
+                                  if (snapshotUrl === undefined) {
+                                    return ;
+                                  }
+                                  if (hasChanged.contents) {
+                                    QueerCode$QueerLoop.addBackground(codeSvg, sizeWithBorder, snapshotUrl);
+                                  }
+                                  centralGroup.appendChild(codeSvg);
+                                  if (Options$QueerLoop.currentOptions.contents.animate) {
+                                    rootSvg.setAttribute("class", "root animationsEnabled");
+                                  }
+                                  SvgScript$QueerLoop.setAnimacy(rootSvg, hash);
+                                  var iconCodeImg = QueerCode$QueerLoop.codeToImage(code, 6, hash);
+                                  iconCodeImg.addEventListener("load", (function (_evt) {
+                                          var iconUrl = Util$QueerLoop.withQuerySelectorDom("#iconCanvas", (function (iconCanvas) {
+                                                  iconCanvas.width = sizeWithBorder;
+                                                  iconCanvas.height = sizeWithBorder;
+                                                  var ctx = iconCanvas.getContext("2d");
+                                                  copySnapshotToIcon(undefined);
+                                                  ctx.globalAlpha = 0.5;
+                                                  ctx.drawImage(iconCodeImg, 0, 0);
+                                                  return iconCanvas.toDataURL();
+                                                }));
+                                          if (iconUrl !== undefined) {
+                                            Util$QueerLoop.withQuerySelectorDom("#codes", (function (container) {
+                                                    var a = document.createElementNS(Util$QueerLoop.htmlNs, "a");
+                                                    a.setAttribute("href", "#" + hash);
+                                                    var linkClasses = a.classList;
+                                                    linkClasses.add("codeLink", "code" + hash);
+                                                    var img = document.createElementNS(Util$QueerLoop.htmlNs, "img");
+                                                    img.setAttribute("src", iconUrl);
+                                                    a.appendChild(img);
+                                                    a.addEventListener("click", (function (evt) {
+                                                            evt.preventDefault();
+                                                            return onClick(hash, undefined);
+                                                          }));
+                                                    container.appendChild(a);
+                                                    
+                                                  }));
+                                            return ;
+                                          }
+                                          
+                                        }));
+                                  Util$QueerLoop.withQuerySelectorDom("#download", (function (a) {
+                                          var downloadOnClickHandler = function (evt) {
+                                            return save(isoformat);
+                                          };
+                                          return setOnClick(a, downloadOnClickHandler);
+                                        }));
+                                  currentSignature.contents = hash;
+                                  
+                                }));
+                          
+                        }));
+                  
                 }));
-          return Promise.resolve(/* () */0);
+          return Promise.resolve(undefined);
         }));
-  return /* () */0;
+  
 }
 
 var setText = Debouncer.make(200, (function (hash) {
         Util$QueerLoop.withQuerySelectorDom("#codeContents", (function (el) {
                 el.innerText = decodeURIComponent(hash);
-                return /* () */0;
+                
               }));
-        return /* () */0;
+        
       }));
 
 function onHashChange(_evt) {
   var opts = Options$QueerLoop.currentOptions.contents;
   var url = new URL(window.location.href);
-  var match = Time$QueerLoop.maybeDeserializeTime(url.hash.slice(1));
-  var date = match !== undefined ? Caml_option.valFromOption(match) : new Date();
-  var isoformat = date.toISOString();
-  var localeString = date.toLocaleString();
+  var date = Time$QueerLoop.maybeDeserializeTime(url.hash.slice(1));
+  var date$1 = date !== undefined ? Caml_option.valFromOption(date) : new Date();
+  var isoformat = date$1.toISOString();
+  var localeString = date$1.toLocaleString();
   Util$QueerLoop.withQuerySelectorDom("title", (function (title) {
-          var match = Options$QueerLoop.currentOptions.contents.title;
-          title.innerText = match !== undefined ? match : localeString;
-          return /* () */0;
+          var titleStr = Options$QueerLoop.currentOptions.contents.title;
+          title.innerText = titleStr !== undefined ? titleStr : localeString;
+          
         }));
   Util$QueerLoop.withQuerySelectorDom("time", (function (time) {
           time.setAttribute("datetime", isoformat);
           time.innerText = localeString;
-          return /* () */0;
+          
         }));
-  var match$1 = opts.url;
-  var urlText;
-  if (match$1 !== undefined) {
-    var match$2 = hasChanged.contents;
-    urlText = match$1 + (
-      match$2 ? url.hash : ""
-    );
-  } else {
-    var match$3 = opts.includeDomain;
-    var match$4 = opts.includeQueryString;
-    var match$5 = opts.includeHash;
-    urlText = (
-      match$3 ? url.origin : ""
+  var url_ = opts.url;
+  var urlText = url_ !== undefined ? url_ + (
+      hasChanged.contents ? url.hash : ""
+    ) : (
+      opts.includeDomain ? url.origin : ""
     ) + ((
-        match$4 ? url.search : ""
+        opts.includeQueryString ? url.search : ""
       ) + (
-        match$5 ? url.hash : ""
+        opts.includeHash ? url.hash : ""
       ));
-  }
-  setCode(urlText, date);
+  setCode(urlText, date$1);
   return Curry._1(setText, urlText);
 }
 
@@ -408,7 +392,7 @@ var lastUpdated = {
 function onTick(ts) {
   frameCount.contents = frameCount.contents + 1 | 0;
   requestAnimationFrame(onTick);
-  return /* () */0;
+  
 }
 
 function maybeUrl(s) {
@@ -428,19 +412,17 @@ function _onInput(param) {
   Util$QueerLoop.withQuerySelectorDom("#codeContents", (function (el) {
           var text = el.innerText;
           return Belt_Option.map(maybeUrl(text), (function (url) {
-                        window.location;
                         window.location.hash = url.hash;
-                        return /* () */0;
+                        
                       }));
         }));
-  return /* () */0;
+  
 }
 
 var onInput = Debouncer.make(100, _onInput);
 
-function boolParam($$default, param) {
-  if (param !== undefined) {
-    var s = param;
+function boolParam($$default, s) {
+  if (s !== undefined) {
     if (s === "true" || s === "1" || s === "y") {
       return true;
     } else {
@@ -478,22 +460,19 @@ function cycleThroughPast(param) {
   var timeToNext = function (param) {
     var currentTime = getTimestampFromCode(Caml_array.caml_array_get(allIds, i.contents));
     var nextTime = getTimestampFromCode(Caml_array.caml_array_get(allIds, Caml_int32.mod_(i.contents + 1 | 0, allIds.length)));
-    if (currentTime !== undefined) {
-      var match = Caml_option.valFromOption(currentTime);
-      if (match !== undefined) {
-        if (nextTime !== undefined) {
-          var match$1 = Caml_option.valFromOption(nextTime);
-          if (match$1 !== undefined) {
-            return match$1 - match;
-          } else {
-            return 500.0;
-          }
-        } else {
-          return 500.0;
-        }
-      } else {
-        return 500.0;
-      }
+    if (currentTime === undefined) {
+      return 500.0;
+    }
+    var current = Caml_option.valFromOption(currentTime);
+    if (current === undefined) {
+      return 500.0;
+    }
+    if (nextTime === undefined) {
+      return 500.0;
+    }
+    var next = Caml_option.valFromOption(nextTime);
+    if (next !== undefined) {
+      return next - current;
     } else {
       return 500.0;
     }
@@ -506,7 +485,7 @@ function cycleThroughPast(param) {
     Util$QueerLoop.withQuerySelectorDom("#" + Caml_array.caml_array_get(allIds, i.contents), (function (live) {
             return SvgScript$QueerLoop.addClassSvg(live, "active");
           }));
-    return /* () */0;
+    
   };
   return /* tuple */[
           step,
@@ -531,41 +510,40 @@ function featuresCallback(features) {
   var rmsS = Math.sqrt(rms).toString();
   Util$QueerLoop.withQuerySelectorDom("#chromaBackdrop", (function (chromaBackdrop) {
           chromaBackdrop.setAttribute("style", "opacity: " + (String(rmsS) + ""));
-          return /* () */0;
+          
         }));
   var chroma = features.chroma;
   return $$Array.iteri((function (i, v) {
                 Util$QueerLoop.withQuerySelectorDom("#pc" + String((i + 5 | 0) % 12), (function (pc) {
                         var vStr = v.toString();
                         pc.setAttribute("style", "opacity: " + (String(vStr) + ""));
-                        return /* () */0;
+                        
                       }));
-                return /* () */0;
+                
               }), chroma);
 }
 
 function enableAudio(param) {
-  var match = maybeAudioContext.contents;
+  var ctx = maybeAudioContext.contents;
   var audioContext;
-  if (match !== undefined) {
-    audioContext = Caml_option.valFromOption(match);
+  if (ctx !== undefined) {
+    audioContext = Caml_option.valFromOption(ctx);
   } else {
-    var ctx = new (window.AudioContext)();
-    maybeAudioContext.contents = Caml_option.some(ctx);
-    audioContext = ctx;
+    var ctx$1 = new (window.AudioContext)();
+    maybeAudioContext.contents = Caml_option.some(ctx$1);
+    audioContext = ctx$1;
   }
   Audio$QueerLoop.getAudioSource(audioContext).then((function (maybeSource) {
           maybeAudioInputNode.contents = maybeSource;
           if (maybeSource !== undefined) {
-            var sourceNode = maybeSource;
             if (audioRecording.contents) {
-              maybeFilterBank.contents = AudioFilter$QueerLoop.init(audioContext, sourceNode, audioContext.destination, /* () */0);
+              maybeFilterBank.contents = AudioFilter$QueerLoop.init(audioContext, maybeSource, audioContext.destination, undefined);
             }
             var opts = {
               audioContext: audioContext,
-              source: sourceNode,
+              source: maybeSource,
               bufferSize: 4096,
-              featureExtractors: /* array */[
+              featureExtractors: [
                 "rms",
                 "chroma",
                 "buffer"
@@ -575,18 +553,18 @@ function enableAudio(param) {
             var analyzer = Meyda.createMeydaAnalyzer(opts);
             analyzer.start();
           }
-          return Promise.resolve(/* () */0);
+          return Promise.resolve(undefined);
         }));
-  return /* () */0;
+  
 }
 
 function showHide(_evt) {
   Util$QueerLoop.withQuerySelectorDom("#queer-loop", (function (loop) {
           var classes = loop.classList;
           classes.toggle("hidden");
-          return /* () */0;
+          
         }));
-  return /* () */0;
+  
 }
 
 function makeIframe(url) {
@@ -597,30 +575,29 @@ function makeIframe(url) {
           iframe.setAttribute("allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; microphone; camera");
           iframe.setAttribute("src", url);
           iframeContainer.appendChild(iframe);
-          return /* () */0;
+          
         }));
-  return /* () */0;
+  
 }
 
 function init(_evt) {
-  HtmlShell$QueerLoop.setup(/* () */0);
+  HtmlShell$QueerLoop.setup(undefined);
   HtmlShell$QueerLoop.createIconButtonWithCallback("#toolbar", "mic", (function (_evt) {
-          return enableAudio(/* () */0);
+          return enableAudio(undefined);
         }));
   HtmlShell$QueerLoop.createIconButtonWithCallback("#toolbar", "hide", showHide);
   HtmlShell$QueerLoop.createIconButtonWithCallback("#toolbar", "invert", (function (_evt) {
-          return toggleInversion(/* () */0);
+          return toggleInversion(undefined);
         }));
   Util$QueerLoop.withQuerySelectorDom("#snapshotCanvas", (function (canvas) {
           canvas.width = 480;
           canvas.height = 480;
-          return /* () */0;
+          
         }));
-  var queryString = Util$QueerLoop.getQueryString(/* () */0);
+  var queryString = Util$QueerLoop.getQueryString(undefined);
   if (queryString !== "") {
     var params = new URLSearchParams(queryString);
     var cameraIndices = $$Array.map(Caml_format.caml_int_of_string, params.getAll("c"));
-    var match = cameraIndices.length === 0;
     Options$QueerLoop.currentOptions.contents = {
       background: Belt_Option.getWithDefault(Belt_Option.map(Caml_option.nullable_to_opt(params.get("b")), (function (prim) {
                   return decodeURIComponent(prim);
@@ -638,61 +615,61 @@ function init(_evt) {
       poem: Caml_option.nullable_to_opt(params.get("p")),
       wiki: Caml_option.nullable_to_opt(params.get("w")),
       youtubeVideo: Caml_option.nullable_to_opt(params.get("v")),
-      cameraIndices: match ? /* array */[0] : cameraIndices
+      cameraIndices: cameraIndices.length === 0 ? [0] : cameraIndices
     };
   }
   if (Options$QueerLoop.currentOptions.contents.background !== "") {
     Util$QueerLoop.setBackground(".background", Options$QueerLoop.currentOptions.contents.background);
   }
-  var match$1 = Options$QueerLoop.currentOptions.contents.url;
-  if (match$1 !== undefined) {
-    makeIframe(match$1);
+  var url = Options$QueerLoop.currentOptions.contents.url;
+  if (url !== undefined) {
+    makeIframe(url);
   }
-  var match$2 = Options$QueerLoop.currentOptions.contents.youtubeVideo;
-  if (match$2 !== undefined) {
-    makeIframe("https://www.youtube-nocookie.com/embed/" + (String(match$2) + "?cc_load_policy=1&autoplay=1"));
+  var ytId = Options$QueerLoop.currentOptions.contents.youtubeVideo;
+  if (ytId !== undefined) {
+    makeIframe("https://www.youtube-nocookie.com/embed/" + (String(ytId) + "?cc_load_policy=1&autoplay=1"));
   }
-  var match$3 = Options$QueerLoop.currentOptions.contents.poem;
-  if (match$3 !== undefined) {
-    makeIframe("https://poets.org/poem/" + (String(match$3) + "?mbd=1"));
+  var poem = Options$QueerLoop.currentOptions.contents.poem;
+  if (poem !== undefined) {
+    makeIframe("https://poets.org/poem/" + (String(poem) + "?mbd=1"));
   }
-  var match$4 = Options$QueerLoop.currentOptions.contents.wiki;
-  if (match$4 !== undefined) {
-    makeIframe("https://en.m.wikipedia.org/wiki/" + (String(match$4) + ""));
+  var wiki = Options$QueerLoop.currentOptions.contents.wiki;
+  if (wiki !== undefined) {
+    makeIframe("https://en.m.wikipedia.org/wiki/" + (String(wiki) + ""));
   }
-  initialHash.contents = Util$QueerLoop.getHash(/* () */0).slice(1);
+  initialHash.contents = Util$QueerLoop.getHash(undefined).slice(1);
   if (initialHash.contents === "") {
-    initialHash.contents = Time$QueerLoop.getTimestamp(/* () */0);
+    initialHash.contents = Time$QueerLoop.getTimestamp(undefined);
     Util$QueerLoop.setHash(initialHash.contents);
   } else {
-    onHashChange(/* () */0);
+    onHashChange(undefined);
   }
-  if (!Curry._1(hasBody, /* () */0)) {
-    var match$5 = cycleThroughPast(/* () */0);
-    var timeToNext = match$5[1];
-    var stepFn = match$5[0];
+  if (!Curry._1(hasBody, undefined)) {
+    var match = cycleThroughPast(undefined);
+    var timeToNext = match[1];
+    var stepFn = match[0];
     var lastUpdated = {
       contents: 0.0
     };
     var until = {
-      contents: Curry._1(timeToNext, /* () */0)
+      contents: Curry._1(timeToNext, undefined)
     };
     var onTick$1 = function (ts) {
       if (ts - lastUpdated.contents >= until.contents) {
-        Curry._1(stepFn, /* () */0);
-        until.contents = Curry._1(timeToNext, /* () */0);
+        Curry._1(stepFn, undefined);
+        until.contents = Curry._1(timeToNext, undefined);
         lastUpdated.contents = ts;
       }
       requestAnimationFrame(onTick$1);
-      return /* () */0;
+      
     };
     requestAnimationFrame(onTick$1);
   }
   Util$QueerLoop.withQuerySelectorDom("#codeContents", (function (el) {
           el.addEventListener("blur", (function (_evt) {
-                  return Curry._1(onInput, /* () */0);
+                  return Curry._1(onInput, undefined);
                 }));
-          return /* () */0;
+          
         }));
   var response = function (srcCanvas, inputCode) {
     var input = inputCode.data;
@@ -715,7 +692,7 @@ function init(_evt) {
                       }
                       var ctx = destCanvas.getContext("2d");
                       ctx.drawImage(srcCanvas, rect.x, rect.y, rect.w, rect.h, 0, 0, dw, dh);
-                      return /* () */0;
+                      
                     }));
               var alreadySeen = Belt_Option.isSome(Js_dict.get(dataSeen, hexHash));
               var isSelf = hexHash === currentSignature.contents;
@@ -727,16 +704,15 @@ function init(_evt) {
                       isSelf ? "queer-loop" : input,
                       hexHash
                     ]);
-                Util$QueerLoop.setHash(Time$QueerLoop.getTimestamp(/* () */0));
+                Util$QueerLoop.setHash(Time$QueerLoop.getTimestamp(undefined));
               }
-              return Promise.resolve(/* () */0);
+              return Promise.resolve(undefined);
             }));
-      return /* () */0;
-    } else {
-      return 0;
+      return ;
     }
+    
   };
-  UserMedia$QueerLoop.getCameras(/* () */0).then((function (cameras) {
+  UserMedia$QueerLoop.getCameras(undefined).then((function (cameras) {
               camerasRef.contents = cameras;
               console.log("Cameras found:", cameras);
               return Promise.all($$Array.map((function (camera) {
@@ -750,24 +726,24 @@ function init(_evt) {
             requestAnimationFrame(onTick);
             console.log("Initalization complete.");
             queerLoopState.contents = /* Awake */2;
-            return Promise.resolve(/* () */0);
+            return Promise.resolve(undefined);
           })).catch((function (err) {
           console.log("Camera input disabled.");
           console.log("Initalization complete.");
           Util$QueerLoop.withQuerySelectorDom("#welcome", (function (welcome) {
                   welcome.setAttribute("style", "display: block;");
-                  return /* () */0;
+                  
                 }));
-          return Promise.resolve(/* () */0);
+          return Promise.resolve(undefined);
         }));
-  return /* () */0;
+  
 }
 
 function activateQueerLoop (){window.queerLoop = true;};
 
 if (!window.queerLoop) {
   console.log("Initializing queer-loop...");
-  Curry._1(activateQueerLoop, /* () */0);
+  Curry._1(activateQueerLoop, undefined);
   window.addEventListener("load", init);
   window.addEventListener("hashchange", onHashChange);
 }

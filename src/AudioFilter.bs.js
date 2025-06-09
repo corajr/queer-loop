@@ -23,7 +23,7 @@ function init(audioContext, sourceNode, output, param) {
   var bank = Audio$QueerLoop.makeFilterBank(audioContext, 12, 64.0, (function (i) {
           return Audio$QueerLoop.noteToFrequency(i + 60.0);
         }));
-  Audio$QueerLoop.updateFilterBank(undefined, undefined, bank, /* array */[
+  Audio$QueerLoop.updateFilterBank(undefined, undefined, bank, [
         0.5,
         0.0,
         0.0,
@@ -36,7 +36,7 @@ function init(audioContext, sourceNode, output, param) {
         0.0,
         0.0,
         0.0
-      ], /* () */0);
+      ], undefined);
   var now = audioContext.currentTime;
   var delay = audioContext.createDelay(2.0);
   delay.delayTime.setValueAtTime(2.0, now);

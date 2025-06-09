@@ -11,12 +11,11 @@ var Caml_js_exceptions = require("bs-platform/lib/js/caml_js_exceptions.js");
 var UserMedia$QueerLoop = require("./UserMedia.bs.js");
 
 function syncScan(scanCallback, srcCanvas, invertOptions, imageData) {
-  var match = JsQr$QueerLoop.jsQR(imageData.data, imageData.width, imageData.height, invertOptions);
-  if (match !== undefined) {
-    return Curry._2(scanCallback, srcCanvas, Caml_option.valFromOption(match));
-  } else {
-    return /* () */0;
+  var code = JsQr$QueerLoop.jsQR(imageData.data, imageData.width, imageData.height, invertOptions);
+  if (code !== undefined) {
+    return Curry._2(scanCallback, srcCanvas, Caml_option.valFromOption(code));
   }
+  
 }
 
 function copyVideoToSnapshotCanvas(videoCanvas) {
@@ -42,7 +41,7 @@ function copyVideoToSnapshotCanvas(videoCanvas) {
                   ];
                 }
                 snapshotCtx.drawImage(videoCanvas, match[0], match[1], w, w, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
-                return /* () */0;
+                
               }));
 }
 
@@ -53,9 +52,8 @@ function runScanFromCanvas(canvas, maybeWorker, scanCallback) {
       var maybeCode = e.data;
       if (maybeCode !== undefined) {
         return Curry._2(scanCallback, canvas, Caml_option.valFromOption(maybeCode));
-      } else {
-        return /* () */0;
       }
+      
     };
     Caml_option.valFromOption(maybeWorker).onmessage = msgBackHandler;
   }
@@ -71,7 +69,7 @@ function runScanFromCanvas(canvas, maybeWorker, scanCallback) {
           canvas.height,
           /* DontInvert */1
         ]);
-    return /* () */0;
+    return ;
   } else {
     return syncScan(scanCallback, canvas, /* DontInvert */1, imageData);
   }
@@ -83,7 +81,7 @@ function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
                 Util$QueerLoop.withQuerySelectorDom("#videoContainer", (function (htmlContainer) {
                         htmlContainer.appendChild(video);
                         htmlContainer.appendChild(canvas);
-                        return /* () */0;
+                        
                       }));
                 var maybeWorker;
                 var exit = 0;
@@ -122,9 +120,8 @@ function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
                           var maybeCode = e.data;
                           if (maybeCode !== undefined) {
                             return Curry._2(scanCallback, canvas, Caml_option.valFromOption(maybeCode));
-                          } else {
-                            return /* () */0;
                           }
+                          
                         };
                         Caml_option.valFromOption(maybeWorker).onmessage = msgBackHandler;
                       }
@@ -148,7 +145,7 @@ function scanUsingDeviceId(videoEl, deviceId, currentOptions, scanCallback) {
                   }
                   frameCount.contents = frameCount.contents + 1 | 0;
                   requestAnimationFrame(onTick);
-                  return /* () */0;
+                  
                 };
                 requestAnimationFrame(onTick);
                 return Promise.resolve(canvas);

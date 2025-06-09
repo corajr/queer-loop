@@ -42,14 +42,11 @@ function getNextHsv(param) {
   var s = param[1];
   var h = param[0];
   var inc = 1.0 / 5.0;
-  var match = s !== 0.0;
-  var match$1 = Caml_float.caml_modf_float(match ? h + inc : h);
-  var match$2 = s === 0.0 && v === 1.0 || match$1[1] !== 0.0;
-  var s_ = match$2 ? s + inc : s;
-  var match$3 = s_ === 0.0 || h === 0.8 && s === 1.0;
-  var v_ = match$3 ? v - inc : v;
+  var match = Caml_float.caml_modf_float(s !== 0.0 ? h + inc : h);
+  var s_ = s === 0.0 && v === 1.0 || match[1] !== 0.0 ? s + inc : s;
+  var v_ = s_ === 0.0 || h === 0.8 && s === 1.0 ? v - inc : v;
   return /* tuple */[
-          match$1[0],
+          match[0],
           wrap01(s_),
           wrap01(v_)
         ];

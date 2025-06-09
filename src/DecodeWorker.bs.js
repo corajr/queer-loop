@@ -7,7 +7,7 @@ self.onmessage = (function (e) {
     var match = e.data;
     var maybeCode = JsQr$QueerLoop.jsQR(match[0], match[1], match[2], match[3]);
     postMessage(maybeCode);
-    return /* () */0;
+    
   });
 
 /*  Not a pure module */

@@ -16,21 +16,21 @@ function deserializeTime(str) {
 
 function maybeDeserializeTime(str) {
   var t = Number(str);
-  if (isFinite(t)) {
-    var date = new Date();
-    date.setTime(t);
-    var val;
-    try {
-      val = date.toISOString();
-    }
-    catch (raw_err){
-      var err = Caml_js_exceptions.internalToOCamlException(raw_err);
-      console.error("Could not make valid date from:", t, err);
-      return ;
-    }
-    return Caml_option.some(date);
+  if (!isFinite(t)) {
+    return ;
   }
-  
+  var date = new Date();
+  date.setTime(t);
+  var val;
+  try {
+    val = date.toISOString();
+  }
+  catch (raw_err){
+    var err = Caml_js_exceptions.internalToOCamlException(raw_err);
+    console.error("Could not make valid date from:", t, err);
+    return ;
+  }
+  return Caml_option.some(date);
 }
 
 function getTimestamp(param) {
@@ -56,16 +56,15 @@ function toOptionFiniteFloat(f) {
 function parseTimestampFromText(text) {
   if (text === "") {
     return ;
-  } else {
-    var date;
-    try {
-      date = new Date(text);
-    }
-    catch (exn){
-      return ;
-    }
-    return toOptionFiniteFloat(date.getTime());
   }
+  var date;
+  try {
+    date = new Date(text);
+  }
+  catch (exn){
+    return ;
+  }
+  return toOptionFiniteFloat(date.getTime());
 }
 
 function parseTimestampFromFragment(href) {
@@ -82,52 +81,53 @@ function parseTimestampFromFragment(href) {
     var fragment = url.hash.slice(1);
     if (fragment === "") {
       return ;
-    } else {
-      var match = maybeDeserializeTime(fragment);
-      var tryFloat = match !== undefined ? toOptionFiniteFloat(Caml_option.valFromOption(match).getTime()) : undefined;
-      if (tryFloat !== undefined) {
-        return tryFloat;
-      } else if (fragment === "") {
-        return ;
-      } else {
-        var date2;
-        try {
-          date2 = new Date(fragment);
-        }
-        catch (exn$1){
-          return ;
-        }
-        return toOptionFiniteFloat(date2.getTime());
-      }
     }
+    var date = maybeDeserializeTime(fragment);
+    var tryFloat = date !== undefined ? toOptionFiniteFloat(Caml_option.valFromOption(date).getTime()) : undefined;
+    if (tryFloat !== undefined) {
+      return tryFloat;
+    }
+    if (fragment === "") {
+      return ;
+    }
+    var exit$1 = 0;
+    var date2;
+    try {
+      date2 = new Date(fragment);
+      exit$1 = 2;
+    }
+    catch (exn$1){
+      return ;
+    }
+    if (exit$1 === 2) {
+      return toOptionFiniteFloat(date2.getTime());
+    }
+    
   }
   
 }
 
 function getTimestampFromElement(element) {
   var getTextTimestamp = function (param) {
-    var match = element.querySelector("text");
-    if (match == null) {
-      return ;
-    } else {
-      return parseTimestampFromText(match.textContent);
+    var text = element.querySelector("text");
+    if (!(text == null)) {
+      return parseTimestampFromText(text.textContent);
     }
+    
   };
-  var match = element.querySelector("a");
-  if (match == null) {
-    return getTextTimestamp(/* () */0);
+  var link = element.querySelector("a");
+  if (link == null) {
+    return getTextTimestamp(undefined);
+  }
+  var href = link.getAttribute("href");
+  if (href == null) {
+    return getTextTimestamp(undefined);
+  }
+  var timestamp = parseTimestampFromFragment(href);
+  if (timestamp !== undefined) {
+    return timestamp;
   } else {
-    var match$1 = match.getAttribute("href");
-    if (match$1 == null) {
-      return getTextTimestamp(/* () */0);
-    } else {
-      var match$2 = parseTimestampFromFragment(match$1);
-      if (match$2 !== undefined) {
-        return match$2;
-      } else {
-        return getTextTimestamp(/* () */0);
-      }
-    }
+    return getTextTimestamp(undefined);
   }
 }
 

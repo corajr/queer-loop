@@ -11,18 +11,16 @@ function cmp(param, param$1) {
   var c = Caml_obj.caml_compare(param[0], param$1[0]);
   if (c !== 0) {
     return c;
+  }
+  var c$1 = Caml_obj.caml_compare(param[1], param$1[1]);
+  if (c$1 !== 0) {
+    return c$1;
+  }
+  var c$2 = Caml_obj.caml_compare(param[2], param$1[2]);
+  if (c$2 !== 0) {
+    return c$2;
   } else {
-    var c$1 = Caml_obj.caml_compare(param[1], param$1[1]);
-    if (c$1 !== 0) {
-      return c$1;
-    } else {
-      var c$2 = Caml_obj.caml_compare(param[2], param$1[2]);
-      if (c$2 !== 0) {
-        return c$2;
-      } else {
-        return Caml_obj.caml_compare(param[3], param$1[3]);
-      }
-    }
+    return Caml_obj.caml_compare(param[3], param$1[3]);
   }
 }
 
@@ -33,7 +31,7 @@ var EdgeComparator = Belt_Id.MakeComparable({
 var emptyEdgeSet = Belt_Set.make(EdgeComparator);
 
 var emptyAudioGraph = {
-  nodes: Belt_MapString.empty,
+  nodes: undefined,
   edges: emptyEdgeSet,
   actuallyConnectedEdges: emptyEdgeSet
 };
@@ -115,9 +113,9 @@ function disconnectEdges(edgesToDisconnect, graph) {
   return Belt_Set.forEach(edgesToDisconnect, (function (edge) {
                 maybeApplyToGraph((function (prim, prim$1, prim$2, prim$3) {
                         prim.disconnect(prim$1, prim$2, prim$3);
-                        return /* () */0;
+                        
                       }), edge, graph);
-                return /* () */0;
+                
               }));
 }
 
@@ -126,12 +124,12 @@ function updateConnections(graph) {
   var edgesToDisconnect = Belt_Set.diff(graph.actuallyConnectedEdges, graph.edges);
   disconnectEdges(edgesToDisconnect, graph);
   var nowConnected = Belt_Set.reduce(edgesToConnect, emptyEdgeSet, (function (acc, edge) {
-          var match = maybeApplyToGraph((function (prim, prim$1, prim$2, prim$3) {
+          var edge$1 = maybeApplyToGraph((function (prim, prim$1, prim$2, prim$3) {
                   prim.connect(prim$1, prim$2, prim$3);
-                  return /* () */0;
+                  
                 }), edge, graph);
-          if (match !== undefined) {
-            return Belt_Set.add(acc, match);
+          if (edge$1 !== undefined) {
+            return Belt_Set.add(acc, edge$1);
           } else {
             return acc;
           }

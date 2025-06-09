@@ -26,10 +26,9 @@ function getMinAndMax(ary) {
           }
           if (x > currentMax.contents) {
             currentMax.contents = x;
-            return /* () */0;
-          } else {
-            return 0;
+            return ;
           }
+          
         }), ary);
   return /* tuple */[
           currentMin.contents,
@@ -42,14 +41,14 @@ function extractAABB(loc) {
   var match$1 = getPointAsFloats(loc.topRightCorner);
   var match$2 = getPointAsFloats(loc.bottomRightCorner);
   var match$3 = getPointAsFloats(loc.bottomLeftCorner);
-  var match$4 = getMinAndMax(/* array */[
+  var match$4 = getMinAndMax([
         match[0],
         match$1[0],
         match$2[0],
         match$3[0]
       ]);
   var minX = match$4[0];
-  var match$5 = getMinAndMax(/* array */[
+  var match$5 = getMinAndMax([
         match[1],
         match$1[1],
         match$2[1],

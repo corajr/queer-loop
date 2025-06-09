@@ -12,14 +12,14 @@ function asPromise(request) {
                 request.addEventListener("success", (function (_evt) {
                         return resolve(request.result);
                       }));
-                return /* () */0;
+                
               }));
 }
 
-function open_(name, version, $staropt$star, unit) {
-  var upgradeNeededHandler = $staropt$star !== undefined ? $staropt$star : (function (db) {
+function open_(name, version, upgradeNeededHandlerOpt, unit) {
+  var upgradeNeededHandler = upgradeNeededHandlerOpt !== undefined ? upgradeNeededHandlerOpt : (function (db) {
         console.log("Upgrading database...");
-        return /* () */0;
+        
       });
   var request = window.indexedDB.open(name, version);
   request.addEventListener("upgradeneeded", upgradeNeededHandler);

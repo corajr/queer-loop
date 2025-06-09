@@ -13,7 +13,7 @@ function invert(canvas) {
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, w, h);
   ctx.globalCompositeOperation = originalCompositeOperation;
-  return /* () */0;
+  
 }
 
 exports.Ctx = Ctx;

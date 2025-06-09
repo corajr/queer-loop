@@ -18,14 +18,13 @@ function withQuerySelector(query, f) {
 }
 
 function catMaybes(ary) {
-  var newArray = /* array */[];
-  $$Array.iter((function (param) {
-          if (param !== undefined) {
-            newArray.push(Caml_option.valFromOption(param));
-            return /* () */0;
-          } else {
-            return /* () */0;
+  var newArray = [];
+  $$Array.iter((function (a) {
+          if (a !== undefined) {
+            newArray.push(Caml_option.valFromOption(a));
+            return ;
           }
+          
         }), ary);
   return newArray;
 }
@@ -55,23 +54,21 @@ function withQuerySelectorSub(query, childQuery, f) {
 }
 
 function removeFromParentNode(node) {
-  var match = node.parentNode;
-  if (match == null) {
-    return /* () */0;
-  } else {
-    match.removeChild(node);
-    return /* () */0;
+  var parent = node.parentNode;
+  if (!(parent == null)) {
+    parent.removeChild(node);
+    return ;
   }
+  
 }
 
 function removeFromParent(element) {
-  var match = element.parentElement;
-  if (match == null) {
-    return /* () */0;
-  } else {
-    match.removeChild(element);
-    return /* () */0;
+  var parent = element.parentElement;
+  if (!(parent == null)) {
+    parent.removeChild(element);
+    return ;
   }
+  
 }
 
 function createElementWithId(tagName, id) {
@@ -86,7 +83,7 @@ function getHash(param) {
 
 function setHash(hash) {
   window.location.hash = hash;
-  return /* () */0;
+  
 }
 
 function getQueryString(param) {
@@ -95,14 +92,14 @@ function getQueryString(param) {
 
 function setQueryString(search) {
   window.location.search = search;
-  return /* () */0;
+  
 }
 
 function setBackground(selector, bgCss) {
   return withQuerySelector(selector, (function (el) {
                 el.style.setProperty("background", bgCss, "");
                 console.log(bgCss);
-                return /* () */0;
+                
               }));
 }
 

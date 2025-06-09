@@ -12,9 +12,9 @@ var QrCodeGen$QueerLoop = require("./QrCodeGen.bs.js");
 function getPathString(code, border) {
   var size = code.size;
   var modules = code.getModules();
-  var parts = /* array */[];
-  for(var y = 0 ,y_finish = size - 1 | 0; y <= y_finish; ++y){
-    for(var x = 0 ,x_finish = size - 1 | 0; x <= x_finish; ++x){
+  var parts = [];
+  for(var y = 0; y < size; ++y){
+    for(var x = 0; x < size; ++x){
       if (Caml_array.caml_array_get(Caml_array.caml_array_get(modules, y), x)) {
         parts.push("M" + (String(x + border | 0) + ("," + (String(y + border | 0) + "h1v1h-1z"))));
       }
@@ -90,8 +90,8 @@ function createTimeLink(href, timestamp, localeString, sizeWithBorder, border) {
   return timeLink;
 }
 
-function createTextBox(text, border, sizeWithBorder, $staropt$star, unit) {
-  var additionalClasses = $staropt$star !== undefined ? $staropt$star : /* array */[];
+function createTextBox(text, border, sizeWithBorder, additionalClassesOpt, unit) {
+  var additionalClasses = additionalClassesOpt !== undefined ? additionalClassesOpt : [];
   var htmlContainer = document.createElementNS(svgNs, "foreignObject");
   htmlContainer.setAttribute("x", "0");
   htmlContainer.setAttribute("y", String((sizeWithBorder - border | 0) + 1 | 0));
@@ -127,7 +127,7 @@ function createCodeSvg(href, code, hash, localeString, timestamp, border) {
   codeSvg.appendChild(codeGroup);
   var metadataGroup = document.createElementNS(svgNs, "g");
   metadataGroup.appendChild(createTimeLink(href, timestamp, localeString, sizeWithBorder, border));
-  var codeText = createTextBox(href, border, sizeWithBorder, undefined, /* () */0);
+  var codeText = createTextBox(href, border, sizeWithBorder, undefined, undefined);
   metadataGroup.appendChild(codeText);
   codeSvg.appendChild(metadataGroup);
   return codeSvg;
@@ -146,9 +146,9 @@ function createSvgSkeleton(hash) {
   Util$QueerLoop.withQuerySelectorDom("script.main", (function (main) {
           var script = createScript(main.textContent);
           svg.appendChild(script);
-          return /* () */0;
+          
         }));
-  var style = createStyle(/* () */0);
+  var style = createStyle(undefined);
   svg.appendChild(style);
   var centralGroup = document.createElementNS(svgNs, "g");
   centralGroup.id = "centralGroup";
@@ -190,37 +190,36 @@ function createIconSvg(code, border, bg, hash) {
 }
 
 function createIconFromText(text) {
-  var match = QrCodeGen$QueerLoop.QrCode.encodeText(text, QrCodeGen$QueerLoop.Ecc.low);
-  if (match !== undefined) {
-    var code = Caml_option.valFromOption(match);
-    var size = code.size;
-    var sizeWithBorder = size + 12 | 0;
-    var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
-    var svg = document.createElementNS(svgNs, "svg");
-    svg.setAttribute("viewBox", viewBox);
-    svg.setAttribute("class", "icon");
-    var defs = document.createElementNS(svgNs, "defs");
-    var lightRainbowGradient = createRainbowGradient(0.95, "lightRainbow");
-    var darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");
-    defs.appendChild(lightRainbowGradient);
-    defs.appendChild(darkRainbowGradient);
-    svg.appendChild(defs);
-    var rect = document.createElementNS(svgNs, "rect");
-    rect.setAttribute("width", "100%");
-    rect.setAttribute("height", "100%");
-    rect.setAttribute("class", "codeBackdrop");
-    svg.appendChild(rect);
-    var path = createQrCodePathElement(code, 6);
-    svg.appendChild(path);
-    var codeText = createTextBox(text, 6, sizeWithBorder, /* array */["iconText"], /* () */0);
-    codeText.setAttribute("y", String(sizeWithBorder - 6 | 0));
-    svg.appendChild(codeText);
-    svg.setAttribute("width", String((sizeWithBorder << 1)));
-    svg.setAttribute("height", String((sizeWithBorder << 1)));
-    return svg;
-  } else {
+  var code = QrCodeGen$QueerLoop.QrCode.encodeText(text, QrCodeGen$QueerLoop.Ecc.low);
+  if (code === undefined) {
     return document.createElementNS(Util$QueerLoop.htmlNs, "div");
   }
+  var code$1 = Caml_option.valFromOption(code);
+  var size = code$1.size;
+  var sizeWithBorder = size + 12 | 0;
+  var viewBox = "0 0 " + (String(sizeWithBorder) + (" " + (String(sizeWithBorder) + "")));
+  var svg = document.createElementNS(svgNs, "svg");
+  svg.setAttribute("viewBox", viewBox);
+  svg.setAttribute("class", "icon");
+  var defs = document.createElementNS(svgNs, "defs");
+  var lightRainbowGradient = createRainbowGradient(0.95, "lightRainbow");
+  var darkRainbowGradient = createRainbowGradient(0.1, "darkRainbow");
+  defs.appendChild(lightRainbowGradient);
+  defs.appendChild(darkRainbowGradient);
+  svg.appendChild(defs);
+  var rect = document.createElementNS(svgNs, "rect");
+  rect.setAttribute("width", "100%");
+  rect.setAttribute("height", "100%");
+  rect.setAttribute("class", "codeBackdrop");
+  svg.appendChild(rect);
+  var path = createQrCodePathElement(code$1, 6);
+  svg.appendChild(path);
+  var codeText = createTextBox(text, 6, sizeWithBorder, ["iconText"], undefined);
+  codeText.setAttribute("y", String(sizeWithBorder - 6 | 0));
+  svg.appendChild(codeText);
+  svg.setAttribute("width", String((sizeWithBorder << 1)));
+  svg.setAttribute("height", String((sizeWithBorder << 1)));
+  return svg;
 }
 
 var $$XMLSerializer = { };
@@ -234,7 +233,7 @@ function svgToDataURL(svg) {
 function svgToBlob(svg) {
   var xmlSerializer = new XMLSerializer();
   var str = xmlSerializer.serializeToString(svg);
-  return new Blob(/* array */[str], {
+  return new Blob([str], {
               type: "image/svg+xml;charset=utf-8"
             });
 }
@@ -252,9 +251,9 @@ function svgToBlobObjectURL(svg) {
   return URL.createObjectURL(svgToBlob(svg));
 }
 
-function svgToPng(svg, $staropt$star, $staropt$star$1, unit) {
-  var width = $staropt$star !== undefined ? $staropt$star : 480;
-  var height = $staropt$star$1 !== undefined ? $staropt$star$1 : 480;
+function svgToPng(svg, widthOpt, heightOpt, unit) {
+  var width = widthOpt !== undefined ? widthOpt : 480;
+  var height = heightOpt !== undefined ? heightOpt : 480;
   var svgBlob = svgToBlob(svg);
   var svgUrl = URL.createObjectURL(svgBlob);
   var svgImg = document.createElementNS(Util$QueerLoop.htmlNs, "img");
@@ -265,9 +264,9 @@ function svgToPng(svg, $staropt$star, $staropt$star$1, unit) {
                   var ctx = canvas.getContext("2d");
                   ctx.drawImage(svgImg, 0, 0);
                   URL.revokeObjectURL(svgUrl);
-                  return /* () */0;
+                  
                 }));
-          return /* () */0;
+          
         }));
   svgImg.setAttribute("src", svgUrl);
   svgImg.setAttribute("width", widthStr);
@@ -304,7 +303,7 @@ function drawCanvas(canvas, code) {
       
     }
   }
-  return /* () */0;
+  
 }
 
 function clipCanvas(canvas, code) {
@@ -322,7 +321,7 @@ function clipCanvas(canvas, code) {
     }
   }
   ctx.clip();
-  return /* () */0;
+  
 }
 
 var lightRainbowLightness = 0.95;

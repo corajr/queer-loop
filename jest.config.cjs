@@ -14,10 +14,14 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!(@glennsl/bs-jest)/)',
   ],
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
+  testEnvironmentOptions: {
+    url: 'http://localhost/',
+  },
   moduleFileExtensions: ['js', 'bs.js'],
   testMatch: ['**/__tests__/**/*.bs.js'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1'
-  }
+  },
+  setupFiles: ['<rootDir>/jest.setup.js']
 }; 

@@ -26,9 +26,9 @@ function initStreamByDeviceId(videoEl, deviceId) {
                 }
               }).then((function (stream) {
                 videoEl.srcObject = stream;
-                var match = Webapi__Dom__Element.asHtmlElement(videoEl);
-                if (match !== undefined) {
-                  Caml_option.valFromOption(match).setAttribute("playsinline", "true");
+                var video = Webapi__Dom__Element.asHtmlElement(videoEl);
+                if (video !== undefined) {
+                  Caml_option.valFromOption(video).setAttribute("playsinline", "true");
                 }
                 videoEl.play();
                 return Promise.resolve(videoEl);

@@ -15,14 +15,14 @@ function exportKeyJWK(key) {
 
 function importKeyJWK(json) {
   var parsed = JSON.parse(json);
-  return window.crypto.subtle.importKey("jwk", parsed, defaultHmac, true, /* array */[
+  return window.crypto.subtle.importKey("jwk", parsed, defaultHmac, true, [
               "sign",
               "verify"
             ]);
 }
 
 function generateHmac(param) {
-  return window.crypto.subtle.generateKey(defaultHmac, true, /* array */[
+  return window.crypto.subtle.generateKey(defaultHmac, true, [
               "sign",
               "verify"
             ]);

@@ -5,11 +5,11 @@ var $$Array = require("bs-platform/lib/js/array.js");
 var Block = require("bs-platform/lib/js/block.js");
 var Audio$QueerLoop = require("./Audio.bs.js");
 
-function setupSingleDelay(audioContext, sourceNode, output, $staropt$star, $staropt$star$1, $staropt$star$2, $staropt$star$3, param) {
-  var gain = $staropt$star !== undefined ? $staropt$star : 0.7;
-  var outputGain = $staropt$star$1 !== undefined ? $staropt$star$1 : 0.5;
-  var cutoff = $staropt$star$2 !== undefined ? $staropt$star$2 : 2000.0;
-  var midiNote = $staropt$star$3 !== undefined ? $staropt$star$3 : 45.0;
+function setupSingleDelay(audioContext, sourceNode, output, gainOpt, outputGainOpt, cutoffOpt, midiNoteOpt, param) {
+  var gain = gainOpt !== undefined ? gainOpt : 0.7;
+  var outputGain = outputGainOpt !== undefined ? outputGainOpt : 0.5;
+  var cutoff = cutoffOpt !== undefined ? cutoffOpt : 2000.0;
+  var midiNote = midiNoteOpt !== undefined ? midiNoteOpt : 45.0;
   var now = audioContext.currentTime;
   var delayNode = audioContext.createDelay(1.0);
   var biquadFilter = Audio$QueerLoop.makeFilter(audioContext, /* LowPass */Block.__(0, [
@@ -37,10 +37,10 @@ function setupSingleDelay(audioContext, sourceNode, output, $staropt$star, $star
         };
 }
 
-function setupDelaysFeedback(audioContext, sourceNode, output, $staropt$star, $staropt$star$1, $staropt$star$2, param) {
-  var gain = $staropt$star !== undefined ? $staropt$star : 0.7;
-  var cutoff = $staropt$star$1 !== undefined ? $staropt$star$1 : 2000.0;
-  var midiNotes = $staropt$star$2 !== undefined ? $staropt$star$2 : /* array */[
+function setupDelaysFeedback(audioContext, sourceNode, output, gainOpt, cutoffOpt, midiNotesOpt, param) {
+  var gain = gainOpt !== undefined ? gainOpt : 0.7;
+  var cutoff = cutoffOpt !== undefined ? cutoffOpt : 2000.0;
+  var midiNotes = midiNotesOpt !== undefined ? midiNotesOpt : [
       45.0,
       52.0
     ];
@@ -72,10 +72,10 @@ function setupDelaysFeedback(audioContext, sourceNode, output, $staropt$star, $s
         };
 }
 
-function setupDelays(audioContext, sourceNode, output, $staropt$star, $staropt$star$1, $staropt$star$2, param) {
-  var gain = $staropt$star !== undefined ? $staropt$star : 0.7;
-  var cutoff = $staropt$star$1 !== undefined ? $staropt$star$1 : 2000.0;
-  var midiNotes = $staropt$star$2 !== undefined ? $staropt$star$2 : /* array */[
+function setupDelays(audioContext, sourceNode, output, gainOpt, cutoffOpt, midiNotesOpt, param) {
+  var gain = gainOpt !== undefined ? gainOpt : 0.7;
+  var cutoff = cutoffOpt !== undefined ? cutoffOpt : 2000.0;
+  var midiNotes = midiNotesOpt !== undefined ? midiNotesOpt : [
       45.0,
       62.0,
       69.0,

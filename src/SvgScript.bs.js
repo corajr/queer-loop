@@ -13,24 +13,24 @@ function setAnimacy(svg, hash) {
   Util$QueerLoop.withQuerySelectorAllFrom(".animate", svg, (function (param) {
           return $$Array.map((function (animated) {
                         animated.setAttribute("class", "code previous");
-                        return /* () */0;
+                        
                       }), param);
         }));
   Util$QueerLoop.withQuerySelectorAllFrom(".previous", svg, (function (param) {
           return $$Array.map((function (animated) {
                         animated.setAttribute("class", "code");
-                        return /* () */0;
+                        
                       }), param);
         }));
   Util$QueerLoop.withQuerySelectorAllFrom(".selected", svg, (function (param) {
           return $$Array.map((function (animated) {
                         animated.setAttribute("class", "code");
-                        return /* () */0;
+                        
                       }), param);
         }));
   return Belt_Option.map(Caml_option.nullable_to_opt(svg.querySelector("#code" + hash)), (function (toAnimate) {
                 toAnimate.setAttribute("class", "code animate");
-                return /* () */0;
+                
               }));
 }
 
@@ -38,41 +38,40 @@ function setSelection(svg, hash) {
   Util$QueerLoop.withQuerySelectorAllFrom(".animate", svg, (function (param) {
           return $$Array.map((function (animated) {
                         animated.setAttribute("class", "code");
-                        return /* () */0;
+                        
                       }), param);
         }));
   Util$QueerLoop.withQuerySelectorAllFrom(".previous", svg, (function (param) {
           return $$Array.map((function (animated) {
                         animated.setAttribute("class", "code");
-                        return /* () */0;
+                        
                       }), param);
         }));
   Util$QueerLoop.withQuerySelectorAllFrom(".selected", svg, (function (param) {
           return $$Array.map((function (animated) {
                         animated.setAttribute("class", "code");
-                        return /* () */0;
+                        
                       }), param);
         }));
   return Belt_Option.map(Caml_option.nullable_to_opt(svg.querySelector("#code" + hash)), (function (toAnimate) {
                 toAnimate.setAttribute("class", "code selected");
-                return /* () */0;
+                
               }));
 }
 
 function modifyClassSet(f, el) {
-  var match = el.getAttribute("class");
-  var newSet = (match == null) ? Curry._1(f, Belt_SetString.empty) : Curry._1(f, Belt_SetString.fromArray(match.split(" ")));
+  var s = el.getAttribute("class");
+  var newSet = (s == null) ? Curry._1(f, undefined) : Curry._1(f, Belt_SetString.fromArray(s.split(" ")));
   el.setAttribute("class", Belt_SetString.toArray(newSet).join(" "));
-  return /* () */0;
+  
 }
 
 function getClassesSvg(el) {
-  var match = el.getAttribute("class");
-  if (match == null) {
-    return Belt_SetString.empty;
-  } else {
-    return Belt_SetString.fromArray(match.split(" "));
+  var s = el.getAttribute("class");
+  if (!(s == null)) {
+    return Belt_SetString.fromArray(s.split(" "));
   }
+  
 }
 
 function addClassSvg(el, classNameToAdd) {
@@ -111,15 +110,16 @@ function toggleHash(hash) {
         }));
   Util$QueerLoop.withQuerySelectorAll(".active", (function (a) {
           Util$QueerLoop.withQuerySelectorDom(".code.animate", (function (code) {
-                  if (Belt_SetString.has(getClassesSvg(code), "active")) {
-                    return 0;
-                  } else if (a.length !== 0) {
-                    return addClassSvg(code, "temporarilyInactive");
-                  } else {
-                    return removeClassSvg(code, "temporarilyInactive");
+                  if (!Belt_SetString.has(getClassesSvg(code), "active")) {
+                    if (a.length !== 0) {
+                      return addClassSvg(code, "temporarilyInactive");
+                    } else {
+                      return removeClassSvg(code, "temporarilyInactive");
+                    }
                   }
+                  
                 }));
-          return /* () */0;
+          
         }));
   return result;
 }
