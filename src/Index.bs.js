@@ -458,22 +458,7 @@ function pick(ary, indices) {
 }
 
 function getTimestampFromCode(id) {
-  return Util$QueerLoop.withQuerySelectorDom("#" + id, (function (element) {
-                var match = element.querySelector("text");
-                if (match == null) {
-                  return ;
-                } else {
-                  var timestamp = match.textContent;
-                  var date;
-                  try {
-                    date = new Date(timestamp);
-                  }
-                  catch (exn){
-                    return ;
-                  }
-                  return date.getTime();
-                }
-              }));
+  return Util$QueerLoop.withQuerySelectorDom("#" + id, Time$QueerLoop.getTimestampFromElement);
 }
 
 function cycleThroughPast(param) {

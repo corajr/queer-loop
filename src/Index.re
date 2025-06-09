@@ -519,15 +519,7 @@ let pick: (array('a), array(int)) => array('a) =
 
 let getTimestampFromCode = id => {
   withQuerySelectorDom("#" ++ id, element => {
-    switch (Webapi.Dom.Element.querySelector("text", element)) {
-    | Some(text) => 
-      let timestamp = Webapi.Dom.Element.textContent(text);
-      switch (Js.Date.fromString(timestamp)) {
-      | date => Some(Js.Date.getTime(date))
-      | exception _ => None
-      }
-    | None => None
-    }
+    Time.getTimestampFromElement(element)
   })
 };
 

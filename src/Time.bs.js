@@ -46,9 +46,98 @@ function getTimestampAndLocaleString(param) {
         ];
 }
 
+function toOptionFiniteFloat(f) {
+  if (isFinite(f)) {
+    return f;
+  }
+  
+}
+
+function parseTimestampFromText(text) {
+  if (text === "") {
+    return ;
+  } else {
+    var date;
+    try {
+      date = new Date(text);
+    }
+    catch (exn){
+      return ;
+    }
+    return toOptionFiniteFloat(date.getTime());
+  }
+}
+
+function parseTimestampFromFragment(href) {
+  var exit = 0;
+  var url;
+  try {
+    url = new URL(href);
+    exit = 1;
+  }
+  catch (exn){
+    return ;
+  }
+  if (exit === 1) {
+    var fragment = url.hash.slice(1);
+    if (fragment === "") {
+      return ;
+    } else {
+      var match = maybeDeserializeTime(fragment);
+      var tryFloat = match !== undefined ? toOptionFiniteFloat(Caml_option.valFromOption(match).getTime()) : undefined;
+      if (tryFloat !== undefined) {
+        return tryFloat;
+      } else if (fragment === "") {
+        return ;
+      } else {
+        var date2;
+        try {
+          date2 = new Date(fragment);
+        }
+        catch (exn$1){
+          return ;
+        }
+        return toOptionFiniteFloat(date2.getTime());
+      }
+    }
+  }
+  
+}
+
+function getTimestampFromElement(element) {
+  var getTextTimestamp = function (param) {
+    var match = element.querySelector("text");
+    if (match == null) {
+      return ;
+    } else {
+      return parseTimestampFromText(match.textContent);
+    }
+  };
+  var match = element.querySelector("a");
+  if (match == null) {
+    return getTextTimestamp(/* () */0);
+  } else {
+    var match$1 = match.getAttribute("href");
+    if (match$1 == null) {
+      return getTextTimestamp(/* () */0);
+    } else {
+      var match$2 = parseTimestampFromFragment(match$1);
+      if (match$2 !== undefined) {
+        return match$2;
+      } else {
+        return getTextTimestamp(/* () */0);
+      }
+    }
+  }
+}
+
 exports.serializeTime = serializeTime;
 exports.deserializeTime = deserializeTime;
 exports.maybeDeserializeTime = maybeDeserializeTime;
 exports.getTimestamp = getTimestamp;
 exports.getTimestampAndLocaleString = getTimestampAndLocaleString;
+exports.toOptionFiniteFloat = toOptionFiniteFloat;
+exports.parseTimestampFromText = parseTimestampFromText;
+exports.parseTimestampFromFragment = parseTimestampFromFragment;
+exports.getTimestampFromElement = getTimestampFromElement;
 /* No side effect */
